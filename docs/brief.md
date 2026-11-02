@@ -39,3 +39,4 @@ Tài liệu này tóm tắt ngắn gọn ý tưởng, bối cảnh và mục ti�
 - **10/11/2026 (14:00):** Chấm Báo cáo biện pháp nâng cao chất lượng giảng dạy.
 - **11/11 – 17/11/2026:** Thực hành tiết dạy trên lớp.
 - **Ràng buộc kỹ thuật:** Game phải chạy mượt mà không cần Internet, giao diện thân thiện với điện thoại di động mọi hệ điều hành.
+

@@ -1,71 +1,475 @@
-<!doctype html><html lang="vi"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>MATHVERSE OXYZ – 5 MINI-GAME CHƠI THỬ</title><style>:root{font-family:'Segoe UI',Arial,'Noto Sans',sans-serif;color:#202747;background:#eef5ff;font-synthesis:none;--blue:#4673f1;--purple:#7954e9;--cyan:#18c5d7;--mint:#10bd9b;--pink:#ff6b91;--yellow:#ffc85b;--slate:#263457;--muted:#71809a;--border:#dfe8f4;--shadow:0 15px 36px rgba(65,83,135,.11)}
-*{box-sizing:border-box}html{min-height:100%}body{margin:0;min-height:100vh;background:radial-gradient(circle at 100% 0%,#eedfff 0,transparent 30%),radial-gradient(circle at 0% 60%,#ddfcf7 0,transparent 33%),linear-gradient(135deg,#f7fbff,#f5f3ff);overflow-x:hidden}button,input,select{font:inherit}button{cursor:pointer;transition:transform .16s,filter .16s,box-shadow .16s}button:hover:not(:disabled){transform:translateY(-2px);filter:saturate(1.13);box-shadow:0 6px 20px #273c751a}button:disabled{opacity:.46;cursor:not-allowed}button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #31bdd1;outline-offset:2px}a{color:#4d44d1}small,.muted{color:var(--muted)}h1,h2,h3,p{margin:0}h1,h2,h3{line-height:1.22}h1{font-size:clamp(2rem,4vw,3.8rem);font-weight:900;letter-spacing:-.035em}h2{font-size:clamp(1.5rem,2.5vw,2.15rem);font-weight:850}h3{font-size:1.15rem;font-weight:800}p{line-height:1.58}.wrap{max-width:1300px;margin:0 auto;padding:22px 22px 70px}.navbar{display:flex;justify-content:space-between;align-items:center;gap:15px;margin-bottom:20px}.brand{display:flex;align-items:center;gap:11px;font-size:22px;letter-spacing:.03em;font-weight:900;color:#343771}.brand-mark{display:grid;place-items:center;background:linear-gradient(135deg,#7554ef,#22bdd4);height:43px;width:43px;border-radius:15px;color:white;font-size:24px;box-shadow:0 7px 22px #665cec40}.pills{display:flex;align-items:center;gap:9px;flex-wrap:wrap}.pill{display:inline-flex;align-items:center;gap:5px;border:1px solid #e1e7fa;background:#fff;color:#41537b;border-radius:99px;padding:7px 12px;font-size:12px;font-weight:800;letter-spacing:.045em}.pill.gold{background:#fff2c8;border-color:#ffe1a0;color:#8b520d}.pill.green{background:#d8fff0;border-color:#a2efd5;color:#067a5e}.pill.pink{background:#ffebf3;border-color:#fdd0e0;color:#a83e68}.hero{position:relative;overflow:hidden;min-height:258px;padding:37px 42px;border-radius:28px;box-shadow:0 21px 45px #34438528;background:linear-gradient(112deg,#302b7b,#5b48c1 49%,#2a9fca);color:#fff}.hero:before{content:'';position:absolute;width:420px;height:420px;border:2px solid #ffffff1e;border-radius:50%;right:-105px;top:-178px;box-shadow:0 0 0 43px #ffffff08,0 0 0 87px #ffffff06}.hero:after{content:'✦ ✧ ✦';font-size:70px;letter-spacing:25px;position:absolute;right:60px;bottom:13px;transform:rotate(-21deg);color:#fdf6b856;pointer-events:none}.hero>*{position:relative;z-index:1}.hero p{max-width:700px;color:#e5eaff}.eyebrow{font-size:12px;letter-spacing:.16em;font-weight:900;text-transform:uppercase;margin-bottom:11px;color:#00eadc}.hero h1{margin-bottom:12px}.hero .subtitle{font-size:18px}.hero-character{position:absolute;right:8%;top:24px;font-size:120px;z-index:0;filter:drop-shadow(0 13px 20px #20116c5e);animation:float 3.8s ease-in-out infinite}.tabs{display:flex;gap:9px;flex-wrap:wrap;margin:20px 0}.tabs button{border:1px solid #dce2f4;background:#fff;color:#4d5c7a;border-radius:13px;padding:12px 19px;font-weight:800}.tabs button.active{background:#6953d9;color:#fff;border-color:#6953d9}.panel{background:rgba(255,255,255,.96);border:1px solid var(--border);border-radius:22px;box-shadow:var(--shadow);padding:24px}.panel+.panel{margin-top:16px}.section-title{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:18px}.section-title small{line-height:1.5}.grid{display:grid;gap:17px}.grid-2{grid-template-columns:repeat(2,minmax(0,1fr))}.grid-3{grid-template-columns:repeat(3,minmax(0,1fr))}.grid-4{grid-template-columns:repeat(4,minmax(0,1fr))}.button{border:0;border-radius:14px;padding:13px 17px;font-weight:850;display:inline-flex;justify-content:center;align-items:center;gap:8px;text-align:center}.button.primary{background:linear-gradient(115deg,#6c55df,#447bfa);color:#fff}.button.teal{background:linear-gradient(115deg,#03bba4,#39c4d7);color:#08383f}.button.gold{background:linear-gradient(115deg,#ffcf55,#ffae63);color:#684009}.button.gray{background:#edf1fb;color:#374c79}.button.red{background:#fff1f4;color:#a72b5d}.button.flat{background:none;color:#4f5dc7}.button.sm{padding:8px 12px;border-radius:10px;font-size:12px}.button.block{width:100%}.button:disabled{box-shadow:none}.controls{display:flex;flex-wrap:wrap;gap:9px;align-items:center}.form-field{display:flex;flex-direction:column;gap:8px;margin:14px 0}.form-field label{font-weight:800;font-size:13px;color:#465476}.form-field input,.form-field select{width:100%;background:#fff;border:1.4px solid #cad7ed;border-radius:12px;padding:13px 14px;color:#283455}.form-field input:focus,.form-field select:focus{border-color:#8064ec}.form-field input.mono{letter-spacing:.18em;text-align:center;font-size:23px;font-weight:800}.setup{max-width:1000px;margin:0 auto}.setup .grid-2>.panel{min-height:275px}.notice{background:#fff8e7;border:1px solid #ffdf9a;color:#775012;padding:13px 16px;border-radius:14px;line-height:1.5;font-size:14px}.notice.error{background:#fff1f5;border-color:#fac0cf;color:#a72f5b}.notice.good{background:#e1fff5;border-color:#9aefd3;color:#0c8061}.dashboard-head{display:flex;justify-content:space-between;gap:20px;align-items:center}.room-number{font-size:clamp(30px,4vw,48px);font-weight:950;letter-spacing:.17em;color:#5844cc}.clock{font-variant-numeric:tabular-nums;font-size:33px;font-weight:950;color:#222f65}.clock.warn{color:#ed6a69}.key{display:inline-block;border-radius:9px;padding:6px 10px;background:#f2f1ff;color:#5649d0;font-weight:800;letter-spacing:.08em}.teacher-main{display:grid;grid-template-columns:1.44fr .95fr;gap:17px;margin-top:18px}.team-join{padding:14px;border-radius:15px;border:1px solid #e1e9f6;background:linear-gradient(135deg,#fff,#f5f8ff);display:flex;align-items:center;gap:11px}.team-emoji{height:52px;width:52px;display:grid;place-items:center;font-size:31px;background:#f2f4ff;border-radius:14px}.team-details{min-width:0;flex:1}.team-details b{display:block}.team-details small{font-size:12px}.code{font-size:17px;font-weight:900;color:#5144c4;letter-spacing:.12em}.team-controls{display:flex;align-items:center;gap:5px}.stage-track{display:flex;align-items:center;justify-content:space-between;position:relative;gap:7px;margin:17px 2px 12px}.stage-track:before{content:'';position:absolute;left:5%;right:5%;height:7px;border-radius:10px;top:22px;background:#e1e7f7;z-index:0}.station{display:flex;flex:1;flex-direction:column;align-items:center;gap:9px;z-index:1;min-width:0}.station .emoji{height:48px;width:48px;display:grid;place-items:center;border-radius:50%;border:3px solid #dce5f7;background:#fff;font-size:23px;box-shadow:0 4px 14px #243a6b11}.station.done .emoji{border-color:#4bd3bd;background:#e1fcf4}.station.current .emoji{border-color:#a278fb;background:#f5efff;animation:pulse 2s infinite}.station span{font-size:10.5px;font-weight:800;color:#5e708f;text-align:center;max-width:90px}.big-map{padding:18px 18px 10px;background:linear-gradient(165deg,#fbfeff,#f1f2ff);border:1px solid #e4eafb;border-radius:18px;overflow:hidden}.map-lane{display:flex;align-items:center;gap:12px;margin:14px 0}.map-name{width:136px;flex:0 0 136px;font-size:13px;font-weight:850;display:flex;gap:6px;align-items:center}.track{height:36px;flex:1;background:linear-gradient(90deg,#e6ecfa,#f7f3ff);border-radius:99px;position:relative;border:1px solid #d7e2f3}.track .filled{height:100%;border-radius:99px;transition:width .45s ease;opacity:.35;background:linear-gradient(90deg,#41c9e3,#8262df)}.track .pawn{position:absolute;top:50%;left:var(--pos,0%);transform:translate(-50%,-50%);font-size:27px;filter:drop-shadow(0 2px 3px #2225);transition:left .65s cubic-bezier(.2,.8,.3,1.15);z-index:2}.track .ticks{position:absolute;inset:0;display:flex;justify-content:space-between;align-items:center;padding:0 6px;pointer-events:none}.track .ticks i{width:2px;height:8px;background:#bdc7e3}.lane-score{width:75px;text-align:right;font-size:13px;font-weight:900;color:#3b477c}.result-table{width:100%;border-collapse:collapse;font-size:13px}.result-table th{text-align:left;color:#617291;padding:10px 8px;border-bottom:2px solid #e4ebf6;font-size:12px}.result-table td{padding:11px 8px;border-bottom:1px solid #edf1f8;vertical-align:middle}.result-table tr:first-child td{color:#6650cb;font-weight:800}.mini-progress{height:8px;background:#e8edf9;border-radius:99px;overflow:hidden;min-width:78px}.mini-progress span{display:block;height:100%;background:linear-gradient(90deg,#24c3d2,#795cde);border-radius:99px}.events{max-height:310px;overflow-y:auto;padding-right:6px}.event{display:flex;gap:9px;border-bottom:1px solid #edf1f7;padding:12px 0;font-size:13px}.event time{font-size:10px;color:#8b9ab3;flex:0 0 48px}.mission-hero{display:flex;align-items:center;gap:24px;padding:23px;border-radius:22px;background:linear-gradient(115deg,#302e79,#6a4bcc 55%,#178fbc);color:#fff;margin:18px 0}.mission-hero .avatar{height:93px;width:93px;display:grid;place-items:center;border:3px solid #ffffff68;border-radius:24px;background:#ffffff1d;font-size:56px;animation:float 4s infinite}.mission-hero h2{color:white}.mission-hero p{color:#dedaff}.mission-wrapper{display:grid;grid-template-columns:1fr 310px;gap:18px;margin-top:18px}.question-card{background:#fff;border-radius:23px;box-shadow:var(--shadow);border:1px solid #dee9f5;overflow:hidden}.quest-top{background:linear-gradient(110deg,#263a8c,#684ac9);color:#fff;padding:24px 26px}.quest-top h2{color:#fff;margin-bottom:10px}.quest-top p{color:#f0ebff}.quest-top .tag{display:inline-block;background:#ffffff24;border:1px solid #ffffff59;padding:6px 11px;border-radius:30px;font-size:12px;font-weight:800;margin-bottom:13px}.question-body{padding:27px}.question{font-size:clamp(19px,2vw,24px);font-weight:850;line-height:1.52;color:#223459;margin-bottom:22px}.options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.option{border:2px solid #e1e8f5;border-radius:15px;padding:17px;text-align:left;background:#f8faff;color:#253455;font-size:17px;font-weight:750;min-height:72px}.option:hover:not(:disabled){border-color:#8d73f4;background:#f5f0ff}.option b{display:inline-grid;place-items:center;width:35px;height:35px;margin-right:10px;background:#e9e5ff;color:#654fc0;border-radius:9px}.tool-row{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-top:22px}.small-tip{font-size:13px;color:#7e8da7}.inventory{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;margin:16px 0}.digit{border-radius:12px;background:#f3f2ff;border:1px solid #dedaf8;text-align:center;padding:12px 0}.digit strong{font-size:23px;color:#6355c7;display:block}.digit small{display:block;font-size:10px;font-weight:800}.digit.empty{background:#f6f8fc;border-color:#e8edf6}.digit.empty strong{color:#aebbd0}.team-sidebar .panel{margin-bottom:16px}.mini-rank{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #eef1f7;font-size:13px}.final-wrap{max-width:790px;margin:0 auto}.cipher-lock{font-size:34px;letter-spacing:.16em;font-weight:900;text-align:center;color:#5c4ccc;background:#f6f2ff;border:2px dashed #c6b9fb;padding:18px;margin:14px 0;border-radius:16px}.words{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}.word-chip{background:#ecfbf6;border:1px solid #c3f0de;border-radius:10px;padding:8px 11px;font-weight:800;color:#187c62;font-size:12px}.final-option{display:block;border:1.5px solid #dfe6f4;border-radius:12px;padding:12px 15px;margin:10px 0;cursor:pointer;font-weight:750}.final-option:has(input:checked){border-color:#7b5cde;background:#f3efff}.final-option input{margin-right:8px}.modal-backdrop{position:fixed;inset:0;background:#111b3cbb;display:grid;place-items:center;z-index:50;padding:20px;backdrop-filter:blur(4px)}.modal{background:#fff;max-width:610px;width:100%;border-radius:26px;box-shadow:0 30px 90px #050a1845;padding:30px;position:relative}.modal-icon{font-size:65px;margin-bottom:10px}.modal h2{margin:0 0 11px}.modal p{margin:0 0 14px;color:#586781}.modal .reward{display:inline-block;font-size:22px;font-weight:900;color:#a5700d;background:#ffefc4;border-radius:12px;padding:7px 13px;margin:12px 0}.modal .button{margin-top:12px}.success{color:#099b7b}.failure{color:#dc5d74}.top-numbers{display:flex;gap:12px;flex-wrap:wrap;margin:15px 0}.metric{padding:17px 20px;background:#f8faff;border:1px solid #e1e8f7;border-radius:17px;min-width:130px}.metric b{font-size:28px;display:block;color:#504cc6}.metric small{font-size:12px}.actions-side{display:flex;flex-wrap:wrap;gap:7px}.teacher-answer{margin:10px 0;padding:11px 15px;background:#f7f9fd;border:1px solid #e7eefa;border-radius:12px}.teacher-answer summary{cursor:pointer;font-weight:800;color:#3b5086}.teacher-answer p{margin-top:11px;font-size:13.5px}.teacher-answer .correct{color:#13936f;font-weight:850}.champion{background:linear-gradient(130deg,#ffecae,#ffe0b7);border:2px solid #ffc968;text-align:center;padding:23px;border-radius:21px}.champion strong{color:#87511f;font-size:22px}.champion .star{font-size:52px;display:block;margin-bottom:8px;animation:float 3s infinite}.loading{padding:40px;text-align:center;font-weight:800;color:#6e64bf}.hidden{display:none!important}.footer{text-align:center;margin-top:28px;font-size:12px;color:#98a2b7}.single-line{white-space:nowrap}.flex-between{display:flex;justify-content:space-between;align-items:center;gap:12px}.danger{color:#cd4769}.team-avatar{display:inline-flex;align-items:center;justify-content:center;font-size:25px}.teacher-only{color:#a24c68;font-size:11px;font-weight:850;letter-spacing:.08em}.screen-tag{font-size:11px;letter-spacing:.13em;color:#697eaa;font-weight:900;text-transform:uppercase}.sound-button{font-size:14px}.inline-digits{display:flex;gap:7px;justify-content:center;margin:16px 0}.inline-digits .digit{min-width:56px}
-@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}@keyframes pulse{0%,100%{box-shadow:0 0 0 0 #9875e155}50%{box-shadow:0 0 0 7px #9875e100}}@media(max-width:1050px){.teacher-main,.mission-wrapper{grid-template-columns:1fr}.grid-4{grid-template-columns:repeat(2,minmax(0,1fr))}.hero-character{opacity:.5}.map-name{flex-basis:116px;width:116px}}@media(max-width:720px){.wrap{padding:13px 12px 45px}.hero{border-radius:20px;padding:27px 20px;min-height:230px}.hero-character{font-size:75px;right:10px;top:35px;opacity:.45}.grid-2,.grid-3,.grid-4{grid-template-columns:1fr}.navbar{flex-wrap:wrap}.panel{padding:16px}.mission-hero{gap:14px;padding:17px}.mission-hero .avatar{width:65px;height:65px;font-size:37px;flex:0 0 65px}.quest-top,.question-body{padding:19px}.options{grid-template-columns:1fr}.option{min-height:57px;padding:10px}.dashboard-head{flex-wrap:wrap}.map-name{width:90px;flex-basis:90px;font-size:11px}.track{height:32px}.station span{font-size:9px}.station .emoji{width:42px;height:42px;font-size:21px}.section-title{align-items:start}.result-table{font-size:11px}.result-table td,.result-table th{padding:8px 4px}.team-join{gap:7px;padding:10px}.team-emoji{width:42px;height:42px;font-size:25px}.team-controls{flex-wrap:wrap}.code{font-size:14px}.teacher-main{gap:12px}.mission-wrapper{gap:12px}.room-number{font-size:32px}.clock{font-size:26px}}@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.001s!important;transition-duration:.001s!important}}
-/* Sân khấu trao giải – chỉ xuất hiện khi giáo viên chủ động công bố */
-.award-backdrop{position:fixed;inset:0;background:#12143fe8;z-index:40;overflow:auto;display:flex;align-items:flex-start;justify-content:center;padding:25px;backdrop-filter:blur(8px)}.award-panel{width:min(920px,100%);background:linear-gradient(143deg,#312e89 0%,#593bc0 60%,#167fb0 100%);border:2px solid #ffffff40;color:white;box-shadow:0 35px 95px #0008;border-radius:30px;padding:34px;text-align:center;position:relative;overflow:hidden}.award-panel:before{content:'✦ ✧ ✦ ✧ ✦';color:#ffffff4f;font-size:48px;letter-spacing:55px;position:absolute;transform:rotate(-22deg);top:65px;left:-50px}.award-panel>*{position:relative;z-index:1}.award-panel h1{font-size:clamp(25px,3.4vw,41px);margin:10px auto;max-width:830px}.award-panel p{color:#e5e0ff;font-size:15px}.stars{font-size:40px;color:#ffdc71;letter-spacing:13px;animation:float 3s infinite}.podium{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:27px auto;max-width:780px}.podium-item{padding:23px 9px 20px;border-radius:22px;border:1px solid #ffffff5e;background:#ffffff1e;display:flex;align-items:center;flex-direction:column;gap:6px}.podium-item.gold-podium{background:linear-gradient(150deg,#ffcc5899,#fff4b43b);border:2px solid #ffd56d;box-shadow:0 0 35px #ffdf5a2b}.podium-avatar{font-size:61px;filter:drop-shadow(0 9px 8px #12132d8c);animation:float 4s infinite}.podium-item b{font-size:18px}.podium-item strong{font-size:24px;color:#ffe785}.podium-item small{color:#d2e0ff}.winner-bottom{margin:13px auto 23px;padding:12px;background:#ffffff12;border:1px solid #ffffff38;border-radius:12px;color:#ecf5ff}.award-panel .button.gray{background:#ffffff;color:#493b98}@media(max-width:620px){.award-panel{padding:23px 14px}.podium{gap:7px}.podium-item{padding:16px 4px}.podium-avatar{font-size:37px}.podium-item b{font-size:12px}.podium-item strong{font-size:17px}.stars{font-size:26px;letter-spacing:4px}}
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>MATHVERSE OXYZ – SĂN KHO BÁU 2D & BẢO VỆ THÀNH TRÌ (CHƠI THỬ 1 MÁY)</title>
+<style>
+:root{font-family:'Segoe UI',Arial,'Noto Sans',sans-serif;color:#202747;background:#eef5ff;font-synthesis:none;--blue:#4673f1;--purple:#7954e9;--cyan:#18c5d7;--mint:#10bd9b;--pink:#ff6b91;--yellow:#ffc85b;--slate:#263457;--muted:#71809a;--border:#dfe8f4;--shadow:0 15px 36px rgba(65,83,135,.11)}
+*{box-sizing:border-box}html{min-height:100%}body{margin:0;min-height:100vh;background:radial-gradient(circle at 100% 0%,#eedfff 0,transparent 30%),radial-gradient(circle at 0% 60%,#ddfcf7 0,transparent 33%),linear-gradient(135deg,#f7fbff,#f5f3ff);overflow-x:hidden}button,input,select{font:inherit}button{cursor:pointer;transition:transform .16s,filter .16s,box-shadow .16s}button:hover:not(:disabled){transform:translateY(-2px);filter:saturate(1.13);box-shadow:0 6px 20px #273c751a}button:disabled{opacity:.46;cursor:not-allowed}button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #31bdd1;outline-offset:2px}a{color:#4d44d1}small,.muted{color:var(--muted)}h1,h2,h3,p{margin:0}h1,h2,h3{line-height:1.22}h1{font-size:clamp(2rem,4vw,3.8rem);font-weight:900;letter-spacing:-.035em}h2{font-size:clamp(1.4rem,2.4vw,2.05rem);font-weight:850}h3{font-size:1.12rem;font-weight:800}p{line-height:1.58}.wrap{max-width:1360px;margin:0 auto;padding:20px 20px 70px}.navbar{display:flex;justify-content:space-between;align-items:center;gap:15px;margin-bottom:18px}.brand{display:flex;align-items:center;gap:11px;font-size:22px;letter-spacing:.03em;font-weight:900;color:#343771}.brand-mark{display:grid;place-items:center;background:linear-gradient(135deg,#7554ef,#22bdd4);height:43px;width:43px;border-radius:15px;color:white;font-size:24px;box-shadow:0 7px 22px #665cec40}.pills{display:flex;align-items:center;gap:9px;flex-wrap:wrap}.pill{display:inline-flex;align-items:center;gap:5px;border:1px solid #e1e7fa;background:#fff;color:#41537b;border-radius:99px;padding:7px 12px;font-size:12px;font-weight:800;letter-spacing:.045em}.pill.gold{background:#fff2c8;border-color:#ffe1a0;color:#8b520d}.pill.green{background:#d8fff0;border-color:#a2efd5;color:#067a5e}.pill.pink{background:#ffebf3;border-color:#fdd0e0;color:#a83e68}.hero{position:relative;overflow:hidden;min-height:248px;padding:34px 40px;border-radius:28px;box-shadow:0 21px 45px #34438528;background:linear-gradient(112deg,#302b7b,#5b48c1 49%,#2a9fca);color:#fff}.hero:before{content:'';position:absolute;width:420px;height:420px;border:2px solid #ffffff1e;border-radius:50%;right:-105px;top:-178px;box-shadow:0 0 0 43px #ffffff08,0 0 0 87px #ffffff06}.hero:after{content:'✦ ✧ ✦';font-size:70px;letter-spacing:25px;position:absolute;right:60px;bottom:13px;transform:rotate(-21deg);color:#fdf6b856;pointer-events:none}.hero>*{position:relative;z-index:1}.hero p{max-width:720px;color:#e5eaff}.eyebrow{font-size:12px;letter-spacing:.16em;font-weight:900;text-transform:uppercase;margin-bottom:11px;color:#00eadc}.hero h1{margin-bottom:12px}.hero .subtitle{font-size:17px}.hero-character{position:absolute;right:8%;top:24px;font-size:115px;z-index:0;filter:drop-shadow(0 13px 20px #20116c5e);animation:float 3.8s ease-in-out infinite}.tabs{display:flex;gap:9px;flex-wrap:wrap;margin:20px 0}.tabs button{border:1px solid #dce2f4;background:#fff;color:#4d5c7a;border-radius:13px;padding:12px 19px;font-weight:800}.tabs button.active{background:#6953d9;color:#fff;border-color:#6953d9}.panel{background:rgba(255,255,255,.96);border:1px solid var(--border);border-radius:22px;box-shadow:var(--shadow);padding:22px}.panel+.panel{margin-top:16px}.section-title{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:16px}.section-title small{line-height:1.5}.grid{display:grid;gap:17px}.grid-2{grid-template-columns:repeat(2,minmax(0,1fr))}.grid-3{grid-template-columns:repeat(3,minmax(0,1fr))}.grid-4{grid-template-columns:repeat(4,minmax(0,1fr))}.button{border:0;border-radius:14px;padding:12px 16px;font-weight:850;display:inline-flex;justify-content:center;align-items:center;gap:8px;text-align:center}.button.primary{background:linear-gradient(115deg,#6c55df,#447bfa);color:#fff}.button.teal{background:linear-gradient(115deg,#03bba4,#39c4d7);color:#08383f}.button.gold{background:linear-gradient(115deg,#ffcf55,#ffae63);color:#684009}.button.gray{background:#edf1fb;color:#374c79}.button.red{background:#fff1f4;color:#a72b5d}.button.flat{background:none;color:#4f5dc7}.button.sm{padding:8px 12px;border-radius:10px;font-size:12px}.button.block{width:100%}.button:disabled{box-shadow:none}.controls{display:flex;flex-wrap:wrap;gap:9px;align-items:center}.form-field{display:flex;flex-direction:column;gap:8px;margin:14px 0}.form-field label{font-weight:800;font-size:13px;color:#465476}.form-field input,.form-field select{width:100%;background:#fff;border:1.4px solid #cad7ed;border-radius:12px;padding:12px 14px;color:#283455}.form-field input:focus,.form-field select:focus{border-color:#8064ec}.form-field input.mono{letter-spacing:.18em;text-align:center;font-size:23px;font-weight:800}.setup{max-width:1000px;margin:0 auto}.setup .grid-2>.panel{min-height:275px}.notice{background:#fff8e7;border:1px solid #ffdf9a;color:#775012;padding:12px 15px;border-radius:14px;line-height:1.5;font-size:14px}.notice.error{background:#fff1f5;border-color:#fac0cf;color:#a72f5b}.notice.good{background:#e1fff5;border-color:#9aefd3;color:#0c8061}.dashboard-head{display:flex;justify-content:space-between;gap:20px;align-items:center}.room-number{font-size:clamp(30px,4vw,48px);font-weight:950;letter-spacing:.17em;color:#5844cc}.clock{font-variant-numeric:tabular-nums;font-size:33px;font-weight:950;color:#222f65}.clock.warn{color:#ed6a69}.key{display:inline-block;border-radius:9px;padding:6px 10px;background:#f2f1ff;color:#5649d0;font-weight:800;letter-spacing:.08em}.teacher-main{display:grid;grid-template-columns:1.44fr .95fr;gap:17px;margin-top:18px}.team-join{padding:14px;border-radius:15px;border:1px solid #e1e9f6;background:linear-gradient(135deg,#fff,#f5f8ff);display:flex;align-items:center;gap:11px;margin-bottom:8px}.team-emoji{height:50px;width:50px;display:grid;place-items:center;font-size:29px;background:#f2f4ff;border-radius:14px}.team-details{min-width:0;flex:1}.team-details b{display:block}.team-details small{font-size:12px}.code{font-size:17px;font-weight:900;color:#5144c4;letter-spacing:.12em}.team-controls{display:flex;align-items:center;gap:5px}.stage-track{display:flex;align-items:center;justify-content:space-between;position:relative;gap:7px;margin:15px 2px 10px}.stage-track:before{content:'';position:absolute;left:5%;right:5%;height:7px;border-radius:10px;top:22px;background:#e1e7f7;z-index:0}.station{display:flex;flex:1;flex-direction:column;align-items:center;gap:8px;z-index:1;min-width:0}.station .emoji{height:46px;width:46px;display:grid;place-items:center;border-radius:50%;border:3px solid #dce5f7;background:#fff;font-size:22px;box-shadow:0 4px 14px #243a6b11}.station.done .emoji{border-color:#4bd3bd;background:#e1fcf4}.station.current .emoji{border-color:#a278fb;background:#f5efff;animation:pulse 2s infinite}.station span{font-size:10.5px;font-weight:800;color:#5e708f;text-align:center;max-width:95px}.big-map{padding:18px 18px 10px;background:linear-gradient(165deg,#fbfeff,#f1f2ff);border:1px solid #e4eafb;border-radius:18px;overflow:hidden}.map-lane{display:flex;align-items:center;gap:12px;margin:14px 0}.map-name{width:136px;flex:0 0 136px;font-size:13px;font-weight:850;display:flex;gap:6px;align-items:center}.track{height:36px;flex:1;background:linear-gradient(90deg,#e6ecfa,#f7f3ff);border-radius:99px;position:relative;border:1px solid #d7e2f3}.track .filled{height:100%;border-radius:99px;transition:width .45s ease;opacity:.35;background:linear-gradient(90deg,#41c9e3,#8262df)}.track .pawn{position:absolute;top:50%;left:var(--pos,0%);transform:translate(-50%,-50%);font-size:27px;filter:drop-shadow(0 2px 3px #2225);transition:left .65s cubic-bezier(.2,.8,.3,1.15);z-index:2}.track .ticks{position:absolute;inset:0;display:flex;justify-content:space-between;align-items:center;padding:0 6px;pointer-events:none}.track .ticks i{width:2px;height:8px;background:#bdc7e3}.lane-score{width:95px;text-align:right;font-size:13px;font-weight:900;color:#3b477c}.lane-score small{color:#8793a9;white-space:nowrap;font-size:10px}.result-table{width:100%;border-collapse:collapse;font-size:13px}.result-table th{text-align:left;color:#617291;padding:10px 8px;border-bottom:2px solid #e4ebf6;font-size:12px}.result-table td{padding:11px 8px;border-bottom:1px solid #edf1f8;vertical-align:middle}.result-table tr:first-child td{color:#6650cb;font-weight:800}.mini-progress{height:8px;background:#e8edf9;border-radius:99px;overflow:hidden;min-width:78px}.mini-progress span{display:block;height:100%;background:linear-gradient(90deg,#24c3d2,#795cde);border-radius:99px}.events{max-height:310px;overflow-y:auto;padding-right:6px}.event{display:flex;gap:9px;border-bottom:1px solid #edf1f7;padding:10px 0;font-size:13px}.event time{font-size:10px;color:#8b9ab3;flex:0 0 48px}.mission-hero{display:flex;align-items:center;gap:20px;padding:18px 22px;border-radius:22px;background:linear-gradient(115deg,#302e79,#6a4bcc 55%,#178fbc);color:#fff;margin:14px 0}.mission-hero .avatar{height:78px;width:78px;display:grid;place-items:center;border:3px solid #ffffff68;border-radius:22px;background:#ffffff1d;font-size:46px;animation:float 4s infinite}.mission-hero h2{color:white}.mission-hero p{color:#dedaff;font-size:14px}.mission-wrapper{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:16px;margin-top:16px}.question-card{background:#fff;border-radius:23px;box-shadow:var(--shadow);border:1px solid #dee9f5;overflow:hidden}.quest-top{background:linear-gradient(110deg,#1f2f75,#583bb8 60%,#167aa3);color:#fff;padding:18px 22px}.quest-top h2{color:#fff;margin-bottom:6px}.quest-top p{color:#f0ebff;font-size:14px}.quest-top .tag{display:inline-block;background:#ffffff24;border:1px solid #ffffff59;padding:5px 11px;border-radius:30px;font-size:11.5px;font-weight:800;margin-bottom:8px}.inventory{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;margin:14px 0}.digit{border-radius:12px;background:#f3f2ff;border:1px solid #dedaf8;text-align:center;padding:10px 0}.digit strong{font-size:22px;color:#6355c7;display:block}.digit small{display:block;font-size:10px;font-weight:800}.digit.empty{background:#f6f8fc;border-color:#e8edf6}.digit.empty strong{color:#aebbd0}.team-sidebar .panel{margin-bottom:14px}.mini-rank{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid #eef1f7;font-size:13px}.final-wrap{max-width:790px;margin:0 auto}.words{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}.word-chip{background:#ecfbf6;border:1px solid #c3f0de;border-radius:10px;padding:8px 11px;font-weight:800;color:#187c62;font-size:12px}.final-option{display:block;border:1.5px solid #dfe6f4;border-radius:12px;padding:12px 15px;margin:10px 0;cursor:pointer;font-weight:750}.final-option:has(input:checked){border-color:#7b5cde;background:#f3efff}.final-option input{margin-right:8px}.modal-backdrop{position:fixed;inset:0;background:#111b3cbb;display:grid;place-items:center;z-index:80;padding:20px;backdrop-filter:blur(4px)}.modal{background:#fff;max-width:610px;width:100%;border-radius:26px;box-shadow:0 30px 90px #050a1845;padding:28px;position:relative}.modal-icon{font-size:60px;margin-bottom:8px}.modal h2{margin:0 0 10px}.modal p{margin:0 0 12px;color:#586781}.modal .reward{display:inline-block;font-size:20px;font-weight:900;color:#a5700d;background:#ffefc4;border-radius:12px;padding:7px 13px;margin:8px 4px 8px 0}.modal .button{margin-top:12px}.success{color:#099b7b}.failure{color:#dc5d74}.top-numbers{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0}.metric{padding:14px 16px;background:#f8faff;border:1px solid #e1e8f7;border-radius:16px;min-width:115px;flex:1}.metric b{font-size:24px;display:block;color:#504cc6}.metric small{font-size:11px}.teacher-answer{margin:10px 0;padding:11px 15px;background:#f7f9fd;border:1px solid #e7eefa;border-radius:12px}.teacher-answer summary{cursor:pointer;font-weight:800;color:#3b5086}.teacher-answer p{margin-top:9px;font-size:13.5px}.teacher-answer .correct{color:#13936f;font-weight:850}.answer-round{border-bottom:1px dashed #d8e3ef;padding:7px 0 10px}.champion{background:linear-gradient(130deg,#ffecae,#ffe0b7);border:2px solid #ffc968;text-align:center;padding:23px;border-radius:21px}.champion strong{color:#87511f;font-size:22px}.champion .star{font-size:52px;display:block;margin-bottom:8px;animation:float 3s infinite}.loading{padding:40px;text-align:center;font-weight:800;color:#6e64bf}.hidden{display:none!important}.footer{text-align:center;margin-top:28px;font-size:12px;color:#98a2b7}.flex-between{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}.team-avatar{display:inline-flex;align-items:center;justify-content:center;font-size:25px}.teacher-only{color:#a24c68;font-size:11px;font-weight:850;letter-spacing:.08em}.screen-tag{font-size:11px;letter-spacing:.13em;color:#697eaa;font-weight:900;text-transform:uppercase}
 
-/* ═══ BỘ 5 MINI-GAME THẬT — SĂN KHO BÁU / THỦ THÀNH / LÒ RÈN / MÊ CUNG / BOSS ═══ */
-.mini-game{--accent:#36c5de;--glow:#8ee9ff;position:relative;padding:18px 22px 24px;overflow:hidden;background:linear-gradient(160deg,#f3fbff,#ffffff 48%,#f5f2ff)}
-.mini-defense{--accent:#ffbf54;--glow:#ffeeb3}.mini-forge{--accent:#9769f4;--glow:#d5b9ff}.mini-maze{--accent:#3dd3a6;--glow:#a9ffe1}.mini-boss{--accent:#fc7187;--glow:#ffb6c3}
-.mini-game-head{display:flex;justify-content:space-between;gap:12px;align-items:center;margin:0 0 14px;flex-wrap:wrap}
-.mini-kicker{font-weight:950;color:#526c9b;font-size:11px;letter-spacing:.08em}
-.mini-game-head h3{font-size:19px;margin:5px 0 0;color:#273c67}
-.mini-round-progress{display:flex;gap:6px}.mini-step{width:43px;padding:5px 2px;border-radius:13px;background:#e8edf8;border:1.5px solid #d9e1f2;text-align:center;color:#7e8aa4;font-size:20px}
-.mini-step span{display:block}.mini-step small{font-size:10px;font-weight:900}.mini-step.cleared{background:#dbffed;border-color:#65ddb0}.mini-step.playing{background:#fff4d3;border-color:#ffc65b;animation:pulse .9s infinite}
-.scene-hunt,.scene-defense,.scene-forge,.scene-maze,.scene-boss{height:225px;position:relative;overflow:hidden;border-radius:19px;margin:13px 0 17px;isolation:isolate;border:3px solid #ffffffa8;box-shadow:0 9px 22px #24427b22}
-.scene-hunt{background:linear-gradient(165deg,#8ad9ff 0%,#c8f4ff 49%,#3fcfce 50%,#42b2dd 100%)}.hunt-sky{position:absolute;left:11%;top:12%;font-size:28px;color:white;animation:float 5s ease-in-out infinite}.hunt-islands{position:absolute;left:0;bottom:20px;right:0;display:flex;align-items:flex-end;justify-content:space-around}.hunt-ship{font-size:53px;align-self:end;filter:drop-shadow(0 7px 4px #15344d66);z-index:2;animation:float 2.5s infinite}
-.hunt-spot{height:120px;width:23%;border-radius:48% 52% 40% 60%;border:4px solid #68c36a;background:radial-gradient(ellipse at top,#b4ee98,#6dbb68);font-size:58px;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 12px 0 #348b5e,0 18px 15px #215d7777;filter:grayscale(.65);transform:scale(.86);transition:transform .4s}
-.hunt-spot.solved{filter:none;background:radial-gradient(ellipse at top,#fcefbb,#fed361);border-color:#ffd56f}.hunt-spot.active{filter:none;transform:scale(1.04);animation:island 2.5s infinite}.hunt-spot span{font-size:12px;color:#195c38;font-weight:900}.hunt-wave{position:absolute;bottom:1px;left:0;right:0;text-align:center;color:#e1ffffaa;letter-spacing:19px}
-.scene-defense{background:linear-gradient(175deg,#202e6b 0%,#6861b8 58%,#658059 59%,#334e3c 100%);color:#fff}.scene-defense:before{content:'✧  ✦  ☁  ✧';position:absolute;top:16px;left:28px;color:#d8e7ff85;font-size:22px;letter-spacing:19px}.castle-tower{position:absolute;left:7%;bottom:36px;font-size:105px;filter:drop-shadow(2px 11px 8px #101733bb)}.castle-tower span,.creep span{font-size:10px;font-weight:950;color:#fff;display:block;background:#1f285aa9;padding:3px 9px;text-align:center;border-radius:12px}.creep{position:absolute;right:7%;bottom:45px;font-size:83px;filter:drop-shadow(0 11px 8px #15142aab);animation:creepMove 3s ease-in-out infinite}.defense-ray{position:absolute;left:42%;top:38%;font-size:29px;color:#ffd94f;white-space:nowrap;animation:laser 2s ease-in-out infinite}.defense-shields{position:absolute;left:35%;bottom:6px;background:#1b2857b8;padding:6px 13px;border-radius:20px;font-size:14px;font-weight:900}
-.scene-forge{background:radial-gradient(ellipse at center,#7e76dd 0%,#342863 62%,#151e45);display:flex;align-items:flex-end;justify-content:center}.forge-arch{position:absolute;top:13px;left:0;right:0;text-align:center;font-size:57px;text-shadow:0 0 22px #bca7ff}.forge-arch span{display:block;color:#fff4c8;font-size:11px;font-weight:900;letter-spacing:2px}.forge-sockets{display:flex;align-items:center;gap:30px;position:absolute;bottom:42px}.forge-socket{width:92px;height:80px;background:#35265e;border:2px solid #8475ca;border-radius:19px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:41px;color:#dad4ef;box-shadow:inset 0 -10px 0 #0002}.forge-socket.active{border-color:#ffd26f;background:#49336d;box-shadow:0 0 21px #f4cfff96;animation:pulse 2.5s infinite}.forge-socket small{color:#e2dafe;font-size:12px;font-weight:900}.forge-fire{position:absolute;bottom:-25px;font-size:37px;opacity:.65;filter:blur(1px);z-index:-1}
-.scene-maze{background:radial-gradient(circle at 50% 20%,#72ead2,#1f957e 73%,#176977)}.maze-pattern{position:absolute;inset:0;background:repeating-linear-gradient(90deg,transparent 0 70px,#0c625f6b 72px 79px,transparent 81px 145px),repeating-linear-gradient(0deg,transparent 0 36px,#0c5d5b59 38px 43px,transparent 46px 102px);transform:perspective(210px) rotateX(10deg)}.maze-avatar{position:absolute;left:13%;bottom:25%;font-size:64px;filter:drop-shadow(0 5px 5px #0c564d)}.maze-avatar span,.maze-exit span{display:block;font-size:11px;color:#fff;font-weight:950;text-shadow:0 2px 3px #035}.maze-exit{position:absolute;right:11%;bottom:18%;font-size:85px;animation:pulse 3s infinite}.maze-route{position:absolute;left:39%;top:43%;font-size:29px;font-weight:900;color:#fffadd;letter-spacing:7px;animation:float 2.5s infinite}
-.scene-boss{background:radial-gradient(ellipse at center,#ba486b 0%,#69336e 65%,#22254c 100%)}.boss-hero{position:absolute;left:6%;bottom:38px;font-size:83px;filter:drop-shadow(0 10px 5px #130b2b88)}.boss-dragon{position:absolute;right:10%;bottom:37px;font-size:112px;animation:bossFloat 2.5s ease-in-out infinite;filter:drop-shadow(0 9px 7px #200b32b8)}.boss-hero span,.boss-dragon span{display:block;text-align:center;font-size:10px;color:#fff;font-weight:950}.boss-magic{position:absolute;top:44%;left:36%;font-size:39px;color:#ffe172;animation:laser 1.5s ease-in-out infinite}.boss-hp{position:absolute;right:8%;top:8px;width:47%;font-size:11px;color:#fff;font-weight:900;text-align:center}.boss-bars{display:flex;gap:5px;margin-top:6px}.boss-bars i{height:12px;flex:1;border-radius:30px;background:#5e436e;border:1px solid #ffffff60}.boss-bars i.full{background:linear-gradient(90deg,#ff556d,#ffd06e);box-shadow:0 0 15px #ffbd8a88}
-.mini-prompt{padding:17px 20px;background:#fff;border-left:6px solid var(--accent);border-radius:15px;font-size:clamp(17px,2vw,21px);font-weight:950;line-height:1.48;color:#243759;box-shadow:0 5px 12px #23407113}.mini-choice-title{margin:16px 0 8px;text-align:center;color:#6b619c;font-size:12px;font-weight:950;letter-spacing:.10em}.mini-choices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}.mini-choice{display:flex;align-items:center;gap:13px;text-align:left;min-height:71px;border:2px solid #dde5f2;background:#fff;border-radius:15px;padding:10px 13px;color:#29365b;cursor:pointer;font-family:inherit;transition:transform .16s,box-shadow .16s,border .16s;box-shadow:0 5px 0 #dbe1ef;font-size:16px}.mini-choice:hover:not(:disabled){transform:translateY(-3px);box-shadow:0 9px 16px #434c931e;border-color:var(--accent)}.mini-choice:active:not(:disabled){transform:translateY(2px);box-shadow:0 1px 0 #dbe1ef}.mini-choice .choice-icon{font-size:30px;min-width:38px;text-align:center}.mini-choice b{font-size:13px;background:#eae9fc;color:#6144b8;min-width:33px;height:33px;border-radius:10px;display:grid;place-items:center}.mini-choice strong{font-size:17px;flex:1}.mini-choice:disabled{opacity:.55;cursor:not-allowed}.mini-choice.defense{background:#f1f5ff}.mini-choice.boss{background:#fff4f4}.mini-choice.maze{background:#effef9}.mini-choice.forge{background:#f7f2ff}.mini-choice.hunt{background:#fffdf1}.mini-toolbar{display:flex;justify-content:space-between;align-items:center;margin-top:17px;flex-wrap:wrap;gap:8px}.mini-toolbar>span{font-size:11px;color:#687d9c;flex:1}.answer-round{border-bottom:1px dashed #d8e3ef;padding:7px 0 10px}
-.lane-score small{color:#8793a9;white-space:nowrap;font-size:10px}.mini-boss .mini-step.playing{border-color:#f36b93}
-@keyframes creepMove{0%,100%{transform:translateX(0)}50%{transform:translateX(-19px)}}@keyframes laser{0%,100%{opacity:.5;transform:translateX(0)}55%{opacity:1;transform:translateX(11px)}}@keyframes bossFloat{0%,100%{transform:translateY(0) rotate(-1deg)}50%{transform:translateY(-11px) rotate(2deg)}}@keyframes island{0%,100%{transform:scale(1.04) translateY(0)}50%{transform:scale(1.04) translateY(-9px)}}
-@media(max-width:620px){.scene-hunt,.scene-defense,.scene-forge,.scene-maze,.scene-boss{height:188px}.hunt-spot{height:86px;width:21%;font-size:36px}.hunt-spot span{font-size:9px}.hunt-ship{font-size:39px}.creep{font-size:65px}.castle-tower{font-size:79px;left:0}.defense-shields{left:24%}.forge-arch{font-size:39px}.forge-sockets{gap:10px;bottom:25px}.forge-socket{width:74px;height:75px;font-size:29px}.maze-avatar{font-size:44px}.maze-exit{font-size:60px}.maze-route{font-size:19px;left:37%}.boss-hero{font-size:48px}.boss-dragon{font-size:82px}.boss-magic{font-size:25px}.mini-game{padding:14px}.mini-choices{grid-template-columns:1fr}.mini-choice{min-height:60px;padding:8px 12px}.mini-choice .choice-icon{font-size:23px}.mini-kicker{font-size:10px}.mini-game-head h3{font-size:16px}.mini-step{width:37px}}
+/* ═══ SÂN KHẤU TRAO GIẢI ═══ */
+.award-backdrop{position:fixed;inset:0;background:#12143fe8;z-index:75;overflow:auto;display:flex;align-items:flex-start;justify-content:center;padding:25px;backdrop-filter:blur(8px)}.award-panel{width:min(920px,100%);background:linear-gradient(143deg,#312e89 0%,#593bc0 60%,#167fb0 100%);border:2px solid #ffffff40;color:white;box-shadow:0 35px 95px #0008;border-radius:30px;padding:34px;text-align:center;position:relative;overflow:hidden}.award-panel>*{position:relative;z-index:1}.award-panel h1{font-size:clamp(25px,3.4vw,41px);margin:10px auto;max-width:830px}.award-panel p{color:#e5e0ff;font-size:15px}.stars{font-size:40px;color:#ffdc71;letter-spacing:13px;animation:float 3s infinite}.podium{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:27px auto;max-width:780px}.podium-item{padding:23px 9px 20px;border-radius:22px;border:1px solid #ffffff5e;background:#ffffff1e;display:flex;align-items:center;flex-direction:column;gap:6px}.podium-item.gold-podium{background:linear-gradient(150deg,#ffcc5899,#fff4b43b);border:2px solid #ffd56d;box-shadow:0 0 35px #ffdf5a2b}.podium-avatar{font-size:61px;filter:drop-shadow(0 9px 8px #12132d8c);animation:float 4s infinite}.podium-item b{font-size:18px}.podium-item strong{font-size:24px;color:#ffe785}.podium-item small{color:#d2e0ff}.winner-bottom{margin:13px auto 23px;padding:12px;background:#ffffff12;border:1px solid #ffffff38;border-radius:12px;color:#ecf5ff}.award-panel .button.gray{background:#ffffff;color:#493b98}
 
-.demo-banner{background:linear-gradient(110deg,#f4f1ff,#eafff9);border:2px solid #ded7fb;border-radius:16px;padding:17px;margin:18px 0;display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap}.demo-banner small{flex:1 0 100%;text-align:center;color:#7584a5}.demo-banner strong{color:#443a89}
-</style></head><body><main class="wrap" id="app"></main><script>// Bản xem thử một thiết bị, mô phỏng API ngay trong bộ nhớ trình duyệt.
-const offStages={"STAGES": [{"id": 1, "gameType": "hunt", "title": "SĂN KHO BÁU TỌA ĐỘ", "place": "Rừng Vectơ", "icon": "🏝️", "tag": "Vectơ AB trong Oxyz", "time": "5–6 phút", "item": "La bàn ba trục", "digit": "3", "digitRule": "Lấy hiệu hoành độ 5 − 2.", "story": "Bản đồ bị chia thành ba tọa độ. Cả đội hãy lần theo dấu chân (x, y, z), đào đúng kho báu tại từng điểm để mở Cổng Vectơ.", "groupTask": "Ba thành viên lần lượt phụ trách trục x, y, z; đội trưởng kiểm tra và chỉ đường.", "challenges": [{"prompt": "A(2; −1; 3), B(5; 1; 7). Thành phần x của vectơ AB bằng bao nhiêu?", "options": ["7", "3", "−3", "2"], "correct": 1, "hints": ["Lấy hoành độ B trừ hoành độ A.", "5 − 2 = ?"], "explain": "ABₓ = xB − xA = 5 − 2 = 3.", "label": "Tọa độ X · Đào điểm 1"}, {"prompt": "Thành phần y của vectơ AB với A(2; −1; 3), B(5; 1; 7) bằng bao nhiêu?", "options": ["0", "2", "−2", "1"], "correct": 1, "hints": ["Cẩn thận khi trừ một số âm.", "1 − (−1) = ?"], "explain": "ABᵧ = 1 − (−1) = 2.", "label": "Tọa độ Y · Đào điểm 2"}, {"prompt": "Thành phần z của vectơ AB với A(2; −1; 3), B(5; 1; 7) bằng bao nhiêu?", "options": ["−4", "10", "4", "3"], "correct": 2, "hints": ["Lấy cao độ điểm cuối trừ cao độ điểm đầu.", "7 − 3 = ?"], "explain": "ABz = 7 − 3 = 4. Vậy AB=(3;2;4).", "label": "Tọa độ Z · Đào điểm 3"}]}, {"id": 2, "gameType": "defense", "title": "THỦ THÀNH TRỰC GIAO", "place": "Pháo Đài Vuông Góc", "icon": "🏰", "tag": "Tích vô hướng", "time": "6–7 phút", "item": "Khiên trực giao", "digit": "0", "digitRule": "Lấy kết quả tích vô hướng của đợt tấn công đầu tiên.", "story": "Ba đợt quái vật mang theo tích vô hướng tiến đến. Chọn đúng năng lượng của vectơ để bắn hạ từng đợt và giữ an toàn cho thành.", "groupTask": "Các thành viên luân phiên tính tích vô hướng. Đội trưởng chọn mục tiêu, thư ký kiểm tra kết quả.", "challenges": [{"prompt": "ĐỢT 1: u=(1;2;−2), v=(2;0;1). Tính u·v.", "options": ["−2", "0", "2", "4"], "correct": 1, "hints": ["Nhân từng cặp tọa độ tương ứng rồi cộng.", "1×2 + 2×0 + (−2)×1."], "explain": "u·v = 2+0−2=0. Hai vectơ đều khác 0 nên vuông góc.", "label": "Sóng quái 1 · Cổng Bắc"}, {"prompt": "ĐỢT 2: a=(2;−1;3), b=(1;1;−1). Tính a·b.", "options": ["2", "−2", "−4", "0"], "correct": 1, "hints": ["Có ba tích thành phần.", "2×1 + (−1)×1 + 3×(−1)."], "explain": "a·b=2−1−3=−2.", "label": "Sóng quái 2 · Cổng Đông"}, {"prompt": "ĐỢT 3: c=(1;1;1), d=(2;−1;−1). Tính c·d.", "options": ["3", "2", "0", "−1"], "correct": 2, "hints": ["Đừng bỏ dấu trừ ở hai thành phần cuối.", "2 − 1 − 1 = ?"], "explain": "c·d=2−1−1=0.", "label": "Sóng quái 3 · Cổng Tây"}]}, {"id": 3, "gameType": "forge", "title": "LÒ RÈN PHA LÊ KHOẢNG CÁCH", "place": "Tháp Pha Lê", "icon": "💠", "tag": "Khoảng cách hai điểm", "time": "6 phút", "item": "Tinh thể khoảng cách", "digit": "5", "digitRule": "Lấy khoảng cách AB = 5.", "story": "Ba viên pha lê phải được rèn theo đúng hiệu tọa độ. Lò rèn sẽ phát sáng khi cả đội tính đúng chiều dài AB.", "groupTask": "Một bạn tính Δx, một bạn tính Δy, một bạn tính Δz, bạn còn lại sử dụng công thức độ dài.", "challenges": [{"prompt": "A(1;2;−1), B(4;6;−1). Hiệu hoành độ Δx bằng:", "options": ["5", "3", "−3", "1"], "correct": 1, "hints": ["Δx=xB−xA.", "4−1 = ?"], "explain": "Δx=4−1=3.", "label": "Pha lê X · Tinh thể xanh"}, {"prompt": "Với A(1;2;−1), B(4;6;−1), hiệu tung độ Δy bằng:", "options": ["8", "−4", "2", "4"], "correct": 3, "hints": ["Δy=yB−yA.", "6−2 = ?"], "explain": "Δy=6−2=4.", "label": "Pha lê Y · Tinh thể tím"}, {"prompt": "Với Δx=3, Δy=4, Δz=0, độ dài AB bằng:", "options": ["7", "25", "5", "√7"], "correct": 2, "hints": ["Dùng định lý Pitago trong Oxyz.", "√(3² + 4² + 0²) = ?"], "explain": "AB=√(9+16+0)=5.", "label": "Pha lê Z · Rèn lõi năng lượng"}]}, {"id": 4, "gameType": "maze", "title": "MÊ CUNG TRUNG ĐIỂM", "place": "Mê Cung Không Gian", "icon": "🌀", "tag": "Tọa độ trung điểm", "time": "6–7 phút", "item": "Bản đồ mê cung", "digit": "2", "digitRule": "Lấy hoành độ trung điểm I = 2.", "story": "Các hành lang chồng lên nhau trong không gian. Chỉ cửa mang đúng một tọa độ của trung điểm I mới mở đường.", "groupTask": "Ba thành viên mỗi người tính một tọa độ, một người điều khiển chọn cửa. Cùng nhau kiểm tra trước khi rẽ.", "challenges": [{"prompt": "A(0;−2;4), B(4;2;0). Hoành độ trung điểm I là:", "options": ["4", "0", "2", "−2"], "correct": 2, "hints": ["Lấy trung bình cộng hai hoành độ.", "(0+4)/2 = ?"], "explain": "xI=(0+4)/2=2.", "label": "Ngã rẽ X · Cánh cửa thứ nhất"}, {"prompt": "Với cùng A, B, tung độ trung điểm I là:", "options": ["0", "−2", "2", "4"], "correct": 0, "hints": ["Trung bình cộng hai tung độ.", "(−2+2)/2 = ?"], "explain": "yI=(−2+2)/2=0.", "label": "Ngã rẽ Y · Cánh cửa thứ hai"}, {"prompt": "Với cùng A, B, cao độ trung điểm I là:", "options": ["4", "−2", "2", "0"], "correct": 2, "hints": ["Trung bình cộng hai cao độ.", "(4+0)/2 = ?"], "explain": "zI=(4+0)/2=2. Vậy I=(2;0;2).", "label": "Ngã rẽ Z · Cửa thoát"}]}, {"id": 5, "gameType": "boss", "title": "ĐÁNH BẠI BÓNG ĐEN LÃNG QUÊN", "place": "Thành Trì Cuối", "icon": "🐲", "tag": "Hai vectơ cùng phương", "time": "7–8 phút", "item": "Chìa khóa Lõi Trí Tuệ", "digit": "4", "digitRule": "Lấy tham số m=4 trong lần đánh cuối.", "story": "Boss có ba tầng giáp. Mỗi đáp án đúng là một phát đại bác phá một lớp giáp; phá hết mới lấy được mảnh mã cuối.", "groupTask": "Mỗi thành viên phụ trách một quan hệ tỉ lệ, cả đội đối chiếu để xác định hệ số và tham số.", "challenges": [{"prompt": "u=(m;2;4), v=(2;1;2) cùng phương. Từ hai tọa độ cuối suy ra u=kv với k bằng:", "options": ["1", "2", "3", "4"], "correct": 1, "hints": ["Dựa vào 2=k×1 hoặc 4=k×2.", "k=2/1 = ?"], "explain": "Hệ số tỉ lệ k=2.", "label": "Phá giáp 1 · Tỉ lệ"}, {"prompt": "Với u=(m;2;4), v=(2;1;2) và k=2, suy ra m bằng:", "options": ["2", "8", "4", "1"], "correct": 2, "hints": ["Tọa độ thứ nhất: m=k×2.", "m=2×2."], "explain": "m=4.", "label": "Phá giáp 2 · Tham số"}, {"prompt": "Khi m=4, cặp vectơ nào sau đây cùng phương?", "options": ["(4;2;4) và (2;1;2)", "(4;2;4) và (1;2;2)", "(4;2;4) và (2;2;1)", "(4;2;4) và (4;1;2)"], "correct": 0, "hints": ["Hai vectơ cùng phương nếu một vectơ là bội của vectơ kia.", "(4;2;4)=2×(2;1;2)."], "explain": "(4;2;4)=2(2;1;2). Boss bị đánh bại!", "label": "Phá giáp 3 · Chiến thắng"}]}], "TOKEN_WORDS": {"0": "VÀ", "2": "MỞ", "3": "TƯ DUY", "4": "KHO BÁU", "5": "HỢP TÁC"}, "MESSAGE_OPTIONS": ["TƯ DUY VÀ HỢP TÁC MỞ KHO BÁU", "TỐC ĐỘ LUÔN QUAN TRỌNG NHẤT", "CHỈ MỘT NGƯỜI GIỎI MỚI CHIẾN THẮNG"]}.STAGES;
-const offWords={'3':'TƯ DUY','0':'VÀ','5':'HỢP TÁC','2':'MỞ','4':'KHO BÁU'};
-const offOptions=['TƯ DUY VÀ HỢP TÁC MỞ KHO BÁU','TỐC ĐỘ LUÔN QUAN TRỌNG NHẤT','CHỈ MỘT NGƯỜI GIỎI MỚI CHIẾN THẮNG'];
-function initDemo(){const emoji=['🐉','⚡','🔥','🌟'];const names=['Rồng Xanh','Tia Chớp','Phượng Hoàng','Ngôi Sao'];return {id:'123456',teacherToken:'DEMO_GV',paused:false,
- clock:{minutes:45,remainingMs:2700000,running:false,startedAt:0},events:[{text:'NOVA đã mở phòng demo cho 4 đội.',at:new Date().toISOString()}],
- teams:names.map((name,i)=>({id:'doi-'+(i+1),name,avatar:emoji[i],color:['#36C6E8','#FFC857','#FF758F','#AB8CFF'][i],code:String(i+1).repeat(4),token:'DEMO_DOI_'+(i+1),stage:0,round:0,health:3,wrong:0,score:0,bonus:0,completed:false,finishedAt:null,attempts:[0,0,0,0,0],hintsUsed:[false,false,false,false,false],digits:[]}))};}
+/* ═══ THANH CHUYỂN ĐỔI 2 CHẾ ĐỘ GAME & PHÂN VAI NHÓM ═══ */
+.mode-bar{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 18px;background:linear-gradient(90deg,#1a2346,#2b3568);color:#fff;border-bottom:2px solid #3f4f8c;flex-wrap:wrap}
+.mode-bar-left{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.mode-bar-title{font-size:12px;font-weight:900;letter-spacing:.08em;color:#9be7ff;text-transform:uppercase}
+.mode-switcher{display:inline-flex;background:#0f162e;padding:4px;border-radius:12px;border:1px solid #45599c;gap:4px}
+.mode-btn{border:0;background:transparent;color:#b8c7eb;padding:7px 13px;border-radius:9px;font-size:12.5px;font-weight:850;display:inline-flex;align-items:center;gap:6px}
+.mode-btn.active{background:linear-gradient(135deg,#f6b93b,#e58e26);color:#231400;box-shadow:0 3px 12px rgba(246,185,59,.35)}
+.role-strip{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;padding:10px 18px;background:#f4f7ff;border-bottom:1px solid #dde6f7}
+.role-chip{background:#fff;border:1px solid #d5e0f5;border-radius:10px;padding:7px 10px;font-size:11.5px;font-weight:750;color:#2c3e6b;line-height:1.35;box-shadow:0 2px 5px rgba(30,50,100,.04)}
+.role-chip.active-role{border-color:#f59e0b;background:#fffbeb;color:#92400e}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ENGINE 1: SĂN KHO BÁU 2D MAP (SCAVENGER HUNT - THEO MẪU HUNT-PREVIEW)
+   ═══════════════════════════════════════════════════════════════════════════ */
+.hw-wrapper{background:#121b28;color:#fff;padding:14px;position:relative;user-select:none}
+.hw-hud-top{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap;background:rgba(15,24,42,.88);border:1.5px solid rgba(200,169,110,.55);border-radius:14px;padding:10px 14px;box-shadow:0 8px 20px rgba(0,0,0,.35)}
+.hw-hud-keys{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.hw-key-slot{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:10px;background:#1e293b;border:2px solid #475569;color:#94a3b8;font-weight:900;font-size:13px;transition:all .25s}
+.hw-key-slot.earned{background:linear-gradient(135deg,#fef3c7,#fde68a);border-color:#f59e0b;color:#78350f;box-shadow:0 0 14px rgba(245,158,11,.45)}
+.hw-key-slot.current{border-color:#38bdf8;color:#e0f2fe;background:#0f2942;animation:pulse 1.5s infinite}
+.hw-quick-nav{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.hw-quick-btn{border:1.5px solid #c8a96e;background:linear-gradient(135deg,#3b2d1d,#251b10);color:#fde68a;border-radius:9px;padding:6px 11px;font-size:12px;font-weight:850;display:inline-flex;align-items:center;gap:5px}
+.hw-quick-btn.done{border-color:#10b981;background:#064e3b;color:#a7f3d0}
+.hw-quick-btn.active{border-color:#38bdf8;background:#0c4a6e;color:#bae6fd;box-shadow:0 0 12px rgba(56,189,248,.4)}
+
+.hw-viewport{position:relative;width:100%;height:470px;border-radius:18px;overflow:hidden;border:3px solid #c8a96e;box-shadow:inset 0 0 40px rgba(0,0,0,.65),0 12px 28px rgba(0,0,0,.35);background:#1b2e1e;cursor:crosshair;touch-action:none}
+.hw-world{position:absolute;left:0;top:0;width:1200px;height:820px;transform-origin:0 0;transition:transform 60ms linear;will-change:transform}
+.hw-world.theme-forest{background:
+  radial-gradient(circle at 34% 26%,rgba(255,235,140,.22) 0,transparent 16%),
+  radial-gradient(circle at 54% 74%,rgba(80,220,255,.22) 0,transparent 16%),
+  radial-gradient(circle at 72% 30%,rgba(255,180,100,.22) 0,transparent 16%),
+  repeating-linear-gradient(0deg,rgba(255,255,255,.03) 0 1px,transparent 1px 40px),
+  repeating-linear-gradient(90deg,rgba(255,255,255,.03) 0 1px,transparent 1px 40px),
+  linear-gradient(135deg,#1e4620 0%,#2d6a31 35%,#245329 68%,#17381b 100%)}
+.hw-world.theme-fortress{background:
+  radial-gradient(circle at 35% 28%,rgba(140,180,255,.22) 0,transparent 18%),
+  radial-gradient(circle at 56% 72%,rgba(255,130,130,.2) 0,transparent 18%),
+  repeating-linear-gradient(0deg,rgba(255,255,255,.04) 0 2px,transparent 2px 44px),
+  repeating-linear-gradient(90deg,rgba(255,255,255,.04) 0 2px,transparent 2px 44px),
+  linear-gradient(135deg,#2c3545 0%,#3c485e 48%,#252f3f 100%)}
+.hw-world.theme-crystal{background:
+  radial-gradient(circle at 32% 30%,rgba(56,189,248,.28) 0,transparent 18%),
+  radial-gradient(circle at 52% 70%,rgba(192,132,252,.28) 0,transparent 18%),
+  radial-gradient(circle at 73% 34%,rgba(250,204,21,.25) 0,transparent 18%),
+  repeating-linear-gradient(0deg,rgba(255,255,255,.04) 0 1px,transparent 1px 40px),
+  repeating-linear-gradient(90deg,rgba(255,255,255,.04) 0 1px,transparent 1px 40px),
+  linear-gradient(135deg,#1e1b4b 0%,#312e81 45%,#3b0764 100%)}
+.hw-world.theme-maze{background:
+  radial-gradient(circle at 50% 50%,rgba(45,212,191,.18) 0,transparent 45%),
+  repeating-linear-gradient(0deg,rgba(255,255,255,.05) 0 2px,transparent 2px 36px),
+  repeating-linear-gradient(90deg,rgba(255,255,255,.05) 0 2px,transparent 2px 36px),
+  linear-gradient(135deg,#0f3d3e 0%,#134e4a 52%,#082f49 100%)}
+.hw-world.theme-citadel{background:
+  radial-gradient(circle at 34% 28%,rgba(244,63,94,.25) 0,transparent 18%),
+  radial-gradient(circle at 56% 72%,rgba(249,115,22,.25) 0,transparent 18%),
+  radial-gradient(circle at 75% 34%,rgba(168,85,247,.3) 0,transparent 20%),
+  repeating-linear-gradient(0deg,rgba(255,255,255,.03) 0 1px,transparent 1px 40px),
+  repeating-linear-gradient(90deg,rgba(255,255,255,.03) 0 1px,transparent 1px 40px),
+  linear-gradient(135deg,#31102f 0%,#4c1d4b 48%,#1f1235 100%)}
+
+/* Đường mòn & vật cản trang trí trên bản đồ 2D */
+.hw-path-svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:1}
+.hw-obstacle{position:absolute;transform:translate(-50%,-50%);font-size:28px;pointer-events:none;z-index:3;filter:drop-shadow(0 4px 4px rgba(0,0,0,.45));user-select:none}
+.hw-wall-block{position:absolute;background:linear-gradient(180deg,#475569,#1e293b);border:2px solid #94a3b8;border-radius:8px;box-shadow:0 6px 0 #0f172a,0 8px 14px rgba(0,0,0,.45);z-index:3;pointer-events:none}
+.theme-maze .hw-wall-block{background:linear-gradient(180deg,#0d9488,#115e59);border-color:#5eead4;box-shadow:0 6px 0 #042f2e}
+.theme-crystal .hw-wall-block{background:linear-gradient(180deg,#7c3aed,#4c1d95);border-color:#c4b5fd;box-shadow:0 6px 0 #2e1065}
+
+/* Trạm Quái Vật / Câu Hỏi trên bản đồ */
+.hw-station{position:absolute;transform:translate(-50%,-50%);z-index:12;cursor:pointer;display:flex;flex-direction:column;align-items:center;transition:transform .2s}
+.hw-station:hover{transform:translate(-50%,-50%) scale(1.08)}
+.hw-ring{position:absolute;width:110px;height:110px;border-radius:50%;border:3px dashed rgba(250,204,21,.85);background:radial-gradient(circle,rgba(250,204,21,.24) 0%,rgba(250,204,21,.02) 70%);top:50%;left:50%;transform:translate(-50%,-50%);animation:hwSpin 12s linear infinite;pointer-events:none}
+.hw-station.locked .hw-ring{border-color:rgba(148,163,184,.45);background:radial-gradient(circle,rgba(148,163,184,.12) 0%,transparent 70%);animation:none}
+.hw-station.passed .hw-ring{border-color:rgba(52,211,153,.85);background:radial-gradient(circle,rgba(52,211,153,.25) 0%,transparent 70%);animation:none}
+.hw-station-core{width:64px;height:64px;border-radius:50%;background:radial-gradient(circle at 30% 30%,#475569,#0f172a);border:3px solid #facc15;display:grid;place-items:center;font-size:34px;box-shadow:0 8px 20px rgba(0,0,0,.6);position:relative;z-index:2;animation:float 2.6s ease-in-out infinite}
+.hw-station.locked .hw-station-core{border-color:#64748b;filter:grayscale(.65);opacity:.82;animation:none}
+.hw-station.passed .hw-station-core{border-color:#10b981;background:radial-gradient(circle at 30% 30%,#065f46,#022c22);animation:none}
+.hw-station-label{margin-top:6px;padding:4px 10px;border-radius:99px;background:rgba(15,23,42,.92);border:1.5px solid #facc15;color:#fef08a;font-size:11.5px;font-weight:900;white-space:nowrap;box-shadow:0 4px 10px rgba(0,0,0,.5);z-index:3}
+.hw-station.passed .hw-station-label{border-color:#34d399;color:#a7f3d0}
+.hw-station.locked .hw-station-label{border-color:#64748b;color:#cbd5e1}
+
+/* Rương kho báu chặng */
+.hw-chest{position:absolute;transform:translate(-50%,-50%);z-index:11;display:flex;flex-direction:column;align-items:center;cursor:pointer}
+.hw-chest-box{width:68px;height:68px;border-radius:18px;background:radial-gradient(circle,#fef08a,#ca8a04);border:3px solid #fff;display:grid;place-items:center;font-size:36px;box-shadow:0 0 28px rgba(250,204,21,.75)}
+.hw-chest.locked .hw-chest-box{filter:grayscale(.7);opacity:.65;box-shadow:none}
+
+/* Nhân vật của Đội trên bản đồ */
+.hw-player{position:absolute;transform:translate(-50%,-50%);z-index:20;pointer-events:none;transition:left 55ms linear,top 55ms linear;display:flex;flex-direction:column;align-items:center}
+.hw-player-torch{position:absolute;width:190px;height:190px;border-radius:50%;background:radial-gradient(circle,rgba(255,243,176,.28) 0%,rgba(255,243,176,.05) 55%,transparent 72%);top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none}
+.hw-player-avatar{width:54px;height:54px;border-radius:50%;background:radial-gradient(circle at 30% 30%,#ffffff,#dbeafe);border:3px solid #38bdf8;box-shadow:0 0 18px rgba(56,189,248,.8),0 8px 14px rgba(0,0,0,.55);display:grid;place-items:center;font-size:30px;position:relative;z-index:2}
+.hw-player.moving .hw-player-avatar{animation:hwBounce .32s infinite alternate}
+.hw-player-name{margin-top:4px;padding:2px 9px;border-radius:99px;background:#0284c7;color:#fff;font-size:11px;font-weight:900;white-space:nowrap;border:1px solid #bae6fd;box-shadow:0 3px 8px rgba(0,0,0,.5)}
+.hw-ripple{position:absolute;width:36px;height:36px;border-radius:50%;border:2.5px solid #38bdf8;transform:translate(-50%,-50%);pointer-events:none;z-index:15;animation:hwRipple .55s ease-out forwards}
+
+/* D-Pad ảo & Hướng dẫn điều khiển trên Viewport */
+.hw-controls-overlay{position:absolute;bottom:14px;left:14px;right:14px;display:flex;justify-content:space-between;align-items:flex-end;pointer-events:none;z-index:25}
+.hw-dpad{display:grid;grid-template-columns:repeat(3,42px);grid-template-rows:repeat(2,42px);gap:5px;pointer-events:auto;background:rgba(15,23,42,.78);padding:7px;border-radius:16px;border:1.5px solid rgba(255,255,255,.22);backdrop-filter:blur(4px)}
+.hw-dpad button{width:42px;height:42px;border-radius:10px;border:1px solid rgba(255,255,255,.28);background:rgba(30,41,59,.92);color:#fff;font-size:18px;font-weight:900;display:grid;place-items:center;padding:0}
+.hw-dpad button:active{background:#0284c7;transform:scale(.94)}
+.hw-action-panel{pointer-events:auto;display:flex;flex-direction:column;align-items:flex-end;gap:8px}
+.hw-attack-station-btn{border:2px solid #fde047;background:linear-gradient(135deg,#eab308,#ca8a04);color:#1e1b4b;font-weight:950;font-size:14px;padding:11px 18px;border-radius:14px;box-shadow:0 8px 22px rgba(234,179,8,.5);animation:pulse 1.2s infinite}
+.hw-hint-pill{background:rgba(15,23,42,.85);border:1px solid rgba(255,255,255,.2);color:#e2e8f0;padding:6px 12px;border-radius:10px;font-size:11.5px;font-weight:750}
+
+/* Cửa sổ Chiến Đấu Cuộn Giấy Cổ (Battle Scroll Modal giống hunt-preview) */
+.hw-battle-backdrop{position:fixed;inset:0;background:rgba(9,13,26,.82);z-index:70;display:grid;place-items:center;padding:16px;backdrop-filter:blur(5px)}
+.hw-battle-modal{width:min(900px,100%);background:linear-gradient(160deg,#fdf6e3 0%,#f5e6c4 100%);border:4px solid #8b5e2b;border-radius:24px;box-shadow:0 28px 80px rgba(0,0,0,.75),inset 0 0 0 2px #c8a96e;color:#3d2a14;overflow:hidden;display:grid;grid-template-columns:1.35fr .85fr;position:relative;max-height:92vh}
+.hw-battle-scroll{padding:22px 24px;display:flex;flex-direction:column;justify-content:space-between;overflow-y:auto}
+.hw-scroll-kicker{display:inline-flex;align-items:center;gap:6px;background:#8b5e2b;color:#fffdf5;padding:4px 11px;border-radius:99px;font-size:11px;font-weight:900;letter-spacing:.06em;width:fit-content;margin-bottom:8px}
+.hw-scroll-role{background:rgba(139,94,43,.12);border-left:4px solid #8b5e2b;padding:8px 12px;border-radius:8px;font-size:12.5px;font-weight:800;color:#5d3a18;margin-bottom:12px}
+.hw-scroll-question{font-size:clamp(16px,1.8vw,20px);font-weight:900;color:#2b1b0c;line-height:1.45;margin-bottom:14px;padding:12px 14px;background:rgba(255,255,255,.68);border:1.5px solid #d6c096;border-radius:14px}
+.hw-scroll-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:12px}
+.hw-opt-btn{display:flex;align-items:center;gap:10px;padding:11px 13px;border-radius:12px;border:2px solid #c8a96e;background:#fffdf7;color:#3d2a14;font-weight:850;font-size:15px;text-align:left}
+.hw-opt-btn span.opt-letter{width:30px;height:30px;border-radius:8px;background:#c8a96e;color:#3d2a14;display:grid;place-items:center;font-family:monospace;font-weight:900;flex-shrink:0}
+.hw-opt-btn.selected{background:linear-gradient(135deg,#8b5e2b,#6b441d);color:#fffdf5;border-color:#5d3a18;box-shadow:0 4px 12px rgba(93,58,24,.35)}
+.hw-opt-btn.selected span.opt-letter{background:rgba(255,255,255,.25);color:#fff}
+.hw-short-box{display:flex;gap:8px;align-items:center;margin-bottom:12px;background:rgba(255,255,255,.6);padding:8px 11px;border-radius:12px;border:1.5px dashed #b08d57}
+.hw-short-box input{flex:1;border:1.5px solid #c8a96e;border-radius:9px;padding:8px 11px;background:#fff;color:#2b1b0c;font-weight:800}
+.hw-scroll-footer{display:flex;justify-content:space-between;align-items:center;gap:10px;padding-top:12px;border-top:2px dashed rgba(139,94,43,.3);flex-wrap:wrap}
+.hw-btn-flee{border:2px solid #c8a96e;background:#fdf6e3;color:#6b4d28;border-radius:12px;padding:10px 15px;font-weight:800}
+.hw-btn-attack{border:2px solid #c8a96e;background:linear-gradient(135deg,#8b5e2b,#5d3a18);color:#fff;border-radius:12px;padding:11px 22px;font-weight:900;font-size:15px;box-shadow:0 6px 16px rgba(93,58,24,.35)}
+.hw-monster-stage{background:radial-gradient(circle at 50% 40%,#3b2d54 0%,#1a1426 85%);color:#fff;padding:22px;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;border-left:3px solid #8b5e2b;text-align:center}
+.hw-monster-hp{width:85%;background:#0f0a06;border:2px solid #c8a96e;border-radius:99px;height:14px;overflow:hidden;margin-bottom:8px}
+.hw-monster-hp i{display:block;height:100%;background:linear-gradient(90deg,#ef4444,#f97316);transition:width .3s}
+.hw-monster-sprite{font-size:96px;filter:drop-shadow(0 12px 16px rgba(0,0,0,.6));animation:float 2.4s ease-in-out infinite;margin:10px 0;position:relative}
+.hw-monster-sprite.defeated{transform:scale(.2) rotate(25deg);opacity:.15;transition:all .5s}
+.hw-monster-impact{position:absolute;font-size:78px;animation:hwPop .5s ease-out}
+.hw-letter-reward-overlay{position:absolute;inset:0;background:radial-gradient(ellipse at center,rgba(22,163,74,.96),rgba(20,83,45,.98));z-index:30;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:24px;text-align:center;color:#fff}
+.hw-letter-card{width:110px;height:110px;border-radius:24px;background:linear-gradient(160deg,#fffdf5,#f3e3c2);color:#15803d;border:4px solid #facc15;display:grid;place-items:center;font-size:32px;font-weight:950;box-shadow:0 0 35px rgba(250,204,21,.8);animation:hwLetterFly .65s cubic-bezier(.34,1.56,.64,1)}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ENGINE 2: BẢO VỆ THÀNH TRÌ (CASTLE DEFENSE - THEO MẪU GIAOVIENSANGTAO.VN)
+   ═══════════════════════════════════════════════════════════════════════════ */
+.cd-game{background:#181009;color:#fff4dc;border:3px solid #8c5820;border-radius:18px;overflow:hidden;box-shadow:0 16px 40px rgba(0,0,0,.4)}
+.cd-hud{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 14px;background:linear-gradient(180deg,#2c1b10,#1a1009);border-bottom:3px solid #7c4d1b;flex-wrap:wrap}
+.cd-hud-stats{display:flex;align-items:center;gap:8px;flex-wrap:wrap;flex:1}
+.cd-stat{display:flex;align-items:center;gap:8px;background:rgba(15,9,5,.72);border:1.5px solid #8d5b24;border-radius:12px;padding:6px 11px;min-width:115px}
+.cd-stat-icon{font-size:20px}
+.cd-stat small{display:block;font-size:10px;color:#e7cfa1;font-weight:800;text-transform:uppercase}
+.cd-stat strong{font-size:14px;color:#fff7df;font-weight:950}
+.cd-bar{width:100%;height:7px;background:#0e0905;border-radius:99px;overflow:hidden;margin-top:3px;border:1px solid #472c11}
+.cd-bar i{display:block;height:100%;border-radius:99px;transition:width .25s}
+.cd-bar.hp i{background:linear-gradient(90deg,#ef4444,#84cc16)}
+.cd-bar.xp i{background:linear-gradient(90deg,#0ea5e9,#67e8f9)}
+
+.cd-layout{display:grid;grid-template-columns:minmax(0,1fr) 280px}
+.cd-main-col{display:flex;flex-direction:column;min-width:0}
+
+/* Chiến trường 3 làn đường (Battlefield) */
+.cd-battlefield{position:relative;height:290px;overflow:hidden;border-bottom:4px solid #593714;background:linear-gradient(180deg,#1d3557 0%,#457b9d 34%,#4f8732 35%,#3f7227 68%,#2f591c 100%);isolation:isolate}
+.cd-sky-decor{position:absolute;top:10px;left:22px;color:rgba(255,255,255,.65);font-size:13px;font-weight:800;letter-spacing:2px;z-index:1;pointer-events:none}
+.cd-lane-guide{position:absolute;left:18%;right:0;height:1px;border-top:1.5px dashed rgba(255,248,196,.25);pointer-events:none}
+.cd-lane-0{top:43%}
+.cd-lane-1{top:64%}
+.cd-lane-2{top:85%}
+
+/* Dock 4 Kỹ năng chủ động góc trên phải Chiến trường */
+.cd-skill-dock{position:absolute;top:10px;right:10px;z-index:22;display:flex;gap:6px;padding:5px;background:rgba(16,11,8,.82);border:2px solid rgba(250,204,21,.65);border-radius:12px;backdrop-filter:blur(4px)}
+.cd-skill-btn{width:48px;height:48px;border-radius:10px;border:2px solid #855823;background:linear-gradient(160deg,#2b1c10,#140c06);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2px;position:relative;font-size:20px}
+.cd-skill-btn small{font-size:8.5px;font-weight:900;color:#fde68a;line-height:1}
+.cd-skill-btn.active{border-color:#38bdf8;background:linear-gradient(160deg,#0369a1,#0c4a6e);box-shadow:0 0 14px #38bdf8}
+.cd-skill-btn.cooldown{opacity:.6;cursor:not-allowed}
+.cd-skill-cd{position:absolute;inset:0;background:rgba(0,0,0,.72);border-radius:8px;display:grid;place-items:center;font-size:12px;font-weight:950;color:#facc15}
+
+/* Thành trì & Khiên chắn bên trái */
+.cd-castle{position:absolute;left:1%;bottom:4%;width:125px;height:82%;z-index:4;display:flex;flex-direction:column;align-items:center;justify-content:flex-end}
+.cd-castle-art{font-size:86px;line-height:1;filter:drop-shadow(6px 8px 8px rgba(0,0,0,.45))}
+.cd-castle-tag{background:rgba(18,12,7,.88);border:1.5px solid #eab308;color:#fef08a;padding:2px 8px;border-radius:8px;font-size:10px;font-weight:900;white-space:nowrap}
+.cd-castle-shield{position:absolute;inset:5% -10% 2% 0;border:4px solid rgba(56,189,248,.8);border-radius:50%;background:radial-gradient(circle,rgba(56,189,248,.12),rgba(14,165,233,.32));box-shadow:0 0 24px rgba(56,189,248,.8),inset 0 0 18px rgba(56,189,248,.65);animation:pulse 1.5s infinite;pointer-events:none}
+
+/* 3 Anh Hùng trấn giữ 3 làn */
+.cd-hero{position:absolute;left:15%;transform:translate(-50%,-50%);z-index:6;display:flex;flex-direction:column;align-items:center}
+.cd-hero-sprite{width:46px;height:46px;border-radius:50%;background:radial-gradient(circle,#fef3c7,#d97706);border:2.5px solid #fff;display:grid;place-items:center;font-size:25px;box-shadow:0 5px 12px rgba(0,0,0,.5)}
+.cd-hero-label{font-size:9.5px;font-weight:900;background:rgba(0,0,0,.75);color:#fde68a;padding:1px 6px;border-radius:6px;margin-top:2px;white-space:nowrap}
+
+/* Quái vật di chuyển trên 3 làn */
+.cd-enemy{position:absolute;transform:translate(-50%,-50%);z-index:7;display:flex;flex-direction:column;align-items:center;transition:left 50ms linear}
+.cd-enemy-hp{width:42px;height:6px;background:#1c1917;border:1px solid #000;border-radius:99px;overflow:hidden;margin-bottom:2px}
+.cd-enemy-hp i{display:block;height:100%;background:linear-gradient(90deg,#ef4444,#f97316)}
+.cd-enemy-sprite{font-size:36px;line-height:1;filter:drop-shadow(0 5px 6px rgba(0,0,0,.45))}
+.cd-enemy.is-boss .cd-enemy-sprite{font-size:50px}
+.cd-enemy.is-slowed .cd-enemy-sprite{filter:drop-shadow(0 0 8px #38bdf8) hue-rotate(160deg)}
+
+/* Đạn bắn & Hiệu ứng nổ sát thương */
+.cd-proj{position:absolute;transform:translate(-50%,-50%);z-index:8;font-size:18px;pointer-events:none;filter:drop-shadow(0 0 6px #fde047)}
+.cd-fx{position:absolute;transform:translate(-50%,-50%);z-index:15;font-weight:950;font-size:15px;color:#fde047;text-shadow:0 2px 4px #000;pointer-events:none;animation:cdFloatUp .75s ease-out forwards;white-space:nowrap}
+.cd-fx.crit{font-size:20px;color:#4ade80}
+.cd-fx.hit-castle{color:#f87171;font-size:18px}
+
+/* Khu vực Câu Hỏi Toán Học dưới Chiến trường (Question Dock) */
+.cd-question-dock{background:linear-gradient(180deg,#f7ebd2,#edd8b1);color:#2d1d0e;padding:16px 18px}
+.cd-q-header{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap}
+.cd-q-badge{background:#7c4a15;color:#fff7e0;padding:4px 10px;border-radius:8px;font-size:11.5px;font-weight:900}
+.cd-q-reward{background:#15803d;color:#fff;padding:4px 10px;border-radius:8px;font-size:11.5px;font-weight:900}
+.cd-q-prompt{font-size:clamp(16px,1.85vw,19.5px);font-weight:900;color:#231508;background:rgba(255,255,255,.72);border:2px solid #c69c63;border-radius:13px;padding:11px 14px;margin-bottom:11px;line-height:1.45}
+.cd-answers{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.cd-ans-btn{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;border:2px solid #966125;background:linear-gradient(180deg,#fff9ea,#f3dfb9);color:#2d1d0e;font-weight:900;font-size:15px;text-align:left;box-shadow:inset 0 0 0 2px rgba(255,255,255,.6),0 3px 0 #794815}
+.cd-ans-btn:hover:not(:disabled){background:linear-gradient(180deg,#fffdf5,#fae8c6)}
+.cd-ans-btn span.ans-letter{width:30px;height:30px;border-radius:50%;background:linear-gradient(180deg,#a66a20,#70400f);color:#fff4c7;display:grid;place-items:center;font-size:13px;font-weight:950;flex-shrink:0}
+.cd-q-InputRow{display:flex;gap:8px;align-items:center;margin-top:10px;flex-wrap:wrap}
+.cd-q-InputRow input{flex:1;min-width:160px;border:2px solid #966125;border-radius:10px;padding:8px 12px;background:#fffaf0;color:#26180d;font-weight:800}
+
+/* Cột phải: Bảng Nâng Cấp Đội Quân (Upgrade Panel) */
+.cd-upgrade-panel{background:linear-gradient(180deg,#23160c,#160d07);border-left:3px solid #6e4215;padding:14px;display:flex;flex-direction:column;justify-content:space-between;gap:10px}
+.cd-up-title{font-size:13px;font-weight:950;color:#fcd34d;letter-spacing:.05em;text-transform:uppercase;display:flex;align-items:center;gap:6px;margin-bottom:4px}
+.cd-up-list{display:flex;flex-direction:column;gap:8px}
+.cd-up-item{background:rgba(255,255,255,.05);border:1.5px solid #6e4215;border-radius:12px;padding:9px 10px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.cd-up-info b{display:block;font-size:12.5px;color:#fff4dc}
+.cd-up-info small{font-size:11px;color:#fbbf24;font-weight:800}
+.cd-up-buy{border:1.5px solid #f59e0b;background:linear-gradient(180deg,#d97706,#92400e);color:#fff;border-radius:9px;padding:6px 10px;font-size:11.5px;font-weight:900;white-space:nowrap}
+.cd-up-buy:disabled{opacity:.45;border-color:#57534e;background:#292524}
+
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(250,204,21,.55)}50%{box-shadow:0 0 0 8px rgba(250,204,21,0)}}
+@keyframes hwSpin{from{transform:translate(-50%,-50%) rotate(0deg)}to{transform:translate(-50%,-50%) rotate(360deg)}}
+@keyframes hwBounce{from{transform:translateY(0) scale(1)}to{transform:translateY(-5px) scale(1.05)}}
+@keyframes hwRipple{0%{width:12px;height:12px;opacity:1}100%{width:70px;height:70px;opacity:0}}
+@keyframes hwPop{0%{transform:scale(.3);opacity:0}60%{transform:scale(1.25);opacity:1}100%{transform:scale(1);opacity:1}}
+@keyframes hwLetterFly{0%{transform:scale(.2) rotate(-20deg);opacity:0}100%{transform:scale(1) rotate(0);opacity:1}}
+@keyframes cdFloatUp{0%{transform:translate(-50%,0);opacity:1}100%{transform:translate(-50%,-34px);opacity:0}}
+
+@media(max-width:1050px){
+  .teacher-main,.mission-wrapper,.cd-layout{grid-template-columns:1fr}
+  .cd-upgrade-panel{border-left:0;border-top:3px solid #6e4215}
+  .cd-up-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
+  .role-strip{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:720px){
+  .wrap{padding:12px 10px 45px}
+  .hero{border-radius:20px;padding:24px 18px;min-height:210px}
+  .hero-character{font-size:70px;right:10px;top:30px;opacity:.4}
+  .grid-2,.grid-3,.grid-4,.cd-answers,.hw-scroll-options,.cd-up-list,.role-strip{grid-template-columns:1fr}
+  .hw-battle-modal{grid-template-columns:1fr}
+  .hw-monster-stage{border-left:0;border-top:3px solid #8b5e2b;padding:16px}
+  .hw-viewport{height:390px}
+  .cd-battlefield{height:240px}
+}
+
+
+.demo-banner{background:linear-gradient(110deg,#f4f1ff,#eafff9);border:2px solid #ded7fb;border-radius:16px;padding:15px;margin:14px 0;display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap}
+.demo-banner small{flex:1 0 100%;text-align:center;color:#7584a5}
+.demo-banner strong{color:#443a89}
+
+</style>
+</head>
+<body>
+<main class="wrap" id="app"></main>
+<script>
+window.IS_DEMO_MODE = true;
+const offStages = [{"id":1,"gameType":"hunt","defaultMode":"hunt","title":"SĂN KHO BÁU TỌA ĐỘ","place":"Rừng Vectơ Nguyên Sinh","icon":"🏝️","tag":"Tọa độ vectơ AB trong Oxyz","time":"5–6 phút","item":"La bàn ba trục","digit":"3","digitRule":"Lấy hiệu hoành độ xB − xA = 5 − 2 = 3.","story":"Bản đồ Rừng Vectơ bị phong ấn bởi 3 Trạm Quái Vật giữ 3 thành phần (x; y; z) của vectơ AB. Cả đội hãy điều khiển nhân vật vượt địa hình, đánh bại từng trạm để thu thập đủ 3 chìa khóa tọa độ và mở Rương Mật Mã!","groupTask":"TV1 tính trục Ox, TV2 tính trục Oy, TV3 tính trục Oz; Đội trưởng điều khiển nhân vật trên bản đồ và phát lệnh tấn công.","teamRoles":["🧭 Thành viên 1: Phụ trách công thức hoành độ xB − xA","📐 Thành viên 2: Phụ trách công thức tung độ yB − yA (chú ý dấu âm)","🔭 Thành viên 3: Phụ trách công thức cao độ zB − zA","👑 Đội trưởng: Điều khiển nhân vật di chuyển & chốt đáp án tấn công"],"huntMap":{"theme":"forest","worldTitle":"BẢN ĐỒ RỪNG VECTƠ OXYZ","spawn":{"x":14,"y":52},"chest":{"x":86,"y":50,"name":"Rương La Bàn Ba Trục"},"stations":[{"x":34,"y":26,"name":"Trạm I · Đền Hoành Độ Ox","monsterIcon":"👹","monsterName":"Thần Rừng Hoành Độ","badge":"ABx = 3"},{"x":54,"y":74,"name":"Trạm II · Đầm Tung Độ Oy","monsterIcon":"🐊","monsterName":"Thủy Quái Tung Độ","badge":"ABy = 2"},{"x":72,"y":30,"name":"Trạm III · Đỉnh Cao Độ Oz","monsterIcon":"🦅","monsterName":"Đại Bàng Cao Độ","badge":"ABz = 4"}]},"defenseConfig":{"castleName":"Thành Trì Rừng Vectơ","theme":"forest","waves":[{"name":"Đợt 1: Quái Hoành Độ Ox","enemies":["goblin","bat","goblin"],"boss":"👹"},{"name":"Đợt 2: Quái Tung Độ Oy","enemies":["bat","skeleton","goblin"],"boss":"🐊"},{"name":"Đợt 3: Quái Cao Độ Oz","enemies":["skeleton","orc","bat"],"boss":"🦅"}]},"challenges":[{"prompt":"Cho hai điểm A(2; −1; 3) và B(5; 1; 7) trong không gian Oxyz. Thành phần hoành độ x của vectơ AB bằng bao nhiêu?","options":["7","3","−3","2"],"correct":1,"shortAnswer":"3","hints":["Lấy hoành độ điểm cuối B trừ hoành độ điểm đầu A.","Tính: xB − xA = 5 − 2 = ?"],"explain":"Ta có ABₓ = xB − xA = 5 − 2 = 3.","label":"Trạm I · Tọa độ X · Đào điểm 1","roleAssign":"Thành viên 1 (Trục Ox) tính nhanh xB − xA","monster":{"icon":"👹","name":"Thần Rừng Hoành Độ","hp":100},"keyBadge":"X=3"},{"prompt":"Với A(2; −1; 3) và B(5; 1; 7), thành phần tung độ y của vectơ AB bằng bao nhiêu?","options":["0","2","−2","1"],"correct":1,"shortAnswer":"2","hints":["Cẩn thận khi trừ một số âm: yB − yA.","Tính: 1 − (−1) = ?"],"explain":"Ta có ABᵧ = yB − yA = 1 − (−1) = 2.","label":"Trạm II · Tọa độ Y · Đào điểm 2","roleAssign":"Thành viên 2 (Trục Oy) kiểm tra dấu âm 1 − (−1)","monster":{"icon":"🐊","name":"Thủy Quái Tung Độ","hp":120},"keyBadge":"Y=2"},{"prompt":"Với A(2; −1; 3) và B(5; 1; 7), thành phần cao độ z của vectơ AB bằng bao nhiêu?","options":["−4","10","4","3"],"correct":2,"shortAnswer":"4","hints":["Lấy cao độ điểm cuối B trừ cao độ điểm đầu A.","Tính: zB − zA = 7 − 3 = ?"],"explain":"Ta có ABz = zB − zA = 7 − 3 = 4. Vậy vectơ AB = (3; 2; 4).","label":"Trạm III · Tọa độ Z · Đào điểm 3","roleAssign":"Thành viên 3 (Trục Oz) tính 7 − 3 & Đội trưởng tổng hợp AB=(3;2;4)","monster":{"icon":"🦅","name":"Đại Bàng Cao Độ","hp":150},"keyBadge":"Z=4"}]},{"id":2,"gameType":"defense","defaultMode":"defense","title":"BẢO VỆ THÀNH TRÌ TRỰC GIAO","place":"Pháo Đài Vuông Góc","icon":"🏰","tag":"Tích vô hướng & Hai vectơ vuông góc","time":"6–7 phút","item":"Khiên trực giao","digit":"0","digitRule":"Lấy kết quả tích vô hướng của đợt tấn công đầu tiên (u·v = 0).","story":"Ba đợt quân đoàn Quái Vật Không Gian đang tiến vào Pháo Đài Vuông Góc trên 3 làn đường! Các Anh Hùng đang chiến đấu cầm chân chúng. Cả đội hãy giải nhanh tích vô hướng để kiếm Vàng nâng cấp Anh Hùng, tung Kỹ năng và gọi Pháo Kích tiêu diệt từng đợt quái!","groupTask":"TV1 tính tích x₁x₂, TV2 tính y₁y₂, TV3 tính z₁z₂; Đội trưởng cộng tổng, mua Nâng cấp và tung Kỹ năng Bảo vệ Thành trì.","teamRoles":["🏹 Thành viên 1 (Cung Thủ): Tính tích hoành độ x₁·x₂","🧙‍♂️ Thành viên 2 (Pháp Sư): Tính tích tung độ y₁·y₂","🛡️ Thành viên 3 (Hiệp Sĩ): Tính tích cao độ z₁·z₂","👑 Đội trưởng (Chỉ huy): Cộng x₁x₂+y₁y₂+z₁z₂, nâng cấp & kích hoạt kỹ năng"],"huntMap":{"theme":"fortress","worldTitle":"BẢN ĐỒ PHÁO ĐÀI VUÔNG GÓC","spawn":{"x":14,"y":50},"chest":{"x":86,"y":50,"name":"Rương Khiên Trực Giao"},"stations":[{"x":35,"y":28,"name":"Cổng Bắc · Đợt Quái 1","monsterIcon":"👾","monsterName":"Quái Tích Vô Hướng Bắc","badge":"u·v = 0"},{"x":56,"y":72,"name":"Cổng Đông · Đợt Quái 2","monsterIcon":"👹","monsterName":"Chiến Binh Cổng Đông","badge":"a·b = −2"},{"x":74,"y":32,"name":"Cổng Tây · Đợt Quái 3","monsterIcon":"🤖","monsterName":"Cơ Giáp Cổng Tây","badge":"c·d = 0"}]},"defenseConfig":{"castleName":"Pháo Đài Vuông Góc","theme":"fortress","waves":[{"name":"Sóng Quái 1 · Cổng Bắc","enemies":["goblin","bat","skeleton","goblin"],"boss":"👾"},{"name":"Sóng Quái 2 · Cổng Đông","enemies":["skeleton","orc","bat","skeleton"],"boss":"👹"},{"name":"Sóng Quái 3 · Cổng Tây","enemies":["orc","skeleton","orc","bat"],"boss":"🤖"}]},"challenges":[{"prompt":"ĐỢT 1: Cho u = (1; 2; −2) và v = (2; 0; 1). Tích vô hướng u · v bằng bao nhiêu?","options":["−2","0","2","4"],"correct":1,"shortAnswer":"0","hints":["Áp dụng công thức: u·v = x₁x₂ + y₁y₂ + z₁z₂.","Tính: 1×2 + 2×0 + (−2)×1 = ?"],"explain":"u·v = 1×2 + 2×0 + (−2)×1 = 2 + 0 − 2 = 0. Hai vectơ khác 0 có tích vô hướng bằng 0 nên vuông góc với nhau!","label":"Sóng quái 1 · Cổng Bắc (Làn 1)","roleAssign":"TV1 tính 1×2, TV2 tính 2×0, TV3 tính (−2)×1 → Cộng lại","monster":{"icon":"👾","name":"Thủ Lĩnh Sóng Quái 1","hp":140},"keyBadge":"u·v=0"},{"prompt":"ĐỢT 2: Cho a = (2; −1; 3) và b = (1; 1; −1). Tích vô hướng a · b bằng bao nhiêu?","options":["2","−2","−4","0"],"correct":1,"shortAnswer":"-2","hints":["Nhân từng cặp tọa độ tương ứng rồi cộng lại.","Tính: 2×1 + (−1)×1 + 3×(−1) = ?"],"explain":"a·b = 2×1 + (−1)×1 + 3×(−1) = 2 − 1 − 3 = −2.","label":"Sóng quái 2 · Cổng Đông (Làn 2)","roleAssign":"Chú ý dấu âm ở tích thứ hai (−1)×1 và thứ ba 3×(−1)","monster":{"icon":"👹","name":"Ác Quỷ Cổng Đông","hp":170},"keyBadge":"a·b=−2"},{"prompt":"ĐỢT 3: Cho c = (1; 1; 1) và d = (2; −1; −1). Tích vô hướng c · d bằng bao nhiêu?","options":["3","2","0","−1"],"correct":2,"shortAnswer":"0","hints":["Đừng bỏ quên hai dấu trừ ở hai thành phần cuối.","Tính: 1×2 + 1×(−1) + 1×(−1) = 2 − 1 − 1 = ?"],"explain":"c·d = 2 − 1 − 1 = 0. Следовательно, hai vectơ c và d vuông góc (c ⊥ d)!","label":"Sóng quái 3 · Cổng Tây (Làn 3)","roleAssign":"Cả nhóm kiểm tra điều kiện hai vectơ vuông góc c·d = 0","monster":{"icon":"🤖","name":"Cơ Giáp Khổng Lồ","hp":200},"keyBadge":"c⊥d"}]},{"id":3,"gameType":"forge","defaultMode":"hunt","title":"THUNG LŨNG PHA LÊ KHOẢNG CÁCH","place":"Tháp Pha Lê","icon":"💠","tag":"Khoảng cách giữa hai điểm AB","time":"6 phút","item":"Tinh thể khoảng cách","digit":"5","digitRule":"Lấy độ dài đoạn thẳng AB = 5.","story":"Trong Thung Lũng Pha Lê, 3 Mỏ Tinh Thể (Δx, Δy, Δz) đang bị các Golem Đá canh giữ. Hãy điều khiển nhân vật đi tới từng mỏ tinh thể, giải bài toán hiệu tọa độ và dùng định lý Pitago không gian để rèn Tinh Thể Khoảng Cách AB!","groupTask":"TV1 tính Δx, TV2 tính Δy, TV3 tính Δz; Đội trưởng lấy căn bậc hai √(Δx² + Δy² + Δz²).","teamRoles":["🔷 Thành viên 1: Tính hiệu hoành độ Δx = xB − xA","💜 Thành viên 2: Tính hiệu tung độ Δy = yB − yA","💎 Thành viên 3: Tính hiệu cao độ Δz = zB − zA","👑 Đội trưởng: Tính độ dài AB = √(Δx² + Δy² + Δz²)"],"huntMap":{"theme":"crystal","worldTitle":"BẢN ĐỒ THUNG LŨNG PHA LÊ","spawn":{"x":14,"y":50},"chest":{"x":86,"y":50,"name":"Lò Rèn Tinh Thể AB"},"stations":[{"x":32,"y":30,"name":"Mỏ I · Pha Lê Xanh (Δx)","monsterIcon":"🗿","monsterName":"Golem Tinh Thể Xanh","badge":"Δx = 3"},{"x":52,"y":70,"name":"Mỏ II · Pha Lê Tím (Δy)","monsterIcon":"🔮","monsterName":"Phù Thủy Pha Lê Tím","badge":"Δy = 4"},{"x":73,"y":34,"name":"Mỏ III · Lõi Năng Lượng AB","monsterIcon":"💎","monsterName":"Vệ Binh Kim Cương","badge":"AB = 5"}]},"defenseConfig":{"castleName":"Tháp Pha Lê Khoảng Cách","theme":"crystal","waves":[{"name":"Đợt 1: Golem Tinh Thể Xanh","enemies":["goblin","skeleton","goblin"],"boss":"🗿"},{"name":"Đợt 2: Phù Thủy Pha Lê Tím","enemies":["bat","skeleton","orc"],"boss":"🔮"},{"name":"Đợt 3: Vệ Binh Kim Cương","enemies":["orc","skeleton","orc"],"boss":"💎"}]},"challenges":[{"prompt":"Cho hai điểm A(1; 2; −1) và B(4; 6; −1). Hiệu hoành độ Δx = xB − xA bằng bao nhiêu?","options":["5","3","−3","1"],"correct":1,"shortAnswer":"3","hints":["Tính Δx = xB − xA.","Lấy 4 − 1 = ?"],"explain":"Ta có Δx = xB − xA = 4 − 1 = 3.","label":"Mỏ I · Pha lê X · Tinh thể xanh","roleAssign":"Thành viên 1 khai thác Pha lê Xanh (Δx = 4 − 1)","monster":{"icon":"🗿","name":"Golem Tinh Thể Xanh","hp":130},"keyBadge":"Δx=3"},{"prompt":"Với hai điểm A(1; 2; −1) và B(4; 6; −1), hiệu tung độ Δy = yB − yA bằng bao nhiêu?","options":["8","−4","2","4"],"correct":3,"shortAnswer":"4","hints":["Tính Δy = yB − yA.","Lấy 6 − 2 = ?"],"explain":"Ta có Δy = yB − yA = 6 − 2 = 4.","label":"Mỏ II · Pha lê Y · Tinh thể tím","roleAssign":"Thành viên 2 khai thác Pha lê Tím (Δy = 6 − 2)","monster":{"icon":"🔮","name":"Phù Thủy Pha Lê Tím","hp":150},"keyBadge":"Δy=4"},{"prompt":"Biết Δx = 3, Δy = 4 và Δz = (−1) − (−1) = 0. Độ dài đoạn thẳng AB bằng bao nhiêu?","options":["7","25","5","√7"],"correct":2,"shortAnswer":"5","hints":["Áp dụng công thức khoảng cách: AB = √(Δx² + Δy² + Δz²).","Tính: √(3² + 4² + 0²) = √25 = ?"],"explain":"Ta có AB = √(3² + 4² + 0²) = √(9 + 16 + 0) = √25 = 5.","label":"Mỏ III · Rèn Lõi Năng Lượng AB","roleAssign":"Thành viên 3 & Đội trưởng tính √(3² + 4² + 0²)","monster":{"icon":"💎","name":"Vệ Binh Kim Cương","hp":180},"keyBadge":"AB=5"}]},{"id":4,"gameType":"maze","defaultMode":"hunt","title":"THÁM HIỂM MÊ CUNG TRUNG ĐIỂM","place":"Mê Cung Không Gian","icon":"🌀","tag":"Tọa độ trung điểm đoạn thẳng","time":"6–7 phút","item":"Bản đồ mê cung","digit":"2","digitRule":"Lấy hoành độ trung điểm xI = 2.","story":"Cả đội đang đứng giữa Mê Cung Không Gian cổ đại với những bức tường đá đan xen. Hãy dẫn đường cho nhân vật luồn lách qua các ngã rẽ tới 3 Cổng Không Gian (xI, yI, zI), giải mã tọa độ trung điểm I của đoạn thẳng AB để mở lối thoát!","groupTask":"3 thành viên tính trung bình cộng từng trục (xA+xB)/2, (yA+yB)/2, (zA+zB)/2; Đội trưởng tìm đường vượt mê cung.","teamRoles":["🚪 Thành viên 1: Tính hoành độ trung điểm xI = (xA + xB) / 2","🚪 Thành viên 2: Tính tung độ trung điểm yI = (yA + yB) / 2","🚪 Thành viên 3: Tính cao độ trung điểm zI = (zA + zB) / 2","👑 Đội trưởng: Dẫn đường vượt tường mê cung & mở 3 Cổng Không Gian"],"huntMap":{"theme":"maze","worldTitle":"BẢN ĐỒ MÊ CUNG TRUNG ĐIỂM I(x;y;z)","spawn":{"x":12,"y":50},"chest":{"x":88,"y":50,"name":"Rương Bản Đồ Mê Cung"},"stations":[{"x":30,"y":22,"name":"Cổng I · Ngã Rẽ Hoành Độ xI","monsterIcon":"👻","monsterName":"Bóng Ma Ngã Rẽ X","badge":"xI = 2"},{"x":52,"y":76,"name":"Cổng II · Ngã Rẽ Tung Độ yI","monsterIcon":"🦇","monsterName":"Dơi Canh Cổng Y","badge":"yI = 0"},{"x":74,"y":24,"name":"Cổng III · Cửa Thoát Cao Độ zI","monsterIcon":"🐺","monsterName":"Sói Không Gian Z","badge":"zI = 2"}]},"defenseConfig":{"castleName":"Thành Trì Mê Cung Trung Điểm","theme":"maze","waves":[{"name":"Đợt 1: Bóng Ma Ngã Rẽ X","enemies":["bat","goblin","bat","skeleton"],"boss":"👻"},{"name":"Đợt 2: Dơi Canh Cổng Y","enemies":["bat","skeleton","bat","orc"],"boss":"🦇"},{"name":"Đợt 3: Sói Không Gian Z","enemies":["skeleton","orc","skeleton","bat"],"boss":"🐺"}]},"challenges":[{"prompt":"Cho đoạn thẳng AB với A(0; −2; 4) và B(4; 2; 0). Hoành độ xI của trung điểm I bằng bao nhiêu?","options":["4","0","2","−2"],"correct":2,"shortAnswer":"2","hints":["Hoành độ trung điểm bằng trung bình cộng hai hoành độ.","Tính: xI = (0 + 4) / 2 = ?"],"explain":"Ta có xI = (xA + xB) / 2 = (0 + 4) / 2 = 2.","label":"Ngã rẽ X · Cánh cửa thứ nhất","roleAssign":"Thành viên 1 tính nhanh (0 + 4) / 2","monster":{"icon":"👻","name":"Bóng Ma Ngã Rẽ X","hp":140},"keyBadge":"xI=2"},{"prompt":"Với A(0; −2; 4) và B(4; 2; 0), tung độ yI của trung điểm I bằng bao nhiêu?","options":["0","−2","2","4"],"correct":0,"shortAnswer":"0","hints":["Tung độ trung điểm bằng trung bình cộng hai tung độ.","Tính: yI = (−2 + 2) / 2 = ?"],"explain":"Ta có yI = (yA + yB) / 2 = (−2 + 2) / 2 = 0.","label":"Ngã rẽ Y · Cánh cửa thứ hai","roleAssign":"Thành viên 2 tính (−2 + 2) / 2","monster":{"icon":"🦇","name":"Dơi Canh Cổng Y","hp":160},"keyBadge":"yI=0"},{"prompt":"Với A(0; −2; 4) và B(4; 2; 0), cao độ zI của trung điểm I bằng bao nhiêu?","options":["4","−2","2","0"],"correct":2,"shortAnswer":"2","hints":["Cao độ trung điểm bằng trung bình cộng hai cao độ.","Tính: zI = (4 + 0) / 2 = ?"],"explain":"Ta có zI = (zA + zB) / 2 = (4 + 0) / 2 = 2. Vậy trung điểm I(2; 0; 2)!","label":"Ngã rẽ Z · Cửa thoát mê cung","roleAssign":"Thành viên 3 tính (4 + 0) / 2 & Đội trưởng chốt I(2; 0; 2)","monster":{"icon":"🐺","name":"Sói Không Gian Z","hp":190},"keyBadge":"zI=2"}]},{"id":5,"gameType":"boss","defaultMode":"defense","title":"ĐẠI CHIẾN BOSS: BÓNG ĐEN LÃNG QUÊN","place":"Thành Trì Cuối Cùng","icon":"🐲","tag":"Điều kiện hai vectơ cùng phương","time":"7–8 phút","item":"Chìa khóa Lõi Trí Tuệ","digit":"4","digitRule":"Lấy giá trị tham số m = 4 khi hai vectơ cùng phương.","story":"Boss cuối \"Bóng Đen Lãng Quên\" cùng đại quân Orc & Rồng Hắc Ám đang tổng tấn công Thành Trì Cuối Cùng! Boss mang 3 lớp giáp tương ứng với bài toán Hai Vectơ Cùng Phương (u = k·v). Hãy hợp sức giải toán, nâng cấp tối đa 3 Anh Hùng và tung toàn bộ Kỹ năng để phá vỡ 3 lớp giáp của Boss!","groupTask":"TV1 tìm hệ số tỉ lệ k, TV2 tìm tham số m, TV3 kiểm tra cặp vectơ cùng phương; Đội trưởng chỉ huy chiến trường Thủ Thành.","teamRoles":["⚔️ Thành viên 1: Tìm hệ số tỉ lệ k từ hai tọa độ đã biết (u = k·v)","🔥 Thành viên 2: Thay hệ số k để tìm tham số m = k·x_v","⚡ Thành viên 3: Kiểm tra bộ ba tỉ lệ x₁/x₂ = y₁/y₂ = z₁/z₂","👑 Đội trưởng: Nâng cấp tối đa Anh Hùng, bật Khiên Thành & Mưa Tên diệt Boss"],"huntMap":{"theme":"citadel","worldTitle":"BẢN ĐỒ THÀNH TRÌ BÓNG ĐEN CUỐI CÙNG","spawn":{"x":14,"y":50},"chest":{"x":86,"y":50,"name":"Rương Chìa Khóa Lõi Trí Tuệ"},"stations":[{"x":34,"y":28,"name":"Giáp I · Tiền Đồn Hệ Số k","monsterIcon":"⚔️","monsterName":"Kỵ Sĩ Hắc Ám (Lớp Giáp 1)","badge":"k = 2"},{"x":56,"y":72,"name":"Giáp II · Pháp Trận Tham Số m","monsterIcon":"🔥","monsterName":"Pháp Sư Hắc Ám (Lớp Giáp 2)","badge":"m = 4"},{"x":75,"y":34,"name":"Giáp III · Điện Thờ Rồng Boss","monsterIcon":"🐲","monsterName":"Boss Bóng Đen Lãng Quên","badge":"u = 2v"}]},"defenseConfig":{"castleName":"Thành Trì Lõi Trí Tuệ Oxyz","theme":"citadel","waves":[{"name":"Phá Giáp 1 · Tìm Hệ Số Tỉ Lệ k","enemies":["skeleton","orc","bat","orc"],"boss":"⚔️"},{"name":"Phá Giáp 2 · Giải Tham Số m","enemies":["orc","skeleton","orc","bat","orc"],"boss":"🔥"},{"name":"Phá Giáp 3 · Đại Chiến Boss Rồng","enemies":["orc","orc","skeleton","bat","orc"],"boss":"🐲"}]},"challenges":[{"prompt":"Cho hai vectơ u = (m; 2; 4) và v = (2; 1; 2) cùng phương với nhau. Từ hai tọa độ cuối, hệ số tỉ lệ k trong đẳng thức u = k·v bằng bao nhiêu?","options":["1","2","3","4"],"correct":1,"shortAnswer":"2","hints":["Dựa vào tung độ và cao độ: 2 = k×1 và 4 = k×2.","Suy ra k = 2 / 1 = ?"],"explain":"Vì u = k·v nên ta có 2 = k·1 và 4 = k·2, suy ra hệ số tỉ lệ k = 2. Lớp giáp thứ nhất của Boss đã vỡ!","label":"Phá giáp 1 · Xác định hệ số tỉ lệ k","roleAssign":"Thành viên 1 lập tỉ số y_u / y_v = 2 / 1 = 4 / 2","monster":{"icon":"⚔️","name":"Kỵ Sĩ Hắc Ám (Giáp 1)","hp":180},"keyBadge":"k=2"},{"prompt":"Với u = (m; 2; 4), v = (2; 1; 2) cùng phương và hệ số tỉ lệ k = 2 (tức u = 2v), giá trị của tham số m bằng bao nhiêu?","options":["2","8","4","1"],"correct":2,"shortAnswer":"4","hints":["Hoành độ của u bằng k lần hoành độ của v: m = k × 2.","Với k = 2, tính m = 2 × 2 = ?"],"explain":"Ta có m = k × 2 = 2 × 2 = 4. Lớp giáp thứ hai của Boss đã bị xuyên thủng!","label":"Phá giáp 2 · Tìm tham số m","roleAssign":"Thành viên 2 tính m = k × x_v = 2 × 2","monster":{"icon":"🔥","name":"Pháp Sư Hắc Ám (Giáp 2)","hp":220},"keyBadge":"m=4"},{"prompt":"Khi m = 4, cặp vectơ nào dưới đây là hai vectơ cùng phương?","options":["(4; 2; 4) và (2; 1; 2)","(4; 2; 4) và (1; 2; 2)","(4; 2; 4) và (2; 2; 1)","(4; 2; 4) và (4; 1; 2)"],"correct":0,"shortAnswer":"A","hints":["Hai vectơ cùng phương khi tọa độ tương ứng tỉ lệ: x₁/x₂ = y₁/y₂ = z₁/z₂.","Kiểm tra: (4; 2; 4) = 2 × (2; 1; 2)."],"explain":"Vì (4; 2; 4) = 2 × (2; 1; 2) nên hai vectơ cùng phương. Boss Bóng Đen Lãng Quên đã bị đánh bại hoàn toàn!","label":"Phá giáp 3 · Đòn quyết định hạ Boss","roleAssign":"Cả đội đồng thanh kiểm tra tỉ lệ 4/2 = 2/1 = 4/2 = 2","monster":{"icon":"🐲","name":"Boss Bóng Đen Lãng Quên","hp":300},"keyBadge":"BOSS💥"}]}];
+const offWords = {"0":"VÀ","2":"MỞ","3":"TƯ DUY","4":"KHO BÁU","5":"HỢP TÁC"};
+const offOptions = ["TƯ DUY VÀ HỢP TÁC MỞ KHO BÁU","TỐC ĐỘ LUÔN QUAN TRỌNG NHẤT","CHỈ MỘT NGƯỜI GIỎI MỚI CHIẾN THẮNG"];
+
+function initDemo(){
+ const emoji=['🐉','⚡','🔥','🌟'];
+ const names=['Rồng Xanh','Tia Chớp','Phượng Hoàng','Ngôi Sao'];
+ return {
+  id:'123456',
+  teacherToken:'DEMO_GV',
+  paused:false,
+  clock:{minutes:45,remainingMs:2700000,running:false,startedAt:0},
+  events:[{text:'NOVA đã mở phòng demo 1 máy (Săn Kho Báu 2D & Bảo Vệ Thành Trì) cho 4 đội.',at:new Date().toISOString()}],
+  teams:names.map((name,i)=>({
+   id:'doi-'+(i+1),
+   name,
+   avatar:emoji[i],
+   color:['#36C6E8','#FFC857','#FF758F','#AB8CFF'][i],
+   code:String(i+1).repeat(4),
+   token:'DEMO_DOI_'+(i+1),
+   stage:i===1?1:0,
+   round:i===2?1:0,
+   health:3,
+   wrong:0,
+   score:i===1?20:0,
+   bonus:0,
+   gold:120,
+   heroLevel:i===1?2:1,
+   upgrades:{damage:1,speed:1,hp:1,regen:1},
+   completed:false,
+   finishedAt:null,
+   attempts:[0,0,0,0,0],
+   hintsUsed:[false,false,false,false,false],
+   digits:i===1?[{stage:1,digit:'3',rule:offStages[0].digitRule,item:offStages[0].item}]:[]
+  }))
+ };
+}
 let demoRoom=initDemo();
-function offErr(msg){throw new Error(msg)}
-function offEvent(s){demoRoom.events.push({text:s,at:new Date().toISOString()})}
-function offState(d){let r=demoRoom,gv=d.token===r.teacherToken,t=r.teams.find(x=>x.token===d.token);if(!gv&&!t)offErr('Mã truy cập không hợp lệ.');
- const teams=r.teams.map(x=>({id:x.id,name:x.name,avatar:x.avatar,color:x.color,stage:x.stage,round:x.round,health:x.health,wrong:x.wrong,score:x.score,bonus:x.bonus,completed:x.completed,finishedAt:x.finishedAt}));
- let clk={...r.clock};if(clk.running)clk.remainingMs=Math.max(0,clk.remainingMs-(Date.now()-clk.startedAt));
- let data={room:r.id,role:gv?'teacher':'student',teams,paused:r.paused,clock:clk,stages:offStages.map(m=>({id:m.id,title:m.title,icon:m.icon,place:m.place,tag:m.tag,gameType:m.gameType,totalRounds:3})),messageOptions:offOptions,lastEvent:r.events.slice(-15).reverse(),createdAt:new Date().toISOString(),joinBaseURL:'Bản chơi thử 1 máy'};
+function offErr(msg){throw new Error(msg);}
+function offEvent(s){demoRoom.events.push({text:s,at:new Date().toISOString()});}
+function normAns(s){return String(s??'').trim().replace(/\u2212/g,'-').replace(/\s+/g,'').toUpperCase();}
+function publicStageDemo(s,round){
+ const q=s.challenges[round];
+ return {
+  id:s.id,title:s.title,place:s.place,icon:s.icon,tag:s.tag,time:s.time,
+  story:s.story,groupTask:s.groupTask,gameType:s.gameType,defaultMode:s.defaultMode||(s.id===2||s.id===5?'defense':'hunt'),
+  teamRoles:s.teamRoles||[],huntMap:s.huntMap||null,defenseConfig:s.defenseConfig||null,
+  allRounds:s.challenges.map((c,i)=>({index:i,label:c.label,keyBadge:c.keyBadge||'Mảnh '+(i+1),monster:c.monster||{icon:'👾',name:'Quái Vật',hp:100}})),
+  round,totalRounds:s.challenges.length,
+  challenge:{label:q.label,prompt:q.prompt,options:q.options,roleAssign:q.roleAssign||'',monster:q.monster||{icon:'👾',name:'Quái Vật Trạm',hp:120},keyBadge:q.keyBadge||'',hasShortAnswer:Boolean(q.shortAnswer)}
+ };
+}
+function offState(d){
+ let r=demoRoom,gv=d.token===r.teacherToken,t=r.teams.find(x=>x.token===d.token);
+ if(!gv&&!t)offErr('Mã truy cập không hợp lệ.');
+ const teams=r.teams.map(x=>({id:x.id,name:x.name,avatar:x.avatar,color:x.color,stage:x.stage,round:x.round,health:x.health,wrong:x.wrong,score:x.score,bonus:x.bonus,gold:x.gold,heroLevel:x.heroLevel,upgrades:x.upgrades,completed:x.completed,finishedAt:x.finishedAt}));
+ let clk={...r.clock};
+ if(clk.running)clk.remainingMs=Math.max(0,clk.remainingMs-(Date.now()-clk.startedAt));
+ let data={room:r.id,role:gv?'teacher':'student',teams,paused:r.paused,clock:clk,stages:offStages.map(m=>({id:m.id,title:m.title,icon:m.icon,place:m.place,tag:m.tag,gameType:m.gameType,defaultMode:m.defaultMode,totalRounds:3})),messageOptions:offOptions,lastEvent:r.events.slice(-15).reverse(),createdAt:new Date().toISOString(),joinBaseURL:'Bản chơi thử 1 máy'};
  if(gv)return {...data,teamCodes:Object.fromEntries(r.teams.map(x=>[x.id,x.code])),missions:offStages.map(m=>({...m,challenges:m.challenges.map(q=>({...q,answer:'ABCD'[q.correct]}))})),teacherToken:r.teacherToken,cipher:'30524',cipherWords:offWords};
- let m=offStages[t.stage],q=m?.challenges[t.round];return {...data,me:{...t},current:m?{id:m.id,icon:m.icon,title:m.title,place:m.place,tag:m.tag,time:m.time,story:m.story,groupTask:m.groupTask,gameType:m.gameType,round:t.round,totalRounds:3,challenge:{prompt:q.prompt,options:q.options,label:q.label}}:null,cipherWords:t.stage>=5?offWords:null};}
-async function demoApi(route,d){let r=demoRoom;if(route==='/api/create'){r=demoRoom=initDemo();return {room:r.id,teacherToken:r.teacherToken}};
- if(route==='/api/join'){let team=r.teams.find(x=>x.id===d.team&&x.code===String(d.code));if(!team)offErr('Sai mã đội. Đội 1: 1111 · đội 2: 2222 · đội 3: 3333 · đội 4: 4444');return {room:r.id,team:team.id,token:team.token}}
+ let m=offStages[t.stage];
+ return {...data,me:{...t},current:m?publicStageDemo(m,t.round):null,cipherWords:t.stage>=5?offWords:null};
+}
+async function demoApi(route,d){
+ let r=demoRoom;
+ if(route==='/api/create'){r=demoRoom=initDemo();return {room:r.id,teacherToken:r.teacherToken};}
+ if(route==='/api/join'){
+  let team=r.teams.find(x=>x.id===d.team&&x.code===String(d.code));
+  if(!team)offErr('Sai mã đội. Đội 1: 1111 · Đội 2: 2222 · Đội 3: 3333 · Đội 4: 4444');
+  return {room:r.id,team:team.id,token:team.token};
+ }
  if(route==='/api/state')return offState(d);
- let t=r.teams.find(x=>x.token===d.token);if(route==='/api/teacher'){if(d.token!==r.teacherToken)offErr('Chỉ GV được thao tác');if(d.action==='bonus'){let x=r.teams.find(x=>x.id===d.team);x.score+=Number(d.value)-x.bonus;x.bonus=Number(d.value)}else if(d.action==='pause'){r.paused=!r.paused}else if(d.action==='resetTeam'){let x=r.teams.find(x=>x.id===d.team);let base=initDemo().teams.find(v=>v.id===d.team);Object.assign(x,base)}else if(d.action==='timer'){if(d.value==='start'){r.clock.running=true;r.clock.startedAt=Date.now()}else if(d.value==='pause'){r.clock.remainingMs=Math.max(0,r.clock.remainingMs-(Date.now()-r.clock.startedAt));r.clock.running=false}else if(d.value==='reset'){r.clock.running=false;r.clock.remainingMs=r.clock.minutes*60000}else{r.clock.minutes=Number(d.value);r.clock.remainingMs=Number(d.value)*60000;r.clock.running=false}}return {ok:true}}
- if(!t)offErr('Đội chưa đăng nhập');if(r.paused)offErr('GV đang tạm dừng game');
- if(route==='/api/answer'){if(t.stage!==Number(d.stage)||t.round!==Number(d.round))offErr('Nhiệm vụ thay đổi, hãy tải lại');let s=offStages[t.stage],q=s.challenges[t.round];if(Number(d.choice)===q.correct){t.round++;let pts=0,digit=null;if(t.round===3){pts=t.attempts[t.stage]===0&&!t.hintsUsed[t.stage]?20:t.attempts[t.stage]<=2?12:8;t.score+=pts;digit=s.digit;t.digits.push({stage:t.stage+1,digit:s.digit,rule:s.digitRule,item:s.item});t.stage++;t.round=0;t.health=3;offEvent(t.avatar+' '+t.name+' vượt trạm và nhận '+digit)}else offEvent(t.name+' vượt lượt '+t.round+'/3');return {correct:true,points:pts,explain:q.explain,roundFinished:true,stageFinished:digit!==null,digit,digitRule:digit?s.digitRule:undefined,item:digit?s.item:undefined,nextRound:t.round,nextStage:t.stage,health:t.health,score:t.score}}t.attempts[t.stage]++;t.wrong++;t.health=Math.max(0,t.health-1);return {correct:false,hint:q.hints[Math.min(t.attempts[t.stage]-1,1)],health:t.health,tries:t.attempts[t.stage]}}
- if(route==='/api/hint'){let q=offStages[t.stage].challenges[t.round];t.hintsUsed[t.stage]=true;return {hint:q.hints[0],cost:'Được tính điểm theo số lần sai và mức gợi ý.'}}
- if(route==='/api/final'){if(t.stage!==5)offErr('Chưa thu đủ mảnh mã');if(t.completed)offErr('Đội đã hoàn thành');if(d.code==='30524'&&Number(d.choice)===0){t.completed=true;t.finishedAt=new Date().toISOString();t.score+=20;offEvent(t.name+' mở Lõi Trí Tuệ');return {correct:true,points:20,message:offOptions[0],score:t.score}}return {correct:false,hint:String(d.code)==='30524'?'Chọn đúng câu thông điệp từ bảng giải mã.':'Ghép chữ số theo thứ tự 5 chặng.'}};
- offErr('Tác vụ không hỗ trợ trong bản demo');}
-</script><script>/* MATHVERSE OXYZ — client không dùng thư viện ngoài */
+ let t=r.teams.find(x=>x.token===d.token);
+ if(route==='/api/teacher'){
+  if(d.token!==r.teacherToken)offErr('Chỉ GV được thao tác');
+  if(d.action==='bonus'){let x=r.teams.find(x=>x.id===d.team);x.score+=Number(d.value)-x.bonus;x.bonus=Number(d.value);}
+  else if(d.action==='pause'){r.paused=!r.paused;}
+  else if(d.action==='resetTeam'){let x=r.teams.find(x=>x.id===d.team);let base=initDemo().teams.find(v=>v.id===d.team);Object.assign(x,base);}
+  else if(d.action==='timer'){
+   if(d.value==='start'){r.clock.running=true;r.clock.startedAt=Date.now();}
+   else if(d.value==='pause'){r.clock.remainingMs=Math.max(0,r.clock.remainingMs-(Date.now()-r.clock.startedAt));r.clock.running=false;}
+   else if(d.value==='reset'){r.clock.running=false;r.clock.remainingMs=r.clock.minutes*60000;}
+   else{r.clock.minutes=Number(d.value);r.clock.remainingMs=Number(d.value)*60000;r.clock.running=false;}
+  }
+  return {ok:true};
+ }
+ if(!t)offErr('Đội chưa đăng nhập');
+ if(route==='/api/demoJump'){
+  const stg=Math.max(0,Math.min(5,Number(d.stage)||0));
+  t.stage=stg;t.round=0;t.health=3;t.completed=false;
+  t.digits=offStages.slice(0,stg).map((s,idx)=>({stage:idx+1,digit:s.digit,rule:s.digitRule,item:s.item}));
+  t.score=stg*20;
+  return {ok:true};
+ }
+ if(r.paused)offErr('GV đang tạm dừng game');
+ if(route==='/api/answer'){
+  if(t.stage!==Number(d.stage)||t.round!==Number(d.round))offErr('Nhiệm vụ thay đổi, hãy tải lại');
+  let s=offStages[t.stage],q=s.challenges[t.round];
+  let isCorrect=false;
+  if(d.shortText!==undefined&&String(d.shortText).trim()!==''){
+   const given=normAns(d.shortText);
+   const targetShort=normAns(q.shortAnswer);
+   const targetOpt=normAns(q.options[q.correct]);
+   const targetLetter=String.fromCharCode(65+q.correct);
+   isCorrect=(targetShort&&given===targetShort)||given===targetOpt||given===targetLetter;
+  }else{
+   isCorrect=(Number(d.choice)===q.correct);
+  }
+  if(isCorrect){
+   t.round++;let pts=0,digit=null,goldEarned=120;
+   t.gold=(t.gold||100)+goldEarned;
+   if(t.round===3){
+    pts=t.attempts[t.stage]===0&&!t.hintsUsed[t.stage]?20:t.attempts[t.stage]<=2?12:8;
+    t.score+=pts;t.gold+=80;t.heroLevel=Math.min(6,(t.heroLevel||1)+1);
+    digit=s.digit;
+    t.digits.push({stage:t.stage+1,digit:s.digit,rule:s.digitRule,item:s.item});
+    t.stage++;t.round=0;t.health=3;
+    offEvent(t.avatar+' '+t.name+' vượt Chặng '+s.id+' và nhận mảnh mã '+digit);
+   }else{
+    offEvent(t.avatar+' '+t.name+' vượt lượt '+t.round+'/3 tại '+s.place);
+   }
+   return {correct:true,points:pts,goldEarned,gold:t.gold,heroLevel:t.heroLevel,explain:q.explain,keyBadge:q.keyBadge,roundFinished:true,stageFinished:digit!==null,digit,digitRule:digit?s.digitRule:undefined,item:digit?s.item:undefined,nextRound:t.round,nextStage:t.stage,health:t.health,score:t.score};
+  }
+  t.attempts[t.stage]++;t.wrong++;t.health=Math.max(0,t.health-1);
+  return {correct:false,hint:q.hints[Math.min(t.attempts[t.stage]-1,q.hints.length-1)],health:t.health,tries:t.attempts[t.stage],gold:t.gold};
+ }
+ if(route==='/api/upgrade'){
+  const key=String(d.upgrade||'');
+  const curLv=t.upgrades[key]||1;
+  if(curLv>=5)offErr('Chỉ số này đã đạt cấp tối đa (Lv.5)!');
+  const cost=60+curLv*40;
+  if((t.gold||0)<cost)offErr('Không đủ Vàng! Cần '+cost+' Vàng. Hãy giải câu hỏi để nhận thêm Vàng.');
+  t.gold-=cost;t.upgrades[key]=curLv+1;
+  if(key==='hp'||key==='regen')t.health=Math.min(3,t.health+1);
+  return {ok:true,gold:t.gold,upgrades:t.upgrades,health:t.health,cost,level:t.upgrades[key]};
+ }
+ if(route==='/api/hint'){
+  let q=offStages[t.stage].challenges[t.round];
+  t.hintsUsed[t.stage]=true;
+  return {hint:q.hints[0],cost:'Điểm chặng tính theo số lần sai và gợi ý.'};
+ }
+ if(route==='/api/final'){
+  if(t.stage!==5)offErr('Chưa thu đủ 5 mảnh mã');
+  if(t.completed)offErr('Đội đã hoàn thành');
+  if(String(d.code||'').trim()==='30524'&&Number(d.choice)===0){
+   t.completed=true;t.finishedAt=new Date().toISOString();t.score+=20;
+   offEvent('🏆 '+t.name+' mở Rương Lõi Trí Tuệ thành công!');
+   return {correct:true,points:20,message:offOptions[0],score:t.score};
+  }
+  return {correct:false,hint:String(d.code||'').trim()==='30524'?'Chọn đúng thông điệp từ bảng giải mã.':'Ghép 5 chữ số theo thứ tự Chặng 1 → 5 (30524).'};
+ }
+ offErr('Tác vụ không hỗ trợ trong bản demo');
+}
+</script>
+<script>
+/* MATHVERSE OXYZ — Hệ thống Game Tương Tác Nhóm (Săn Kho Báu 2D & Bảo Vệ Thành Trì) */
 'use strict';
 const $=sel=>document.querySelector(sel);
+const $$=sel=>Array.from(document.querySelectorAll(sel));
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const app=$('#app');
 const qs=new URLSearchParams(location.search);
-let session=null, world=null, modal=null, busy=false, showAward=false, soundEnabled=true, showAnswers=false;
-let lastSignature='', clockBase=null, tickBase=0;
-const missionMeta=[['🏰','Cổng Vectơ'],['🌉','Cầu Vuông Góc'],['🗼','Tháp Tinh Thể'],['🌀','Mê Cung'],['💎','Pháo Đài']];
+let session=null, world=null, modal=null, busy=false, showAward=false, soundEnabled=true;
+let lastSignature='', lastStudentKey='', clockBase=null, tickBase=0;
+let activePlayMode=null; // 'hunt' | 'defense'
+
+const missionMeta=[['🏝️','Rừng Vectơ'],['🏰','Pháo Đài Vuông Góc'],['💠','Tháp Pha Lê'],['🌀','Mê Cung'],['🐲','Thành Trì Cuối']];
 const labels=['A','B','C','D'];
 const initialRoom=(qs.get('room')||'').trim().toUpperCase();
 const initialTeam=qs.get('team')||'';
 const initialView=qs.get('view')||'';
+
+/* ─── TRẠNG THÁI ENGINE 1: SĂN KHO BÁU 2D (HUNT MAP) ─── */
+const huntState={
+ stageId:-1,
+ x:14, y:50,
+ targetX:null, targetY:null,
+ keysPressed:new Set(),
+ moving:false,
+ battleOpen:false,
+ selectedChoice:null,
+ shortText:'',
+ monsterDefeated:false,
+ rewardBadge:null,
+ lastAutoStation:-1
+};
+
+/* ─── TRẠNG THÁI ENGINE 2: BẢO VỆ THÀNH TRÌ (CASTLE DEFENSE) ─── */
+const cdState={
+ stageId:-1,
+ castleHp:300,
+ castleMaxHp:300,
+ shieldUntil:0,
+ slowUntil:0,
+ enemies:[],
+ projectiles:[],
+ effects:[],
+ lastSpawnAt:0,
+ lastHeroShot:[0,0,0],
+ lastRegenAt:0,
+ seq:0,
+ skillCd:{arrowRain:0,iceVolley:0,groupHeal:0,castleShield:0},
+ shortText:''
+};
+
 function cacheKey(role,room,id=''){return 'mathverse_oyxz_'+role+'_'+room+(id?'_'+id:'');}
-function saveSession(d){session=d;try{localStorage.setItem(cacheKey(d.role,d.room,d.teamId),d.token)}catch(e){};const par=new URLSearchParams({room:d.room,...(d.role==='teacher'?{view:'teacher'}:{team:d.teamId})});try{history.replaceState({},'',location.pathname+'?'+par.toString())}catch(e){};}
+function saveSession(d){
+ session=d;
+ try{localStorage.setItem(cacheKey(d.role,d.room,d.teamId),d.token);}catch(e){}
+ const par=new URLSearchParams({room:d.room,...(d.role==='teacher'?{view:'teacher'}:{team:d.teamId})});
+ try{history.replaceState({},'',location.pathname+'?'+par.toString());}catch(e){}
+}
 function restoreSession(){
  if(!initialRoom)return null;
  if(initialView==='teacher'){const token=localStorage.getItem(cacheKey('teacher',initialRoom));if(token)return{role:'teacher',room:initialRoom,token};}
@@ -74,128 +478,1044 @@ function restoreSession(){
 }
 async function api(route,payload){return demoApi(route,payload);}
 function btn(text,action,cls='primary',attr=''){return `<button type="button" class="button ${cls}" data-action="${action}" ${attr}>${esc(text)}</button>`;}
-function layout(content){return `<nav class="navbar"><div class="brand"><span class="brand-mark">✦</span><span>MATHVERSE <span style="color:#15b9b8">OXYZ</span></span></div><div class="pills"><span class="pill">📐 TOÁN 12</span><span class="pill gold">🎮 PHIÊU LƯU HỘI NHÓM</span>${session?`<button class="button sm gray" data-action="home">⌂ Đổi màn hình</button>`:''}</div></nav>${content}<div class="footer">MathVerse – Giải cứu Thành phố Tri Thức • Game ôn tập Vectơ và hệ trục Oxyz • Dữ liệu chỉ lưu trên máy chủ của lớp</div>`;}
+function layout(content){
+ return `<nav class="navbar"><div class="brand"><span class="brand-mark">✦</span><span>MATHVERSE <span style="color:#15b9b8">OXYZ</span></span></div><div class="pills"><span class="pill">📐 TOÁN 12 (GDPT 2018)</span><span class="pill gold">🗺️ SĂN KHO BÁU 2D & 🏰 THỦ THÀNH</span><button class="button sm gray" data-action="toggleSound">${soundEnabled?'🔊 Âm thanh: Bật':'🔇 Âm thanh: Tắt'}</button>${session?`<button class="button sm gray" data-action="home">⌂ Đổi màn hình</button>`:''}</div></nav>${content}<div class="footer">MathVerse Oxyz – Hệ thống Game Tương Tác Nhóm (Săn Kho Báu 2D & Bảo Vệ Thành Trì) • Trường THPT Số 1 Phan Chu Trinh</div>`;
+}
+
 function startScreen(msg=''){
  const fRoom=esc(initialRoom),fTeam=esc(initialTeam);
- app.innerHTML=layout(`<header class="hero"><div class="eyebrow">HÀNH TRÌNH GIẢI MẬT THƯ • TOÁN LỚP 12</div><h1>MATHVERSE<br/>GIẢI CỨU THÀNH PHỐ TRI THỨC</h1><p class="subtitle">5 MINI-GAME KHÁC NHAU • săn kho báu • thủ thành • rèn pha lê • mê cung • đánh boss. Tối đa 8 đội, mỗi đội một nhân vật.</p><div class="hero-character">🧭</div></header>
- <div class="demo-banner"><strong>🎮 CHƠI THỬ MỘT MÁY:</strong> ${btn('▶ VÀO ĐỘI RỒNG XANH','demoPlay','teal')} ${btn('👩‍🏫 XEM MÀN HÌNH GIÁO VIÊN','demoTeacher','gold')}<small>Phòng mẫu 123456 · đội 1: 1111 · đội 2: 2222 · đội 3: 3333 · đội 4: 4444</small></div>
+ const demoBar=window.IS_DEMO_MODE?`<div class="demo-banner"><strong>🎮 CHẾ ĐỘ CHƠI THỬ & TRÌNH CHIẾU 1 MÁY:</strong> ${btn('▶ VÀO ĐỘI RỒNG XANH (CHƠI NGAY)','demoPlay','teal')} ${btn('👩‍🏫 XEM MÀN HÌNH GIÁO VIÊN','demoTeacher','gold')}<small>Phòng mẫu 123456 · Mã PIN Đội 1: 1111 · Đội 2: 2222 · Đội 3: 3333 · Đội 4: 4444</small></div>`:'';
+ app.innerHTML=layout(`<header class="hero"><div class="eyebrow">HÀNH TRÌNH GIẢI MẬT THƯ • TOÁN LỚP 12</div><h1>MATHVERSE OXYZ<br/>SĂN KHO BÁU & BẢO VỆ THÀNH TRÌ</h1><p class="subtitle">Hệ thống 5 Chặng Game Tương Tác Nhóm: Điều khiển nhân vật Săn Kho Báu trên bản đồ 2D & Chỉ huy 3 Anh Hùng Bảo Vệ Thành Trì thời gian thực!</p><div class="hero-character">🧭</div></header>
+ ${demoBar}
  <div class="tabs"><button class="active" data-action="switch-tab" data-tab="teacher">👩‍🏫 Tạo phòng – Giáo viên</button><button data-action="switch-tab" data-tab="student">🧑‍🚀 Vào đội – Học sinh</button></div>
  ${msg?`<div class="notice error">${esc(msg)}</div>`:''}
- <section class="setup grid grid-2" id="entry"><div class="panel" data-tabbox="teacher"><div class="section-title"><h2>🎓 Phòng điều khiển</h2></div><p>Giáo viên tạo mã phòng, phát mã đội, chiếu bản đồ và theo dõi học sinh theo thời gian thực.</p><div class="form-field"><label>Số đội tham gia</label><select id="teamCount"><option value="4">4 đội</option><option value="5">5 đội</option><option value="6" selected>6 đội</option><option value="7">7 đội</option><option value="8">8 đội</option></select></div>${btn('✨ TẠO PHÒNG MATHVERSE','create','primary block')}<p class="muted" style="margin-top:13px;font-size:12px">Khuyến nghị 4–6 học sinh/đội. Giáo viên giữ bí mật mã quản trị.</p></div>
- <div class="panel" data-tabbox="student"><div class="section-title"><h2>🚀 Đăng nhập đội</h2></div><p>Nhận mã phòng và mã đội từ giáo viên. Đội trưởng nộp đáp án sau khi cả nhóm thống nhất.</p><div class="form-field"><label>Mã phòng 6 chữ số</label><input id="roomInput" type="text" inputmode="numeric" maxlength="6" class="mono" value="${fRoom}" placeholder="VD: 123456" /></div><div class="form-field"><label>Đội thám hiểm</label><select id="teamSelect">${Array.from({length:8},(_,i)=>`<option value="doi-${i+1}" ${fTeam===`doi-${i+1}`?'selected':''}>Đội ${i+1}</option>`).join('')}</select></div><div class="form-field"><label>Mã đội 4 chữ số</label><input id="teamCode" type="password" inputmode="numeric" maxlength="4" placeholder="Mã đội của em" /></div>${btn('🗝️ VÀO HÀNH TRÌNH','join','teal block')}</div></section>
- <div class="panel" style="margin-top:20px"><h3>📜 Tín hiệu từ NOVA</h3><p style="margin-top:9px">“Bóng Đen Lãng Quên đã đánh cắp Lõi Trí Tuệ. Năm mảnh mật mã bị giấu ở Cổng Vectơ, Cầu Vuông Góc, Tháp Tinh Thể, Mê Cung Trung Điểm và Pháo Đài Cuối. Hãy hợp tác để thu hồi năm chữ số, giải mật thư và giải cứu thế giới Oxyz!”</p></div>`);
- if(fRoom){const teacherPane=$('[data-tabbox="teacher"]'),studentPane=$('[data-tabbox="student"]');studentPane?.scrollIntoView({behavior:'smooth',block:'nearest'});}
+ <section class="setup grid grid-2" id="entry"><div class="panel" data-tabbox="teacher"><div class="section-title"><h2>🎓 Phòng điều khiển Giáo viên</h2></div><p>Giáo viên tạo mã phòng, phát mã PIN cho 4–8 nhóm học sinh, chiếu bản đồ hành trình và theo dõi điểm XP, Vàng, Khiên theo thời gian thực.</p><div class="form-field"><label>Số đội tham gia</label><select id="teamCount"><option value="4">4 đội</option><option value="5">5 đội</option><option value="6" selected>6 đội</option><option value="7">7 đội</option><option value="8">8 đội</option></select></div>${btn('✨ TẠO PHÒNG MATHVERSE','create','primary block')}<p class="muted" style="margin-top:13px;font-size:12px">Khuyến nghị 4–6 học sinh/đội (phân vai tính trục Ox, Oy, Oz và Đội trưởng điều khiển).</p></div>
+ <div class="panel" data-tabbox="student"><div class="section-title"><h2>🚀 Đăng nhập Đội Thám Hiểm</h2></div><p>Nhận mã phòng và mã PIN đội từ giáo viên. Cả nhóm cùng thảo luận công thức để điều khiển nhân vật và bảo vệ thành trì!</p><div class="form-field"><label>Mã phòng 6 chữ số</label><input id="roomInput" type="text" inputmode="numeric" maxlength="6" class="mono" value="${fRoom}" placeholder="VD: 123456" /></div><div class="form-field"><label>Đội thám hiểm</label><select id="teamSelect">${Array.from({length:8},(_,i)=>`<option value="doi-${i+1}" ${fTeam===`doi-${i+1}`?'selected':''}>Đội ${i+1}</option>`).join('')}</select></div><div class="form-field"><label>Mã đội 4 chữ số</label><input id="teamCode" type="password" inputmode="numeric" maxlength="4" placeholder="Mã PIN của đội" /></div>${btn('🗝️ VÀO HÀNH TRÌNH NGAY','join','teal block')}</div></section>
+ <div class="panel" style="margin-top:20px"><h3>📜 Cốt truyện & Hai cơ chế Game Tương Tác Nhóm</h3><p style="margin-top:8px">“Bóng Đen Lãng Quên đã chia Lõi Trí Tuệ của Thành phố Oxyz thành 5 mảnh mật mã. Ở mỗi chặng, các đội có thể trải nghiệm <b>🗺️ Săn Kho Báu 2D</b> (điều khiển nhân vật đi trên bản đồ tìm các trạm quái vật, mở cuộn giấy giải toán) và <b>🏰 Bảo Vệ Thành Trì</b> (chỉ huy 3 Anh Hùng bắn hạ các đợt quái vật trên 3 làn đường, dùng Vàng nâng cấp vũ khí và tung 4 Kỹ năng đặc biệt)!”</p></div>`);
 }
-function mapTrack(stage){return `<div class="stage-track">${missionMeta.map((a,i)=>`<div class="station ${i<stage?'done':i===stage?'current':''}"><div class="emoji">${i<stage?'✅':a[0]}</div><span>${esc(a[1])}</span></div>`).join('')}</div>`;}
-function teacherMap(teams){return `<div class="big-map"><div class="screen-tag">🗺️ BẢN ĐỒ DI CHUYỂN CỦA CÁC ĐỘI</div>${mapTrack(-1)}${teams.map(t=>`<div class="map-lane"><div class="map-name"><span class="team-avatar">${t.avatar}</span><span>${esc(t.name)}</span></div><div class="track"><div class="filled" style="width:${Math.max(1,t.stage/5*100)}%"></div><div class="ticks">${[0,1,2,3,4,5].map(()=>'<i></i>').join('')}</div><span class="pawn" style="--pos:calc(5% + ${t.stage} * 18%)">${t.avatar}</span></div><div class="lane-score">${t.score} XP<br/><small>${t.stage<5?`Lượt ${t.round+1}/3 · 🛡️${t.health}`:"Mở mã"}</small></div></div>`).join('')}</div>`;}
-function standings(teams,compact=false){const list=[...teams].sort((a,b)=>b.score-a.score||(b.stage-a.stage)||((a.finishedAt||'9999').localeCompare(b.finishedAt||'9999')));if(compact)return list.map((t,i)=>`<div class="mini-rank"><span>${i===0?'🥇':i===1?'🥈':i===2?'🥉':'🏅'} ${t.avatar} ${esc(t.name)}</span><strong>${t.score} XP</strong></div>`).join('');return `<table class="result-table"><thead><tr><th>Hạng</th><th>Đội</th><th>Chặng</th><th>Điểm</th><th>Thành tích</th></tr></thead><tbody>${list.map((t,i)=>`<tr><td>${i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1}</td><td>${t.avatar} <strong>${esc(t.name)}</strong></td><td><div class="mini-progress"><span style="width:${t.stage/5*100}%"></span></div><small>${t.stage}/5 • ${t.stage<5?`lượt ${t.round+1}/3`:"đủ mảnh"}</small></td><td><strong>${t.score} XP</strong></td><td>${t.completed?'<span class="pill green">🏆 Mở kho báu</span>':t.stage===5?'<span class="pill gold">🔐 Giải mật mã</span>':'Đang khám phá'}</td></tr>`).join('')}</tbody></table>`;}
-function teacherScreen(){const teams=world.teams,done=teams.filter(t=>t.completed).length;
+
+function mapTrack(stage){
+ return `<div class="stage-track">${missionMeta.map((a,i)=>`<div class="station ${i<stage?'done':i===stage?'current':''}"><div class="emoji">${i<stage?'✅':a[0]}</div><span>Chặng ${i+1}: ${esc(a[1])}</span></div>`).join('')}</div>`;
+}
+function teacherMap(teams){
+ return `<div class="big-map"><div class="screen-tag">🗺️ BẢN ĐỒ DI CHUYỂN TRỰC TIẾP CỦA CÁC ĐỘI</div>${mapTrack(-1)}${teams.map(t=>`<div class="map-lane"><div class="map-name"><span class="team-avatar">${t.avatar}</span><span>${esc(t.name)}</span></div><div class="track"><div class="filled" style="width:${Math.max(2,(t.stage*3+t.round)/15*100)}%"></div><div class="ticks">${[0,1,2,3,4,5].map(()=>'<i></i>').join('')}</div><span class="pawn" style="--pos:calc(5% + ${(t.stage*3+(t.stage<5?t.round:0))/15} * 90%)">${t.avatar}</span></div><div class="lane-score">${t.score} XP · 🪙${t.gold??100}<br/><small>${t.stage<5?`Chặng ${t.stage+1} (${t.round+1}/3) · 🛡️${t.health}`:'🔓 Đủ 5 mảnh'}</small></div></div>`).join('')}</div>`;
+}
+function standings(teams,compact=false){
+ const list=[...teams].sort((a,b)=>b.score-a.score||(b.stage-a.stage)||(b.round-a.round)||((a.finishedAt||'9999').localeCompare(b.finishedAt||'9999')));
+ if(compact)return list.map((t,i)=>`<div class="mini-rank"><span>${i===0?'🥇':i===1?'🥈':i===2?'🥉':'🏅'} ${t.avatar} ${esc(t.name)}</span><strong>${t.score} XP</strong></div>`).join('');
+ return `<table class="result-table"><thead><tr><th>Hạng</th><th>Đội</th><th>Tiến độ Chặng</th><th>Vàng & Cấp</th><th>Điểm XP</th><th>Trạng thái</th></tr></thead><tbody>${list.map((t,i)=>`<tr><td>${i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1}</td><td>${t.avatar} <strong>${esc(t.name)}</strong></td><td><div class="mini-progress"><span style="width:${(t.stage*3+(t.stage<5?t.round:0))/15*100}%"></span></div><small>Chặng ${t.stage}/5 • ${t.stage<5?`lượt ${t.round+1}/3`:'Hoàn tất 5 chặng'}</small></td><td>🪙 ${t.gold??100} · Lv.${t.heroLevel??1}</td><td><strong>${t.score} XP</strong></td><td>${t.completed?'<span class="pill green">🏆 Đã mở kho báu</span>':t.stage===5?'<span class="pill gold">🔐 Đang giải mật mã</span>':'⚔️ Đang chiến đấu'}</td></tr>`).join('')}</tbody></table>`;
+}
+
+function teacherScreen(){
+ const teams=world.teams,done=teams.filter(t=>t.completed).length;
  const joinBase=world.joinBaseURL||location.origin;const baseUrl=joinBase+location.pathname;
  const winners=[...teams].sort((a,b)=>b.score-a.score||((a.finishedAt||'9999').localeCompare(b.finishedAt||'9999')));
  const helper=[...teams].sort((a,b)=>b.bonus-a.bonus)[0];
- return `<div class="dashboard-head"><div><span class="screen-tag">👩‍🏫 MÀN HÌNH ĐIỀU HÀNH GIÁO VIÊN</span><h2>Mật lệnh phòng <span class="room-number">${esc(world.room)}</span></h2><p class="muted">Mỗi đội có mã riêng. Nhân vật tự di chuyển khi đội thắng đủ 3 lượt của mỗi mini-game. Giáo viên quan sát các lượt chơi và mức khiên từng đội.</p></div><div class="panel" style="text-align:center;padding:15px 20px"><span class="screen-tag">ĐỒNG HỒ TIẾT HỌC</span><div class="clock" id="clock">45:00</div><div class="controls">${btn(world.clock.running?'⏸ Dừng giờ':'▶ Bắt đầu','timerToggle','sm teal')}${btn('↻','timerReset','sm gray')}<select id="clockMinutes" aria-label="Thời lượng tiết học"><option value="35" ${world.clock.minutes===35?'selected':''}>35 phút</option><option value="40" ${world.clock.minutes===40?'selected':''}>40 phút</option><option value="45" ${world.clock.minutes===45?'selected':''}>45 phút</option><option value="50" ${world.clock.minutes===50?'selected':''}>50 phút</option></select></div></div></div>
- <div class="top-numbers"><div class="metric"><b>${teams.length}</b><small>ĐỘI THÁM HIỂM</small></div><div class="metric"><b>${done}</b><small>ĐÃ MỞ KHO BÁU</small></div><div class="metric"><b>${teams.filter(t=>t.stage>=5).length}</b><small>ĐỦ 5 MẢNH MÃ</small></div><div class="metric"><b>${teams.reduce((a,t)=>a+t.score,0)}</b><small>XP TOÀN LỚP</small></div></div>
- <div class="controls" style="margin-bottom:16px">${btn(world.paused?'▶ Tiếp tục game':'⏸ Tạm dừng nhiệm vụ','pauseGame',world.paused?'teal':'gold')}${btn('🏆 Công bố giải thưởng','awards','primary')}${btn('📥 Xuất CSV','exportCSV','gray')}${btn('🖨️ In bảng kết quả','print','gray')}<span class="pill ${world.paused?'pink':'green'}">${world.paused?'🔒 Nhiệm vụ đang khóa':'🟢 Nhiệm vụ đang mở'}</span></div>
- <div class="teacher-main"><div><section class="panel"><div class="section-title"><h2>🗺️ Hành trình trực tiếp qua 5 mini-game</h2><span class="pill">Tự cập nhật ~2 giây</span></div>${teacherMap(teams)}</section><section class="panel"><div class="section-title"><h2>🏅 Bảng xếp hạng</h2><small>Tính theo điểm, sau đó thời điểm hoàn thành</small></div>${standings(teams)}</section><section class="panel"><h2>🎊 Kết quả và trao thưởng</h2>${showAward?`<div class="champion" style="margin-top:17px"><span class="star">🏆</span><strong>NHÀ VÔ ĐỊCH MATHVERSE: ${winners[0].avatar} ${esc(winners[0].name)}</strong><p>${winners[0].score} XP · ${winners[0].completed?'Đã giải mật thư':'Chưa mở kho báu'}</p></div><div class="grid grid-2" style="margin-top:13px"><div class="notice good">🥈 Á quân: ${winners[1]?esc(winners[1].name):'—'}</div><div class="notice good">🥉 Giải ba: ${winners[2]?esc(winners[2].name):'—'}</div><div class="notice">🤝 Giải hợp tác: ${helper&&helper.bonus>0?esc(helper.name):'GV lựa chọn'}</div><div class="notice">🔐 Giải mã: ${teams.filter(t=>t.completed).length} đội hoàn thành</div></div>`:`<p class="muted" style="margin:10px 0">Khi học sinh hoàn thành, nhấn “Công bố giải thưởng” để hiện nhà vô địch, á quân và giải hợp tác.</p><div class="notice">Lưu ý: nếu điểm bằng nhau, ưu tiên đội hoàn thành sớm hơn.</div>`}</section></div>
- <aside><section class="panel"><div class="section-title"><h3>🔑 Mã tham gia của từng đội</h3><span class="teacher-only">CHỈ GV XEM</span></div><div class="notice" style="margin-bottom:14px">Học sinh cùng Wi-Fi mở <strong>${esc(joinBase)}</strong>, nhập mã phòng <strong>${esc(world.room)}</strong>, chọn đội và mã đội.</div>${teams.map(t=>`<div class="team-join"><div class="team-emoji">${t.avatar}</div><div class="team-details"><b>${esc(t.name)}</b><small>Đội ${t.id.split('-')[1]} · <span class="code">${esc(world.teamCodes[t.id])}</span></small></div><button class="button sm gray" data-action="copy" data-url="${esc(baseUrl+'?room='+world.room+'&team='+t.id)}" title="Sao chép liên kết đội">⧉</button></div>`).join('')}<p class="muted" style="font-size:12px;margin-top:14px">Không gửi ảnh màn hình giáo viên cho học sinh vì có chứa mã của tất cả đội.</p></section>
- <section class="panel"><h3>✨ Điểm hợp tác (0–10 XP)</h3><p class="muted" style="font-size:12px;margin:6px 0 12px">Chọn đội và số điểm thưởng thêm cho cách phối hợp. Điểm được thay thế, không cộng lặp.</p><div class="form-field"><label>Đội</label><select id="bonusTeam">${teams.map(t=>`<option value="${t.id}">${t.avatar} ${esc(t.name)} (hiện +${t.bonus})</option>`).join('')}</select></div><div class="form-field"><label>Điểm cộng</label><select id="bonusValue">${Array.from({length:11},(_,n)=>`<option value="${n}">${n} XP</option>`).join('')}</select></div>${btn('Lưu điểm hợp tác','setBonus','sm primary block')}</section>
- <section class="panel"><h3>📡 Nhật ký nhiệm vụ</h3><div class="events" style="margin-top:10px">${world.lastEvent.length?world.lastEvent.map(e=>`<div class="event"><time>${new Date(e.at).toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'})}</time><span>${esc(e.text)}</span></div>`).join(''):'Chưa có hoạt động nào.'}</div></section>
- <section class="panel"><div class="section-title"><h3>📚 Đáp án giáo viên</h3><span class="teacher-only">ẨN KHỎI HS</span></div>${world.missions.map(m=>`<details class="teacher-answer"><summary>${m.icon} Chặng ${m.id}: ${esc(m.title)} · ${m.challenges.length} lượt</summary>${m.challenges.map((q,i)=>`<div class="answer-round"><p><b>Lượt ${i+1}: ${esc(q.prompt)}</b></p><p class="correct">Đáp án ${esc(q.answer)} – ${esc(q.options[q.correct])}</p><p>${esc(q.explain)}</p><p><em>Gợi ý: ${esc(q.hints[0])}</em></p></div>`).join('')}<p class="notice good">Mảnh mã: <b>${m.digit}</b> · ${esc(m.digitRule)}</p></details>`).join('')}<p class="notice good">Mã cuối: <b>30524</b> · Thông điệp: <b>TƯ DUY VÀ HỢP TÁC MỞ KHO BÁU</b></p></section>
- <section class="panel"><h3>🧹 Hỗ trợ nếu đội gặp lỗi</h3><p class="muted" style="font-size:12px;margin:8px 0">Chỉ sử dụng khi cần khôi phục đội chơi. Việc đặt lại đội sẽ xóa điểm và tiến độ của đội đó.</p><div class="form-field"><select id="resetTeam">${teams.map(t=>`<option value="${t.id}">${t.avatar} ${esc(t.name)}</option>`).join('')}</select></div>${btn('↺ Đặt lại đội được chọn','resetTeam','sm red block')}</section>
+ return `<div class="dashboard-head"><div><span class="screen-tag">👩‍🏫 MÀN HÌNH ĐIỀU HÀNH GIÁO VIÊN</span><h2>Mã Phòng Học: <span class="room-number">${esc(world.room)}</span></h2><p class="muted">Học sinh tham gia theo nhóm qua 2 cơ chế: <b>Săn Kho Báu 2D</b> & <b>Bảo Vệ Thành Trì</b>. Bản đồ cập nhật tự động theo thời gian thực.</p></div><div class="panel" style="text-align:center;padding:15px 20px"><span class="screen-tag">ĐỒNG HỒ TIẾT HỌC</span><div class="clock" id="clock">45:00</div><div class="controls">${btn(world.clock.running?'⏸ Dừng giờ':'▶ Bắt đầu','timerToggle','sm teal')}${btn('↻','timerReset','sm gray')}<select id="clockMinutes" aria-label="Thời lượng tiết học"><option value="35" ${world.clock.minutes===35?'selected':''}>35 phút</option><option value="40" ${world.clock.minutes===40?'selected':''}>40 phút</option><option value="45" ${world.clock.minutes===45?'selected':''}>45 phút</option><option value="50" ${world.clock.minutes===50?'selected':''}>50 phút</option></select></div></div></div>
+ <div class="top-numbers"><div class="metric"><b>${teams.length}</b><small>ĐỘI THÁM HIỂM</small></div><div class="metric"><b>${done}</b><small>ĐÃ MỞ KHO BÁU</small></div><div class="metric"><b>${teams.filter(t=>t.stage>=5).length}</b><small>ĐỦ 5 MẢNH MÃ</small></div><div class="metric"><b>${teams.reduce((a,t)=>a+t.score,0)}</b><small>TỔNG XP LỚP</small></div></div>
+ <div class="controls" style="margin-bottom:16px">${window.IS_DEMO_MODE?btn('▶ Vào Đội Rồng Xanh (Trải nghiệm Game)','demoPlay','teal'):''}${btn(world.paused?'▶ Tiếp tục game':'⏸ Tạm dừng lớp học','pauseGame',world.paused?'teal':'gold')}${btn('🏆 Công bố giải thưởng','awards','primary')}${btn('📥 Xuất CSV minh chứng','exportCSV','gray')}${btn('🖨️ In bảng kết quả','print','gray')}<span class="pill ${world.paused?'pink':'green'}">${world.paused?'🔒 Đang tạm dừng để GV giảng bài':'🟢 Học sinh đang làm nhiệm vụ'}</span></div>
+ <div class="teacher-main"><div><section class="panel"><div class="section-title"><h2>🗺️ Tiến độ trực tiếp qua 5 chặng Oxyz</h2><span class="pill">Tự cập nhật ~2 giây</span></div>${teacherMap(teams)}</section><section class="panel"><div class="section-title"><h2>🏅 Bảng xếp hạng các đội</h2><small>Tính theo XP, sau đó thời điểm hoàn thành</small></div>${standings(teams)}</section><section class="panel"><h2>🎊 Tổng kết và vinh danh</h2>${showAward?`<div class="champion" style="margin-top:14px"><span class="star">🏆</span><strong>QUÁN QUÂN MATHVERSE: ${winners[0].avatar} ${esc(winners[0].name)}</strong><p>${winners[0].score} XP · ${winners[0].completed?'Đã giải mã Lõi Trí Tuệ':'Đang trên hành trình'}</p></div><div class="grid grid-2" style="margin-top:12px"><div class="notice good">🥈 Á quân: ${winners[1]?esc(winners[1].name):'—'}</div><div class="notice good">🥉 Giải ba: ${winners[2]?esc(winners[2].name):'—'}</div><div class="notice">🤝 Giải hợp tác xuất sắc: ${helper&&helper.bonus>0?esc(helper.name):'GV lựa chọn'}</div><div class="notice">🔐 Mở kho báu: ${done}/${teams.length} đội</div></div>`:`<p class="muted" style="margin:10px 0">Khi kết thúc hoạt động, nhấn “Công bố giải thưởng” để chiếu sân khấu vinh danh 3 đội dẫn đầu và giải hợp tác.</p>`}</section></div>
+ <aside><section class="panel"><div class="section-title"><h3>🔑 Mã PIN đăng nhập từng đội</h3><span class="teacher-only">CHỈ GV XEM</span></div><div class="notice" style="margin-bottom:12px">Học sinh cùng Wi-Fi mở <strong>${esc(joinBase)}</strong>, nhập mã phòng <strong>${esc(world.room)}</strong> và mã PIN đội:</div>${teams.map(t=>`<div class="team-join"><div class="team-emoji">${t.avatar}</div><div class="team-details"><b>${esc(t.name)}</b><small>Đội ${t.id.split('-')[1]} · PIN: <span class="code">${esc(world.teamCodes[t.id])}</span></small></div><button class="button sm gray" data-action="copy" data-url="${esc(baseUrl+'?room='+world.room+'&team='+t.id)}" title="Sao chép liên kết đội">⧉ Link</button></div>`).join('')}</section>
+ <section class="panel"><h3>✨ Cộng điểm hợp tác nhóm (0–10 XP)</h3><div class="form-field"><label>Chọn đội</label><select id="bonusTeam">${teams.map(t=>`<option value="${t.id}">${t.avatar} ${esc(t.name)} (hiện +${t.bonus})</option>`).join('')}</select></div><div class="form-field"><label>Điểm thưởng hợp tác</label><select id="bonusValue">${Array.from({length:11},(_,n)=>`<option value="${n}">${n} XP</option>`).join('')}</select></div>${btn('Lưu điểm hợp tác','setBonus','sm primary block')}</section>
+ <section class="panel"><h3>📡 Nhật ký hoạt động trực tiếp</h3><div class="events" style="margin-top:10px">${world.lastEvent.length?world.lastEvent.map(e=>`<div class="event"><time>${new Date(e.at).toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'})}</time><span>${esc(e.text)}</span></div>`).join(''):'Chưa có hoạt động nào.'}</div></section>
+ <section class="panel"><div class="section-title"><h3>📚 Bảng đáp án & Gợi ý sư phạm</h3><span class="teacher-only">ẨN KHỎI HS</span></div>${world.missions.map(m=>`<details class="teacher-answer"><summary>${m.icon} Chặng ${m.id}: ${esc(m.title)}</summary>${m.challenges.map((q,i)=>`<div class="answer-round"><p><b>Lượt ${i+1}: ${esc(q.prompt)}</b></p><p class="correct">Đáp án ${esc(q.answer)} – ${esc(q.options[q.correct])}</p><p>${esc(q.explain)}</p></div>`).join('')}<p class="notice good">Mảnh mã: <b>${m.digit}</b> · ${esc(m.digitRule)}</p></details>`).join('')}<p class="notice good">Mã kho báu: <b>30524</b> → <b>TƯ DUY VÀ HỢP TÁC MỞ KHO BÁU</b></p></section>
+ <section class="panel"><h3>🧹 Khôi phục đội chơi</h3><div class="form-field"><select id="resetTeam">${teams.map(t=>`<option value="${t.id}">${t.avatar} ${esc(t.name)}</option>`).join('')}</select></div>${btn('↺ Đặt lại đội được chọn','resetTeam','sm red block')}</section>
  </aside></div>`;
 }
-function inv(digits){const d=Object.fromEntries((digits||[]).map(v=>[v.stage,v.digit]));return `<div class="inventory">${[1,2,3,4,5].map(i=>`<div class="digit ${d[i]===undefined?'empty':''}"><small>${i}</small><strong>${d[i]===undefined?'?':esc(d[i])}</strong></div>`).join('')}</div>`;}
-/* Mini-game trực tiếp – mỗi chặng có bối cảnh và thao tác riêng. */
-function gameBoard(m){
- const r=m.round, q=m.challenge, c=m.gameType;
- const spots=[1,2,3].map((_,i)=>`<div class="mini-step ${i<r?'cleared':i===r?'playing':'locked'}"><span>${i<r?'✅':i===r?'✨':'🔒'}</span><small>${['I','II','III'][i]}</small></div>`).join('');
- const health=Array.from({length:3},(_,i)=>i<world.me.health?'🛡️':'▫️').join('');
- let intro='', scene='';
- if(c==='hunt'){
-   intro='🏝️ TRUY TÌM KHO BÁU · MỞ 3 MỐC TỌA ĐỘ';
-   scene=`<div class="scene-hunt"><div class="hunt-sky">☀️ &nbsp; ☁️ &nbsp; 🕊️</div><div class="hunt-islands"><div class="hunt-ship">${world.me.avatar}</div>${[0,1,2].map((_,i)=>`<div class="hunt-spot ${i===r?'active':''} ${i<r?'solved':''}">${i<r?'💎':i===r?'🧰':'❔'}<span>${['Trục X','Trục Y','Trục Z'][i]}</span></div>`).join('')}</div><div class="hunt-wave">🌊 ~ ~ 🌊 ~ ~ 🌊</div></div>`;
- } else if(c==='defense'){
-   intro='🏰 PHÒNG THỦ THÀNH TRÌ · 3 ĐỢT QUÁI VẬT';
-   scene=`<div class="scene-defense"><div class="castle-tower">🏰<span>THÀNH CỦA ${esc(world.me.name)}</span></div><div class="defense-ray">⚡ ━ ━ ➤</div><div class="creep">${['👾','👹','🤖'][r]||'👾'}<span>ĐỢT ${r+1} / 3</span></div><div class="defense-shields">KHIÊN: ${health}</div></div>`;
- } else if(c==='forge'){
-   intro='💎 LÒ RÈN PHA LÊ · GHÉP 3 THÀNH PHẦN';
-   scene=`<div class="scene-forge"><div class="forge-arch">🔮<span>LÒ RÈN OXYZ</span></div><div class="forge-sockets">${[0,1,2].map((_,i)=>`<div class="forge-socket ${i<=r?'active':''}">${i<r?'💎':i===r?'✨':'◇'}<small>${['Δx','Δy','AB'][i]}</small></div>`).join('')}</div><div class="forge-fire">🔥 🔥 🔥</div></div>`;
- } else if(c==='maze'){
-   intro='🌀 MÊ CUNG KHÔNG GIAN · 3 CỬA THOÁT';
-   scene=`<div class="scene-maze"><div class="maze-pattern"></div><div class="maze-avatar">${world.me.avatar}<span>VỊ TRÍ ${r+1}/3</span></div><div class="maze-exit">🚪<span>LỐI THOÁT</span></div><div class="maze-route">→ → →</div></div>`;
- } else {
-   intro='🐲 BOSS CUỐI · PHÁ 3 LỚP GIÁP';
-   scene=`<div class="scene-boss"><div class="boss-hero">${world.me.avatar}<span>ĐỘI THÁM HIỂM</span></div><div class="boss-magic">✦ ⚡ ➤</div><div class="boss-dragon">🐲<span>BÓNG ĐEN LÃNG QUÊN</span></div><div class="boss-hp"><span>GIÁP BOSS</span><div class="boss-bars">${[0,1,2].map((_,i)=>`<i class="${i<3-r?'full':''}"></i>`).join('')}</div></div></div>`;
+
+function inv(digits){
+ const d=Object.fromEntries((digits||[]).map(v=>[v.stage,v.digit]));
+ return `<div class="inventory">${[1,2,3,4,5].map(i=>`<div class="digit ${d[i]===undefined?'empty':''}"><small>Chặng ${i}</small><strong>${d[i]===undefined?'?':esc(d[i])}</strong></div>`).join('')}</div>`;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   RENDER ENGINE 1: SĂN KHO BÁU 2D MAP (SCAVENGER HUNT)
+   ═══════════════════════════════════════════════════════════════════════════ */
+function initHuntForStage(m){
+ const hm=m.huntMap||{theme:'forest',spawn:{x:14,y:50},chest:{x:86,y:50,name:'Rương Kho Báu'},stations:[{x:34,y:28,name:'Trạm I',monsterIcon:'👹',monsterName:'Quái Trạm 1',badge:'I'},{x:54,y:72,name:'Trạm II',monsterIcon:'🐊',monsterName:'Quái Trạm 2',badge:'II'},{x:73,y:32,name:'Trạm III',monsterIcon:'🦅',monsterName:'Quái Trạm 3',badge:'III'}]};
+ if(huntState.stageId!==m.id){
+  huntState.stageId=m.id;
+  huntState.x=hm.spawn.x;
+  huntState.y=hm.spawn.y;
+  huntState.targetX=null;
+  huntState.targetY=null;
+  huntState.battleOpen=false;
+  huntState.selectedChoice=null;
+  huntState.shortText='';
+  huntState.monsterDefeated=false;
+  huntState.rewardBadge=null;
+  huntState.lastAutoStation=-1;
  }
- const icons={hunt:['🧰','🗝️','🏺','💰'],defense:['🎯','🏹','🔥','⚔️'],forge:['🔷','💠','💎','✨'],maze:['🚪','🚪','🚪','🚪'],boss:['💥','⚡','☄️','🎯']};
- const choiceTitle={hunt:'MỞ RƯƠNG TỌA ĐỘ',defense:'BẮN HẠ MỤC TIÊU',forge:'CHỌN VIÊN PHA LÊ',maze:'CHỌN CÁNH CỬA',boss:'BẮN ĐẠI BÁC TOÁN HỌC'};
- const choices=q.options.map((v,i)=>`<button class="mini-choice ${c}" data-action="answer" data-choice="${i}" ${world.paused?'disabled':''}><span class="choice-icon">${icons[c][i]}</span><b>${labels[i]}</b><strong>${esc(v)}</strong></button>`).join('');
- return `<div class="mini-game mini-${c}"><div class="mini-game-head"><div><span class="mini-kicker">${intro}</span><h3>${esc(q.label)}</h3></div><div class="mini-round-progress">${spots}</div></div>${scene}<div class="mini-prompt">🧩 ${esc(q.prompt)}</div><div class="mini-choice-title">${choiceTitle[c]}</div><div class="mini-choices">${choices}</div><div class="mini-toolbar">${btn('💡 NOVA gợi ý','hint','gray')}<span>${world.me.attempts[world.me.stage]} lần chưa đúng · 20 XP khi hoàn hảo · 12/8 XP khi cần hỗ trợ</span></div></div>`;
+ return hm;
 }
-function stageContent(m){return `<div class="question-card"><header class="quest-top"><span class="tag">${m.icon} CHẶNG ${m.id} / 05 · ${esc(m.tag)}</span><h2>${esc(m.title)}</h2><p>${esc(m.story)}</p><p style="margin-top:10px;font-size:13px;color:#ffe38c">🤝 NHIỆM VỤ NHÓM: ${esc(m.groupTask||'Các em hãy cùng thống nhất lựa chọn.')}</p></header>${gameBoard(m)}</div>`;}
-function finalContent(){const words=Object.entries(world.cipherWords||{});return `<div class="final-wrap"><div class="panel"><div class="section-title"><h2>🔐 MỞ LÕI TRI THỨC</h2><span class="pill gold">BOSS CUỐI</span></div><p>Chúc mừng! Cả đội đã hoàn thành 5 trạm. Hãy sắp xếp năm chữ số theo thứ tự trạm 1 → 5, nhập mã mở kho báu rồi giải thông điệp cuối.</p>${inv(world.me.digits)}<div class="form-field"><label>Nhập mật mã 5 chữ số</label><input id="finalCode" type="text" class="mono" placeholder="? ? ? ? ?" inputmode="numeric" maxlength="5" autocomplete="off" /></div><h3 style="margin:18px 0 8px">Bảng giải mã từ ngữ</h3><div class="words">${words.map(([k,v])=>`<span class="word-chip">${esc(k)} = ${esc(v)}</span>`).join('')}</div><h3 style="margin:19px 0 8px">Chọn thông điệp nhận được</h3>${world.messageOptions.map((msg,i)=>`<label class="final-option"><input type="radio" name="message" value="${i}" /> ${labels[i]}. ${esc(msg)}</label>`).join('')}${btn('🔓 GIẢI MÃ KHO BÁU','final','gold block')}</div></div>`;}
-function studentScreen(){const me=world.me,rank=[...world.teams].sort((a,b)=>b.score-a.score),mineRank=rank.findIndex(t=>t.id===me.id)+1;
- return `<div class="mission-hero"><div class="avatar">${me.avatar}</div><div><div class="eyebrow" style="color:#f7ce71">BIỆT ĐỘI ${esc(me.name).toUpperCase()} • PHÒNG ${world.room}</div><h2>${me.completed?'KHO BÁU ĐÃ ĐƯỢC MỞ!':me.stage===5?'BẠN ĐÃ THU ĐỦ MẢNH MẬT MÃ!':'HÀNH TRÌNH GIẢI CỨU OXYZ'}</h2><p>${me.completed?'Hãy theo dõi bảng xếp hạng và phần công bố giải thưởng của giáo viên.':me.stage===5?'NOVA đang chờ đội ghép mã và mở Lõi Tri Thức.':'Bóng Đen Lãng Quên đang chờ ở các trạm phía trước. Cả đội hãy hợp tác để vượt thử thách!'}</p></div></div>
- <div class="panel" style="padding:17px 21px"><div class="flex-between"><h3>🗺️ Bản đồ hành trình của ${esc(me.name)}</h3><span class="pill ${me.stage===5?'green':'gold'}">${me.stage}/5 trạm</span></div>${mapTrack(me.stage)}</div>
- ${world.paused?'<div class="notice error" style="margin:17px 0"><b>⏸ Giáo viên đang tạm dừng game.</b> Hãy chuẩn bị, chờ hiệu lệnh tiếp tục.</div>':''}
- <div class="mission-wrapper"><div>${me.completed?`<div class="panel champion"><span class="star">🏆</span><h2>ĐỘI ${esc(me.name).toUpperCase()} ĐÃ CHIẾN THẮNG!</h2><p style="margin-top:9px;font-size:19px;font-weight:850;color:#8e5b18">“TƯ DUY VÀ HỢP TÁC MỞ KHO BÁU”</p><div class="top-numbers" style="justify-content:center"><div class="metric"><b>${me.score}</b><small>ĐIỂM ĐỘI</small></div><div class="metric"><b>${mineRank}</b><small>THỨ HẠNG HIỆN TẠI</small></div></div></div>`:me.stage>=5?finalContent():stageContent(world.current)}</div>
- <aside class="team-sidebar"><div class="panel"><h3>🎒 Túi mật mã</h3><p class="muted" style="font-size:12px;margin-top:4px">Đọc theo thứ tự 1 → 5 để mở kho báu.</p>${inv(me.digits)}<div class="top-numbers"><div class="metric"><b>${me.score}</b><small>XP CỦA ĐỘI</small></div><div class="metric"><b>#${mineRank}</b><small>HẠNG TẠM THỜI</small></div></div></div><div class="panel"><h3>🏅 Bảng xếp hạng</h3><div style="margin-top:10px">${standings(world.teams,true)}</div></div><div class="panel"><h3>🧑‍🤝‍🧑 Luật hợp tác</h3><p style="font-size:13px;margin-top:8px">Một bạn đọc nhiệm vụ, một bạn tính toán, một bạn kiểm tra, đội trưởng chỉ nộp khi nhóm thống nhất.</p><div class="notice" style="margin-top:11px;font-size:12px">Điểm: đúng lần đầu +20; đúng sau gợi ý/lần sai +12; sai nhiều lần +8; mật thư cuối +20; hợp tác tối đa +10.</div></div></aside></div>`;
+
+function getMapDecorations(theme){
+ if(theme==='maze'){
+  return `
+   <div class="hw-wall-block" style="left:21%;top:10%;width:3.5%;height:52%"></div>
+   <div class="hw-wall-block" style="left:41%;top:38%;width:3.5%;height:52%"></div>
+   <div class="hw-wall-block" style="left:63%;top:10%;width:3.5%;height:52%"></div>
+   <div class="hw-obstacle" style="left:16%;top:22%">🗿</div>
+   <div class="hw-obstacle" style="left:48%;top:18%">🕯️</div>
+   <div class="hw-obstacle" style="left:82%;top:76%">🏛️</div>`;
+ }
+ if(theme==='crystal'){
+  return `
+   <div class="hw-wall-block" style="left:22%;top:58%;width:12%;height:6%"></div>
+   <div class="hw-wall-block" style="left:42%;top:22%;width:12%;height:6%"></div>
+   <div class="hw-obstacle" style="left:18%;top:22%">💎</div>
+   <div class="hw-obstacle" style="left:45%;top:48%">🔮</div>
+   <div class="hw-obstacle" style="left:64%;top:75%">🔷</div>
+   <div class="hw-obstacle" style="left:82%;top:22%">✨</div>`;
+ }
+ if(theme==='fortress'||theme==='citadel'){
+  return `
+   <div class="hw-wall-block" style="left:23%;top:14%;width:4%;height:26%"></div>
+   <div class="hw-wall-block" style="left:62%;top:56%;width:4%;height:28%"></div>
+   <div class="hw-obstacle" style="left:18%;top:75%">🔥</div>
+   <div class="hw-obstacle" style="left:45%;top:20%">⚔️</div>
+   <div class="hw-obstacle" style="left:66%;top:18%">🌋</div>
+   <div class="hw-obstacle" style="left:82%;top:74%">🛡️</div>`;
+ }
+ return `
+  <div class="hw-obstacle" style="left:18%;top:22%">🌲</div>
+  <div class="hw-obstacle" style="left:25%;top:72%">🌳</div>
+  <div class="hw-obstacle" style="left:44%;top:46%">🪨</div>
+  <div class="hw-obstacle" style="left:46%;top:18%">🌴</div>
+  <div class="hw-obstacle" style="left:64%;top:62%">🌲</div>
+  <div class="hw-obstacle" style="left:82%;top:24%">🌳</div>
+  <div class="hw-obstacle" style="left:80%;top:76%">⛺</div>`;
 }
-function render(){if(!session)return startScreen();if(!world){app.innerHTML='<div class="loading">Đang lấy dữ liệu phòng học…</div>';return;}
- app.innerHTML=layout(session.role==='teacher'?teacherScreen():studentScreen());updateClock();$('.award-backdrop')?.remove();if(showAward&&session.role==='teacher'){const aw=document.createElement('div');aw.innerHTML=awardScreen();document.body.appendChild(aw.firstElementChild);}if(modal)showModal();}
-function showModal(){if(!modal)return;const old=$('.modal-backdrop');if(old)old.remove();let good=modal.good;const el=document.createElement('div');el.className='modal-backdrop';el.innerHTML=`<div class="modal" role="dialog" aria-modal="true" aria-label="Thông báo trò chơi"><div class="modal-icon">${good?'🎉':'🧩'}</div><h2 class="${good?'success':'failure'}">${esc(modal.title)}</h2><p>${esc(modal.message)}</p>${modal.explain?`<p class="notice good">${esc(modal.explain)}</p>`:''}${modal.digit!==undefined?`<div class="reward">🔑 MẢNH MÃ: ${esc(modal.digit)}</div>`:''}${modal.points!==undefined?`<div class="reward">⭐ +${modal.points} XP</div>`:''}${btn(modal.button||'Tiếp tục hành trình','closeModal',good?'teal block':'primary block')}</div>`;document.body.appendChild(el);}
+
+function renderHuntGame(m){
+ const hm=initHuntForStage(m);
+ const r=m.round;
+ const q=m.challenge;
+ const stList=hm.stations||[];
+ const roundsMeta=m.allRounds||[];
+ const keySlots=[0,1,2].map(i=>{
+  const badge=roundsMeta[i]?.keyBadge||stList[i]?.badge||`Mảnh ${i+1}`;
+  if(i<r)return `<div class="hw-key-slot earned">🔑 Trạm ${i+1}: <b>${esc(badge)}</b> ✅</div>`;
+  if(i===r)return `<div class="hw-key-slot current">⚔️ Trạm ${i+1}: Đang mở</div>`;
+  return `<div class="hw-key-slot">🔒 Trạm ${i+1}: Khóa</div>`;
+ }).join('');
+
+ const quickBtns=[0,1,2].map(i=>{
+  const st=stList[i]||{x:35+i*20,y:40,name:'Trạm '+(i+1)};
+  const cls=i<r?'done':i===r?'active':'';
+  return `<button type="button" class="hw-quick-btn ${cls}" data-action="walkToStation" data-idx="${i}">${i<r?'✅':i===r?'🏃 Đi tới':'🔒'} Trạm ${i+1}</button>`;
+ }).join('');
+
+ const pathPts=[hm.spawn,...stList,hm.chest].map(p=>`${Math.round(p.x*12)},${Math.round(p.y*8.2)}`).join(' ');
+
+ const stationsHtml=stList.map((st,i)=>{
+  const state=i<r?'passed':i===r?'active':'locked';
+  return `<div class="hw-station ${state}" style="left:${st.x}%;top:${st.y}%" data-action="clickStation" data-idx="${i}">
+   <div class="hw-ring"></div>
+   <div class="hw-station-core">${i<r?'✅':st.monsterIcon||'👾'}</div>
+   <div class="hw-station-label">${i<r?`Đã vượt (${esc(st.badge)})`:esc(st.name)}</div>
+  </div>`;
+ }).join('');
+
+ const curStation=stList[r]||{x:50,y:50,name:q.label,monsterIcon:q.monster?.icon||'👾',monsterName:q.monster?.name||'Quái Vật Trạm'};
+ const dist=Math.hypot(huntState.x-curStation.x,huntState.y-curStation.y);
+ const nearStation=dist<=10.5;
+
+ return `<div class="hw-wrapper">
+  <div class="hw-hud-top">
+   <div class="hw-hud-keys">${keySlots}<div class="hw-key-slot ${r>=3?'earned':''}">🎁 Mảnh chặng: <b>${r>=3?esc(m.digit):'?'}</b></div></div>
+   <div class="hw-quick-nav">${quickBtns}</div>
+  </div>
+  <div class="hw-viewport" id="hwViewport">
+   <div class="hw-world theme-${esc(hm.theme||'forest')}" id="hwWorld">
+    <svg class="hw-path-svg" viewBox="0 0 1200 820" preserveAspectRatio="none">
+     <polyline points="${pathPts}" fill="none" stroke="rgba(250,204,21,0.38)" stroke-width="14" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="18 14" />
+    </svg>
+    ${getMapDecorations(hm.theme)}
+    ${stationsHtml}
+    <div class="hw-chest ${r<3?'locked':''}" style="left:${hm.chest.x}%;top:${hm.chest.y}%" data-action="clickChest">
+     <div class="hw-chest-box">🧰</div>
+     <div class="hw-station-label">${esc(hm.chest.name||'Rương Mật Mã')}</div>
+    </div>
+    <div class="hw-player ${huntState.moving?'moving':''}" id="hwPlayer" style="left:${huntState.x}%;top:${huntState.y}%">
+     <div class="hw-player-torch"></div>
+     <div class="hw-player-avatar">${world.me.avatar}</div>
+     <div class="hw-player-name">${esc(world.me.name)}</div>
+    </div>
+   </div>
+   <div class="hw-controls-overlay">
+    <div class="hw-dpad">
+     <span></span><button type="button" data-dpad="up" title="Đi lên (W / ↑)">▲</button><span></span>
+     <button type="button" data-dpad="left" title="Qua trái (A / ←)">◀</button>
+     <button type="button" data-dpad="down" title="Đi xuống (S / ↓)">▼</button>
+     <button type="button" data-dpad="right" title="Qua phải (D / →)">▶</button>
+    </div>
+    <div class="hw-action-panel">
+     <button type="button" class="hw-attack-station-btn" data-action="openHuntBattle">⚔️ ${nearStation?'MỞ CUỘN GIẤY CHIẾN ĐẤU NGAY!':'ĐI TỚI & MỞ TRẠM '+(r+1)}</button>
+     <div class="hw-hint-pill">💡 Chạm lên bản đồ, dùng phím WASD/Mũi tên hoặc bấm "Đi tới Trạm ${r+1}"</div>
+    </div>
+   </div>
+  </div>
+  ${huntState.battleOpen?renderHuntBattleModal(m):''}
+ </div>`;
+}
+
+function renderHuntBattleModal(m){
+ const q=m.challenge;
+ const monster=q.monster||{icon:'👹',name:'Quái Vật Canh Trạm',hp:120};
+ const sel=huntState.selectedChoice;
+ return `<div class="hw-battle-backdrop">
+  <div class="hw-battle-modal">
+   ${huntState.rewardBadge?`<div class="hw-letter-reward-overlay">
+     <div style="font-size:56px">🎉</div>
+     <h2>ĐÁNH BẠI QUÁI VẬT TRẠM ${m.round+1}!</h2>
+     <div class="hw-letter-card">${esc(huntState.rewardBadge)}</div>
+     <p style="max-width:420px;color:#dcfce7;font-weight:700">${esc(huntState.rewardExplain||'')}</p>
+     <button type="button" class="button gold" data-action="finishHuntReward">Tiếp tục hành trình trên bản đồ →</button>
+    </div>`:''}
+   <div class="hw-battle-scroll">
+    <div>
+     <div class="hw-scroll-kicker">📜 TRẠM ${m.round+1} / ${m.totalRounds} · ${esc(q.label)}</div>
+     <div class="hw-scroll-role">🤝 <b>Phân công nhóm:</b> ${esc(q.roleAssign||m.groupTask)}</div>
+     <div class="hw-scroll-question">🧩 ${esc(q.prompt)}</div>
+     <div class="hw-scroll-options">
+      ${q.options.map((opt,i)=>`<button type="button" class="hw-opt-btn ${sel===i?'selected':''}" data-action="selectHuntOpt" data-choice="${i}">
+       <span class="opt-letter">${labels[i]}</span>
+       <span>${esc(opt)}</span>
+      </button>`).join('')}
+     </div>
+     <div class="hw-short-box">
+      <span style="font-size:12px;font-weight:900;color:#6b4d28">✍️ Hoặc nhập nhanh đáp án:</span>
+      <input type="text" id="huntShortInput" value="${esc(huntState.shortText)}" placeholder="Nhập kết quả số (VD: 3, -2, 0...)" />
+     </div>
+    </div>
+    <div class="hw-scroll-footer">
+     <div style="display:flex;gap:8px">
+      <button type="button" class="hw-btn-flee" data-action="closeHuntBattle">🏃 Rút lui ra bản đồ</button>
+      <button type="button" class="hw-btn-flee" data-action="hint">💡 NOVA gợi ý</button>
+     </div>
+     <button type="button" class="hw-btn-attack" data-action="attackHuntMonster">⚔️ TẤN CÔNG QUÁI VẬT!</button>
+    </div>
+   </div>
+   <div class="hw-monster-stage">
+    <span class="pill gold" style="margin-bottom:8px">🛡️ KHIÊN ĐỘI: ${'🛡️'.repeat(world.me.health)||'0'}</span>
+    <div class="hw-monster-hp"><i style="width:${huntState.monsterDefeated?0:100}%"></i></div>
+    <small style="color:#fde68a;font-weight:800">${esc(monster.name)} · HP: ${huntState.monsterDefeated?0:monster.hp}/${monster.hp}</small>
+    <div class="hw-monster-sprite ${huntState.monsterDefeated?'defeated':''}">${monster.icon}</div>
+    ${huntState.monsterDefeated?'<div class="hw-monster-impact">💥</div>':''}
+    <p style="font-size:12.5px;color:#cbd5e1;margin-top:8px">Chọn đáp án đúng hoặc nhập kết quả rồi nhấn <b>⚔️ Tấn công</b> để tiêu diệt quái vật và thu hồi chìa khóa tọa độ!</p>
+   </div>
+  </div>
+ </div>`;
+}
+
+function updateHuntCamera(){
+ const vp=$('#hwViewport'), wd=$('#hwWorld'), pl=$('#hwPlayer');
+ if(!vp||!wd||!pl)return;
+ pl.style.left=huntState.x+'%';
+ pl.style.top=huntState.y+'%';
+ pl.classList.toggle('moving',huntState.moving);
+ const vw=vp.clientWidth||800, vh=vp.clientHeight||470;
+ const ww=1200, wh=820;
+ const px=huntState.x/100*ww, py=huntState.y/100*wh;
+ const tx=Math.min(0,Math.max(vw-ww,vw/2-px));
+ const ty=Math.min(0,Math.max(vh-wh,vh/2-py));
+ wd.style.transform=`translate3d(${Math.round(tx)}px,${Math.round(ty)}px,0)`;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   RENDER ENGINE 2: BẢO VỆ THÀNH TRÌ (CASTLE DEFENSE REAL-TIME)
+   ═══════════════════════════════════════════════════════════════════════════ */
+function initCastleForStage(m){
+ const up=world?.me?.upgrades||{damage:1,speed:1,hp:1,regen:1};
+ const maxHp=260+up.hp*40;
+ cdState.castleMaxHp=maxHp;
+ if(cdState.stageId!==m.id){
+  cdState.stageId=m.id;
+  cdState.castleHp=maxHp;
+  cdState.enemies=[];
+  cdState.projectiles=[];
+  cdState.effects=[];
+  cdState.lastSpawnAt=0;
+  spawnCastleWaveEnemies(m);
+ }
+}
+
+function spawnCastleWaveEnemies(m){
+ if(!m||!m.defenseConfig)return;
+ const w=m.defenseConfig.waves?.[m.round]||{name:'Đợt tấn công',enemies:['goblin','bat','skeleton'],boss:'👹'};
+ const list=w.enemies||['goblin','bat','skeleton'];
+ const spriteMap={goblin:'👺',bat:'🦇',skeleton:'💀',orc:'👹'};
+ list.forEach((kind,idx)=>{
+  const hp=75+m.id*20+m.round*15;
+  cdState.enemies.push({
+   id:'en-'+(++cdState.seq),
+   lane:idx%3,
+   x:84+idx*5,
+   hp, maxHp:hp,
+   speed:2.1+(idx%2)*0.4,
+   sprite:spriteMap[kind]||'👺',
+   isBoss:false
+  });
+ });
+ // Thêm Thủ lĩnh của Đợt
+ const bossHp=160+m.id*35+m.round*25;
+ cdState.enemies.push({
+  id:'boss-'+(++cdState.seq),
+  lane:1,
+  x:94,
+  hp:bossHp, maxHp:bossHp,
+  speed:1.45,
+  sprite:w.boss||m.challenge?.monster?.icon||'👹',
+  isBoss:true
+ });
+}
+
+function renderCastleDefenseGame(m){
+ initCastleForStage(m);
+ const me=world.me;
+ const up=me.upgrades||{damage:1,speed:1,hp:1,regen:1};
+ const q=m.challenge;
+ const cfg=m.defenseConfig||{castleName:'Thành Trì Oxyz'};
+ const now=performance.now();
+ const shieldActive=cdState.shieldUntil>now;
+ const hpPct=Math.max(0,Math.min(100,Math.round(cdState.castleHp/cdState.castleMaxHp*100)));
+
+ const skills=[
+  {key:'arrowRain',icon:'🌧️',name:'Mưa Tên',cd:12000},
+  {key:'iceVolley',icon:'❄️',name:'Băng Giá',cd:14000},
+  {key:'groupHeal',icon:'💚',name:'Hồi Máu',cd:15000},
+  {key:'castleShield',icon:'🛡️',name:'Khiên Thành',cd:16000}
+ ];
+
+ const upgradeItems=[
+  {key:'damage',icon:'⚔️',name:'Sát thương Anh Hùng',lv:up.damage||1,desc:`Đạn bắn mạnh hơn (${22+(up.damage||1)*10} DMG)`},
+  {key:'speed',icon:'⚡',name:'Tốc độ bắn',lv:up.speed||1,desc:'Anh hùng nạp tên & phép nhanh hơn'},
+  {key:'hp',icon:'❤️',name:'Máu & Giáp Thành Trì',lv:up.hp||1,desc:`Tăng máu tối đa (${cdState.castleMaxHp} HP) & +1 Khiên`},
+  {key:'regen',icon:'🔧',name:'Kỹ sư Hồi phục Thành',lv:up.regen||1,desc:`Tự hồi +${(up.regen||1)*3} HP mỗi giây`}
+ ];
+
+ return `<div class="cd-game">
+  <div class="cd-hud">
+   <div class="cd-hud-stats">
+    <div class="cd-stat">
+     <span class="cd-stat-icon">🏰</span>
+     <div style="flex:1">
+      <small>MÁU THÀNH TRÌ</small>
+      <strong id="cdHudHp">${Math.round(cdState.castleHp)} / ${cdState.castleMaxHp}</strong>
+      <div class="cd-bar hp"><i id="cdHudHpBar" style="width:${hpPct}%"></i></div>
+     </div>
+    </div>
+    <div class="cd-stat">
+     <span class="cd-stat-icon">🌊</span>
+     <div>
+      <small>ĐỢT QUÁI VẬT</small>
+      <strong>Đợt ${m.round+1} / ${m.totalRounds}</strong>
+     </div>
+    </div>
+    <div class="cd-stat">
+     <span class="cd-stat-icon">⭐</span>
+     <div style="flex:1">
+      <small>CẤP ĐỘI QUÂN</small>
+      <strong>Lv.${me.heroLevel||1} · ${me.score} XP</strong>
+      <div class="cd-bar xp"><i style="width:${Math.min(100,(me.round+1)/3*100)}%"></i></div>
+     </div>
+    </div>
+    <div class="cd-stat">
+     <span class="cd-stat-icon">🪙</span>
+     <div>
+      <small>KHO VÀNG ĐỘI</small>
+      <strong id="cdHudGold">${me.gold??100} Vàng</strong>
+     </div>
+    </div>
+    <div class="cd-stat">
+     <span class="cd-stat-icon">🛡️</span>
+     <div>
+      <small>KHIÊN BẢO VỆ</small>
+      <strong>${'🛡️'.repeat(me.health)||'0'} (${me.health}/3)</strong>
+     </div>
+    </div>
+   </div>
+  </div>
+
+  <div class="cd-layout">
+   <div class="cd-main-col">
+    <div class="cd-battlefield" id="cdBattlefield">
+     <div class="cd-sky-decor">⚔️ CHIẾN TRƯỜNG: ${esc(cfg.castleName.toUpperCase())} · ${esc(q.label)}</div>
+     <div class="cd-lane-guide cd-lane-0"></div>
+     <div class="cd-lane-guide cd-lane-1"></div>
+     <div class="cd-lane-guide cd-lane-2"></div>
+
+     <div class="cd-skill-dock">
+      ${skills.map(sk=>{
+       const rem=Math.max(0,Math.ceil(((cdState.skillCd[sk.key]||0)-now)/1000));
+       return `<button type="button" class="cd-skill-btn ${rem>0?'cooldown':''}" data-action="useSkill" data-skill="${sk.key}" title="Kỹ năng ${sk.name}">
+        <span>${sk.icon}</span>
+        <small>${sk.name}</small>
+        ${rem>0?`<span class="cd-skill-cd">${rem}s</span>`:''}
+       </button>`;
+      }).join('')}
+     </div>
+
+     <div class="cd-castle">
+      <div class="cd-castle-shield" id="cdCastleShield" style="display:${shieldActive?'block':'none'}"></div>
+      <div class="cd-castle-art">🏰</div>
+      <span class="cd-castle-tag">${esc(me.name)}</span>
+     </div>
+
+     <div class="cd-hero" style="top:43%"><div class="cd-hero-sprite">🏹</div><span class="cd-hero-label">Cung Thủ Ox</span></div>
+     <div class="cd-hero" style="top:64%"><div class="cd-hero-sprite">🧙‍♂️</div><span class="cd-hero-label">Pháp Sư Oy</span></div>
+     <div class="cd-hero" style="top:85%"><div class="cd-hero-sprite">🛡️</div><span class="cd-hero-label">Hiệp Sĩ Oz</span></div>
+
+     <div id="cdDynamicLayer"></div>
+    </div>
+
+    <div class="cd-question-dock">
+     <div class="cd-q-header">
+      <span class="cd-q-badge">🎯 NHIỆM VỤ PHÁO KÍCH ĐỢT ${m.round+1}/${m.totalRounds}: ${esc(q.label)}</span>
+      <span class="cd-q-reward">🎁 Giải đúng: +120 Vàng · 💥 Pháo Kích Diệt Đợt Quái!</span>
+     </div>
+     <div style="font-size:12.5px;font-weight:800;color:#6b4214;margin-bottom:6px">🤝 Phân công: ${esc(q.roleAssign||m.groupTask)}</div>
+     <div class="cd-q-prompt">🧩 ${esc(q.prompt)}</div>
+     <div class="cd-answers">
+      ${q.options.map((opt,i)=>`<button type="button" class="cd-ans-btn" data-action="answer" data-choice="${i}" ${world.paused?'disabled':''}>
+       <span class="ans-letter">${labels[i]}</span>
+       <strong>${esc(opt)}</strong>
+      </button>`).join('')}
+     </div>
+     <div class="cd-q-InputRow">
+      <input type="text" id="cdShortInput" placeholder="✍️ Hoặc nhập trực tiếp đáp án số rồi bấm Khai Hỏa..." />
+      ${btn('💥 KHAI HỎA','submitShortCastle','gold sm')}
+      ${btn('💡 NOVA gợi ý','hint','gray sm')}
+     </div>
+    </div>
+   </div>
+
+   <aside class="cd-upgrade-panel">
+    <div>
+     <div class="cd-up-title">🛠️ NÂNG CẤP ĐỘI QUÂN (VÀNG)</div>
+     <p style="font-size:11.5px;color:#d6bfa0;margin-bottom:10px">Giải đúng câu hỏi Toán Oxyz để nhận <b>+120 Vàng</b> và nâng cấp sức mạnh cho 3 Anh Hùng!</p>
+     <div class="cd-up-list">
+      ${upgradeItems.map(u=>{
+       const cost=60+u.lv*40;
+       const maxed=u.lv>=5;
+       return `<div class="cd-up-item">
+        <div class="cd-up-info">
+         <b>${u.icon} ${esc(u.name)} (Lv.${u.lv})</b>
+         <small>${esc(u.desc)}</small>
+        </div>
+        <button type="button" class="cd-up-buy" data-action="buyUpgrade" data-upgrade="${u.key}" ${maxed||(me.gold||0)<cost?'disabled':''}>
+         ${maxed?'TỐI ĐA':`🪙 ${cost}`}
+        </button>
+       </div>`;
+      }).join('')}
+     </div>
+    </div>
+    <div style="background:rgba(255,255,255,.06);border:1px solid #6e4215;border-radius:12px;padding:10px;font-size:11.5px;color:#fde68a">
+     <b>⚡ Mẹo chiến thuật nhóm:</b>
+     <div style="margin-top:4px;color:#e7cfa1">• Bấm 4 nút Kỹ năng ở góc trên phải chiến trường (Mưa Tên, Băng Giá, Hồi Máu, Khiên Thành) để hỗ trợ Anh Hùng!<br/>• Trả lời đúng câu hỏi Toán sẽ gọi Pháo Kích quét sạch đợt quái ngay lập tức!</div>
+    </div>
+   </aside>
+  </div>
+ </div>`;
+}
+
+function stageContent(m){
+ const mode=activePlayMode||m.defaultMode||(m.id===2||m.id===5?'defense':'hunt');
+ const roles=m.teamRoles||[];
+ return `<div class="question-card">
+  <header class="quest-top">
+   <div class="flex-between">
+    <span class="tag">${m.icon} CHẶNG ${m.id} / 05 · ${esc(m.tag)}</span>
+    <span class="pill gold">Lượt ${m.round+1} / ${m.totalRounds} · Mảnh mật mã chặng: ?</span>
+   </div>
+   <h2>${esc(m.title)} – ${esc(m.place)}</h2>
+   <p>${esc(m.story)}</p>
+  </header>
+  <div class="mode-bar">
+   <div class="mode-bar-left">
+    <span class="mode-bar-title">🎮 CHẾ ĐỘ GAME TƯƠNG TÁC NHÓM:</span>
+    <div class="mode-switcher">
+     <button type="button" class="mode-btn ${mode==='hunt'?'active':''}" data-action="setMode" data-mode="hunt">🗺️ Săn Kho Báu 2D (Map)</button>
+     <button type="button" class="mode-btn ${mode==='defense'?'active':''}" data-action="setMode" data-mode="defense">🏰 Bảo Vệ Thành Trì (Real-time)</button>
+    </div>
+   </div>
+   <span style="font-size:12px;color:#bae6fd;font-weight:800">🪙 Vàng đội: <b id="topGoldBadge">${world.me.gold??100}</b> · 🛡️ Khiên: <b>${world.me.health}/3</b></span>
+  </div>
+  ${roles.length?`<div class="role-strip">${roles.map((r,idx)=>`<div class="role-chip ${idx===m.round?'active-role':''}">${esc(r)}</div>`).join('')}</div>`:''}
+  ${mode==='hunt'?renderHuntGame(m):renderCastleDefenseGame(m)}
+ </div>`;
+}
+
+function finalContent(){
+ const words=Object.entries(world.cipherWords||{});
+ return `<div class="final-wrap"><div class="panel"><div class="section-title"><h2>🔐 MỞ RƯƠNG LÕI TRÍ TUỆ OXYZ</h2><span class="pill gold">TRẠM CUỐI</span></div><p>Chúc mừng! Cả đội đã chinh phục đủ 5 chặng. Hãy đọc 5 chữ số mật mã theo thứ tự Chặng 1 → 5, nhập mật mã mở kho báu và chọn thông điệp chiến thắng!</p>${inv(world.me.digits)}<div class="form-field"><label>Nhập mật mã 5 chữ số (theo thứ tự Chặng 1 → 5)</label><input id="finalCode" type="text" class="mono" placeholder="? ? ? ? ?" inputmode="numeric" maxlength="5" autocomplete="off" /></div><h3 style="margin:18px 0 8px">Bảng giải mã từ ngữ</h3><div class="words">${words.map(([k,v])=>`<span class="word-chip">Số ${esc(k)} = ${esc(v)}</span>`).join('')}</div><h3 style="margin:18px 0 8px">Chọn thông điệp nhận được</h3>${world.messageOptions.map((msg,i)=>`<label class="final-option"><input type="radio" name="message" value="${i}" ${i===0?'checked':''}/> ${labels[i]}. ${esc(msg)}</label>`).join('')}${btn('🔓 MỞ RƯƠNG KHO BÁU TRI THỨC','final','gold block')}</div></div>`;
+}
+
+function studentScreen(){
+ const me=world.me,rank=[...world.teams].sort((a,b)=>b.score-a.score),mineRank=rank.findIndex(t=>t.id===me.id)+1;
+ const demoStageBar=window.IS_DEMO_MODE?`<div class="demo-banner" style="margin:10px 0;padding:10px 14px"><strong>⚡ Chuyển nhanh Chặng (Bản Demo):</strong> ${[0,1,2,3,4].map(idx=>`<button type="button" class="button sm ${me.stage===idx?'primary':'gray'}" data-action="demoJumpStage" data-stage="${idx}">Chặng ${idx+1}</button>`).join('')} <button type="button" class="button sm gold" data-action="demoJumpStage" data-stage="5">🔐 Trạm Giải Mã</button> ${btn('👩‍🏫 Sang Màn Hình GV','demoTeacher','sm teal')}</div>`:'';
+ return `<div class="mission-hero"><div class="avatar">${me.avatar}</div><div><div class="eyebrow" style="color:#f7ce71">BIỆT ĐỘI ${esc(me.name).toUpperCase()} • PHÒNG ${world.room}</div><h2>${me.completed?'KHO BÁU ĐÃ ĐƯỢC MỞ!':me.stage===5?'ĐÃ THU ĐỦ 5 MẢNH MẬT MÃ!':'HÀNH TRÌNH GIẢI CỨU THÀNH PHỐ OXYZ'}</h2><p>${me.completed?'Hãy theo dõi bảng xếp hạng và phần vinh danh của giáo viên.':me.stage===5?'Hãy ghép 5 chữ số mật mã để mở Rương Lõi Trí Tuệ!':'Cả nhóm hãy phối hợp giải Toán trên Bản đồ Săn Kho Báu 2D hoặc Chiến trường Bảo Vệ Thành Trì!'}</p></div></div>
+ ${demoStageBar}
+ <div class="panel" style="padding:14px 18px"><div class="flex-between"><h3>🗺️ Tiến trình 5 Chặng của Đội ${esc(me.name)}</h3><span class="pill ${me.stage===5?'green':'gold'}"> Đã vượt ${me.stage}/5 chặng</span></div>${mapTrack(me.stage)}</div>
+ ${world.paused?'<div class="notice error" style="margin:14px 0"><b>⏸ Giáo viên đang tạm dừng trò chơi để hướng dẫn.</b> Cả nhóm hãy lắng nghe nhé!</div>':''}
+ <div class="mission-wrapper"><div>${me.completed?`<div class="panel champion"><span class="star">🏆</span><h2>ĐỘI ${esc(me.name).toUpperCase()} ĐÃ CHIẾN THẮNG!</h2><p style="margin-top:9px;font-size:19px;font-weight:850;color:#8e5b18">“TƯ DUY VÀ HỢP TÁC MỞ KHO BÁU”</p><div class="top-numbers" style="justify-content:center"><div class="metric"><b>${me.score} XP</b><small>TỔNG ĐIỂM ĐỘI</small></div><div class="metric"><b>#${mineRank}</b><small>THỨ HẠNG HIỆN TẠI</small></div></div></div>`:me.stage>=5?finalContent():stageContent(world.current)}</div>
+ <aside class="team-sidebar"><div class="panel"><h3>🎒 Túi Mật Mã (5 Chặng)</h3><p class="muted" style="font-size:12px;margin-top:4px">Thu thập đủ 5 chữ số từ 5 chặng để mở Rương Kho Báu.</p>${inv(me.digits)}<div class="top-numbers" id="studentSidebarMetrics"><div class="metric"><b>${me.score}</b><small>XP CỦA ĐỘI</small></div><div class="metric"><b>#${mineRank}</b><small>HẠNG TẠM THỜI</small></div></div></div><div class="panel"><h3>🏅 Bảng xếp hạng lớp</h3><div style="margin-top:10px" id="studentSidebarRanks">${standings(world.teams,true)}</div></div><div class="panel"><h3>🧑‍🤝‍🧑 Phối hợp nhóm</h3><p style="font-size:12.5px;margin-top:6px">• <b>Chế độ Săn Kho Báu 2D:</b> Điều khiển nhân vật tới từng Trạm I, II, III để mở cuộn giấy giải toán.<br/>• <b>Chế độ Bảo Vệ Thành Trì:</b> Giải toán nhận Vàng, nâng cấp 3 Anh Hùng và bấm 4 Kỹ năng diệt quái!</p></div></aside></div>`;
+}
+
+function render(){
+ if(!session)return startScreen();
+ if(!world){app.innerHTML='<div class="loading">Đang lấy dữ liệu phòng học…</div>';return;}
+ app.innerHTML=layout(session.role==='teacher'?teacherScreen():studentScreen());
+ updateClock();
+ updateHuntCamera();
+ $('.award-backdrop')?.remove();
+ if(showAward&&session.role==='teacher'){
+  const aw=document.createElement('div');aw.innerHTML=awardScreen();document.body.appendChild(aw.firstElementChild);
+ }
+ if(modal)showModal();
+}
+
+function showModal(){
+ if(!modal)return;
+ const old=$('.modal-backdrop');if(old)old.remove();
+ let good=modal.good;
+ const el=document.createElement('div');
+ el.className='modal-backdrop';
+ el.innerHTML=`<div class="modal" role="dialog" aria-modal="true"><div class="modal-icon">${good?'🎉':'🧩'}</div><h2 class="${good?'success':'failure'}">${esc(modal.title)}</h2><p>${esc(modal.message)}</p>${modal.explain?`<p class="notice good">${esc(modal.explain)}</p>`:''}${modal.digit!==undefined&&modal.digit!==null?`<div class="reward">🔑 MẢNH MẬT MÃ CHẶNG: ${esc(modal.digit)}</div>`:''}${modal.points?`<div class="reward">⭐ +${modal.points} XP</div>`:''}${modal.goldEarned?`<div class="reward">🪙 +${modal.goldEarned} Vàng</div>`:''}${btn(modal.button||'Tiếp tục hành trình','closeModal',good?'teal block':'primary block')}</div>`;
+ document.body.appendChild(el);
+}
 function notice(title,message,good=false,extra={}){modal={title,message,good,...extra};showModal();sound(good);}
-function sound(good){if(!soundEnabled)return;try{const actx=new(window.AudioContext||window.webkitAudioContext)();let base=good?510:230;[0,.11,.22].forEach((offset,i)=>{const osc=actx.createOscillator(),gain=actx.createGain();osc.type='sine';osc.frequency.value=base+(good?i*180:-i*35);gain.gain.setValueAtTime(.0001,actx.currentTime+offset);gain.gain.exponentialRampToValueAtTime(.08,actx.currentTime+offset+.012);gain.gain.exponentialRampToValueAtTime(.0001,actx.currentTime+offset+.13);osc.connect(gain).connect(actx.destination);osc.start(actx.currentTime+offset);osc.stop(actx.currentTime+offset+.14)});setTimeout(()=>actx.close(),750);}catch(e){/* audio optional */}}
-function setClock(){clockBase=world?.clock||null;tickBase=Date.now();updateClock();}
-function updateClock(){if(!clockBase)return;const node=$('#clock');if(!node)return;let remaining=clockBase.remainingMs-(clockBase.running?Date.now()-tickBase:0);remaining=Math.max(0,remaining);const sec=Math.floor(remaining/1000);node.textContent=`${String(Math.floor(sec/60)).padStart(2,'0')}:${String(sec%60).padStart(2,'0')}`;node.classList.toggle('warn',sec<=300);}
-async function refresh(force=false){if(!session||busy)return;try{const d=await api('/api/state',{room:session.room,token:session.token});world=d;setClock();let slim={...d,clock:{...d.clock,remainingMs:0}};const sig=JSON.stringify(slim);if(force||sig!==lastSignature){lastSignature=sig;const focused=document.activeElement?.matches('input,select,textarea');if(modal||focused){return;}render();}}catch(e){if(force){session=null;world=null;startScreen(e.message);}/* keep previous view during short disconnection */}}
-async function submit(route,payload){if(busy)return;busy=true;try{return await api(route,{room:session.room,token:session.token,...payload});}finally{busy=false;}}
-function updateAfterAction(){lastSignature='';setTimeout(()=>refresh(true),200);}
-async function handle(action,el){try{
- if(action==='demoPlay'){saveSession({role:'student',room:demoRoom.id,teamId:'doi-1',token:'DEMO_DOI_1'});await refresh(true);return;}
- if(action==='demoTeacher'){saveSession({role:'teacher',room:demoRoom.id,token:'DEMO_GV'});await refresh(true);return;}
- if(action==='switch-tab'){$('.tabs .active')?.classList.remove('active');el.classList.add('active');$('[data-tabbox="'+el.dataset.tab+'"]')?.scrollIntoView({behavior:'smooth',block:'center'});return;}
- if(action==='create'){el.disabled=true;const count=Number($('#teamCount').value);const r=await api('/api/create',{teamCount:count});saveSession({role:'teacher',room:r.room,token:r.teacherToken});await refresh(true);return;}
- if(action==='join'){el.disabled=true;const room=$('#roomInput').value.trim(),team=$('#teamSelect').value,code=$('#teamCode').value.trim();const r=await api('/api/join',{room,team,code});saveSession({role:'student',room:r.room,teamId:r.team,token:r.token});await refresh(true);return;}
- if(action==='home'){const yes=confirm('Quay về màn hình đăng nhập? Tiến độ trên máy chủ không bị xóa.');if(yes){session=null;world=null;history.replaceState({},'',location.pathname);startScreen();}return;}
- if(action==='answer'){
-  if(world.paused)return notice('Tạm dừng','Giáo viên đang tạm dừng nhiệm vụ.',false);
-  const result=await submit('/api/answer',{choice:Number(el.dataset.choice),stage:world.me.stage,round:world.me.round});
-  if(result.correct){
-   if(result.stageFinished){
-    notice('🏆 VƯỢT CHẶNG THÀNH CÔNG!',`NOVA trao tặng ${result.item}. ${result.digitRule}`,true,
-       {explain:result.explain,digit:result.digit,points:result.points,button:result.nextStage===5?'Tiến tới giải mật thư cuối →':'Khám phá mini-game mới →'});
-   }else{
-    const gameWords={hunt:'Đã đào được một mảnh kho báu!',defense:'Đã đánh bật một đợt quái vật!',forge:'Một viên pha lê đã được rèn!',maze:'Cánh cửa chính xác đã mở!',boss:'Một lớp giáp Boss đã vỡ!'};
-    notice('✨ HOÀN THÀNH MỘT LƯỢT!',gameWords[world.current.gameType]||'Chinh phục thành công!',true,
-      {explain:result.explain,button:'Tiếp tục lượt '+(result.nextRound+1)+'/3 →'});
-   }
-  }else{
-   const x=result.health===0?'Đội đã hết khiên, nhưng NOVA cho phép học lại và thử tiếp. ':'';
-   notice('🛡️ CHƯA CHÍNH XÁC – THỬ LẠI!',x+'Gợi ý: '+result.hint,false,{button:'↺ Thử lại thử thách'});
-  }
-  updateAfterAction();return;
- }
- if(action==='hint'){if(world.paused)return notice('Tạm dừng','Giáo viên đang tạm dừng nhiệm vụ.',false);const result=await submit('/api/hint',{stage:world.me.stage,round:world.me.round});notice('💡 GỢI Ý TỪ NOVA',result.hint+' ('+result.cost+')',false,{button:'Quay lại nhiệm vụ'});updateAfterAction();return;}
- if(action==='final'){const code=$('#finalCode').value.trim();const selected=$('input[name="message"]:checked');if(!selected)return notice('Thiếu thông điệp','Hãy chọn một trong ba thông điệp từ mật mã.',false);const r=await submit('/api/final',{code,choice:Number(selected.value)});if(r.correct)notice('GIẢI CỨU THÀNH PHỐ THÀNH CÔNG!','Lõi Trí Tuệ đã được khôi phục. '+r.message,true,{points:r.points,button:'Xem thứ hạng và thành tích →'});else notice('MẬT THƯ CHƯA ĐƯỢC MỞ','NOVA gợi ý: '+r.hint,false,{button:'Thử giải mã lại'});updateAfterAction();return;}
- if(action==='closeModal'){modal=null;$('.modal-backdrop')?.remove();await refresh(true);return;}
- if(action==='pauseGame'){await submit('/api/teacher',{action:'pause'});updateAfterAction();return;}
- if(action==='timerToggle'){await submit('/api/teacher',{action:'timer',value:world.clock.running?'pause':'start'});updateAfterAction();return;}
- if(action==='timerReset'){await submit('/api/teacher',{action:'timer',value:'reset'});updateAfterAction();return;}
- if(action==='setBonus'){const team=$('#bonusTeam').value,value=Number($('#bonusValue').value);await submit('/api/teacher',{action:'bonus',team,value});updateAfterAction();return;}
- if(action==='awards'){showAward=!showAward;render();return;}
- if(action==='print'){window.print();return;}
- if(action==='exportCSV'){exportCSV();return;}
- if(action==='resetTeam'){const team=$('#resetTeam').value;const name=world.teams.find(t=>t.id===team)?.name;if(!confirm('Đặt lại từ đầu toàn bộ nhiệm vụ và điểm của '+name+'?'))return;await submit('/api/teacher',{action:'resetTeam',team});updateAfterAction();return;}
- if(action==='copy'){const url=el.dataset.url;try{await navigator.clipboard.writeText(url);notice('ĐÃ SAO CHÉP LIÊN KẾT',url,true);}catch(e){notice('LIÊN KẾT ĐỘI',url+' — hãy sao chép thủ công địa chỉ này.',true);}return;}
- }catch(e){notice('THÔNG BÁO',e.message||'Có lỗi xảy ra.',false);el.disabled=false;}
+function sound(good){
+ if(!soundEnabled)return;
+ try{
+  const actx=new(window.AudioContext||window.webkitAudioContext)();
+  let base=good?520:230;
+  [0,.11,.22].forEach((offset,i)=>{
+   const osc=actx.createOscillator(),gain=actx.createGain();
+   osc.type='sine';osc.frequency.value=base+(good?i*170:-i*35);
+   gain.gain.setValueAtTime(.0001,actx.currentTime+offset);
+   gain.gain.exponentialRampToValueAtTime(.07,actx.currentTime+offset+.012);
+   gain.gain.exponentialRampToValueAtTime(.0001,actx.currentTime+offset+.13);
+   osc.connect(gain).connect(actx.destination);
+   osc.start(actx.currentTime+offset);osc.stop(actx.currentTime+offset+.14);
+  });
+  setTimeout(()=>actx.close(),700);
+ }catch(e){}
 }
-document.addEventListener('click',e=>{const el=e.target.closest('[data-action]');if(el){e.preventDefault();handle(el.dataset.action,el);}});
-document.addEventListener('change',e=>{if(e.target.id==='clockMinutes'&&session?.role==='teacher'){submit('/api/teacher',{action:'timer',value:Number(e.target.value)}).then(updateAfterAction).catch(e=>notice('Lỗi đồng hồ',e.message,false));}});
-document.addEventListener('keydown',e=>{if(e.key==='Enter'&&!session){const t=document.activeElement;if(t?.closest('[data-tabbox="student"]'))$('#entry [data-action="join"]')?.click();}});
-session=restoreSession();if(session){refresh(true);}else{startScreen();}
-setInterval(()=>{if(session&&!document.hidden)refresh(false)},2500);
-setInterval(updateClock,400);
+
+function setClock(){clockBase=world?.clock||null;tickBase=Date.now();updateClock();}
+function updateClock(){
+ if(!clockBase)return;
+ const node=$('#clock');if(!node)return;
+ let remaining=clockBase.remainingMs-(clockBase.running?Date.now()-tickBase:0);
+ remaining=Math.max(0,remaining);
+ const sec=Math.floor(remaining/1000);
+ node.textContent=`${String(Math.floor(sec/60)).padStart(2,'0')}:${String(sec%60).padStart(2,'0')}`;
+ node.classList.toggle('warn',sec<=300);
+}
+
+async function refresh(force=false){
+ if(!session||busy)return;
+ try{
+  const d=await api('/api/state',{room:session.room,token:session.token});
+  world=d;setClock();
+  if(session.role==='student'&&!force){
+   const me=d.me||{};
+   const studentKey=`${me.stage}_${me.round}_${me.completed}_${d.paused}`;
+   if(studentKey===lastStudentKey){
+    // Chỉ cập nhật bảng xếp hạng bên cạnh để không làm gián đoạn bản đồ 2D hoặc chiến trường Thủ Thành
+    const ranksEl=$('#studentSidebarRanks');
+    if(ranksEl)ranksEl.innerHTML=standings(d.teams,true);
+    const rank=[...d.teams].sort((a,b)=>b.score-a.score),mineRank=rank.findIndex(t=>t.id===me.id)+1;
+    const metricsEl=$('#studentSidebarMetrics');
+    if(metricsEl)metricsEl.innerHTML=`<div class="metric"><b>${me.score}</b><small>XP CỦA ĐỘI</small></div><div class="metric"><b>#${mineRank}</b><small>HẠNG TẠM THỜI</small></div>`;
+    return;
+   }
+   lastStudentKey=studentKey;
+  }
+  if(session.role==='student'&&d.me){
+   lastStudentKey=`${d.me.stage}_${d.me.round}_${d.me.completed}_${d.paused}`;
+  }
+  let slim={...d,clock:{...d.clock,remainingMs:0}};
+  const sig=JSON.stringify(slim);
+  if(force||sig!==lastSignature){
+   lastSignature=sig;
+   const focused=document.activeElement?.matches('input,select,textarea');
+   if(modal||focused||huntState.battleOpen)return;
+   render();
+  }
+ }catch(e){
+  if(force){session=null;world=null;startScreen(e.message);}
+ }
+}
+
+async function submit(route,payload){
+ if(busy)return;
+ busy=true;
+ try{return await api(route,{room:session.room,token:session.token,...payload});}
+ finally{busy=false;}
+}
+function updateAfterAction(){lastSignature='';lastStudentKey='';setTimeout(()=>refresh(true),150);}
+
+async function submitStageAnswer(payload){
+ if(world.paused)return notice('Tạm dừng','Giáo viên đang tạm dừng nhiệm vụ.',false);
+ const curMode=activePlayMode||world.current?.defaultMode||'hunt';
+ const result=await submit('/api/answer',{stage:world.me.stage,round:world.me.round,...payload});
+ if(result.correct){
+  sound(true);
+  // Nếu đang ở chế độ Bảo Vệ Thành Trì: kích hoạt Pháo Kích Tọa Độ diệt toàn bộ quái trên màn hình!
+  if(curMode==='defense'){
+   cdState.enemies.forEach(en=>{
+    cdState.effects.push({id:++cdState.seq,x:en.x,lane:en.lane,text:'💥 PHÁO KÍCH -999!',cls:'crit',until:performance.now()+900});
+   });
+   cdState.enemies=[];
+  }
+  if(result.stageFinished){
+   huntState.battleOpen=false;
+   huntState.monsterDefeated=false;
+   huntState.rewardBadge=null;
+   activePlayMode=null; // Để chặng mới tự chọn defaultMode của chặng đó
+   notice('🏆 CHINH PHỤC CHẶNG THÀNH CÔNG!',`Đội đã thu hồi vật phẩm "${result.item}"! Quy tắc mật mã: ${result.digitRule}`,true,
+    {explain:result.explain,digit:result.digit,points:result.points,goldEarned:result.goldEarned,button:result.nextStage===5?'Tiến tới Mở Rương Lõi Trí Tuệ →':'Bước sang Chặng tiếp theo →'});
+   updateAfterAction();
+  }else if(curMode==='hunt'&&huntState.battleOpen){
+   // Hiện hiệu ứng nổ Quái vật & bay Mảnh Chìa Khóa ngay trong Battle Modal giống hunt-preview
+   huntState.monsterDefeated=true;
+   huntState.rewardBadge=result.keyBadge||`Lượt ${result.nextRound}`;
+   huntState.rewardExplain=result.explain;
+   render();
+  }else{
+   notice('💥 PHÁO KÍCH CHÍNH XÁC!',`Đợt quái vật thứ ${world.me.round+1} đã bị tiêu diệt hoàn toàn! Đội nhận thêm +${result.goldEarned||120} Vàng.`,true,
+    {explain:result.explain,goldEarned:result.goldEarned||120,button:`Tiếp tục Đợt ${result.nextRound+1}/3 →`});
+   updateAfterAction();
+  }
+ }else{
+  sound(false);
+  const x=result.health===0?'Đội đã cạn khiên nhưng NOVA đã sạc lại năng lượng để đội thử tiếp! ':'';
+  notice('🛡️ CHƯA CHÍNH XÁC – HÃY TÍNH LẠI!',x+'Gợi ý từ NOVA: '+result.hint,false,{button:'↺ Thử lại ngay'});
+  updateAfterAction();
+ }
+}
+
+async function handle(action,el){
+ try{
+  if(action==='demoPlay'){saveSession({role:'student',room:'123456',teamId:'doi-1',token:'DEMO_DOI_1'});activePlayMode=null;await refresh(true);return;}
+  if(action==='demoTeacher'){saveSession({role:'teacher',room:'123456',token:'DEMO_GV'});await refresh(true);return;}
+  if(action==='demoJumpStage'){
+   const stg=Number(el.dataset.stage);
+   await submit('/api/demoJump',{stage:stg});
+   activePlayMode=null;
+   huntState.battleOpen=false;
+   huntState.stageId=-1;
+   cdState.stageId=-1;
+   await refresh(true);
+   return;
+  }
+  if(action==='toggleSound'){soundEnabled=!soundEnabled;render();return;}
+  if(action==='switch-tab'){$('.tabs .active')?.classList.remove('active');el.classList.add('active');$('[data-tabbox="'+el.dataset.tab+'"]')?.scrollIntoView({behavior:'smooth',block:'center'});return;}
+  if(action==='create'){el.disabled=true;const count=Number($('#teamCount').value);const r=await api('/api/create',{teamCount:count});saveSession({role:'teacher',room:r.room,token:r.teacherToken});await refresh(true);return;}
+  if(action==='join'){el.disabled=true;const room=$('#roomInput').value.trim(),team=$('#teamSelect').value,code=$('#teamCode').value.trim();const r=await api('/api/join',{room,team,code});saveSession({role:'student',room:r.room,teamId:r.team,token:r.token});await refresh(true);return;}
+  if(action==='home'){const yes=confirm('Quay về màn hình đăng nhập? Tiến độ của đội vẫn được lưu an toàn.');if(yes){session=null;world=null;history.replaceState({},'',location.pathname);startScreen();}return;}
+  if(action==='setMode'){
+   activePlayMode=el.dataset.mode;
+   huntState.battleOpen=false;
+   render();
+   return;
+  }
+  /* ─── ACTIONS CHO SĂN KHO BÁU 2D ─── */
+  if(action==='walkToStation'||action==='clickStation'){
+   const idx=Number(el.dataset.idx);
+   const m=world?.current;if(!m)return;
+   const st=m.huntMap?.stations?.[idx];
+   if(!st)return;
+   if(idx>m.round){
+    return notice('🔒 Trạm đang khóa',`Hãy vượt qua Trạm ${m.round+1} trước khi tiến tới Trạm ${idx+1}!`,false);
+   }
+   if(idx<m.round){
+    return notice('✅ Trạm đã hoàn thành',`Đội đã thu hồi chìa khóa ở Trạm ${idx+1} rồi. Hãy tiến tới Trạm ${m.round+1}!`,true);
+   }
+   huntState.targetX=st.x;
+   huntState.targetY=st.y;
+   huntState.lastAutoStation=-1;
+   return;
+  }
+  if(action==='clickChest'){
+   const m=world?.current;if(!m)return;
+   if(m.round<3){
+    const st=m.huntMap?.stations?.[m.round];
+    if(st){huntState.targetX=st.x;huntState.targetY=st.y;}
+    return notice('🧰 Rương đang khóa','Hãy đánh bại đủ 3 Trạm Quái Vật (I, II, III) trên bản đồ để mở Rương Mật Mã của chặng!',false);
+   }
+   return;
+  }
+  if(action==='openHuntBattle'){
+   const m=world?.current;if(!m)return;
+   const st=m.huntMap?.stations?.[m.round];
+   if(st){huntState.x=st.x;huntState.y=st.y;huntState.targetX=null;huntState.targetY=null;}
+   huntState.battleOpen=true;
+   huntState.selectedChoice=null;
+   huntState.shortText='';
+   huntState.monsterDefeated=false;
+   huntState.rewardBadge=null;
+   render();
+   return;
+  }
+  if(action==='closeHuntBattle'){
+   huntState.battleOpen=false;
+   render();
+   return;
+  }
+  if(action==='selectHuntOpt'){
+   huntState.selectedChoice=Number(el.dataset.choice);
+   $$('.hw-opt-btn').forEach((b,i)=>b.classList.toggle('selected',i===huntState.selectedChoice));
+   return;
+  }
+  if(action==='attackHuntMonster'){
+   const shortVal=$('#huntShortInput')?.value?.trim()||'';
+   huntState.shortText=shortVal;
+   if(shortVal!==''){
+    await submitStageAnswer({shortText:shortVal});
+    return;
+   }
+   if(huntState.selectedChoice===null){
+    return notice('Chưa chọn đòn tấn công','Hãy chọn một đáp án A, B, C, D hoặc nhập kết quả vào ô trống trước khi bấm Tấn công!',false);
+   }
+   await submitStageAnswer({choice:huntState.selectedChoice});
+   return;
+  }
+  if(action==='finishHuntReward'){
+   huntState.battleOpen=false;
+   huntState.monsterDefeated=false;
+   huntState.rewardBadge=null;
+   huntState.selectedChoice=null;
+   huntState.shortText='';
+   await refresh(true);
+   // Tự động hướng nhân vật về phía trạm tiếp theo
+   const m=world?.current;
+   const nextSt=m?.huntMap?.stations?.[m.round];
+   if(nextSt){huntState.targetX=nextSt.x;huntState.targetY=nextSt.y;}
+   return;
+  }
+
+  /* ─── ACTIONS CHO BẢO VỆ THÀNH TRÌ ─── */
+  if(action==='answer'){
+   await submitStageAnswer({choice:Number(el.dataset.choice)});
+   return;
+  }
+  if(action==='submitShortCastle'){
+   const val=$('#cdShortInput')?.value?.trim()||'';
+   if(!val)return notice('Chưa nhập đáp án','Hãy nhập kết quả tính toán vào ô trống hoặc chọn đáp án A, B, C, D!',false);
+   await submitStageAnswer({shortText:val});
+   return;
+  }
+  if(action==='buyUpgrade'){
+   const key=el.dataset.upgrade;
+   const r=await submit('/api/upgrade',{upgrade:key});
+   if(r.ok){
+    world.me.gold=r.gold;
+    world.me.upgrades=r.upgrades;
+    world.me.health=r.health;
+    cdState.castleMaxHp=260+(r.upgrades.hp||1)*40;
+    cdState.castleHp=Math.min(cdState.castleMaxHp,cdState.castleHp+45);
+    sound(true);
+    render();
+   }
+   return;
+  }
+  if(action==='useSkill'){
+   const sk=el.dataset.skill;
+   const now=performance.now();
+   if((cdState.skillCd[sk]||0)>now)return;
+   sound(true);
+   if(sk==='arrowRain'){
+    cdState.skillCd.arrowRain=now+12000;
+    for(let i=0;i<9;i++){
+     cdState.projectiles.push({id:++cdState.seq,lane:i%3,x:18+(i*6),speed:55,dmg:45,icon:'🏹'});
+    }
+    cdState.effects.push({id:++cdState.seq,x:55,lane:1,text:'🌧️ MƯA TÊN VECTƠ!',cls:'crit',until:now+900});
+   }else if(sk==='iceVolley'){
+    cdState.skillCd.iceVolley=now+14000;
+    cdState.slowUntil=now+6000;
+    cdState.effects.push({id:++cdState.seq,x:55,lane:1,text:'❄️ ĐÓNG BĂNG QUÁI 6 GIÂY!',cls:'crit',until:now+950});
+   }else if(sk==='groupHeal'){
+    cdState.skillCd.groupHeal=now+15000;
+    cdState.castleHp=Math.min(cdState.castleMaxHp,cdState.castleHp+90);
+    cdState.effects.push({id:++cdState.seq,x:20,lane:1,text:'💚 +90 HP THÀNH TRÌ!',cls:'crit',until:now+950});
+   }else if(sk==='castleShield'){
+    cdState.skillCd.castleShield=now+16000;
+    cdState.shieldUntil=now+7000;
+    cdState.effects.push({id:++cdState.seq,x:18,lane:1,text:'🛡️ BẬT KHIÊN BẤT TỬ 7 GIÂY!',cls:'crit',until:now+950});
+   }
+   render();
+   return;
+  }
+
+  /* ─── ACTIONS CHUNG ─── */
+  if(action==='hint'){
+   if(world.paused)return notice('Tạm dừng','Giáo viên đang tạm dừng nhiệm vụ.',false);
+   const result=await submit('/api/hint',{stage:world.me.stage,round:world.me.round});
+   notice('💡 GỢI Ý TỪ TRỢ LÝ NOVA',result.hint+' ('+result.cost+')',false,{button:'Quay lại nhiệm vụ'});
+   return;
+  }
+  if(action==='final'){
+   const code=$('#finalCode').value.trim();
+   const selected=$('input[name="message"]:checked');
+   if(!selected)return notice('Thiếu thông điệp','Hãy chọn một trong ba thông điệp từ mật mã.',false);
+   const r=await submit('/api/final',{code,choice:Number(selected.value)});
+   if(r.correct)notice('🏆 GIẢI CỨU THÀNH PHỐ OXYZ THÀNH CÔNG!','Lõi Trí Tuệ đã được khôi phục: '+r.message,true,{points:r.points,button:'Xem bảng vinh danh →'});
+   else notice('MẬT THƯ CHƯA ĐƯỢC MỞ','NOVA gợi ý: '+r.hint,false,{button:'Thử giải mã lại'});
+   updateAfterAction();return;
+  }
+  if(action==='closeModal'){modal=null;$('.modal-backdrop')?.remove();await refresh(true);return;}
+  if(action==='pauseGame'){await submit('/api/teacher',{action:'pause'});updateAfterAction();return;}
+  if(action==='timerToggle'){await submit('/api/teacher',{action:'timer',value:world.clock.running?'pause':'start'});updateAfterAction();return;}
+  if(action==='timerReset'){await submit('/api/teacher',{action:'timer',value:'reset'});updateAfterAction();return;}
+  if(action==='setBonus'){const team=$('#bonusTeam').value,value=Number($('#bonusValue').value);await submit('/api/teacher',{action:'bonus',team,value});updateAfterAction();return;}
+  if(action==='awards'){showAward=!showAward;render();return;}
+  if(action==='print'){window.print();return;}
+  if(action==='exportCSV'){exportCSV();return;}
+  if(action==='resetTeam'){const team=$('#resetTeam').value;const name=world.teams.find(t=>t.id===team)?.name;if(!confirm('Đặt lại từ đầu toàn bộ nhiệm vụ và điểm của '+name+'?'))return;await submit('/api/teacher',{action:'resetTeam',team});updateAfterAction();return;}
+  if(action==='copy'){const url=el.dataset.url;try{await navigator.clipboard.writeText(url);notice('ĐÃ SAO CHÉP LIÊN KẾT',url,true);}catch(e){notice('LIÊN KẾT ĐỘI',url,true);}return;}
+ }catch(e){
+  notice('THÔNG BÁO',e.message||'Có lỗi xảy ra.',false);
+  if(el)el.disabled=false;
+ }
+}
+
+/* ─── XỬ LÝ SỰ KIỆN BÀN PHÍM, CHUỘT & D-PAD CHO BẢN ĐỒ 2D ─── */
+document.addEventListener('click',e=>{
+ const el=e.target.closest('[data-action]');
+ if(el){e.preventDefault();handle(el.dataset.action,el);return;}
+ // Click trực tiếp lên bản đồ Săn Kho Báu để di chuyển nhân vật
+ const vp=e.target.closest('#hwViewport');
+ if(vp&&!e.target.closest('.hw-controls-overlay')&&!e.target.closest('.hw-station')&&!e.target.closest('.hw-chest')){
+  const wd=$('#hwWorld');if(!wd)return;
+  const rect=wd.getBoundingClientRect();
+  if(rect.width>0&&rect.height>0){
+   const tx=Math.max(6,Math.min(94,(e.clientX-rect.left)/rect.width*100));
+   const ty=Math.max(8,Math.min(92,(e.clientY-rect.top)/rect.height*100));
+   huntState.targetX=tx;
+   huntState.targetY=ty;
+   huntState.lastAutoStation=-1;
+   const rip=document.createElement('div');
+   rip.className='hw-ripple';
+   rip.style.left=tx+'%';rip.style.top=ty+'%';
+   wd.appendChild(rip);
+   setTimeout(()=>rip.remove(),550);
+  }
+ }
+});
+
+document.addEventListener('pointerdown',e=>{
+ const dbtn=e.target.closest('[data-dpad]');
+ if(dbtn){
+  e.preventDefault();
+  huntState.keysPressed.add(dbtn.dataset.dpad);
+  huntState.targetX=null;huntState.targetY=null;
+ }
+});
+document.addEventListener('pointerup',()=>{
+ ['up','down','left','right'].forEach(k=>huntState.keysPressed.delete(k));
+});
+
+const keyMap={ArrowUp:'up',ArrowDown:'down',ArrowLeft:'left',ArrowRight:'right',KeyW:'up',KeyS:'down',KeyA:'left',KeyD:'right'};
+window.addEventListener('keydown',e=>{
+ if(document.activeElement?.matches('input,select,textarea')){
+  if(e.key==='Enter'){
+   if(document.activeElement.id==='huntShortInput')handle('attackHuntMonster');
+   else if(document.activeElement.id==='cdShortInput')handle('submitShortCastle');
+   else if(!session)$('#entry [data-action="join"]')?.click();
+  }
+  return;
+ }
+ const dir=keyMap[e.code];
+ if(dir&&session?.role==='student'&&!huntState.battleOpen){
+  e.preventDefault();
+  huntState.keysPressed.add(dir);
+  huntState.targetX=null;huntState.targetY=null;
+ }
+});
+window.addEventListener('keyup',e=>{
+ const dir=keyMap[e.code];
+ if(dir)huntState.keysPressed.delete(dir);
+});
+
+document.addEventListener('change',e=>{
+ if(e.target.id==='clockMinutes'&&session?.role==='teacher'){
+  submit('/api/teacher',{action:'timer',value:Number(e.target.value)}).then(updateAfterAction).catch(err=>notice('Lỗi đồng hồ',err.message,false));
+ }
+});
+
+/* ─── VÒNG LẶP GAME 60FPS CHO CẢ 2 ENGINE (HUNT 2D & CASTLE DEFENSE) ─── */
+let lastFrameTs=performance.now();
+function gameLoop(now){
+ const dt=Math.min(0.08,(now-lastFrameTs)/1000);
+ lastFrameTs=now;
+
+ if(session?.role==='student'&&world?.current&&!world.paused&&!world.me?.completed&&world.me?.stage<5){
+  const m=world.current;
+  const mode=activePlayMode||m.defaultMode||(m.id===2||m.id===5?'defense':'hunt');
+
+  if(mode==='hunt'&&!huntState.battleOpen&&$('#hwViewport')){
+   let vx=0,vy=0;
+   if(huntState.keysPressed.has('left'))vx-=1;
+   if(huntState.keysPressed.has('right'))vx+=1;
+   if(huntState.keysPressed.has('up'))vy-=1;
+   if(huntState.keysPressed.has('down'))vy+=1;
+
+   if(vx!==0||vy!==0){
+    const len=Math.hypot(vx,vy);
+    huntState.x=Math.max(6,Math.min(94,huntState.x+(vx/len)*24*dt));
+    huntState.y=Math.max(8,Math.min(92,huntState.y+(vy/len)*24*dt));
+    huntState.moving=true;
+   }else if(huntState.targetX!==null&&huntState.targetY!==null){
+    const dx=huntState.targetX-huntState.x, dy=huntState.targetY-huntState.y;
+    const dist=Math.hypot(dx,dy);
+    if(dist<0.8){
+     huntState.x=huntState.targetX;huntState.y=huntState.targetY;
+     huntState.targetX=null;huntState.targetY=null;
+     huntState.moving=false;
+    }else{
+     huntState.x+=(dx/dist)*28*dt;
+     huntState.y+=(dy/dist)*28*dt;
+     huntState.moving=true;
+    }
+   }else{
+    huntState.moving=false;
+   }
+   updateHuntCamera();
+
+   // Kiểm tra nếu nhân vật vừa chạm vào Trạm đang mở -> tự động bật Cuộn Giấy Chiến Đấu
+   const curSt=m.huntMap?.stations?.[m.round];
+   if(curSt){
+    const dSt=Math.hypot(huntState.x-curSt.x,huntState.y-curSt.y);
+    if(dSt<=4.2&&huntState.lastAutoStation!==m.round){
+     huntState.lastAutoStation=m.round;
+     huntState.targetX=null;huntState.targetY=null;huntState.moving=false;
+     huntState.battleOpen=true;
+     huntState.selectedChoice=null;
+     huntState.shortText='';
+     huntState.monsterDefeated=false;
+     huntState.rewardBadge=null;
+     render();
+    }else if(dSt>7){
+     huntState.lastAutoStation=-1;
+    }
+   }
+  }
+
+  if(mode==='defense'&&$('#cdBattlefield')){
+   const up=world.me.upgrades||{damage:1,speed:1,hp:1,regen:1};
+   // Hồi máu Thành Trì định kỳ
+   if(now-cdState.lastRegenAt>1000){
+    cdState.lastRegenAt=now;
+    cdState.castleHp=Math.min(cdState.castleMaxHp,cdState.castleHp+(up.regen||1)*2);
+   }
+   // Sinh thêm quái vật nếu chiến trường vắng
+   if(cdState.enemies.length<4&&now-cdState.lastSpawnAt>3200){
+    cdState.lastSpawnAt=now;
+    const kinds=['👺','🦇','💀','👹'];
+    const lane=Math.floor(Math.random()*3);
+    const hp=70+m.id*18+m.round*15;
+    cdState.enemies.push({
+     id:'en-'+(++cdState.seq),
+     lane, x:92,
+     hp, maxHp:hp,
+     speed:2.0+Math.random()*0.7,
+     sprite:kinds[(m.round+lane)%kinds.length],
+     isBoss:false
+    });
+   }
+   // Di chuyển Quái vật
+   const slowed=cdState.slowUntil>now;
+   const shieldOn=cdState.shieldUntil>now;
+   for(let i=cdState.enemies.length-1;i>=0;i--){
+    const en=cdState.enemies[i];
+    en.x-=en.speed*(slowed?0.35:1)*dt;
+    if(en.x<=15){
+     const dmg=shieldOn?0:(en.isBoss?22:12);
+     cdState.castleHp=Math.max(25,cdState.castleHp-dmg);
+     cdState.effects.push({
+      id:++cdState.seq,x:15,lane:en.lane,
+      text:shieldOn?'🛡️ KHIÊN CHẶN!':`-${dmg} HP`,
+      cls:'hit-castle',until:now+700
+     });
+     if(en.isBoss){
+      en.x=78; // Boss lùi lại tiếp tục áp sát cho tới khi học sinh giải đúng toán
+     }else{
+      cdState.enemies.splice(i,1);
+     }
+    }
+   }
+   // 3 Anh Hùng tự động bắn đạn trên 3 làn
+   const fireInterval=Math.max(450,1350-(up.speed||1)*180);
+   const heroIcons=['🏹','🔮','⚡'];
+   for(let lane=0;lane<3;lane++){
+    if(now-cdState.lastHeroShot[lane]>=fireInterval){
+     const hasTarget=cdState.enemies.some(e=>e.lane===lane&&e.x>16);
+     if(hasTarget){
+      cdState.lastHeroShot[lane]=now;
+      cdState.projectiles.push({
+       id:++cdState.seq,lane,x:17,
+       speed:46,
+       dmg:20+(up.damage||1)*9,
+       icon:heroIcons[lane]
+      });
+     }
+    }
+   }
+   // Di chuyển Đạn & Tính va chạm
+   for(let i=cdState.projectiles.length-1;i>=0;i--){
+    const p=cdState.projectiles[i];
+    p.x+=p.speed*dt;
+    const hitIdx=cdState.enemies.findIndex(e=>e.lane===p.lane&&Math.abs(e.x-p.x)<=3.5);
+    if(hitIdx!==-1){
+     const target=cdState.enemies[hitIdx];
+     target.hp-=p.dmg;
+     cdState.effects.push({id:++cdState.seq,x:target.x,lane:target.lane,text:`-${p.dmg}`,cls:'',until:now+550});
+     cdState.projectiles.splice(i,1);
+     if(target.hp<=0){
+      if(target.isBoss){
+       target.hp=Math.round(target.maxHp*0.35); // Boss chỉ bị tiêu diệt hoàn toàn khi học sinh giải đúng câu hỏi Toán!
+       cdState.effects.push({id:++cdState.seq,x:target.x,lane:target.lane,text:'🎯 GIẢI TOÁN ĐỂ KẾT LIỄU BOSS!',cls:'crit',until:now+900});
+      }else{
+       cdState.enemies.splice(hitIdx,1);
+       world.me.gold=(world.me.gold||100)+5;
+      }
+     }
+    }else if(p.x>98){
+     cdState.projectiles.splice(i,1);
+    }
+   }
+   cdState.effects=cdState.effects.filter(fx=>fx.until>now);
+   renderCastleDynamicNodes(now);
+  }
+ }
+ requestAnimationFrame(gameLoop);
+}
+
+function renderCastleDynamicNodes(now){
+ const layer=$('#cdDynamicLayer');if(!layer)return;
+ const laneTops=[43,64,85];
+ const slowed=cdState.slowUntil>now;
+ const shieldEl=$('#cdCastleShield');
+ if(shieldEl)shieldEl.style.display=cdState.shieldUntil>now?'block':'none';
+ const hpEl=$('#cdHudHp'), hpBar=$('#cdHudHpBar'), goldEl=$('#cdHudGold'), topGold=$('#topGoldBadge');
+ if(hpEl)hpEl.textContent=`${Math.round(cdState.castleHp)} / ${cdState.castleMaxHp}`;
+ if(hpBar)hpBar.style.width=`${Math.max(0,Math.min(100,Math.round(cdState.castleHp/cdState.castleMaxHp*100)))}%`;
+ if(goldEl&&world?.me)goldEl.textContent=`${world.me.gold??100} Vàng`;
+ if(topGold&&world?.me)topGold.textContent=world.me.gold??100;
+
+ const enemiesHtml=cdState.enemies.map(en=>`<div class="cd-enemy ${en.isBoss?'is-boss':''} ${slowed?'is-slowed':''}" style="left:${en.x.toFixed(1)}%;top:${laneTops[en.lane]}%">
+  <div class="cd-enemy-hp"><i style="width:${Math.max(0,Math.round(en.hp/en.maxHp*100))}%"></i></div>
+  <div class="cd-enemy-sprite">${en.sprite}</div>
+ </div>`).join('');
+
+ const projHtml=cdState.projectiles.map(p=>`<div class="cd-proj" style="left:${p.x.toFixed(1)}%;top:${laneTops[p.lane]}%">${p.icon}</div>`).join('');
+ const fxHtml=cdState.effects.map(fx=>`<div class="cd-fx ${fx.cls||''}" style="left:${fx.x.toFixed(1)}%;top:${laneTops[fx.lane]-6}%">${esc(fx.text)}</div>`).join('');
+ layer.innerHTML=enemiesHtml+projHtml+fxHtml;
+}
 
 function awardScreen(){
  if(!world||world.role!=='teacher')return '';
@@ -204,8 +1524,8 @@ function awardScreen(){
  const bestCoop=[...ts].sort((a,b)=>b.bonus-a.bonus)[0];
  return `<div class="award-backdrop"><div class="award-panel">
  <div class="stars">✦ ✧ ★ ✦ ★</div><div class="eyebrow">MATHVERSE OXYZ • LỄ VINH DANH</div>
- <h1>${finished>0?'GIẢI CỨU THÀNH PHỐ THÀNH CÔNG!':'BẢNG XẾP HẠNG TẠM THỜI'}</h1>
- <p>${finished>0?'Lõi Trí Tuệ đã được khôi phục. Xin chúc mừng các chiến binh Toán học!':'Chưa có đội hoàn thành mật thư cuối. Hãy tiếp tục hành trình!'}</p>
+ <h1>${finished>0?'GIẢI CỨU THÀNH PHỐ OXYZ THÀNH CÔNG!':'BẢNG XẾP HẠNG TẠM THỜI'}</h1>
+ <p>${finished>0?'Lõi Trí Tuệ đã được khôi phục. Xin chúc mừng các biệt đội Toán học!':'Các đội đang nỗ lực vượt qua 5 chặng thử thách!'}</p>
  <div class="podium">${ts.slice(0,3).map((t,i)=>`<div class="podium-item ${i===0?'gold-podium':''}">
  <div style="font-size:35px">${i===0?'🥇':i===1?'🥈':'🥉'}</div><div class="podium-avatar">${t.avatar}</div>
  <b>${esc(t.name)}</b><strong>${t.score} XP</strong><small>${t.completed?'🔓 Mở kho báu':'Chặng '+t.stage+'/5'}</small></div>`).join('')}</div>
@@ -213,13 +1533,23 @@ function awardScreen(){
  <div class="controls" style="justify-content:center">${btn('⬅ Quay về màn hình giáo viên','awards','gray')}${btn('📥 Tải bảng điểm CSV','exportCSV','gold')}</div>
  </div></div>`;
 }
+
 function exportCSV(){
- const columns=['Thứ hạng','Tên đội','Nhân vật','Số trạm qua','Lượt trong trạm','Số câu sai','Số khiên còn','Điểm nhiệm vụ và mật thư','Điểm hợp tác','Tổng XP','Đã giải mã','Thời điểm hoàn thành'];
+ const columns=['Thứ hạng','Tên đội','Nhân vật','Số trạm qua','Lượt trong trạm','Số câu sai','Số khiên còn','Vàng tích lũy','Cấp Anh Hùng','Điểm nhiệm vụ','Điểm hợp tác','Tổng XP','Đã giải mã','Thời điểm hoàn thành'];
  const ordered=[...world.teams].sort((a,b)=>b.score-a.score||((a.finishedAt||'9999').localeCompare(b.finishedAt||'9999')));
- const rows=ordered.map((t,i)=>[i+1,t.name,t.avatar,t.stage,t.round,t.wrong,t.health,t.score-t.bonus,t.bonus,t.score,t.completed?'Có':'Chưa',t.finishedAt?new Date(t.finishedAt).toLocaleString('vi-VN'):'']);
+ const rows=ordered.map((t,i)=>[i+1,t.name,t.avatar,t.stage,t.round,t.wrong,t.health,t.gold??100,t.heroLevel??1,t.score-t.bonus,t.bonus,t.score,t.completed?'Có':'Chưa',t.finishedAt?new Date(t.finishedAt).toLocaleString('vi-VN'):'']);
  const quote=v=>'"'+String(v).replace(/"/g,'""')+'"';
  const csv='\ufeff'+[columns,...rows].map(r=>r.map(quote).join(',')).join('\r\n');
  const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});
  const link=URL.createObjectURL(blob);const a=document.createElement('a');a.href=link;a.download='MATHVERSE_OXYZ_KET_QUA_'+world.room+'.csv';a.click();setTimeout(()=>URL.revokeObjectURL(link),1500);
 }
-</script></body></html>
+
+session=restoreSession();
+if(session){refresh(true);}else{startScreen();}
+setInterval(()=>{if(session&&!document.hidden)refresh(false);},2500);
+setInterval(updateClock,400);
+requestAnimationFrame(gameLoop);
+
+</script>
+</body>
+</html>

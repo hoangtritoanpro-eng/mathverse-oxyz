@@ -43,3 +43,4 @@ Khi bắt đầu một Phase (ví dụ: Phase 2), bạn phải tuần tự thự
 - **BẮT BUỘC** cập nhật file `CHANGELOG.md` ghi lại các kết quả vừa hoàn thành.
 - **BẮT BUỘC** check tick `[x]` cho phase tương ứng trong `docs/plans/master-plan.md`.
 - Đề xuất commit Git rõ ràng để lưu vết lịch sử.
+

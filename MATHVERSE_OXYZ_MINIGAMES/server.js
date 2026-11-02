@@ -23,82 +23,122 @@ let ROOMS={};
 try{if(fs.existsSync(DATA)){ROOMS=JSON.parse(fs.readFileSync(DATA,'utf8')); console.log('Đã nạp',Object.keys(ROOMS).length,'phòng học');}}catch(e){console.error('Không thể nạp dữ liệu phòng:',e.message);}
 function persist(){fs.mkdirSync(path.dirname(DATA),{recursive:true});const temp=DATA+'.tmp';fs.writeFileSync(temp,JSON.stringify(ROOMS,null,2));fs.renameSync(temp,DATA);}
 function rnd(n=24){return crypto.randomBytes(n).toString('hex');}
+function ensureTeamFields(t){
+ if(t.gold===undefined)t.gold=100;
+ if(t.heroLevel===undefined)t.heroLevel=1;
+ if(!t.upgrades)t.upgrades={damage:1,speed:1,hp:1,regen:1};
+ return t;
+}
 function publicStage(s,round){
  const q=s.challenges[round];
  return {id:s.id,title:s.title,place:s.place,icon:s.icon,tag:s.tag,time:s.time,
-  story:s.story,groupTask:s.groupTask,gameType:s.gameType,
-  round,totalRounds:s.challenges.length,challenge:{label:q.label,prompt:q.prompt,options:q.options}};
+  story:s.story,groupTask:s.groupTask,gameType:s.gameType,defaultMode:s.defaultMode||(s.id===2||s.id===5?'defense':'hunt'),
+  teamRoles:s.teamRoles||[],huntMap:s.huntMap||null,defenseConfig:s.defenseConfig||null,
+  allRounds:s.challenges.map((c,i)=>({index:i,label:c.label,keyBadge:c.keyBadge||`Mảnh ${i+1}`,monster:c.monster||{icon:'👾',name:'Quái Vật',hp:100}})),
+  round,totalRounds:s.challenges.length,
+  challenge:{label:q.label,prompt:q.prompt,options:q.options,roleAssign:q.roleAssign||'',monster:q.monster||{icon:'👾',name:'Quái Vật Trạm',hp:120},keyBadge:q.keyBadge||'',hasShortAnswer:Boolean(q.shortAnswer)}};
 }
 function teacherStage(s){return {...s,challenges:s.challenges.map(q=>({...q,answer:String.fromCharCode(65+q.correct)}))};}
 function roomState(room,token){
  const teacher=token===room.teacherToken;
  const team=room.teams.find(t=>t.token===token);
  if(!teacher&&!team)throw error('Mã truy cập không hợp lệ.',403);
+ room.teams.forEach(ensureTeamFields);
  const teams=room.teams.map(t=>({id:t.id,name:t.name,avatar:t.avatar,color:t.color,
   stage:t.stage,round:t.round,score:t.score,bonus:t.bonus,health:t.health,wrong:t.wrong,
+  gold:t.gold,heroLevel:t.heroLevel,upgrades:t.upgrades,
   completed:t.completed,finishedAt:t.finishedAt,attempts:teacher?t.attempts:undefined,
   hintsUsed:teacher?t.hintsUsed:undefined,digits:teacher?t.digits:undefined}));
  const elapsed=room.clock.running?Date.now()-room.clock.startedAt:0;
  const clock={running:room.clock.running,remainingMs:Math.max(0,room.clock.remainingMs-elapsed),minutes:room.clock.minutes};
  const base={room:room.id,role:teacher?'teacher':'student',teams,paused:room.paused,clock,
-  stages:STAGES.map(x=>({id:x.id,title:x.title,place:x.place,icon:x.icon,tag:x.tag,time:x.time,gameType:x.gameType,totalRounds:x.challenges.length})),
+  stages:STAGES.map(x=>({id:x.id,title:x.title,place:x.place,icon:x.icon,tag:x.tag,time:x.time,gameType:x.gameType,defaultMode:x.defaultMode,totalRounds:x.challenges.length})),
   messageOptions:MESSAGE_OPTIONS,lastEvent:room.events.slice(-15).reverse(),
   createdAt:room.createdAt,joinBaseURL:`http://${LAN_IP}:${PORT}`};
  if(teacher)return {...base,teamCodes:Object.fromEntries(room.teams.map(t=>[t.id,t.code])),
    teacherToken:room.teacherToken,missions:STAGES.map(teacherStage),cipher:'30524',cipherWords:TOKEN_WORDS};
  const cur=STAGES[team.stage];return {...base,me:{id:team.id,name:team.name,avatar:team.avatar,color:team.color,
   stage:team.stage,round:team.round,health:team.health,wrong:team.wrong,score:team.score,bonus:team.bonus,
+  gold:team.gold,heroLevel:team.heroLevel,upgrades:team.upgrades,
   completed:team.completed,attempts:team.attempts,hintsUsed:team.hintsUsed,digits:team.digits,finishedAt:team.finishedAt},
   current:cur?publicStage(cur,team.round):null,cipherWords:team.stage>=5?TOKEN_WORDS:null};
 }
 function error(message,status=400){const e=new Error(message);e.status=status;return e;}
 function getRoom(data){const r=ROOMS[String(data.room||'').toUpperCase()];if(!r)throw error('Không tìm thấy mã phòng. Hãy kiểm tra lại.',404);return r;}
 function requireTeacher(r,token){if(token!==r.teacherToken)throw error('Chỉ giáo viên được phép thao tác này.',403);}
-function requireTeam(r,token){const team=r.teams.find(t=>t.token===token);if(!team)throw error('Mã đội không hợp lệ. Hãy đăng nhập lại.',403);return team;}
+function requireTeam(r,token){const team=r.teams.find(t=>t.token===token);if(!team)throw error('Mã đội không hợp lệ. Hãy đăng nhập lại.',403);return ensureTeamFields(team);}
 function emit(r,content){r.events.push({at:new Date().toISOString(),text:content});if(r.events.length>200)r.events.shift();}
 function clockPause(r){if(!r.clock.running)return;r.clock.remainingMs=Math.max(0,r.clock.remainingMs-(Date.now()-r.clock.startedAt));r.clock.running=false;r.clock.startedAt=0;}
+function normAns(s){return String(s??'').trim().replace(/\u2212/g,'-').replace(/\s+/g,'').toUpperCase();}
 function processAction(endpoint,d){
  if(endpoint==='/api/create'){
   let size=Number(d.teamCount||6);if(!Number.isInteger(size)||size<4||size>8)throw error('Chọn 4–8 đội.');
   let roomId;do{roomId=String(100000+crypto.randomInt(900000));}while(ROOMS[roomId]);
   const r={id:roomId,teacherToken:rnd(),createdAt:new Date().toISOString(),paused:false,
     clock:{minutes:45,remainingMs:45*60*1000,running:false,startedAt:0},
-    teams:TEAM_POOL.slice(0,size).map((t,i)=>({...t,id:'doi-'+(i+1),code:String(1000+crypto.randomInt(9000)),token:rnd(16),stage:0,round:0,health:3,wrong:0,score:0,bonus:0,completed:false,finishedAt:null,attempts:[0,0,0,0,0],hintsUsed:[false,false,false,false,false],digits:[]})),events:[]};
+    teams:TEAM_POOL.slice(0,size).map((t,i)=>({...t,id:'doi-'+(i+1),code:String(1000+crypto.randomInt(9000)),token:rnd(16),stage:0,round:0,health:3,wrong:0,score:0,bonus:0,gold:100,heroLevel:1,upgrades:{damage:1,speed:1,hp:1,regen:1},completed:false,finishedAt:null,attempts:[0,0,0,0,0],hintsUsed:[false,false,false,false,false],digits:[]})),events:[]};
   emit(r,'NOVA đã tạo phòng '+roomId+' với '+size+' đội.');ROOMS[roomId]=r;persist();return{room:roomId,teacherToken:r.teacherToken};
  }
  const r=getRoom(d);
  if(endpoint==='/api/join'){
   const t=r.teams.find(t=>t.id===d.team&&t.code===String(d.code||'').trim());
   if(!t)throw error('Sai mã đội hoặc mã phòng. Hãy hỏi giáo viên.',403);
+  ensureTeamFields(t);
   return{token:t.token,room:r.id,team:t.id};
  }
  if(endpoint==='/api/state')return roomState(r,d.token);
  if(endpoint==='/api/answer'){
   const t=requireTeam(r,d.token);if(r.paused)throw error('Giáo viên đang tạm dừng trò chơi.');
   if(t.completed||t.stage>=5)throw error('Đội đã vượt qua 5 trạm, hãy giải mật thư cuối.');
-  const idx=t.stage,s=STAGES[idx],round=t.round,q=s.challenges[round],choice=Number(d.choice);
+  const idx=t.stage,s=STAGES[idx],round=t.round,q=s.challenges[round];
   if(Number(d.stage)!==idx||Number(d.round)!==round)throw error('Nhiệm vụ vừa thay đổi, hãy nạp lại màn hình để tiếp tục.');
-  if(!Number.isInteger(choice)||choice<0||choice>3)throw error('Vui lòng chọn một trong bốn lựa chọn.');
-  if(choice===q.correct){
-   t.round++;let pts=0,digit=null;
+  let isCorrect=false;
+  if(d.shortText!==undefined&&String(d.shortText).trim()!==''){
+   const given=normAns(d.shortText);
+   const targetShort=normAns(q.shortAnswer);
+   const targetOpt=normAns(q.options[q.correct]);
+   const targetLetter=String.fromCharCode(65+q.correct);
+   isCorrect=(targetShort&&given===targetShort)||given===targetOpt||given===targetLetter;
+  }else{
+   const choice=Number(d.choice);
+   if(!Number.isInteger(choice)||choice<0||choice>3)throw error('Vui lòng chọn một đáp án hoặc nhập câu trả lời.');
+   isCorrect=(choice===q.correct);
+  }
+  if(isCorrect){
+   t.round++;let pts=0,digit=null,goldEarned=120;
+   t.gold=(t.gold||100)+goldEarned;
    if(t.round>=s.challenges.length){
     pts=t.attempts[idx]===0&&!t.hintsUsed[idx]?20:t.attempts[idx]<=2?12:8;
-    t.stage++;t.round=0;t.health=3;t.score+=pts;
+    t.stage++;t.round=0;t.health=3;t.score+=pts;t.gold+=80;
+    t.heroLevel=Math.min(6,(t.heroLevel||1)+1);
     digit=s.digit;
     t.digits.push({stage:idx+1,digit:s.digit,rule:s.digitRule,item:s.item});
-    emit(r,`${t.avatar} ${t.name} đã VƯỢT CHẶNG ${idx+1}: ${s.place}. +${pts} XP và mảnh mã ${digit}.`);
+    emit(r,`${t.avatar} ${t.name} đã VƯỢT CHẶNG ${idx+1}: ${s.place}. +${pts} XP, +200 Vàng và mảnh mã ${digit}.`);
    }else{
-    emit(r,`${t.avatar} ${t.name} đã vượt lượt ${round+1}/${s.challenges.length} tại ${s.place}.`);
+    emit(r,`${t.avatar} ${t.name} đã hạ mục tiêu lượt ${round+1}/${s.challenges.length} tại ${s.place} (+${goldEarned} Vàng).`);
    }
-   persist();return{correct:true,points:pts,explain:q.explain,roundFinished:true,stageFinished:digit!==null,
+   persist();return{correct:true,points:pts,goldEarned,gold:t.gold,heroLevel:t.heroLevel,explain:q.explain,keyBadge:q.keyBadge,roundFinished:true,stageFinished:digit!==null,
      digit,digitRule:digit!==null?s.digitRule:undefined,item:digit!==null?s.item:undefined,
      nextRound:t.round,nextStage:t.stage,health:t.health,score:t.score};
   }
   t.attempts[idx]++;t.wrong++;t.health=Math.max(0,t.health-1);
   const attempt=t.attempts[idx];const hint=q.hints[Math.min(attempt-1,q.hints.length-1)];
-  // Thành trì không bị khóa vĩnh viễn: sau khi cạn giáp sẽ được tiếp tục thử.
-  emit(r,`${t.avatar} ${t.name} thử lại lượt ${round+1} ở ${s.place}; còn ${t.health} khiên.`);
-  persist();return{correct:false,hint,tries:attempt,health:t.health};
+  emit(r,`${t.avatar} ${t.name} trả lời chưa đúng lượt ${round+1} ở ${s.place}; còn ${t.health} khiên.`);
+  persist();return{correct:false,hint,tries:attempt,health:t.health,gold:t.gold};
+ }
+ if(endpoint==='/api/upgrade'){
+  const t=requireTeam(r,d.token);if(r.paused)throw error('Giáo viên đang tạm dừng trò chơi.');
+  const key=String(d.upgrade||'');
+  if(!['damage','speed','hp','regen'].includes(key))throw error('Loại nâng cấp không hợp lệ.');
+  const curLv=t.upgrades[key]||1;
+  if(curLv>=5)throw error('Chỉ số này đã đạt cấp tối đa (Lv.5)!');
+  const cost=60+curLv*40;
+  if((t.gold||0)<cost)throw error(`Không đủ Vàng! Cần ${cost} Vàng (hiện có ${t.gold||0} Vàng). Hãy trả lời câu hỏi để nhận thêm Vàng.`);
+  t.gold-=cost;t.upgrades[key]=curLv+1;
+  if(key==='hp'||key==='regen')t.health=Math.min(3,t.health+1);
+  const names={damage:'Sát thương Anh Hùng',speed:'Tốc độ bắn',hp:'Máu & Giáp Đội Quân',regen:'Hồi phục Thành Trì'};
+  emit(r,`${t.avatar} ${t.name} nâng cấp ${names[key]} lên Lv.${t.upgrades[key]}.`);
+  persist();return{ok:true,gold:t.gold,upgrades:t.upgrades,health:t.health,cost,level:t.upgrades[key]};
  }
  if(endpoint==='/api/hint'){
   const t=requireTeam(r,d.token);if(r.paused)throw error('Giáo viên đang tạm dừng trò chơi.');
@@ -134,7 +174,7 @@ function processAction(endpoint,d){
     else throw error('Tác vụ đồng hồ không hợp lệ.');
   }else if(action==='resetTeam'){
     const t=r.teams.find(t=>t.id===d.team);if(!t)throw error('Không tìm thấy đội.');
-    t.stage=0;t.round=0;t.health=3;t.wrong=0;t.score=0;t.bonus=0;t.completed=false;t.finishedAt=null;t.attempts=[0,0,0,0,0];t.hintsUsed=[false,false,false,false,false];t.digits=[];
+    t.stage=0;t.round=0;t.health=3;t.wrong=0;t.score=0;t.bonus=0;t.gold=100;t.heroLevel=1;t.upgrades={damage:1,speed:1,hp:1,regen:1};t.completed=false;t.finishedAt=null;t.attempts=[0,0,0,0,0];t.hintsUsed=[false,false,false,false,false];t.digits=[];
     emit(r,`GV đã khởi động lại hành trình của ${t.name}.`);
   }else throw error('Tác vụ không được hỗ trợ.');
   persist();return{ok:true};

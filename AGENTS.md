@@ -23,3 +23,4 @@ Dự án này tuân theo **Quy trình Solo Builder** nghiêm ngặt.
 - **Game Engine & Server:** HTML5, Modern CSS3, JavaScript ES6+, Node.js (Zero-dependency, Built-in HTTP module, Crypto, OS).
 - **Mạng lớp học:** LAN/Wi-Fi Socket/HTTP polling thời gian thực, tối ưu cho thiết bị di động không cần Internet.
 - **Tài liệu & Hồ sơ:** Microsoft Word OpenXML (`.docx`), Markdown GFM, LaTeX KaTeX chuẩn công thức toán học GDPT 2018.
+
