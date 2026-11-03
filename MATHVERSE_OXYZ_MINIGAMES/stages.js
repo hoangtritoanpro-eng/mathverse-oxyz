@@ -29,8 +29,8 @@ const STAGES = [
       title: 'Mô phỏng 3D: Vectơ AB với A(2; −1; 3) và B(5; 1; 7)',
       type: 'vectorAB',
       points: [
-        { label: 'A(2;−1;3)', x: 2, y: -1, z: 3, color: '#38bdf8' },
-        { label: 'B(5;1;7)', x: 5, y: 1, z: 7, color: '#facc15' }
+        { label: 'A(2;−1;3)', coords: [2, -1, 3], x: 2, y: -1, z: 3, color: '#38bdf8' },
+        { label: 'B(5;1;7)', coords: [5, 1, 7], x: 5, y: 1, z: 7, color: '#facc15' }
       ],
       vectors: [
         { from: [2, -1, 3], to: [5, 1, 7], label: 'AB = (3; 2; 4)', color: '#4ade80' }
@@ -125,7 +125,7 @@ const STAGES = [
       title: 'Mô phỏng 3D: Tích vô hướng & Góc vuông góc (u ⊥ v ⇔ u·v = 0)',
       type: 'dotProduct',
       points: [
-        { label: 'O(0;0;0)', x: 0, y: 0, z: 0, color: '#ffffff' }
+        { label: 'O(0;0;0)', coords: [0, 0, 0], x: 0, y: 0, z: 0, color: '#ffffff' }
       ],
       vectors: [
         { from: [0, 0, 0], to: [2, 4, -4], label: 'u = (1; 2; −2)', color: '#38bdf8' },
@@ -221,8 +221,8 @@ const STAGES = [
       title: 'Mô phỏng 3D: Khoảng cách AB với A(1; 2; −1) và B(4; 6; −1)',
       type: 'distanceAB',
       points: [
-        { label: 'A(1;2;−1)', x: 1, y: 2, z: -1, color: '#c084fc' },
-        { label: 'B(4;6;−1)', x: 4, y: 6, z: -1, color: '#38bdf8' }
+        { label: 'A(1;2;−1)', coords: [1, 2, -1], x: 1, y: 2, z: -1, color: '#c084fc' },
+        { label: 'B(4;6;−1)', coords: [4, 6, -1], x: 4, y: 6, z: -1, color: '#38bdf8' }
       ],
       vectors: [
         { from: [1, 2, -1], to: [4, 2, -1], label: 'Δx = 3', color: '#f87171' },
@@ -319,9 +319,9 @@ const STAGES = [
       title: 'Mô phỏng 3D: Trung điểm I(2; 0; 2) của A(0; −2; 4) và B(4; 2; 0)',
       type: 'midpointI',
       points: [
-        { label: 'A(0;−2;4)', x: 0, y: -2, z: 4, color: '#38bdf8' },
-        { label: 'I(2;0;2)', x: 2, y: 0, z: 2, color: '#facc15' },
-        { label: 'B(4;2;0)', x: 4, y: 2, z: 0, color: '#f472b6' }
+        { label: 'A(0;−2;4)', coords: [0, -2, 4], x: 0, y: -2, z: 4, color: '#38bdf8' },
+        { label: 'I(2;0;2)', coords: [2, 0, 2], x: 2, y: 0, z: 2, color: '#facc15' },
+        { label: 'B(4;2;0)', coords: [4, 2, 0], x: 4, y: 2, z: 0, color: '#f472b6' }
       ],
       vectors: [
         { from: [0, -2, 4], to: [4, 2, 0], label: 'Đoạn thẳng AB', color: '#2dd4bf' }
@@ -416,7 +416,7 @@ const STAGES = [
       title: 'Mô phỏng 3D: Hai vectơ cùng phương u = (4; 2; 4) = 2 · v(2; 1; 2)',
       type: 'collinear',
       points: [
-        { label: 'O(0;0;0)', x: 0, y: 0, z: 0, color: '#ffffff' }
+        { label: 'O(0;0;0)', coords: [0, 0, 0], x: 0, y: 0, z: 0, color: '#ffffff' }
       ],
       vectors: [
         { from: [0, 0, 0], to: [4, 2, 4], label: 'u = (4; 2; 4) = 2v', color: '#f43f5e' },

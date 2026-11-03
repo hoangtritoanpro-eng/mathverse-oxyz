@@ -151,23 +151,26 @@ function renderOxyz3D(m){
  let projLines='';
  if(oxyz3D.showProj){
   (v3.points||[]).forEach(pt=>{
-   const [px,py,pz]=pt.coords;
+   const coords = Array.isArray(pt.coords) ? pt.coords : [Number(pt.x||0), Number(pt.y||0), Number(pt.z||0)];
+   const [px,py,pz]=coords;
    const P=project3DPoint(px,py,pz);
    const Pxy=project3DPoint(px,py,0);
    const Px=project3DPoint(px,0,0);
    const Py=project3DPoint(0,py,0);
    projLines+=`
-    <line x1="${P.sx}" y1="${P.sy}" x2="${Pxy.sx}" y2="${Pxy.sy}" stroke="${pt.color}" stroke-width="1.3" stroke-dasharray="3 3" opacity="0.75"/>
+    <line x1="${P.sx}" y1="${P.sy}" x2="${Pxy.sx}" y2="${Pxy.sy}" stroke="${pt.color||'#38bdf8'}" stroke-width="1.3" stroke-dasharray="3 3" opacity="0.75"/>
     <line x1="${Pxy.sx}" y1="${Pxy.sy}" x2="${Px.sx}" y2="${Px.sy}" stroke="rgba(239,68,68,0.5)" stroke-width="1.1" stroke-dasharray="2 3"/>
     <line x1="${Pxy.sx}" y1="${Pxy.sy}" x2="${Py.sx}" y2="${Py.sy}" stroke="rgba(16,185,129,0.5)" stroke-width="1.1" stroke-dasharray="2 3"/>
-    <circle cx="${Pxy.sx}" cy="${Pxy.sy}" r="2.5" fill="${pt.color}" opacity="0.6"/>`;
+    <circle cx="${Pxy.sx}" cy="${Pxy.sy}" r="2.5" fill="${pt.color||'#38bdf8'}" opacity="0.6"/>`;
   });
  }
 
  // Vẽ các Vectơ trong không gian 3D
  const vecSvg=(v3.vectors||[]).map(v=>{
-  const pFrom=project3DPoint(...v.from);
-  const pTo=project3DPoint(...v.to);
+  const vFrom = Array.isArray(v.from) ? v.from : [0, 0, 0];
+  const vTo = Array.isArray(v.to) ? v.to : [0, 0, 0];
+  const pFrom=project3DPoint(...vFrom);
+  const pTo=project3DPoint(...vTo);
   const mx=((pFrom.sx+pTo.sx)/2).toFixed(1);
   const my=((pFrom.sy+pTo.sy)/2-7).toFixed(1);
   return `<g>
@@ -178,8 +181,9 @@ function renderOxyz3D(m){
 
  // Vẽ các Điểm trong không gian 3D
  const ptsSvg=(v3.points||[]).map(pt=>{
-  const P=project3DPoint(...pt.coords);
-  const coordStr=`(${pt.coords.join(';')})`;
+  const coords = Array.isArray(pt.coords) ? pt.coords : [Number(pt.x||0), Number(pt.y||0), Number(pt.z||0)];
+  const P=project3DPoint(...coords);
+  const coordStr=`(${coords.join(';')})`;
   return `<g>
    <circle cx="${P.sx}" cy="${P.sy}" r="5.5" fill="${pt.color||'#facc15'}" stroke="#fff" stroke-width="1.8"/>
    <text x="${P.sx+7}" y="${P.sy-6}" fill="#ffffff" font-size="11" font-weight="900" style="text-shadow:0 2px 4px #000">${esc(pt.label)}${esc(coordStr)}</text>
