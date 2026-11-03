@@ -10,6 +10,38 @@ Tất cả những thay đổi quan trọng của dự án này sẽ được gh
 
 ---
 
+## [2.4.0] - 2026-11-03
+
+### Added & Overhauled
+- **Đại Trùng Tu Chặng 3, 4, 5 Thành Game Phiêu Lưu Toán Học 2D Đích Thực (Fantasy Adventure Math Game):**
+  - **Chặng 3 – Tháp Pha Lê Khoảng Cách (Distance & Vector Length):**
+    - Khám phá thung lũng hang động, NPC Vệ Binh Hang Pha Lê tại cửa hang giao nhiệm vụ tìm 5 viên pha lê thất lạc.
+    - 5 bài toán độ dài vectơ và khoảng cách giữa hai điểm trong $Oxyz$, mỗi trạm mở khóa 1 mảnh cổ tự: `P - H - A - L - E`.
+    - Bàn Giải Mã Trung Tâm & Tháp Pha Lê Cổ: Mở Sổ Mật Thư, sắp xếp đúng chuỗi `PHALE` để bừng sáng tháp pha lê và giải phóng phong ấn (nhận số mật mã `5`).
+  - **Chặng 4 – Mê Cung Trung Điểm (Midpoint & Centroid):**
+    - Mê cung cổ đại với hệ thống Lưới Tọa Độ $Oxy$ trực quan ($x=0..8, y=0..6$) hiển thị rõ ràng trên bản đồ.
+    - Cơ chế Tọa độ bí mật: Sau khi tính trung điểm $M$ hoặc trọng tâm $G$, xuất hiện cọc tiêu tọa độ mục tiêu trên bản đồ; học sinh điều khiển nhân vật chạy đến đúng vị trí tọa độ để kích hoạt dấu hiệu bí mật.
+    - Thu thập 5 ký tự cổ `T - R - U - N - G` và ghép thành `TRUNG` tại Bàn Cổ Mê Cung để mở khóa Phòng Kho Báu Trung Tâm (nhận số mật mã `2`).
+  - **Chặng 5 – Thành Trì Lời Trí Tuệ (Collinear Vectors, Vector Addition & Boss Battle):**
+    - Thành trì phép thuật bị quái vật vây hãm, điều khiển nhân vật nạp năng lượng cho 5 Trụ Phép phòng thủ xung quanh thành.
+    - 5 bài toán hai vectơ cùng phương và phép toán vectơ, thu thập 5 cổ ngữ `B - A - O - V - E`.
+    - Ghép thành công `BAOVE` trên Sổ Mật Thư để kích hoạt Màng Chắn Năng Lượng Kim Cương (`hw-shield-dome`).
+    - Nghênh chiến Đại Boss "Bóng Đen Lãng Quên" (500 HP): Giải bài toán vận dụng cao tổng hợp ($|2\vec{u}+\vec{v}|=\sqrt{33}$) để kích hoạt Đại Pháo Laser Thành Trì quét sạch Boss với thông điệp *"THÀNH TRÌ ĐÃ ĐƯỢC BẢO VỆ!"* (nhận số mật mã `4`).
+- **Hệ Thống Sổ Mật Thư Cổ Đại (Interactive Cipher Notebook):**
+  - Giao diện Sổ Mật Thư chuyên dụng với 5 ô khóa ký tự, khay rune khả dụng, thao tác kéo thả/chạm đặt ký tự, gỡ bỏ, làm lại và xác thực linh hoạt, có gợi ý sửa sai không khóa vĩnh viễn.
+- **Hệ Thống Phân Vai Nhóm 5 Thành Viên (Team Roles Modal):**
+  - Hỗ trợ phân công rõ ràng: Dẫn đường & Thám hiểm (TV1), Nhà Toán học (TV2), Chuyên gia Vectơ (TV3), Nhà Giải Mật mã (TV4), Chỉ huy & Điều khiển (Đội trưởng).
+- **Hệ Thống Gợi Ý 2 Cấp (2-Level Hint System):**
+  - Cấp 1: Công thức trọng tâm; Cấp 2: Các bước giải chi tiết từng bước.
+- **Tương Tác Phím E & Chạm Cảm Ứng Di Động:**
+  - Hỗ trợ phím `E` và nút "✋ TƯƠNG TÁC (Phím E)" để tiếp cận NPC, trạm toán học, bàn giải mã, và Boss.
+- **Bộ Hiệu Ứng Âm Thanh Web Audio Độc Lập:**
+  - Tiếng pha lê leng keng (`crystal`), tiếng gầm uy lực của Boss (`boss_roar`), tiếng sạc khiên năng lượng (`energy`), tiếng chuông tọa độ (`gem`), pháo hoa rực rỡ.
+- **Đồng Bộ Hoàn Toàn Bản Chơi Thử 1 Máy:**
+  - Tái tạo toàn bộ logic mật thư, 5 chặng, 5 trạm và Đại chiến Boss vào file offline `CHOI_THU_1_MAY.html` (~246KB).
+
+---
+
 ## [2.3.2] - 2026-11-03
 
 ### Fixed & Improved

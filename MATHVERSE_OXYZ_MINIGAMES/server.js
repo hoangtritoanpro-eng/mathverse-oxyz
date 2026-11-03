@@ -53,15 +53,19 @@ function ensureTeamFields(t){
  if(!t.upgrades)t.upgrades={damage:1,speed:1,hp:1,regen:1};
  return t;
 }
-function publicStage(s,round){
- const q=s.challenges[round];
+function publicStage(s,round,team){
+ const isBoss=Boolean(s.bossChallenge&&team&&team.bossReady);
+ const q=isBoss?s.bossChallenge:(s.challenges[round]||s.challenges[s.challenges.length-1]);
  return {id:s.id,title:s.title,subtitle:s.subtitle||'',place:s.place,icon:s.icon,tag:s.tag,time:s.time,
   biomeColor:s.biomeColor||'#3b82f6',item:s.item||'',visual3D:s.visual3D||null,
   story:s.story,groupTask:s.groupTask,gameType:s.gameType,defaultMode:s.defaultMode||(s.id===2||s.id===5?'defense':'hunt'),
   teamRoles:s.teamRoles||[],huntMap:s.huntMap||null,defenseConfig:s.defenseConfig||null,
-  allRounds:s.challenges.map((c,i)=>({index:i,label:c.label,keyBadge:c.keyBadge||`Mảnh ${i+1}`,monster:c.monster||{icon:'👾',name:'Quái Vật',hp:100}})),
-  round,totalRounds:s.challenges.length,
-  challenge:{label:q.label,prompt:q.prompt,options:q.options,roleAssign:q.roleAssign||'',highlightAxis:q.highlightAxis||'all',monster:q.monster||{icon:'👾',name:'Quái Vật Trạm',hp:120,type:'golem'},keyBadge:q.keyBadge||'',hasShortAnswer:Boolean(q.shortAnswer)}};
+  cipher:s.cipher||null,cipherHint:s.cipherHint||null,cipherLetters:s.cipherLetters||null,
+  cipherReady:Boolean(team&&(team.cipherReady||round>=s.challenges.length)),
+  bossReady:Boolean(team&&team.bossReady),
+  allRounds:s.challenges.map((c,i)=>({index:i,label:c.label,keyBadge:c.keyBadge||`Mảnh ${i+1}`,cipherPiece:c.cipherPiece||null,targetGrid:c.targetGrid||null,monster:c.monster||{icon:'👾',name:'Quái Vật',hp:100}})),
+  round:Math.min(round,s.challenges.length),totalRounds:s.challenges.length,isBoss,
+  challenge:{label:q.label,prompt:q.prompt,options:q.options,roleAssign:q.roleAssign||'',highlightAxis:q.highlightAxis||'all',monster:q.monster||{icon:'👾',name:'Quái Vật Trạm',hp:120,type:'golem'},keyBadge:q.keyBadge||'',cipherPiece:q.cipherPiece||null,targetGrid:q.targetGrid||null,hasShortAnswer:Boolean(q.shortAnswer)}};
 }
 function teacherStage(s){return {...s,challenges:s.challenges.map(q=>({...q,answer:String.fromCharCode(65+q.correct)}))};}
 function roomState(room,token){
@@ -72,6 +76,7 @@ function roomState(room,token){
  const teams=room.teams.map(t=>({id:t.id,name:t.name,avatar:t.avatar,color:t.color,
   stage:t.stage,round:t.round,score:t.score,bonus:t.bonus,health:t.health,wrong:t.wrong,
   gold:t.gold,heroLevel:t.heroLevel,streak:t.streak||0,upgrades:t.upgrades,
+  cipherReady:Boolean(t.cipherReady),bossReady:Boolean(t.bossReady),
   completed:t.completed,finishedAt:t.finishedAt,attempts:teacher?t.attempts:undefined,
   hintsUsed:teacher?t.hintsUsed:undefined,digits:teacher?t.digits:undefined}));
  const elapsed=room.clock.running?Date.now()-room.clock.startedAt:0;
@@ -85,8 +90,9 @@ function roomState(room,token){
  const cur=STAGES[team.stage];return {...base,me:{id:team.id,name:team.name,avatar:team.avatar,color:team.color,
   stage:team.stage,round:team.round,health:team.health,wrong:team.wrong,score:team.score,bonus:team.bonus,
   gold:team.gold,heroLevel:team.heroLevel,streak:team.streak||0,upgrades:team.upgrades,
+  cipherReady:Boolean(team.cipherReady),bossReady:Boolean(team.bossReady),
   completed:team.completed,attempts:team.attempts,hintsUsed:team.hintsUsed,digits:team.digits,finishedAt:team.finishedAt},
-  current:cur?publicStage(cur,team.round):null,cipherWords:team.stage>=5?TOKEN_WORDS:null};
+  current:cur?publicStage(cur,team.round,team):null,cipherWords:team.stage>=5?TOKEN_WORDS:null};
 }
 function error(message,status=400){const e=new Error(message);e.status=status;return e;}
 function getRoom(data){const r=ROOMS[String(data.room||'').toUpperCase()];if(!r)throw error('Không tìm thấy mã phòng. Hãy kiểm tra lại.',404);return r;}
@@ -116,6 +122,7 @@ function processAction(endpoint,d){
   const t=requireTeam(r,d.token);
   const stg=Math.max(0,Math.min(5,Number(d.stage)||0));
   t.stage=stg;t.round=0;t.health=3;t.completed=false;
+  t.cipherReady=false;t.bossReady=false;
   t.digits=STAGES.slice(0,stg).map((s,idx)=>({stage:idx+1,digit:s.digit,rule:s.digitRule,item:s.item}));
   t.score=stg*20;
   persist();return{ok:true};
@@ -123,8 +130,11 @@ function processAction(endpoint,d){
  if(endpoint==='/api/answer'){
   const t=requireTeam(r,d.token);if(r.paused)throw error('Giáo viên đang tạm dừng trò chơi.');
   if(t.completed||t.stage>=5)throw error('Đội đã vượt qua 5 trạm, hãy giải mật thư cuối.');
-  const idx=t.stage,s=STAGES[idx],round=t.round,q=s.challenges[round];
-  if(Number(d.stage)!==idx||Number(d.round)!==round)throw error('Nhiệm vụ vừa thay đổi, hãy nạp lại màn hình để tiếp tục.');
+  const idx=t.stage,s=STAGES[idx];
+  const isBoss=Boolean(s.bossChallenge&&t.bossReady);
+  const round=isBoss?s.challenges.length:t.round;
+  const q=isBoss?s.bossChallenge:s.challenges[round];
+  if(!isBoss&&(Number(d.stage)!==idx||Number(d.round)!==round))throw error('Nhiệm vụ vừa thay đổi, hãy nạp lại màn hình để tiếp tục.');
   let isCorrect=false;
   if(d.shortText!==undefined&&String(d.shortText).trim()!==''){
    const given=normAns(d.shortText);
@@ -140,19 +150,37 @@ function processAction(endpoint,d){
   if(isCorrect){
    t.streak=(t.streak||0)+1;
    const comboBonus=Math.min(4,t.streak-1)*30;
+   if(isBoss){
+    const pts=t.attempts[idx]===0&&!t.hintsUsed[idx]?25:15;
+    t.stage++;t.round=0;t.bossReady=false;t.health=3;t.score+=pts;t.gold+=150;
+    t.heroLevel=Math.min(6,(t.heroLevel||1)+1);
+    const digit=s.digit;
+    t.digits.push({stage:idx+1,digit:s.digit,rule:s.digitRule,item:s.item});
+    emit(r,`🏆 ${t.avatar} ${t.name} đã bắn Đại Pháo Laser tiêu diệt BOSS BÓNG ĐEN LÃNG QUÊN! THÀNH TRÌ ĐÃ ĐƯỢC BẢO VỆ! +${pts} XP.`);
+    persist();
+    return{correct:true,points:pts,goldEarned:150,comboBonus,streak:t.streak,gold:t.gold,heroLevel:t.heroLevel,explain:q.explain,bossDefeated:true,stageFinished:true,digit,digitRule:s.digitRule,item:s.item,nextRound:0,nextStage:t.stage,health:t.health,score:t.score};
+   }
    t.round++;let pts=0,digit=null,goldEarned=120+comboBonus;
    t.gold=(t.gold||100)+goldEarned;
+   const cipherPiece=q.cipherPiece||null;
    if(t.round>=s.challenges.length){
-    pts=t.attempts[idx]===0&&!t.hintsUsed[idx]?20:t.attempts[idx]<=2?12:8;
-    t.stage++;t.round=0;t.health=3;t.score+=pts;t.gold+=80;
-    t.heroLevel=Math.min(6,(t.heroLevel||1)+1);
-    digit=s.digit;
-    t.digits.push({stage:idx+1,digit:s.digit,rule:s.digitRule,item:s.item});
-    emit(r,`${t.avatar} ${t.name} đã VƯỢT CHẶNG ${idx+1}: ${s.place} (Combo x${t.streak}). +${pts} XP, +${goldEarned+80} Vàng và mảnh mã ${digit}.`);
+    if(s.cipher){
+     t.cipherReady=true;
+     emit(r,`📜 ${t.avatar} ${t.name} đã thu thập đủ 5 mảnh mật thư tại ${s.place}! Hãy mở Sổ Mật Thư để giải mã!`);
+     persist();
+     return{correct:true,points:0,goldEarned,comboBonus,streak:t.streak,gold:t.gold,heroLevel:t.heroLevel,explain:q.explain,keyBadge:q.keyBadge,cipherPiece,roundFinished:true,cipherReady:true,stageFinished:false,nextRound:t.round,nextStage:t.stage,health:t.health,score:t.score};
+    }else{
+     pts=t.attempts[idx]===0&&!t.hintsUsed[idx]?20:t.attempts[idx]<=2?12:8;
+     t.stage++;t.round=0;t.health=3;t.score+=pts;t.gold+=80;
+     t.heroLevel=Math.min(6,(t.heroLevel||1)+1);
+     digit=s.digit;
+     t.digits.push({stage:idx+1,digit:s.digit,rule:s.digitRule,item:s.item});
+     emit(r,`${t.avatar} ${t.name} đã VƯỢT CHẶNG ${idx+1}: ${s.place} (Combo x${t.streak}). +${pts} XP, +${goldEarned+80} Vàng và mảnh mã ${digit}.`);
+    }
    }else{
     emit(r,`${t.avatar} ${t.name} đã hạ mục tiêu lượt ${round+1}/${s.challenges.length} tại ${s.place} (Combo x${t.streak}, +${goldEarned} Vàng).`);
    }
-   persist();return{correct:true,points:pts,goldEarned,comboBonus,streak:t.streak,gold:t.gold,heroLevel:t.heroLevel,explain:q.explain,keyBadge:q.keyBadge,roundFinished:true,stageFinished:digit!==null,
+   persist();return{correct:true,points:pts,goldEarned,comboBonus,streak:t.streak,gold:t.gold,heroLevel:t.heroLevel,explain:q.explain,keyBadge:q.keyBadge,cipherPiece,roundFinished:true,stageFinished:digit!==null,
      digit,digitRule:digit!==null?s.digitRule:undefined,item:digit!==null?s.item:undefined,
      nextRound:t.round,nextStage:t.stage,health:t.health,score:t.score};
   }
@@ -161,6 +189,41 @@ function processAction(endpoint,d){
   const attempt=t.attempts[idx];const hint=q.hints[Math.min(attempt-1,q.hints.length-1)];
   emit(r,`${t.avatar} ${t.name} trả lời chưa đúng lượt ${round+1} ở ${s.place}; còn ${t.health} khiên.`);
   persist();return{correct:false,streak:0,hint,tries:attempt,health:t.health,gold:t.gold};
+ }
+ if(endpoint==='/api/cipher'){
+  const t=requireTeam(r,d.token);if(r.paused)throw error('Giáo viên đang tạm dừng trò chơi.');
+  const idx=t.stage,s=STAGES[idx];
+  if(!s||!s.cipher)throw error('Chặng này không yêu cầu giải mật thư.');
+  const submitted=String(d.cipher||'').trim().toUpperCase().replace(/[\s-]/g,'');
+  if(submitted!==s.cipher){
+   return{correct:false,hint:s.cipherHint||'Hãy sắp xếp các ký tự thu thập được theo đúng thứ tự!'};
+  }
+  if(s.id===3){
+   const pts=t.attempts[idx]===0&&!t.hintsUsed[idx]?20:t.attempts[idx]<=2?12:8;
+   t.stage++;t.round=0;t.cipherReady=false;t.health=3;t.score+=pts;t.gold+=100;
+   t.heroLevel=Math.min(6,(t.heroLevel||1)+1);
+   const digit=s.digit;
+   t.digits.push({stage:idx+1,digit:s.digit,rule:s.digitRule,item:s.item});
+   emit(r,`💠 ${t.avatar} ${t.name} đã giải mã thành công PHALE và mở cổng Tháp Pha Lê (+${pts} XP)!`);
+   persist();
+   return{correct:true,points:pts,stageFinished:true,digit,digitRule:s.digitRule,item:s.item,nextRound:0,nextStage:t.stage,health:t.health,score:t.score,message:'THÁP PHA LÊ ĐÃ ĐƯỢC MỞ CỔNG PHONG ẤN THÀNH CÔNG!'};
+  }
+  if(s.id===4){
+   const pts=t.attempts[idx]===0&&!t.hintsUsed[idx]?20:t.attempts[idx]<=2?12:8;
+   t.stage++;t.round=0;t.cipherReady=false;t.health=3;t.score+=pts;t.gold+=100;
+   t.heroLevel=Math.min(6,(t.heroLevel||1)+1);
+   const digit=s.digit;
+   t.digits.push({stage:idx+1,digit:s.digit,rule:s.digitRule,item:s.item});
+   emit(r,`🌀 ${t.avatar} ${t.name} đã giải mã thành công TRUNG và mở Phòng Kho Báu Trung Tâm (+${pts} XP)!`);
+   persist();
+   return{correct:true,points:pts,stageFinished:true,digit,digitRule:s.digitRule,item:s.item,nextRound:0,nextStage:t.stage,health:t.health,score:t.score,message:'CĂN PHÒNG KHO BÁU TRUNG TÂM ĐÃ ĐƯỢC MỞ KHÓA!'};
+  }
+  if(s.id===5){
+   t.cipherReady=false;t.bossReady=true;t.gold+=50;
+   emit(r,`🛡️ ${t.avatar} ${t.name} đã ghép BAOVE kích hoạt Lá Chắn Thành Trì! ĐẠI BOSS BÓNG ĐEN XUẤT HIỆN!`);
+   persist();
+   return{correct:true,bossReady:true,message:'LÁ CHẮN THÀNH TRÌ ĐÃ ĐƯỢC KÍCH HOẠT! ĐẠI BOSS BÓNG ĐEN ĐANG TỔNG TẤN CÔNG!'};
+  }
  }
  if(endpoint==='/api/upgrade'){
   const t=requireTeam(r,d.token);if(r.paused)throw error('Giáo viên đang tạm dừng trò chơi.');
@@ -179,11 +242,15 @@ function processAction(endpoint,d){
  if(endpoint==='/api/hint'){
   const t=requireTeam(r,d.token);if(r.paused)throw error('Giáo viên đang tạm dừng trò chơi.');
   if(t.stage>=5)throw error('Đã hoàn thành năm trạm.');
-  const i=t.stage;if(Number(d.stage)!==i||Number(d.round)!==t.round)throw error('Nhiệm vụ đã thay đổi, hãy tải lại.');
+  const i=t.stage,s=STAGES[i];
+  const isBoss=Boolean(s.bossChallenge&&t.bossReady);
+  const round=isBoss?s.challenges.length:t.round;
+  const q=isBoss?s.bossChallenge:s.challenges[round];
   t.hintsUsed[i]=true;
-  const q=STAGES[i].challenges[t.round];
-  emit(r,`${t.avatar} ${t.name} xin gợi ý ở chặng ${i+1} · lượt ${t.round+1}.`);persist();
-  return{hint:q.hints[0],cost:'Điểm chặng sẽ tính theo số lượt sai và việc dùng gợi ý.'};
+  const level=Number(d.level)||1;
+  const hintIndex=Math.max(0,Math.min(level-1,q.hints.length-1));
+  emit(r,`${t.avatar} ${t.name} xin gợi ý cấp ${hintIndex+1} ở chặng ${i+1}.`);persist();
+  return{hint:q.hints[hintIndex],level:hintIndex+1,totalLevels:q.hints.length,cost:'Gợi ý cấp '+(hintIndex+1)+'/'+q.hints.length};
  }
  if(endpoint==='/api/final'){
   const t=requireTeam(r,d.token);if(r.paused)throw error('Giáo viên đang tạm dừng trò chơi.');

@@ -197,28 +197,32 @@ const STAGES = [
   },
   {
     id: 3,
-    gameType: 'forge',
+    gameType: 'crystal_tower',
     defaultMode: 'hunt',
-    title: 'THUNG LŨNG PHA LÊ',
-    subtitle: 'Rèn Tinh Thể Khoảng Cách AB',
-    place: 'Tháp Pha Lê',
+    title: 'THÁP PHA LÊ KHOẢNG CÁCH',
+    subtitle: 'Tìm 5 Tinh Thể & Mở Khóa Tháp Pha Lê',
+    place: 'Thung Lũng Tháp Pha Lê',
     icon: '💠',
     biomeColor: '#8b5cf6',
-    tag: 'Khoảng cách giữa hai điểm AB',
-    time: '6 phút',
-    item: 'Tinh thể khoảng cách',
+    tag: 'Độ dài vectơ & Khoảng cách giữa hai điểm',
+    time: '6–7 phút',
+    item: 'Lõi Tháp Pha Lê',
     digit: '5',
-    digitRule: 'Lấy độ dài đoạn thẳng AB = 5.',
-    story: 'Trong Thung Lũng Pha Lê huyền bí, 3 Mỏ Tinh Thể (Δx, Δy, Δz) đang bị các Vệ Binh Đá Quý canh giữ. Hãy điều khiển nhân vật đi tới từng mỏ tinh thể, giải bài toán hiệu tọa độ và dùng định lý Pitago không gian để rèn Tinh Thể Khoảng Cách AB = 5!',
-    groupTask: 'TV1 tính Δx, TV2 tính Δy, TV3 tính Δz; Đội trưởng lấy căn bậc hai √(Δx² + Δy² + Δz²).',
+    digitRule: 'Lấy độ dài khoảng cách rèn được AB = 5.',
+    cipher: 'PHALE',
+    cipherHint: 'Tên của tòa tháp cổ được rèn từ 5 viên tinh thể ánh sáng (5 ký tự: P - H - A - L - E)!',
+    cipherLetters: ['P', 'H', 'A', 'L', 'E'],
+    story: 'Tòa tháp cổ Tháp Pha Lê Khoảng Cách đang bị kết giới phong ấn tối thượng! NPC Vệ Binh Hang Tinh Thể giao nhiệm vụ cho đội thám hiểm: Hãy khám phá thung lũng hang động pha lê, tìm kiếm 5 viên pha lê thất lạc gắn với 5 bài toán độ dài và khoảng cách. Mỗi viên pha lê sẽ hé lộ một ký tự mật thư cổ. Hãy thu thập đủ 5 viên và ghép thành mật thư "PHALE" trên Bàn Giải Mã Trung Tâm để bừng sáng ngọn tháp và mở cánh cổng phong ấn!',
+    groupTask: 'Phân vai nhóm: TV1 giải bài toán khoảng cách, TV2 giải độ dài vectơ, TV3 tính căn bậc hai, TV4 ghi chép ký tự mật thư, Đội trưởng điều khiển nhân vật khám phá và ghép mã.',
     teamRoles: [
-      '🔷 Thành viên 1: Tính hiệu hoành độ Δx = xB − xA',
-      '💜 Thành viên 2: Tính hiệu tung độ Δy = yB − yA',
-      '💎 Thành viên 3: Tính hiệu cao độ Δz = zB − zA',
-      '👑 Đội trưởng: Tính độ dài AB = √(Δx² + Δy² + Δz²)'
+      '🧭 TV1 (Thám Hiểm & Dẫn Đường): Xác định vị trí 5 mỏ pha lê và cầu đá trên bản đồ',
+      '📐 TV2 (Nhà Toán Học): Áp dụng công thức khoảng cách AB = √[(xB-xA)² + (yB-yA)² + (zB-zA)²]',
+      '⚡ TV3 (Chuyên Gia Vectơ): Áp dụng công thức độ dài vectơ |u| = √(x² + y² + z²)',
+      '📜 TV4 (Nhà Giải Mật Mã): Thu thập các ký tự rune P, H, A, L, E và giải mã mật thư',
+      '👑 Đội trưởng (Chỉ Huy): Điều khiển di chuyển, nhấn E tương tác và chốt đáp án'
     ],
     visual3D: {
-      title: 'Mô phỏng 3D: Khoảng cách AB với A(1; 2; −1) và B(4; 6; −1)',
+      title: 'Mô phỏng 3D: Khoảng cách AB và độ dài vectơ trong không gian Oxyz',
       type: 'distanceAB',
       points: [
         { label: 'A(1;2;−1)', coords: [1, 2, -1], x: 1, y: 2, z: -1, color: '#c084fc' },
@@ -233,90 +237,144 @@ const STAGES = [
     },
     huntMap: {
       theme: 'crystal',
-      worldTitle: 'THUNG LŨNG PHA LÊ KHOẢNG CÁCH',
-      spawn: { x: 12, y: 50 },
-      chest: { x: 88, y: 50, name: 'Lò Rèn Tinh Thể AB' },
+      worldTitle: 'THÁP PHA LÊ KHOẢNG CÁCH OXYZ',
+      spawn: { x: 8, y: 50 },
+      chest: { x: 92, y: 50, name: 'Bàn Giải Mã Tháp Pha Lê' },
       stations: [
-        { x: 32, y: 28, name: 'Mỏ I · Pha Lê Xanh (Δx)', monsterIcon: '🗿', monsterType: 'golem', monsterName: 'Golem Tinh Thể Xanh', badge: 'Δx = 3' },
-        { x: 53, y: 72, name: 'Mỏ II · Pha Lê Tím (Δy)', monsterIcon: '🔮', monsterType: 'lich', monsterName: 'Phù Thủy Pha Lê Tím', badge: 'Δy = 4' },
-        { x: 74, y: 32, name: 'Mỏ III · Lõi Năng Lượng AB', monsterIcon: '💎', monsterType: 'crystal_boss', monsterName: 'Vệ Binh Kim Cương', badge: 'AB = 5' }
+        { x: 22, y: 26, name: 'Mỏ I · Pha Lê Lam (Mảnh P)', monsterIcon: '🔷', monsterType: 'golem', monsterName: 'Vệ Binh Pha Lê Lam', badge: 'Mảnh P', cipherPiece: 'P' },
+        { x: 38, y: 74, name: 'Mỏ II · Pha Lê Lục (Mảnh H)', monsterIcon: '💚', monsterType: 'lich', monsterName: 'Phù Thủy Tinh Thể Lục', badge: 'Mảnh H', cipherPiece: 'H' },
+        { x: 55, y: 28, name: 'Mỏ III · Pha Lê Hoàng Kim (Mảnh A)', monsterIcon: '⭐', monsterType: 'crystal_boss', monsterName: 'Vệ Binh Hoàng Kim', badge: 'Mảnh A', cipherPiece: 'A' },
+        { x: 70, y: 72, name: 'Mỏ IV · Pha Lê Hồng Ngọc (Mảnh L)', monsterIcon: '🌸', monsterType: 'golem', monsterName: 'Khổng Lồ Thạch Anh', badge: 'Mảnh L', cipherPiece: 'L' },
+        { x: 84, y: 34, name: 'Mỏ V · Lõi Tối Thượng (Mảnh E)', monsterIcon: '💎', monsterType: 'crystal_boss', monsterName: 'Thần Thú Pha Lê Oxyz', badge: 'Mảnh E', cipherPiece: 'E' }
       ]
     },
     defenseConfig: {
       castleName: 'Tháp Pha Lê Khoảng Cách',
       theme: 'crystal',
       waves: [
-        { name: 'Đợt 1: Golem Tinh Thể Xanh', enemies: ['goblin', 'skeleton', 'goblin', 'bat'], boss: '🗿' },
-        { name: 'Đợt 2: Phù Thủy Pha Lê Tím', enemies: ['bat', 'skeleton', 'orc', 'skeleton'], boss: '🔮' },
-        { name: 'Đợt 3: Vệ Binh Kim Cương', enemies: ['orc', 'skeleton', 'orc', 'orc'], boss: '💎' }
+        { name: 'Đợt 1: Vệ Binh Pha Lê Lam', enemies: ['goblin', 'skeleton', 'goblin', 'bat'], boss: '🔷' },
+        { name: 'Đợt 2: Phù Thủy Tinh Thể Lục', enemies: ['bat', 'skeleton', 'orc', 'skeleton'], boss: '💚' },
+        { name: 'Đợt 3: Vệ Binh Hoàng Kim', enemies: ['orc', 'skeleton', 'orc', 'orc'], boss: '⭐' },
+        { name: 'Đợt 4: Khổng Lồ Thạch Anh', enemies: ['skeleton', 'orc', 'goblin', 'orc'], boss: '🌸' },
+        { name: 'Đợt 5: Thần Thú Pha Lê Oxyz', enemies: ['orc', 'orc', 'orc', 'boss'], boss: '💎' }
       ]
     },
     challenges: [
       {
-        prompt: 'Cho hai điểm A(1; 2; −1) và B(4; 6; −1). Hiệu hoành độ Δx = xB − xA bằng bao nhiêu?',
-        options: ['5', '3', '−3', '1'],
-        correct: 1,
+        prompt: 'TRẠM 1: Trong không gian Oxyz, cho hai điểm A(1; 2; −1) và B(4; 2; −1). Khoảng cách giữa hai điểm A và B bằng bao nhiêu?',
+        options: ['3', '5', '4', '1'],
+        correct: 0,
         shortAnswer: '3',
-        hints: ['Tính Δx = xB − xA.', 'Lấy 4 − 1 = ?'],
-        explain: 'Ta có Δx = xB − xA = 4 − 1 = 3.',
-        label: 'Mỏ I · Pha lê X · Tinh thể xanh',
-        roleAssign: 'Thành viên 1 khai thác Pha lê Xanh (Δx = 4 − 1)',
-        monster: { icon: '🗿', type: 'golem', name: 'Golem Tinh Thể Xanh', hp: 140 },
-        keyBadge: 'Δx=3',
+        cipherPiece: 'P',
+        hints: [
+          'Áp dụng công thức khoảng cách: AB = √[(xB − xA)² + (yB − yA)² + (zB − zA)²].',
+          'Vì yA = yB và zA = zB nên AB = |xB − xA| = |4 − 1| = 3.'
+        ],
+        explain: 'Ta có AB = √[(4 − 1)² + (2 − 2)² + (−1 − (−1))²] = √(3² + 0² + 0²) = 3. Đội nhận được Mảnh Mật Thư [P]!',
+        label: 'Mỏ I · Pha Lê Lam · Mảnh [P]',
+        roleAssign: 'TV2 tính hiệu hoành độ Δx = 4 − 1; TV4 ghi chép ký tự P',
+        monster: { icon: '🔷', type: 'golem', name: 'Vệ Binh Pha Lê Lam', hp: 120 },
+        keyBadge: 'Mảnh P (AB=3)',
         highlightAxis: 'x'
       },
       {
-        prompt: 'Với hai điểm A(1; 2; −1) và B(4; 6; −1), hiệu tung độ Δy = yB − yA bằng bao nhiêu?',
-        options: ['8', '−4', '2', '4'],
-        correct: 3,
-        shortAnswer: '4',
-        hints: ['Tính Δy = yB − yA.', 'Lấy 6 − 2 = ?'],
-        explain: 'Ta có Δy = yB − yA = 6 − 2 = 4.',
-        label: 'Mỏ II · Pha lê Y · Tinh thể tím',
-        roleAssign: 'Thành viên 2 khai thác Pha lê Tím (Δy = 6 − 2)',
-        monster: { icon: '🔮', type: 'lich', name: 'Phù Thủy Pha Lê Tím', hp: 165 },
-        keyBadge: 'Δy=4',
-        highlightAxis: 'y'
+        prompt: 'TRẠM 2: Trong không gian Oxyz, cho vectơ u = (2; −1; 2). Độ dài |u| của vectơ u bằng bao nhiêu?',
+        options: ['9', '3', '√5', '5'],
+        correct: 1,
+        shortAnswer: '3',
+        cipherPiece: 'H',
+        hints: [
+          'Áp dụng công thức độ dài vectơ: |u| = √(x² + y² + z²).',
+          'Tính: √(2² + (−1)² + 2²) = √(4 + 1 + 4) = √9 = ?'
+        ],
+        explain: 'Ta có |u| = √(2² + (−1)² + 2²) = √(4 + 1 + 4) = √9 = 3. Đội nhận được Mảnh Mật Thư [H]!',
+        label: 'Mỏ II · Pha Lê Lục · Mảnh [H]',
+        roleAssign: 'TV3 tính bình phương các tọa độ u: 4 + 1 + 4 = 9; TV4 ghi ký tự H',
+        monster: { icon: '💚', type: 'lich', name: 'Phù Thủy Tinh Thể Lục', hp: 150 },
+        keyBadge: 'Mảnh H (|u|=3)',
+        highlightAxis: 'all'
       },
       {
-        prompt: 'Biết Δx = 3, Δy = 4 và Δz = (−1) − (−1) = 0. Độ dài đoạn thẳng AB bằng bao nhiêu?',
-        options: ['7', '25', '5', '√7'],
+        prompt: 'TRẠM 3: Cho hai điểm M(1; −2; 3) và N(3; −2; 1). Độ dài đoạn thẳng MN bằng bao nhiêu?',
+        options: ['2√2', '4', '2', '√6'],
+        correct: 0,
+        shortAnswer: '2√2',
+        cipherPiece: 'A',
+        hints: [
+          'Tính tọa độ vectơ MN = (xN − xM; yN − yM; zN − zM).',
+          'MN = √[(3−1)² + (−2−(−2))² + (1−3)²] = √(2² + 0² + (−2)²) = √8 = 2√2.'
+        ],
+        explain: 'Ta có MN = √(2² + 0² + (−2)²) = √(4 + 0 + 4) = √8 = 2√2. Đội nhận được Mảnh Mật Thư [A]!',
+        label: 'Mỏ III · Pha Lê Hoàng Kim · Mảnh [A]',
+        roleAssign: 'TV2 tính MN = √(2² + (−2)²) = √8 = 2√2; TV4 ghi ký tự A',
+        monster: { icon: '⭐', type: 'crystal_boss', name: 'Vệ Binh Hoàng Kim', hp: 170 },
+        keyBadge: 'Mảnh A (MN=2√2)',
+        highlightAxis: 'all'
+      },
+      {
+        prompt: 'TRẠM 4: Cho hai điểm A(1; 2; 3) và B(3; 5; 9). Khoảng cách giữa hai điểm A và B bằng bao nhiêu?',
+        options: ['√45', '7', '9', '5'],
+        correct: 1,
+        shortAnswer: '7',
+        cipherPiece: 'L',
+        hints: [
+          'Tính hiệu tọa độ: xB − xA = 2, yB − yA = 3, zB − zA = 6.',
+          'Tính: √(2² + 3² + 6²) = √(4 + 9 + 36) = √49 = ?'
+        ],
+        explain: 'Ta có AB = √(2² + 3² + 6²) = √(4 + 9 + 36) = √49 = 7. Đội nhận được Mảnh Mật Thư [L]!',
+        label: 'Mỏ IV · Pha Lê Hồng Ngọc · Mảnh [L]',
+        roleAssign: 'TV2 & TV3 phối hợp tính 4 + 9 + 36 = 49 → căn bậc hai bằng 7; TV4 ghi ký tự L',
+        monster: { icon: '🌸', type: 'golem', name: 'Khổng Lồ Thạch Anh', hp: 190 },
+        keyBadge: 'Mảnh L (AB=7)',
+        highlightAxis: 'all'
+      },
+      {
+        prompt: 'TRẠM 5: Cho hai điểm C(2; 1; −1) và D(6; 4; 11). Độ dài đoạn thẳng CD bằng bao nhiêu?',
+        options: ['15', '12', '13', '√153'],
         correct: 2,
-        shortAnswer: '5',
-        hints: ['Áp dụng công thức khoảng cách: AB = √(Δx² + Δy² + Δz²).', 'Tính: √(3² + 4² + 0²) = √25 = ?'],
-        explain: 'Ta có AB = √(3² + 4² + 0²) = √(9 + 16 + 0) = √25 = 5.',
-        label: 'Mỏ III · Rèn Lõi Năng Lượng AB',
-        roleAssign: 'Thành viên 3 & Đội trưởng tính √(3² + 4² + 0²)',
-        monster: { icon: '💎', type: 'crystal_boss', name: 'Vệ Binh Kim Cương', hp: 200 },
-        keyBadge: 'AB=5',
+        shortAnswer: '13',
+        cipherPiece: 'E',
+        hints: [
+          'Tính các hiệu: Δx = 6 − 2 = 4, Δy = 4 − 1 = 3, Δz = 11 − (−1) = 12.',
+          'Tính: √(4² + 3² + 12²) = √(16 + 9 + 144) = √169 = ?'
+        ],
+        explain: 'Ta có CD = √(4² + 3² + 12²) = √(16 + 9 + 144) = √169 = 13. Đội nhận được Mảnh Mật Thư [E]!',
+        label: 'Mỏ V · Lõi Tối Thượng · Mảnh [E]',
+        roleAssign: 'Cả đội tính √(16 + 9 + 144) = √169 = 13; Đội trưởng chuẩn bị mở Bàn Giải Mã PHALE',
+        monster: { icon: '💎', type: 'crystal_boss', name: 'Thần Thú Pha Lê Oxyz', hp: 220 },
+        keyBadge: 'Mảnh E (CD=13)',
         highlightAxis: 'all'
       }
     ]
   },
   {
     id: 4,
-    gameType: 'maze',
+    gameType: 'coordinate_maze',
     defaultMode: 'hunt',
     title: 'MÊ CUNG TRUNG ĐIỂM',
-    subtitle: 'Giải Mã Tọa Độ Trung Điểm I',
-    place: 'Mê Cung Không Gian',
+    subtitle: 'Khám Phá Tọa Độ Ô Vuông & Ghép Mật Thư TRUNG',
+    place: 'Mê Cung Không Gian Cổ Đại',
     icon: '🌀',
     biomeColor: '#06b6d4',
-    tag: 'Tọa độ trung điểm đoạn thẳng',
+    tag: 'Tọa độ trung điểm & Trọng tâm tam giác',
     time: '6–7 phút',
-    item: 'Bản đồ mê cung',
+    item: 'Bản Đồ Cổ & Chìa Khóa Vàng',
     digit: '2',
     digitRule: 'Lấy hoành độ trung điểm xI = 2.',
-    story: 'Cả đội đang đứng giữa Mê Cung Không Gian Atlantis với những bức tường đá cổ đại đan xen. Hãy dẫn đường cho nhân vật luồn lách qua các ngã rẽ tới 3 Cổng Dịch Chuyển (xI, yI, zI), giải mã tọa độ trung điểm I của đoạn thẳng AB để mở lối thoát!',
-    groupTask: '3 thành viên tính trung bình cộng từng trục (xA+xB)/2, (yA+yB)/2, (zA+zB)/2; Đội trưởng tìm đường vượt mê cung.',
+    cipher: 'TRUNG',
+    cipherHint: 'Mật từ khóa cốt lõi của Trung điểm & Trọng tâm (5 ký tự: T - R - U - N - G)!',
+    cipherLetters: ['T', 'R', 'U', 'N', 'G'],
+    story: 'Cả đội bước vào Mê Cung Atlantis cổ đại với các bức tường đá kiên cố và hệ trục tọa độ ô vuông Oxy hiển thị rõ nét trên mặt sàn. Có 5 trạm thử thách trung điểm và trọng tâm tam giác. Mỗi kết quả tọa độ tính được chính là tọa độ thực tế trên bản đồ ô vuông mà nhân vật phải điều khiển đến để kích hoạt công tắc đá và thu thập mảnh mật mã! Thu thập đủ 5 mảnh và ghép thành mật thư "TRUNG" để mở cánh cổng vàng dẫn vào Căn Phòng Kho Báu Trung Tâm!',
+    groupTask: 'Phân vai nhóm: TV1 tính hoành độ trung bình cộng, TV2 tính tung độ, TV3 tính cao độ, TV4 đối chiếu tọa độ ô vuông trên bản đồ, Đội trưởng điều khiển nhân vật chạy tới đúng vị trí ô bí mật.',
     teamRoles: [
-      '🚪 Thành viên 1: Tính hoành độ trung điểm xI = (xA + xB) / 2',
-      '🚪 Thành viên 2: Tính tung độ trung điểm yI = (yA + yB) / 2',
-      '🚪 Thành viên 3: Tính cao độ trung điểm zI = (zA + zB) / 2',
-      '👑 Đội trưởng: Dẫn đường vượt tường mê cung & mở 3 Cổng Không Gian'
+      '🧭 TV1 (Chuyên Gia Trung Điểm): Áp dụng công thức M = ((xA+xB)/2; (yA+yB)/2; (zA+zB)/2)',
+      '📐 TV2 (Chuyên Gia Trọng Tâm): Áp dụng công thức G = ((xA+xB+xC)/3; (yA+yB+xC)/3; (zA+zB+zC)/3)',
+      '🔍 TV3 (Trinh Sát Tọa Độ): Định vị ô tọa độ (x; y) tương ứng trên lưới mê cung',
+      '📜 TV4 (Chuyên Viên Giải Mật): Thu thập các ký tự T, R, U, N, G và sắp xếp mật thư',
+      '👑 Đội trưởng (Hoa Tiêu): Lái nhân vật luồn lách qua mê cung và nhấn E tại cơ quan bí mật'
     ],
     visual3D: {
-      title: 'Mô phỏng 3D: Trung điểm I(2; 0; 2) của A(0; −2; 4) và B(4; 2; 0)',
+      title: 'Mô phỏng 3D: Trung điểm I(2; 0; 2) và Trọng tâm G trong không gian Oxyz',
       type: 'midpointI',
       points: [
         { label: 'A(0;−2;4)', coords: [0, -2, 4], x: 0, y: -2, z: 4, color: '#38bdf8' },
@@ -330,90 +388,146 @@ const STAGES = [
     },
     huntMap: {
       theme: 'maze',
-      worldTitle: 'MÊ CUNG TRUNG ĐIỂM I(x; y; z)',
-      spawn: { x: 11, y: 50 },
-      chest: { x: 89, y: 50, name: 'Rương Bản Đồ Mê Cung' },
+      worldTitle: 'MÊ CUNG TỌA ĐỘ TRUNG ĐIỂM OXYZ',
+      spawn: { x: 10, y: 50 },
+      chest: { x: 90, y: 50, name: 'Cổng Phòng Kho Báu Trung Tâm' },
       stations: [
-        { x: 30, y: 22, name: 'Cổng I · Ngã Rẽ Hoành Độ xI', monsterIcon: '👻', monsterType: 'wraith', monsterName: 'Bóng Ma Ngã Rẽ X', badge: 'xI = 2' },
-        { x: 52, y: 78, name: 'Cổng II · Ngã Rẽ Tung Độ yI', monsterIcon: '🦇', monsterType: 'vampire_bat', monsterName: 'Dơi Huyết Không Gian Y', badge: 'yI = 0' },
-        { x: 74, y: 24, name: 'Cổng III · Cửa Thoát Cao Độ zI', monsterIcon: '🐺', monsterType: 'fenrir', monsterName: 'Sói Thần Không Gian Z', badge: 'zI = 2' }
+        { x: 25, y: 24, name: 'Trạm I · Cửa Đá Trung Điểm M (Mảnh T)', monsterIcon: '👻', monsterType: 'wraith', monsterName: 'Bóng Ma Trung Điểm', badge: 'Mảnh T', cipherPiece: 'T', mapCoord: { x: 4, y: 3, label: 'M(4; 3)' } },
+        { x: 40, y: 76, name: 'Trạm II · Điện Thờ Trọng Tâm G (Mảnh R)', monsterIcon: '🦇', monsterType: 'vampire_bat', monsterName: 'Dơi Huyết Tọa Độ', badge: 'Mảnh R', cipherPiece: 'R', mapCoord: { x: 3, y: 3, label: 'G(3; 3)' } },
+        { x: 56, y: 26, name: 'Trạm III · Cổng Dịch Chuyển Điểm D (Mảnh U)', monsterIcon: '🌀', monsterType: 'wraith', monsterName: 'Vong Hồn Không Gian', badge: 'Mảnh U', cipherPiece: 'U', mapCoord: { x: 4, y: 1, label: 'D(4; -2; 0)' } },
+        { x: 72, y: 74, name: 'Trạm IV · Pháp Trận Trọng Tâm G₂ (Mảnh N)', monsterIcon: '🐺', monsterType: 'fenrir', monsterName: 'Sói Băng Mê Cung', badge: 'Mảnh N', cipherPiece: 'N', mapCoord: { x: 2, y: 5, label: 'G(2; 1; 2)' } },
+        { x: 84, y: 32, name: 'Trạm V · Bệ Đá Trung Điểm K (Mảnh G)', monsterIcon: '🗝️', monsterType: 'fenrir', monsterName: 'Vệ Binh Chìa Khóa Vàng', badge: 'Mảnh G', cipherPiece: 'G', mapCoord: { x: 6, y: 4, label: 'K(3; 1; 2)' } }
       ]
     },
     defenseConfig: {
-      castleName: 'Thành Trì Mê Cung Trung Điểm',
+      castleName: 'Mê Cung Tọa Độ Trung Điểm',
       theme: 'maze',
       waves: [
-        { name: 'Đợt 1: Bóng Ma Ngã Rẽ X', enemies: ['bat', 'goblin', 'bat', 'skeleton'], boss: '👻' },
-        { name: 'Đợt 2: Dơi Canh Cổng Y', enemies: ['bat', 'skeleton', 'bat', 'orc'], boss: '🦇' },
-        { name: 'Đợt 3: Sói Thần Không Gian Z', enemies: ['skeleton', 'orc', 'skeleton', 'bat'], boss: '🐺' }
+        { name: 'Đợt 1: Bóng Ma Trung Điểm M', enemies: ['bat', 'goblin', 'bat', 'skeleton'], boss: '👻' },
+        { name: 'Đợt 2: Dơi Huyết Tọa Độ G', enemies: ['bat', 'skeleton', 'bat', 'orc'], boss: '🦇' },
+        { name: 'Đợt 3: Vong Hồn Không Gian', enemies: ['skeleton', 'orc', 'skeleton', 'bat'], boss: '🌀' },
+        { name: 'Đợt 4: Sói Băng Mê Cung G₂', enemies: ['orc', 'skeleton', 'orc', 'bat'], boss: '🐺' },
+        { name: 'Đợt 5: Vệ Binh Chìa Khóa Vàng', enemies: ['orc', 'orc', 'skeleton', 'fenrir'], boss: '🗝️' }
       ]
     },
     challenges: [
       {
-        prompt: 'Cho đoạn thẳng AB với A(0; −2; 4) và B(4; 2; 0). Hoành độ xI của trung điểm I bằng bao nhiêu?',
-        options: ['4', '0', '2', '−2'],
-        correct: 2,
-        shortAnswer: '2',
-        hints: ['Hoành độ trung điểm bằng trung bình cộng hai hoành độ.', 'Tính: xI = (0 + 4) / 2 = ?'],
-        explain: 'Ta có xI = (xA + xB) / 2 = (0 + 4) / 2 = 2.',
-        label: 'Ngã rẽ X · Cánh cửa thứ nhất',
-        roleAssign: 'Thành viên 1 tính nhanh (0 + 4) / 2',
-        monster: { icon: '👻', type: 'wraith', name: 'Bóng Ma Ngã Rẽ X', hp: 150 },
-        keyBadge: 'xI=2',
-        highlightAxis: 'x'
-      },
-      {
-        prompt: 'Với A(0; −2; 4) và B(4; 2; 0), tung độ yI của trung điểm I bằng bao nhiêu?',
-        options: ['0', '−2', '2', '4'],
+        prompt: 'TRẠM 1: Cho đoạn thẳng AB với A(2; 4; 0) và B(6; 2; 0). Tọa độ trung điểm M của đoạn thẳng AB là tọa độ nào? (Sau khi tính đúng, hãy điều khiển nhân vật đến ô tọa độ tương ứng trên bản đồ để mở cơ quan!)',
+        options: ['(4; 3; 0)', '(8; 6; 0)', '(2; −1; 0)', '(3; 4; 0)'],
         correct: 0,
-        shortAnswer: '0',
-        hints: ['Tung độ trung điểm bằng trung bình cộng hai tung độ.', 'Tính: yI = (−2 + 2) / 2 = ?'],
-        explain: 'Ta có yI = (yA + yB) / 2 = (−2 + 2) / 2 = 0.',
-        label: 'Ngã rẽ Y · Cánh cửa thứ hai',
-        roleAssign: 'Thành viên 2 tính (−2 + 2) / 2',
-        monster: { icon: '🦇', type: 'vampire_bat', name: 'Dơi Huyết Không Gian Y', hp: 175 },
-        keyBadge: 'yI=0',
-        highlightAxis: 'y'
+        shortAnswer: '(4;3;0)',
+        cipherPiece: 'T',
+        targetGrid: { x: 4, y: 3, label: 'Ô M(4; 3)' },
+        hints: [
+          'Áp dụng công thức trung điểm: xM = (xA + xB) / 2 và yM = (yA + yB) / 2.',
+          'Tính: xM = (2 + 6) / 2 = 4; yM = (4 + 2) / 2 = 3; zM = 0 → M(4; 3; 0).'
+        ],
+        explain: 'Ta có M = ((2+6)/2; (4+2)/2; 0) = (4; 3; 0). Ô bí mật tại tọa độ (4; 3) trên bản đồ đã kích hoạt! Nhận Mảnh [T]!',
+        label: 'Trạm I · Cửa Đá Trung Điểm M · Mảnh [T]',
+        roleAssign: 'TV1 tính trung bình cộng x, y; Đội trưởng tìm ô (4; 3) trên lưới mê cung',
+        monster: { icon: '👻', type: 'wraith', name: 'Bóng Ma Trung Điểm', hp: 130 },
+        keyBadge: 'Mảnh T: M(4;3;0)',
+        highlightAxis: 'all'
       },
       {
-        prompt: 'Với A(0; −2; 4) và B(4; 2; 0), cao độ zI của trung điểm I bằng bao nhiêu?',
-        options: ['4', '−2', '2', '0'],
+        prompt: 'TRẠM 2: Cho tam giác ABC với A(1; 2; 0), B(5; 1; 0) và C(3; 6; 0). Tọa độ trọng tâm G của tam giác ABC là gì?',
+        options: ['(9; 9; 0)', '(3; 3; 0)', '(2; 3; 0)', '(4; 3; 0)'],
+        correct: 1,
+        shortAnswer: '(3;3;0)',
+        cipherPiece: 'R',
+        targetGrid: { x: 3, y: 3, label: 'Ô G(3; 3)' },
+        hints: [
+          'Tọa độ trọng tâm tam giác: xG = (xA + xB + xC) / 3; yG = (yA + yB + yC) / 3.',
+          'Tính: xG = (1 + 5 + 3) / 3 = 9 / 3 = 3; yG = (2 + 1 + 6) / 3 = 9 / 3 = 3 → G(3; 3; 0).'
+        ],
+        explain: 'Ta có G = ((1+5+3)/3; (2+1+6)/3; 0) = (3; 3; 0). Bệ thờ trọng tâm tại ô (3; 3) đã mở! Nhận Mảnh [R]!',
+        label: 'Trạm II · Điện Thờ Trọng Tâm G · Mảnh [R]',
+        roleAssign: 'TV2 tính trung bình cộng 3 đỉnh: xG=3, yG=3; TV4 ghi nhận mảnh R',
+        monster: { icon: '🦇', type: 'vampire_bat', name: 'Dơi Huyết Tọa Độ', hp: 155 },
+        keyBadge: 'Mảnh R: G(3;3;0)',
+        highlightAxis: 'all'
+      },
+      {
+        prompt: 'TRẠM 3: Cho đoạn thẳng CD với C(0; 2; 4) và biết trung điểm là I(2; 0; 2). Tọa độ điểm mút D là gì?',
+        options: ['(4; −2; 0)', '(2; 2; 2)', '(1; 1; 3)', '(4; 2; 0)'],
+        correct: 0,
+        shortAnswer: '(4;-2;0)',
+        cipherPiece: 'U',
+        hints: [
+          'Từ công thức trung điểm I = (C + D) / 2 suy ra D = 2I − C.',
+          'Tính: xD = 2(2) − 0 = 4; yD = 2(0) − 2 = −2; zD = 2(2) − 4 = 0 → D(4; −2; 0).'
+        ],
+        explain: 'Ta có D = 2I − C = (4; −2; 0). Cổng Dịch Chuyển Không Gian đã kích hoạt! Nhận Mảnh [U]!',
+        label: 'Trạm III · Cổng Dịch Chuyển Điểm D · Mảnh [U]',
+        roleAssign: 'TV1 dùng biến đổi D = 2I − C để tìm điểm đối xứng; TV4 ghi nhận mảnh U',
+        monster: { icon: '🌀', type: 'wraith', name: 'Vong Hồn Không Gian', hp: 180 },
+        keyBadge: 'Mảnh U: D(4;−2;0)',
+        highlightAxis: 'all'
+      },
+      {
+        prompt: 'TRẠM 4: Trong không gian Oxyz, cho tam giác MNP với M(2; −1; 3), N(4; 0; 1), P(0; 4; 2). Tọa độ trọng tâm G của tam giác MNP bằng bao nhiêu?',
+        options: ['(6; 3; 6)', '(2; 1; 2)', '(3; 1; 2)', '(2; 0; 2)'],
+        correct: 1,
+        shortAnswer: '(2;1;2)',
+        cipherPiece: 'N',
+        hints: [
+          'Trọng tâm tam giác trong Oxyz: G = ((xM+xN+xP)/3; (yM+yN+yP)/3; (zM+zN+zP)/3).',
+          'Hoành độ: (2+4+0)/3 = 2; Tung độ: (−1+0+4)/3 = 1; Cao độ: (3+1+2)/3 = 2 → G(2; 1; 2).'
+        ],
+        explain: 'Ta có G = ((2+4+0)/3; (−1+0+4)/3; (3+1+2)/3) = (2; 1; 2). Nhận Mảnh Mật Thư [N]!',
+        label: 'Trạm IV · Pháp Trận Trọng Tâm G₂ · Mảnh [N]',
+        roleAssign: 'TV2 và TV3 cùng cộng tọa độ 3 chiều và chia 3; TV4 ghi nhận mảnh N',
+        monster: { icon: '🐺', type: 'fenrir', name: 'Sói Băng Mê Cung', hp: 200 },
+        keyBadge: 'Mảnh N: G(2;1;2)',
+        highlightAxis: 'all'
+      },
+      {
+        prompt: 'TRẠM 5: Cho hai điểm A(1; 3; −2) và B(5; −1; 6). Tọa độ trung điểm K của đoạn thẳng AB bằng bao nhiêu?',
+        options: ['(6; 2; 4)', '(4; −4; 8)', '(3; 1; 2)', '(2; 2; 4)'],
         correct: 2,
-        shortAnswer: '2',
-        hints: ['Cao độ trung điểm bằng trung bình cộng hai cao độ.', 'Tính: zI = (4 + 0) / 2 = ?'],
-        explain: 'Ta có zI = (zA + zB) / 2 = (4 + 0) / 2 = 2. Vậy trung điểm I(2; 0; 2)!',
-        label: 'Ngã rẽ Z · Cửa thoát mê cung',
-        roleAssign: 'Thành viên 3 tính (4 + 0) / 2 & Đội trưởng chốt I(2; 0; 2)',
-        monster: { icon: '🐺', type: 'fenrir', name: 'Sói Thần Không Gian Z', hp: 205 },
-        keyBadge: 'zI=2',
-        highlightAxis: 'z'
+        shortAnswer: '(3;1;2)',
+        cipherPiece: 'G',
+        hints: [
+          'Áp dụng công thức trung điểm 3 chiều: K = ((xA+xB)/2; (yA+yB)/2; (zA+zB)/2).',
+          'xK = (1+5)/2 = 3; yK = (3+(−1))/2 = 1; zK = (−2+6)/2 = 2 → K(3; 1; 2).'
+        ],
+        explain: 'Ta có K = ((1+5)/2; (3−1)/2; (−2+6)/2) = (3; 1; 2). Đội nhận đủ 5 mảnh mật mã và Chìa Khóa Vàng!',
+        label: 'Trạm V · Bệ Đá Trung Điểm K · Mảnh [G]',
+        roleAssign: 'Cả nhóm hoàn thành trung điểm K(3; 1; 2) và mở Sổ Mật Thư ghép chữ TRUNG',
+        monster: { icon: '🗝️', type: 'fenrir', name: 'Vệ Binh Chìa Khóa Vàng', hp: 230 },
+        keyBadge: 'Mảnh G: K(3;1;2)',
+        highlightAxis: 'all'
       }
     ]
   },
   {
     id: 5,
-    gameType: 'boss',
+    gameType: 'citadel_boss',
     defaultMode: 'defense',
-    title: 'THÀNH TRÌ BÓNG ĐEN CUỐI CÙNG',
-    subtitle: 'Đại Chiến Boss Hai Vectơ Cùng Phương',
-    place: 'Thành Trì Cuối Cùng',
-    icon: '🐲',
-    biomeColor: '#f43f5e',
-    tag: 'Điều kiện hai vectơ cùng phương',
+    title: 'THÀNH TRÌ LỜI TRÍ TUỆ',
+    subtitle: 'Nạp Năng Lượng 5 Trụ Phép & Diệt Boss Cuối Oxyz',
+    place: 'Thánh Điện Phép Thuật Oxyz',
+    icon: '🏰',
+    biomeColor: '#ef4444',
+    tag: 'Hai vectơ cùng phương & Cộng vectơ & Đại chiến Boss',
     time: '7–8 phút',
-    item: 'Chìa khóa Lõi Trí Tuệ',
+    item: 'Lõi Năng Lượng Khiên Vĩnh Cửu',
     digit: '4',
     digitRule: 'Lấy giá trị tham số m = 4 khi hai vectơ cùng phương.',
-    story: 'Boss cuối "Bóng Đen Lãng Quên" cùng đại quân Rồng Hắc Ám đang tổng tấn công Thành Trì Cuối Cùng! Boss mang 3 lớp giáp tương ứng với bài toán Hai Vectơ Cùng Phương (u = k·v). Hãy hợp sức giải toán, nâng cấp tối đa 3 Anh Hùng và kích hoạt Đại Bác Laser phá vỡ 3 lớp giáp của Boss!',
-    groupTask: 'TV1 tìm hệ số tỉ lệ k, TV2 tìm tham số m, TV3 kiểm tra cặp vectơ cùng phương; Đội trưởng chỉ huy chiến trường Thủ Thành.',
+    cipher: 'BAOVE',
+    cipherHint: 'Mệnh lệnh thiêng liêng để kích hoạt Khiên Phép Thuật tối thượng (5 ký tự: B - A - O - V - E)!',
+    cipherLetters: ['B', 'A', 'O', 'V', 'E'],
+    story: 'Thành Trì Lời Trí Tuệ đang bị Quân Đoàn Quái Vật Hắc Ám vây hãm dữ dội! Trong sân thành trì có 5 Trụ Phép Phòng Thủ đang cạn kiệt năng lượng. Hãy điều khiển nhân vật chạy tới từng trụ phép, nhấn E để nạp mana bằng cách giải bài toán Vectơ cùng phương và cộng vectơ. Mỗi trụ nạp đầy sẽ phóng luồng tia năng lượng ma thuật vào Lá Chắn Thành Trì và trao tặng 1 Cổ Ngữ (B, A, O, V, E). Ghép mật thư "BAOVE" để kích hoạt Khiên Ma Pháp và bước vào trận ĐẠI CHIẾN BOSS CUỐI CÙNG!',
+    groupTask: 'Phân vai nhóm: TV1 kiểm tra điều kiện cùng phương (u = k·v), TV2 tính tổng/hiệu vectơ, TV3 tính độ dài và hệ thức hình bình hành, TV4 giải mật thư cổ ngữ BAOVE, Đội trưởng điều khiển nhân vật nạp trụ và kích hoạt Pháo Laser diệt Boss.',
     teamRoles: [
-      '⚔️ Thành viên 1: Tìm hệ số tỉ lệ k từ hai tọa độ đã biết (u = k·v)',
-      '🔥 Thành viên 2: Thay hệ số k để tìm tham số m = k·x_v',
-      '⚡ Thành viên 3: Kiểm tra bộ ba tỉ lệ x₁/x₂ = y₁/y₂ = z₁/z₂',
-      '👑 Đội trưởng: Nâng cấp tối đa Anh Hùng, bật Khiên Thành & Mưa Tên diệt Boss'
+      '⚔️ TV1 (Chuyên Gia Tỉ Lệ): Tìm hệ số k = x₁/x₂ = y₁/y₂ = z₁/z₂ và xử lý vectơ cùng phương',
+      '🔥 TV2 (Chuyên Gia Đại Số Vectơ): Tính toán phép cộng/trừ vectơ u + v, 2u + v',
+      '🛡️ TV3 (Chuyên Gia Hình Học Không Gian): Vận dụng tính chất hình bình hành ABCD (AD = BC) và 3 điểm thẳng hàng',
+      '📜 TV4 (Pháp Sư Cổ Ngữ): Ghép 5 mảnh cổ ngữ B, A, O, V, E kích hoạt Khiên Bảo Vệ',
+      '👑 Đội trưởng (Tổng Chỉ Huy): Lái nhân vật nạp năng lượng 5 trụ và điều khiển Đại Pháo Laser tiêu diệt Boss'
     ],
     visual3D: {
-      title: 'Mô phỏng 3D: Hai vectơ cùng phương u = (4; 2; 4) = 2 · v(2; 1; 2)',
+      title: 'Mô phỏng 3D: Hai vectơ cùng phương u = 2v và tổng hợp lực vectơ',
       type: 'collinear',
       points: [
         { label: 'O(0;0;0)', coords: [0, 0, 0], x: 0, y: 0, z: 0, color: '#ffffff' }
@@ -426,65 +540,134 @@ const STAGES = [
     },
     huntMap: {
       theme: 'citadel',
-      worldTitle: 'THÀNH TRÌ BÓNG ĐEN CUỐI CÙNG',
-      spawn: { x: 12, y: 50 },
-      chest: { x: 88, y: 50, name: 'Rương Chìa Khóa Lõi Trí Tuệ' },
+      worldTitle: 'THÀNH TRÌ LỜI TRÍ TUỆ OXYZ',
+      spawn: { x: 10, y: 50 },
+      chest: { x: 90, y: 50, name: 'Bệ Kích Hoạt Lá Chắn Thành Trì' },
       stations: [
-        { x: 34, y: 26, name: 'Giáp I · Tiền Đồn Hệ Số k', monsterIcon: '⚔️', monsterType: 'dark_knight', monsterName: 'Kỵ Sĩ Hắc Ám (Lớp Giáp 1)', badge: 'k = 2' },
-        { x: 56, y: 74, name: 'Giáp II · Pháp Trận Tham Số m', monsterIcon: '🔥', monsterType: 'warlock', monsterName: 'Pháp Sư Lửa Đen (Lớp Giáp 2)', badge: 'm = 4' },
-        { x: 75, y: 32, name: 'Giáp III · Điện Thờ Rồng Boss', monsterIcon: '🐲', monsterType: 'dragon_boss', monsterName: 'Boss Bóng Đen Lãng Quên', badge: 'u = 2v' }
+        { x: 25, y: 24, name: 'Trụ Phép I · Cổ Ngữ [B]', monsterIcon: '⚔️', monsterType: 'dark_knight', monsterName: 'Kỵ Sĩ Hắc Ám Cổng Tây', badge: 'Cổ ngữ B', cipherPiece: 'B' },
+        { x: 42, y: 76, name: 'Trụ Phép II · Cổ Ngữ [A]', monsterIcon: '🔥', monsterType: 'warlock', monsterName: 'Pháp Sư Lửa Hắc Ám', badge: 'Cổ ngữ A', cipherPiece: 'A' },
+        { x: 58, y: 26, name: 'Trụ Phép III · Cổ Ngữ [O]', monsterIcon: '⚡', monsterType: 'dark_knight', monsterName: 'Lôi Tinh Không Gian', badge: 'Cổ ngữ O', cipherPiece: 'O' },
+        { x: 74, y: 74, name: 'Trụ Phép IV · Cổ Ngữ [V]', monsterIcon: '🛡️', monsterType: 'warlock', monsterName: 'Vệ Binh Sa Đọa', badge: 'Cổ ngữ V', cipherPiece: 'V' },
+        { x: 86, y: 34, name: 'Trụ Phép V · Cổ Ngữ [E]', monsterIcon: '🔮', monsterType: 'dragon_boss', monsterName: 'Đại Tướng Quỷ Oxyz', badge: 'Cổ ngữ E', cipherPiece: 'E' }
       ]
     },
     defenseConfig: {
-      castleName: 'Thành Trì Lõi Trí Tuệ Oxyz',
+      castleName: 'Thành Trì Lời Trí Tuệ Oxyz',
       theme: 'citadel',
       waves: [
-        { name: 'Phá Giáp 1 · Tìm Hệ Số Tỉ Lệ k', enemies: ['skeleton', 'orc', 'bat', 'orc'], boss: '⚔️' },
-        { name: 'Phá Giáp 2 · Giải Tham Số m', enemies: ['orc', 'skeleton', 'orc', 'bat', 'orc'], boss: '🔥' },
-        { name: 'Phá Giáp 3 · Đại Chiến Boss Rồng', enemies: ['orc', 'orc', 'skeleton', 'bat', 'orc'], boss: '🐲' }
+        { name: 'Đợt 1: Trụ Phép I (u = kv)', enemies: ['skeleton', 'orc', 'bat', 'orc'], boss: '⚔️' },
+        { name: 'Đợt 2: Trụ Phép II (Tổng u + v)', enemies: ['orc', 'skeleton', 'orc', 'bat'], boss: '🔥' },
+        { name: 'Đợt 3: Trụ Phép III (Cùng phương ngược hướng)', enemies: ['skeleton', 'orc', 'skeleton', 'orc'], boss: '⚡' },
+        { name: 'Đợt 4: Trụ Phép IV (Hình bình hành ABCD)', enemies: ['orc', 'bat', 'orc', 'orc'], boss: '🛡️' },
+        { name: 'Đợt 5: Trụ Phép V & ĐẠI CHIẾN BOSS CUỐI', enemies: ['orc', 'orc', 'orc', 'dragon'], boss: '🐲' }
       ]
     },
     challenges: [
       {
-        prompt: 'Cho hai vectơ u = (m; 2; 4) và v = (2; 1; 2) cùng phương với nhau. Từ hai tọa độ cuối, hệ số tỉ lệ k trong đẳng thức u = k·v bằng bao nhiêu?',
-        options: ['1', '2', '3', '4'],
-        correct: 1,
-        shortAnswer: '2',
-        hints: ['Dựa vào tung độ và cao độ: 2 = k×1 và 4 = k×2.', 'Suy ra k = 2 / 1 = ?'],
-        explain: 'Vì u = k·v nên ta có 2 = k·1 và 4 = k·2, suy ra hệ số tỉ lệ k = 2. Lớp giáp thứ nhất của Boss đã vỡ!',
-        label: 'Phá giáp 1 · Xác định hệ số tỉ lệ k',
-        roleAssign: 'Thành viên 1 lập tỉ số y_u / y_v = 2 / 1 = 4 / 2',
-        monster: { icon: '⚔️', type: 'dark_knight', name: 'Kỵ Sĩ Hắc Ám (Giáp 1)', hp: 190 },
-        keyBadge: 'k=2',
-        highlightAxis: 'y'
+        prompt: 'TRỤ PHÉP I: Cho hai vectơ u = (2; −1; 3) và v = (4; m; 6) (với u ≠ 0). Tìm giá trị của m để hai vectơ u và v cùng phương.',
+        options: ['−2', '2', '−1', '4'],
+        correct: 0,
+        shortAnswer: '-2',
+        cipherPiece: 'B',
+        hints: [
+          'Hai vectơ cùng phương khi các tọa độ tương ứng tỉ lệ: 4/2 = m/(−1) = 6/3.',
+          'Ta có 4/2 = 2 → m / (−1) = 2 → m = 2 × (−1) = −2.'
+        ],
+        explain: 'Vì u và v cùng phương nên tỉ số k = 4/2 = 6/3 = 2. Do đó m = 2 × (−1) = −2. Trụ phép I rực sáng! Nhận Cổ Ngữ [B]!',
+        label: 'Trụ I · Điều kiện cùng phương · Cổ ngữ [B]',
+        roleAssign: 'TV1 lập tỉ lệ 4/2 = m/(−1); TV4 ghi nhận cổ ngữ B',
+        monster: { icon: '⚔️', type: 'dark_knight', name: 'Kỵ Sĩ Hắc Ám Cổng Tây', hp: 150 },
+        keyBadge: 'Cổ ngữ B (m=−2)',
+        highlightAxis: 'all'
       },
       {
-        prompt: 'Với u = (m; 2; 4), v = (2; 1; 2) cùng phương và hệ số tỉ lệ k = 2 (tức u = 2v), giá trị của tham số m bằng bao nhiêu?',
-        options: ['2', '8', '4', '1'],
-        correct: 2,
-        shortAnswer: '4',
-        hints: ['Hoành độ của u bằng k lần hoành độ của v: m = k × 2.', 'Với k = 2, tính m = 2 × 2 = ?'],
-        explain: 'Ta có m = k × 2 = 2 × 2 = 4. Lớp giáp thứ hai của Boss đã bị xuyên thủng!',
-        label: 'Phá giáp 2 · Tìm tham số m',
-        roleAssign: 'Thành viên 2 tính m = k × x_v = 2 × 2',
-        monster: { icon: '🔥', type: 'warlock', name: 'Pháp Sư Lửa Đen (Giáp 2)', hp: 230 },
-        keyBadge: 'm=4',
-        highlightAxis: 'x'
+        prompt: 'TRỤ PHÉP II: Trong không gian Oxyz, cho a = (1; 2; −1) và b = (3; −1; 4). Tọa độ của vectơ tổng w = a + b bằng bao nhiêu?',
+        options: ['(4; 1; 3)', '(2; −3; 5)', '(4; 3; 3)', '(3; −2; −4)'],
+        correct: 0,
+        shortAnswer: '(4;1;3)',
+        cipherPiece: 'A',
+        hints: [
+          'Cộng các thành phần tọa độ tương ứng: w = (xa + xb; ya + yb; za + zb).',
+          'Tính: 1 + 3 = 4; 2 + (−1) = 1; −1 + 4 = 3 → w = (4; 1; 3).'
+        ],
+        explain: 'Ta có w = a + b = (1+3; 2−1; −1+4) = (4; 1; 3). Trụ phép II nạp đầy mana! Nhận Cổ Ngữ [A]!',
+        label: 'Trụ II · Phép cộng vectơ · Cổ ngữ [A]',
+        roleAssign: 'TV2 tính tổng từng cặp tọa độ: (1+3; 2−1; −1+4); TV4 ghi nhận cổ ngữ A',
+        monster: { icon: '🔥', type: 'warlock', name: 'Pháp Sư Lửa Hắc Ám', hp: 175 },
+        keyBadge: 'Cổ ngữ A (w=(4;1;3))',
+        highlightAxis: 'all'
       },
       {
-        prompt: 'Khi m = 4, cặp vectơ nào dưới đây là hai vectơ cùng phương?',
-        options: ['(4; 2; 4) và (2; 1; 2)', '(4; 2; 4) và (1; 2; 2)', '(4; 2; 4) và (2; 2; 1)', '(4; 2; 4) và (4; 1; 2)'],
+        prompt: 'TRỤ PHÉP III: Cho hai vectơ u = (1; −2; 2) và v = (−2; 4; −4). Nhận xét nào sau đây là ĐÚNG về mối quan hệ giữa hai vectơ?',
+        options: [
+          'Cùng phương và ngược hướng',
+          'Cùng phương và cùng hướng',
+          'Vuông góc với nhau',
+          'Bằng nhau'
+        ],
         correct: 0,
         shortAnswer: 'A',
-        hints: ['Hai vectơ cùng phương khi tọa độ tương ứng tỉ lệ: x₁/x₂ = y₁/y₂ = z₁/z₂.', 'Kiểm tra: (4; 2; 4) = 2 × (2; 1; 2).'],
-        explain: 'Vì (4; 2; 4) = 2 × (2; 1; 2) nên hai vectơ cùng phương. Boss Bóng Đen Lãng Quên đã bị đánh bại hoàn toàn!',
-        label: 'Phá giáp 3 · Đòn quyết định hạ Boss',
-        roleAssign: 'Cả đội đồng thanh kiểm tra tỉ lệ 4/2 = 2/1 = 4/2 = 2',
-        monster: { icon: '🐲', type: 'dragon_boss', name: 'Boss Bóng Đen Lãng Quên', hp: 320 },
-        keyBadge: 'BOSS💥',
+        cipherPiece: 'O',
+        hints: [
+          'Xét tỉ số từng thành phần: (−2)/1 = 4/(−2) = (−4)/2 = −2.',
+          'Vì v = −2u với hệ số k = −2 < 0 nên hai vectơ cùng phương và ngược hướng!'
+        ],
+        explain: 'Ta có v = −2u. Vì k = −2 < 0 nên u và v cùng phương và ngược hướng! Trụ phép III rực sáng! Nhận Cổ Ngữ [O]!',
+        label: 'Trụ III · Hướng của hai vectơ · Cổ ngữ [O]',
+        roleAssign: 'TV1 kiểm tra tỉ số k = −2 < 0 (ngược hướng); TV4 ghi nhận cổ ngữ O',
+        monster: { icon: '⚡', type: 'dark_knight', name: 'Lôi Tinh Không Gian', hp: 200 },
+        keyBadge: 'Cổ ngữ O (Ngược hướng)',
+        highlightAxis: 'all'
+      },
+      {
+        prompt: 'TRỤ PHÉP IV: Cho hình bình hành ABCD với A(1; 1; 1), B(2; 3; 4), C(6; 5; 2). Tọa độ đỉnh D là gì?',
+        options: ['(5; 3; −1)', '(7; 7; 5)', '(3; 3; 1)', '(5; 1; −1)'],
+        correct: 0,
+        shortAnswer: '(5;3;-1)',
+        cipherPiece: 'V',
+        hints: [
+          'Vì ABCD là hình bình hành nên vectơ AD = vectơ BC ⇔ D − A = C − B ⇔ D = A + C − B.',
+          'Tính: xD = 1 + 6 − 2 = 5; yD = 1 + 5 − 3 = 3; zD = 1 + 2 − 4 = −1 → D(5; 3; −1).'
+        ],
+        explain: 'Ta có D = A + C − B = (1+6−2; 1+5−3; 1+2−4) = (5; 3; −1). Trụ phép IV phóng tia sáng kết nối! Nhận Cổ Ngữ [V]!',
+        label: 'Trụ IV · Đỉnh hình bình hành · Cổ ngữ [V]',
+        roleAssign: 'TV3 tính D = A + C − B = (5; 3; −1); TV4 ghi nhận cổ ngữ V',
+        monster: { icon: '🛡️', type: 'warlock', name: 'Vệ Binh Sa Đọa', hp: 220 },
+        keyBadge: 'Cổ ngữ V (D(5;3;−1))',
+        highlightAxis: 'all'
+      },
+      {
+        prompt: 'TRỤ PHÉP V: Cho ba điểm A(1; 2; 3), B(2; 4; 5) và C(m; 6; 7). Tìm giá trị của m để ba điểm A, B, C thẳng hàng.',
+        options: ['3', '2', '4', '5'],
+        correct: 0,
+        shortAnswer: '3',
+        cipherPiece: 'E',
+        hints: [
+          'Ba điểm A, B, C thẳng hàng ⇔ vectơ AC cùng phương với vectơ AB.',
+          'Tính AB = (1; 2; 2) và AC = (m−1; 4; 4). Tỉ số: (m−1)/1 = 4/2 = 2 → m − 1 = 2 → m = 3.'
+        ],
+        explain: 'Ta có AB = (1; 2; 2) và AC = (m−1; 4; 4). Để cùng phương thì (m−1)/1 = 4/2 = 2 → m = 3. Nhận Cổ Ngữ [E]! Đủ 5 cổ ngữ B-A-O-V-E!',
+        label: 'Trụ V · Ba điểm thẳng hàng · Cổ ngữ [E]',
+        roleAssign: 'Cả nhóm tính AC = 2AB → m = 3; TV4 kích hoạt Khiên BAOVE để nghênh chiến Boss',
+        monster: { icon: '🔮', type: 'dragon_boss', name: 'Đại Tướng Quỷ Oxyz', hp: 250 },
+        keyBadge: 'Cổ ngữ E (m=3)',
         highlightAxis: 'all'
       }
-    ]
+    ],
+    bossChallenge: {
+      prompt: '🔥 ĐẠI CHIẾN BOSS CUỐI: "BÓNG ĐEN LÃNG QUÊN"! Cho hai vectơ u = (2; 1; −2) và v = (1; 0; 2). Tính độ dài của vectơ tổng hợp w = 2u + v để kích hoạt Đại Pháo Laser Thành Trì kết liễu Boss!',
+      options: ['√33', '√29', '6', '5'],
+      correct: 0,
+      shortAnswer: '√33',
+      hints: [
+        'Tính tọa độ của 2u = (4; 2; −4) rồi cộng với v = (1; 0; 2) để tìm w.',
+        'w = (4+1; 2+0; −4+2) = (5; 2; −2). Độ dài |w| = √(5² + 2² + (−2)²) = √(25 + 4 + 4) = √33.'
+      ],
+      explain: 'Ta có 2u = (4; 2; −4) → w = 2u + v = (5; 2; −2). Do đó |w| = √(5² + 2² + (−2)²) = √33. Đại Pháo Laser Oxyz đã kích hoạt và tiêu diệt hoàn toàn Boss! THÀNH TRÌ ĐÃ ĐƯỢC BẢO VỆ!',
+      label: 'ĐẠI CHIẾN BOSS CUỐI · KÍCH HOẠT ĐẠI PHÁO LASER OXYZ',
+      roleAssign: 'Toàn đội hợp lực: TV1 & TV2 tính 2u + v = (5; 2; −2), TV3 tính độ dài √(25+4+4)=√33, Đội trưởng nhấn bắn Laser!',
+      monster: { icon: '🐲', type: 'dragon_boss', name: 'Boss Bóng Đen Lãng Quên', hp: 500 }
+    }
   }
 ];
 

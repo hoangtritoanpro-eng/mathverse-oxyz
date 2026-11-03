@@ -21,7 +21,7 @@ let session=null, world=null, modal=null, busy=false, showAward=false, soundEnab
 let lastSignature='', lastStudentKey='', clockBase=null, tickBase=0;
 let activePlayMode=null; // 'hunt' | 'defense'
 let teacherPreviewStage=0;
-window.IS_DEMO_MODE=true;
+window.IS_DEMO_MODE=Boolean(typeof demoApi==='function');
 
 /* ─── TRẠNG THÁI MÔ HÌNH HÌNH HỌC 3D OXYZ HOLOGRAM ─── */
 const oxyz3D={
@@ -44,6 +44,17 @@ const initialTeam=qs.get('team')||'';
 const initialView=qs.get('view')||'';
 
 /* ─── TRẠNG THÁI ENGINE 1: SĂN KHO BÁU 2D (HUNT MAP) ─── */
+const cipherState = {
+ open: false,
+ slots: [null, null, null, null, null],
+ error: null,
+ successMsg: null,
+ solving: false
+};
+let showRolesModal = false;
+let questDialogue = null;
+let currentHintLevel = 0;
+
 const huntState={
  stageId:-1,
  x:14, y:50,
@@ -97,6 +108,7 @@ function restoreSession(){
  return null;
 }
 async function api(route,payload){
+ if(typeof demoApi==='function')return demoApi(route,payload);
  let r;
  try{r=await fetch(route,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload||{})});}
  catch(e){throw new Error('Không kết nối được máy giáo viên. Hãy kiểm tra Wi-Fi hoặc máy chủ.');}
@@ -654,22 +666,174 @@ function getMapDecorations(theme){
   <div class="hw-obstacle" style="left:82%;top:74%">⛺</div>`;
 }
 
+function renderCipherNotebookModal(m){
+ const cipherLetters = m.cipherLetters || (m.cipher ? m.cipher.split('') : ['P','H','A','L','E']);
+ const isReady = Boolean(m.cipherReady || world.me?.cipherReady);
+ const earnedLetters = isReady ? [...cipherLetters] : (m.allRounds || []).slice(0, m.round).map(r => r.cipherPiece).filter(Boolean);
+ 
+ const placedLetters = cipherState.slots.filter(Boolean);
+ const availableChips = [...earnedLetters];
+ placedLetters.forEach(ch => {
+  const idx = availableChips.indexOf(ch);
+  if (idx !== -1) availableChips.splice(idx, 1);
+ });
+ 
+ const slotsHtml = [0, 1, 2, 3, 4].map(idx => {
+  const val = cipherState.slots[idx];
+  if (val) {
+   return `<div class="hw-cipher-slot filled" data-action="removeCipherSlot" data-slot="${idx}" title="Chạm để gỡ chữ">
+    <span class="hw-cipher-slot-num">${idx + 1}</span>
+    <span class="hw-cipher-slot-letter">${esc(val)}</span>
+    <span class="hw-slot-remove-btn">×</span>
+   </div>`;
+  }
+  return `<div class="hw-cipher-slot empty" title="Ô ký tự ${idx + 1}">
+   <span class="hw-cipher-slot-num">${idx + 1}</span>
+   <span class="hw-cipher-slot-placeholder">?</span>
+  </div>`;
+ }).join('');
+ 
+ const chipsHtml = availableChips.length ? availableChips.map(ch => `
+  <button type="button" class="hw-cipher-chip" data-action="placeCipherChip" data-char="${esc(ch)}" title="Chạm để xếp vào ô tiếp theo">
+   ${esc(ch)}
+  </button>
+ `).join('') : `<span style="color:#94a3b8;font-size:12.5px;font-style:italic">Đã xếp hết các mảnh ký tự vào ô phía trên.</span>`;
+
+ return `<div class="hw-cipher-backdrop">
+  <div class="hw-cipher-modal">
+   <div class="hw-cipher-header">
+    <div>
+     <h3 style="margin:0;font-size:16px;font-weight:900">📜 SỔ MẬT THƯ CỔ ĐẠI · ${esc(m.title)}</h3>
+     <p style="margin:4px 0 0;font-size:12px;color:#cbd5e1">${esc(m.cipherHint || 'Ghép 5 ký tự cổ thu thập được từ các trạm để mở phong ấn tối thượng!')}</p>
+    </div>
+    <button type="button" class="hw-btn-flee" data-action="closeCipherNotebook" title="Đóng">✕</button>
+   </div>
+   <div class="hw-cipher-body">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+     <span style="font-size:12px;font-weight:900;color:#fde047">
+      🗝️ TIẾN ĐỘ THU THẬP: ${earnedLetters.length}/${cipherLetters.length} MẢNH RUNE
+     </span>
+     <span class="pill ${isReady?'green':'gold'}" style="font-size:11px">
+      ${isReady ? '✨ ĐỦ 5 MẢNH – SẴN SÀNG GIẢI MÃ' : 'Đang thu thập mảnh từ các trạm'}
+     </span>
+    </div>
+    <div class="hw-cipher-slots">${slotsHtml}</div>
+    <div style="font-size:12px;font-weight:800;color:#94a3b8;margin:12px 0 6px">
+     MẢNH RUNE KHẢ DỤNG (CHẠM VÀO ĐỂ ĐẶT VÀO Ô TRỐNG):
+    </div>
+    <div class="hw-cipher-tray">${chipsHtml}</div>
+    ${cipherState.error ? `<div class="hw-cipher-error">⚠️ ${esc(cipherState.error)}</div>` : ''}
+    ${cipherState.successMsg ? `<div class="hw-cipher-success">🎉 ${esc(cipherState.successMsg)}</div>` : ''}
+   </div>
+   <div class="hw-cipher-footer">
+    <div style="display:flex;gap:8px">
+     <button type="button" class="button gray sm" data-action="resetCipherSlots">↺ Xếp lại từ đầu</button>
+     <button type="button" class="button gray sm" data-action="closeCipherNotebook">Đóng sổ</button>
+    </div>
+    <button type="button" class="button gold" data-action="submitCipherNotebook" ${placedLetters.length < 5 ? 'disabled' : ''}>
+     🔓 GIẢI MÃ MẬT THƯ (${placedLetters.length}/5)
+    </button>
+   </div>
+  </div>
+ </div>`;
+}
+
+function renderTeamRolesModal(m){
+ const defaultRoles = [
+  '🧭 TV1 (Dẫn đường & Thám hiểm): Quan sát bản đồ Oxyz, xác định vị trí trạm và mỏ tinh thể.',
+  '📐 TV2 (Nhà Toán học): Nhận diện dạng toán và áp dụng công thức chuẩn GDPT 2018.',
+  '⚡ TV3 (Chuyên gia Vectơ & Tọa độ): Thực hiện phép tính từng trục Ox, Oy, Oz cẩn thận dấu âm.',
+  '📜 TV4 (Nhà Giải Mật mã): Ghi chép ký tự rune cổ và sắp xếp mật thư.',
+  '👑 Đội trưởng (Chỉ huy & Điều khiển): Điều khiển nhân vật di chuyển (WASD / D-Pad), nhấn phím E tương tác và chốt đáp án.'
+ ];
+ const roles = (m.teamRoles && m.teamRoles.length) ? m.teamRoles : defaultRoles;
+ return `<div class="hw-roles-backdrop">
+  <div class="hw-roles-modal">
+   <div class="hw-roles-head">
+    <div>
+     <h3 style="margin:0;font-size:16px;font-weight:900">🤝 PHÂN VAI HỢP TÁC NHÓM 5 THÀNH VIÊN</h3>
+     <small style="color:#bae6fd">${esc(m.title)} · Phân chia nhiệm vụ theo chuẩn GDPT 2018</small>
+    </div>
+    <button type="button" class="hw-btn-flee" data-action="closeTeamRoles" title="Đóng">✕</button>
+   </div>
+   <div class="hw-roles-list">
+    ${roles.map((r, idx) => `<div class="hw-role-card" style="border-left-color:${idx === m.round ? '#facc15' : '#38bdf8'}">
+     <b>${esc(r.split(':')[0] || ('Vai trò ' + (idx + 1)))}</b>
+     <div style="color:#cbd5e1;margin-top:2px">${esc(r.split(':').slice(1).join(':') || r)}</div>
+    </div>`).join('')}
+    <div style="background:rgba(250,204,21,.1);border:1.5px solid #facc15;border-radius:12px;padding:10px 14px;color:#fef08a;font-size:12px">
+     💡 <b>Gợi ý phối hợp:</b> Sau mỗi trạm, các thành viên hãy luân phiên đảm nhận vai trò điều khiển nhân vật và tính toán để cả nhóm cùng tiến bộ!
+    </div>
+   </div>
+   <div style="background:#0b1120;padding:12px 20px;text-align:right;border-top:1px solid #1e293b">
+    <button type="button" class="button primary sm" data-action="closeTeamRoles">Đã Rõ Phân Vai – Tiếp Tục Nhiệm Vụ →</button>
+   </div>
+  </div>
+ </div>`;
+}
+
+function renderQuestDialogueModal(){
+ if (!questDialogue) return '';
+ return `<div class="hw-roles-backdrop">
+  <div class="hw-roles-modal" style="max-width:500px">
+   <div class="hw-roles-head" style="background:linear-gradient(90deg,#581c87,#3b0764)">
+    <div style="display:flex;align-items:center;gap:10px">
+     <span style="font-size:28px">${questDialogue.avatar || '🧙‍♂️'}</span>
+     <div>
+      <h3 style="margin:0;font-size:15px;font-weight:900">${esc(questDialogue.name || 'NPC Giao Nhiệm Vụ')}</h3>
+      <small style="color:#e9d5ff">${esc(questDialogue.role || 'Cố vấn thám hiểm')}</small>
+     </div>
+    </div>
+    <button type="button" class="hw-btn-flee" data-action="closeQuestDialogue">✕</button>
+   </div>
+   <div style="padding:18px;font-size:13.5px;line-height:1.55;color:#e2e8f0">
+    ${questDialogue.text}
+   </div>
+   <div style="background:#0b1120;padding:12px 18px;text-align:right;border-top:1px solid #1e293b">
+    <button type="button" class="button gold sm" data-action="closeQuestDialogue">Đã rõ nhiệm vụ – Lên đường ngay! →</button>
+   </div>
+  </div>
+ </div>`;
+}
+
+function renderGridOverlay(m){
+ if (m.id !== 4) return '';
+ let lines = '';
+ for (let x = 0; x <= 8; x++) {
+  const px = 14 + (x / 8) * 72;
+  lines += `<div class="hw-grid-line-x" style="position:absolute;left:${px}%;top:18%;bottom:18%;width:1px;background:rgba(45,212,191,0.22);pointer-events:none"></div>`;
+  lines += `<div class="hw-grid-label-x" style="position:absolute;left:${px}%;bottom:14%;transform:translateX(-50%);font-size:10px;font-weight:900;color:#2dd4bf;pointer-events:none">${x}</div>`;
+ }
+ for (let y = 0; y <= 6; y++) {
+  const py = 80 - (y / 6) * 62;
+  lines += `<div class="hw-grid-line-y" style="position:absolute;left:14%;right:14%;top:${py}%;height:1px;background:rgba(45,212,191,0.22);pointer-events:none"></div>`;
+  lines += `<div class="hw-grid-label-y" style="position:absolute;left:10%;top:${py}%;transform:translateY(-50%);font-size:10px;font-weight:900;color:#2dd4bf;pointer-events:none">${y}</div>`;
+ }
+ return `<div class="hw-grid-overlay">${lines}
+  <div style="position:absolute;left:10%;bottom:14%;font-size:11px;font-weight:900;color:#facc15;pointer-events:none">O(0;0)</div>
+  <div style="position:absolute;right:10%;bottom:14%;font-size:11px;font-weight:900;color:#2dd4bf;pointer-events:none">Trục Ox ➔</div>
+  <div style="position:absolute;left:10%;top:14%;font-size:11px;font-weight:900;color:#2dd4bf;pointer-events:none">Trục Oy ⬆</div>
+ </div>`;
+}
+
 function renderHuntGame(m){
  const hm=initHuntForStage(m);
  const r=m.round;
  const q=m.challenge;
  const stList=hm.stations||[];
  const roundsMeta=m.allRounds||[];
- const keySlots=[0,1,2].map(i=>{
-  const badge=roundsMeta[i]?.keyBadge||stList[i]?.badge||`Mảnh ${i+1}`;
+ const isBoss=Boolean(m.isBoss||world.me?.bossReady);
+ 
+ const keySlots=Array.from({length:m.totalRounds}, (_,i)=>{
+  const badge=roundsMeta[i]?.keyBadge||stList[i]?.badge||('Trạm '+(i+1));
   if(i<r)return `<div class="hw-key-slot earned">🔑 Trạm ${i+1}: <b>${esc(badge)}</b> ✅</div>`;
   if(i===r)return `<div class="hw-key-slot current">⚔️ Trạm ${i+1}: Đang mở</div>`;
   return `<div class="hw-key-slot">🔒 Trạm ${i+1}: Khóa</div>`;
  }).join('');
 
- const trackerBadges=[0,1,2].map(i=>{
+ const trackerBadges=Array.from({length:m.totalRounds}, (_,i)=>{
   const cls=i<r?'done':i===r?'active':'locked';
-  const label=i<r?`✅ Đền ${i+1}: Đã vượt`:i===r?`🧭 Đang tìm Đền ${i+1}`:`🔒 Đền ${i+1}: Ẩn dấu`;
+  const label=i<r?`✅ Trạm ${i+1}: Xong`:(i===r?`🧭 Tìm Trạm ${i+1}`:`🔒 Trạm ${i+1}`);
   return `<span class="hw-tracker-pill ${cls}">${label}</span>`;
  }).join('');
 
@@ -677,18 +841,19 @@ function renderHuntGame(m){
 
  const stationsHtml=stList.map((st,i)=>{
   const state=i<r?'passed':i===r?'active':'locked';
-  return `<div class="hw-station ${state}" style="left:${st.x}%;top:${st.y}%" data-action="clickStation" data-idx="${i}">
+  const isPylon = m.id === 5;
+  return `<div class="hw-station ${state} ${isPylon?'hw-citadel-pylon':''}" style="left:${st.x}%;top:${st.y}%" data-action="clickStation" data-idx="${i}">
    <div class="hw-shrine-base"></div>
    <div class="hw-shrine-pillars"><span class="hw-pillar left"></span><span class="hw-pillar right"></span></div>
    <div class="hw-ring"></div>
    ${state==='active'?'<div class="hw-beacon-beam"></div>':''}
    <div class="hw-station-core">
-    <div class="hw-station-glyph">${i<r?'🏛️':st.monsterIcon||'👾'}</div>
+    <div class="hw-station-glyph">${i<r?'🏛️':(st.monsterIcon||'👾')}</div>
     ${i<r?'<div class="hw-cleared-badge">✅</div>':''}
    </div>
    <div class="hw-station-info">
-    <div class="hw-station-label">${i<r?`✅ ĐÃ VƯỢT (${esc(st.badge)})`:esc(st.name)}</div>
-    ${state==='active'?'<div class="hw-station-action-hint">⚡ CHẠM ĐỂ CHIẾN ĐẤU</div>':''}
+    <div class="hw-station-label">${i<r?('✅ ĐÃ VƯỢT ('+esc(st.badge)+')'):esc(st.name)}</div>
+    ${state==='active'?'<div class="hw-station-action-hint">⚡ CHẠM ĐỂ CHIẾN ĐẤU (E)</div>':''}
    </div>
   </div>`;
  }).join('');
@@ -699,13 +864,11 @@ function renderHuntGame(m){
  const angleDeg=Math.round(Math.atan2(dy,dx)*180/Math.PI);
  const nearStation=dist<=10.5;
 
- // Mini-map dots
  const miniDots=stList.map((st,i)=>{
   const cls=i<r?'st-done':i===r?'st-active':'st-lock';
   return `<span class="hw-minimap-dot ${cls}" style="left:${st.x}%;top:${st.y}%"></span>`;
  }).join('')+`<span class="hw-minimap-dot chest" style="left:${hm.chest.x}%;top:${hm.chest.y}%"></span>`;
 
- // Tinh thể thu thập trên bản đồ
  const collectiblesHtml=(huntState.collectibles||[]).filter(c=>!c.collected).map(c=>`
   <div class="hw-collectible ${c.type}" id="collectible-${c.id}" style="left:${c.x}%;top:${c.y}%" title="${c.label}">
    <div class="hw-collectible-glow"></div>
@@ -713,11 +876,9 @@ function renderHuntGame(m){
    <span class="hw-collectible-tag">${c.label}</span>
   </div>`).join('');
 
- // Popups chữ nổi khi nhặt đồ
  const popupsHtml=(huntState.popups||[]).map(p=>`
   <div class="hw-float-popup" style="left:${p.x}%;top:${p.y}%;color:${p.color}">${esc(p.text)}</div>`).join('');
 
- // Cọc tiêu điểm đến khi click/tap
  const targetBeaconHtml=(huntState.targetX!==null&&huntState.targetY!==null)?`
   <div class="hw-target-beacon" id="hwTargetBeacon" style="left:${huntState.targetX}%;top:${huntState.targetY}%">
    <div class="hw-target-beacon-sonar"></div>
@@ -726,21 +887,87 @@ function renderHuntGame(m){
    <div class="hw-target-beacon-label">${Math.round(Math.hypot(huntState.targetX-huntState.x,huntState.targetY-huntState.y)*1.5)}m</div>
   </div>`:'' ;
 
+ // Stage 3: NPC & Tháp Pha Lê Cổ
+ let stage3Extra = '';
+ if (m.id === 3) {
+  stage3Extra = `
+   <div class="hw-npc-wrap" style="position:absolute;left:14%;top:52%;transform:translate(-50%,-50%);cursor:pointer;z-index:6" data-action="clickNPC" title="Vệ Binh Hang Pha Lê (Chạm để nhận nhiệm vụ)">
+    <div style="width:52px;height:52px;border-radius:50%;background:rgba(168,85,247,.25);border:2px dashed #c084fc;animation:spinSlow 8s linear infinite;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)"></div>
+    <div style="font-size:38px;text-align:center;filter:drop-shadow(0 4px 8px rgba(0,0,0,.5))">🧙‍♂️</div>
+    <div style="background:rgba(15,23,42,.9);border:1.5px solid #c084fc;color:#f3e8ff;padding:2px 8px;border-radius:99px;font-size:10px;font-weight:900;white-space:nowrap;margin-top:2px">💬 Vệ Binh Hang (E)</div>
+   </div>
+   <div class="hw-crystal-altar" style="left:88%;top:50%" data-action="clickCrystalAltar" title="Bàn Giải Mã Tháp Pha Lê (PHALE)">
+    <div class="hw-crystal-barrier ${m.cipherReady?'unlocked':''}"></div>
+    <div class="hw-crystal-tower-art">
+     <div class="hw-crystal-spire">💠</div>
+    </div>
+    <div style="background:rgba(15,23,42,.92);border:1.5px solid ${m.cipherReady?'#4ade80':'#c084fc'};color:#fff;padding:4px 10px;border-radius:10px;font-size:11px;font-weight:900;white-space:nowrap;box-shadow:0 4px 12px rgba(0,0,0,.6)">
+     ${m.cipherReady ? '✨ BÀN GIẢI MÃ SẴN SÀNG (E)' : '🔒 THÁP PHA LÊ (PHONG ẤN)'}
+    </div>
+   </div>`;
+ }
+
+ // Stage 4: Target grid beacon
+ let stage4Extra = '';
+ if (m.id === 4 && q.targetGrid) {
+  const gx = q.targetGrid[0], gy = q.targetGrid[1];
+  const px = 14 + (gx / 8) * 72;
+  const py = 80 - (gy / 6) * 62;
+  stage4Extra = `
+   <div class="hw-grid-beacon" style="left:${px}%;top:${py}%" data-action="clickTargetBeacon" data-gx="${gx}" data-gy="${gy}" title="Tọa độ mục tiêu (${gx}; ${gy})">
+    <div class="hw-grid-beacon-ring"></div>
+    <div class="hw-grid-beacon-icon">🎯</div>
+    <div class="hw-grid-beacon-tag">Tọa độ mục tiêu: (${gx}; ${gy})</div>
+   </div>`;
+ }
+
+ // Stage 5: Citadel Core, Shield Dome, Boss Arena
+ let stage5Extra = '';
+ if (m.id === 5) {
+  const hasShield = Boolean(m.bossReady || world.me?.bossReady);
+  stage5Extra = `
+   <div class="hw-citadel-core" style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:5;text-align:center" data-action="clickCitadelCore" title="Lõi Năng Lượng Thành Trì (BAOVE)">
+    ${hasShield ? '<div class="hw-shield-dome"></div>' : ''}
+    <div style="font-size:48px;filter:drop-shadow(0 0 20px #38bdf8)">🏰</div>
+    <div style="background:rgba(15,23,42,.92);border:1.5px solid #38bdf8;color:#bae6fd;padding:3px 8px;border-radius:8px;font-size:11px;font-weight:900">
+     ${hasShield ? '🛡️ LÁ CHẮN BAOVE ĐÃ BẬT' : '⚡ LÕI THÀNH TRÌ (BAOVE)'}
+    </div>
+   </div>
+   ${hasShield ? `
+    <div class="hw-boss-arena" data-action="openBossBattle" title="Đại Chiến Boss Bóng Đen (Bấm để nghênh chiến!)">
+     <div class="hw-boss-hud">
+      <div class="hw-boss-name">🐲 BOSS BÓNG ĐEN LÃNG QUÊN</div>
+      <div class="hw-boss-hp-bar"><div class="hw-boss-hp-fill" style="width:${huntState.monsterDefeated?0:100}%"></div></div>
+      <small style="color:#fca5a5;font-weight:900;font-size:10.5px">HP: ${huntState.monsterDefeated?0:500}/500 · Bấm để nghênh chiến!</small>
+     </div>
+     <div class="hw-boss-dragon">🐲</div>
+    </div>` : ''}`;
+ }
+
  return `<div class="hw-wrapper">
   <div class="hw-hud-top">
-   <div class="hw-hud-keys">${keySlots}<div class="hw-key-slot ${r>=3?'earned':''}">🎁 Vật phẩm: <b>${esc(m.item||'Mảnh mật mã')}</b></div></div>
+   <div class="hw-hud-keys">
+    ${keySlots}
+    <div class="hw-key-slot ${r>=m.totalRounds?'earned':''}">🎁 Vật phẩm: <b>${esc(m.item||'Mảnh mật mã')}</b></div>
+   </div>
+   <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+    <button type="button" class="hw-btn-hud ${m.cipherReady?'alert':''}" data-action="openCipherNotebook">
+     📜 SỔ MẬT THƯ (${m.cipherReady?'SẴN SÀNG':'XEM MẢNH'})
+    </button>
+    <button type="button" class="hw-btn-hud" data-action="openTeamRoles">
+     🤝 PHÂN VAI NHÓM
+    </button>
+   </div>
    <div class="hw-quick-nav">${trackerBadges}</div>
   </div>
   <div class="hw-viewport" id="hwViewport">
-   <!-- La bàn định hướng Trạm mục tiêu -->
    <div class="hw-compass">
     <span class="hw-compass-arrow" id="hwCompassArrow" style="transform:rotate(${angleDeg}deg)">➤</span>
     <div>
-     <div style="font-size:10px;color:#7dd3fc">MỤC TIÊU HIỆN TẠI:</div>
-     <strong id="hwCompassText">${esc(curStation.name)} (${Math.round(dist*1.5)}m)</strong>
+     <div style="font-size:10px;color:#7dd3fc">${isBoss ? 'MỤC TIÊU: BOSS BÓNG ĐEN' : 'MỤC TIÊU HIỆN TẠI:'}</div>
+     <strong id="hwCompassText">${isBoss ? '🐲 Boss Bóng Đen Lãng Quên' : (esc(curStation.name) + ' (' + Math.round(dist*1.5) + 'm)')}</strong>
     </div>
    </div>
-   <!-- Mini-Map Radar góc phải -->
    <div class="hw-minimap">
     <span class="hw-minimap-title">📡 RADAR OXYZ</span>
     ${miniDots}
@@ -749,16 +976,19 @@ function renderHuntGame(m){
    <div class="hw-world theme-${esc(hm.theme||'forest')}" id="hwWorld">
     ${getTerrainSVG(hm.theme||'forest',pathPts)}
     ${getMapDecorations(hm.theme)}
+    ${renderGridOverlay(m)}
+    ${stage3Extra}
+    ${stage4Extra}
+    ${stage5Extra}
     ${collectiblesHtml}
     ${popupsHtml}
     ${targetBeaconHtml}
     ${stationsHtml}
-    <div class="hw-chest ${r<3?'locked':'ready'}" style="left:${hm.chest.x}%;top:${hm.chest.y}%" data-action="clickChest">
+    <div class="hw-chest ${r<m.totalRounds?'locked':'ready'}" style="left:${hm.chest.x}%;top:${hm.chest.y}%" data-action="clickChest">
      <div class="hw-chest-pedestal"></div>
-     <div class="hw-chest-box">${r<3?'🧰':'🎁'}</div>
-     <div class="hw-station-label">${r<3?esc(hm.chest.name||'Rương Mật Mã'):'✨ MỞ RƯƠNG KHO BÁU!'}</div>
+     <div class="hw-chest-box">${r<m.totalRounds?'🧰':'🎁'}</div>
+     <div class="hw-station-label">${r<m.totalRounds?esc(hm.chest.name||'Rương Mật Mã'):'✨ MỞ RƯƠNG KHO BÁU!'}</div>
     </div>
-    <!-- NHÂN VẬT THÁM HIỂM CỦA ĐỘI VỚI HÀO QUANG & BÓNG ĐỔ -->
     <div class="hw-player ${huntState.moving?'moving':''} facing-${huntState.facing||'right'} ${huntState.isSprinting?'sprinting':''}" id="hwPlayer" style="left:${huntState.x}%;top:${huntState.y}%">
      <div class="hw-player-torch"></div>
      <div class="hw-player-aura-ring"></div>
@@ -785,12 +1015,13 @@ function renderHuntGame(m){
      <button type="button" class="hw-sprint-btn ${huntState.isSprinting?'active':''}" data-action="toggleSprint" title="Bật/Tắt chạy nhanh (Shift)">⚡ ${huntState.isSprinting?'ĐANG CHẠY NHANH':'TĂNG TỐC'}</button>
     </div>
     <div class="hw-action-panel">
-     <button type="button" class="hw-attack-station-btn ${nearStation?'pulse-urgent':''}" data-action="openHuntBattle" style="${nearStation?'display:inline-flex':'display:none'}">⚔️ ĐÃ TỚI ĐỀN ${r+1}! BẤM MỞ BÀI TOÁN (Space)</button>
+     <button type="button" class="hw-attack-station-btn ${nearStation?'pulse-urgent':''}" data-action="openHuntBattle" style="${nearStation?'display:inline-flex':'display:none'}">⚔️ ĐÃ TỚI TRẠM ${r+1}! BẤM MỞ BÀI TOÁN (Space / E)</button>
+     <button type="button" class="hw-interact-btn" data-action="interactNearObject" style="display:inline-flex" title="Nhấn E để tương tác">✋ TƯƠNG TÁC (Phím E)</button>
      <div class="hw-exploring-pill" style="${nearStation?'display:none':'display:flex'}">
       <span class="hw-exploring-icon">🧭</span>
       <div>
-       <div style="font-size:12px;font-weight:900;color:#fde047">Đang tự lái tìm Đền ${r+1} · <span class="hw-exploring-dist">Còn ${Math.round(dist*1.5)}m</span></div>
-       <div style="font-size:10.5px;color:#bae6fd">Dùng WASD / Mũi tên hoặc chạm bản đồ để chạy đến Đền!</div>
+       <div style="font-size:12px;font-weight:900;color:#fde047">Đang tự lái tìm Trạm ${r+1} · <span class="hw-exploring-dist">Còn ${Math.round(dist*1.5)}m</span></div>
+       <div style="font-size:10.5px;color:#bae6fd">Dùng WASD / Mũi tên hoặc chạm bản đồ để chạy đến Trạm!</div>
       </div>
      </div>
      <div class="hw-hint-pill">💡 Lái nhân vật nhặt Vàng 🪙 và Tinh thể Oxyz 💎 trên đường chạy!</div>
@@ -798,12 +1029,16 @@ function renderHuntGame(m){
    </div>
   </div>
   ${huntState.battleOpen?renderHuntBattleModal(m):''}
+  ${cipherState.open?renderCipherNotebookModal(m):''}
+  ${showRolesModal?renderTeamRolesModal(m):''}
+  ${questDialogue?renderQuestDialogueModal():''}
  </div>`;
 }
 
 function renderHuntBattleModal(m){
+ const isBoss=Boolean(m.isBoss||world.me?.bossReady);
  const q=m.challenge;
- const monster=q.monster||{icon:'👹',name:'Quái Vật Canh Trạm',hp:120,type:'golem'};
+ const monster=q.monster||(isBoss?{icon:'🐲',name:'Boss Bóng Đen Lãng Quên',hp:500,type:'dragon_boss'}:{icon:'👹',name:'Quái Vật Canh Trạm',hp:120,type:'golem'});
  const sel=huntState.selectedChoice;
  return `<div class="hw-battle-backdrop">
   <div class="hw-battle-modal">
@@ -816,7 +1051,7 @@ function renderHuntBattleModal(m){
     </div>`:''}
    <div class="hw-battle-scroll">
     <div>
-     <div class="hw-scroll-kicker">📜 TRẠM ${m.round+1} / ${m.totalRounds} · ${esc(q.label)}</div>
+     <div class="hw-scroll-kicker">${isBoss?'🐲 ĐẠI CHIẾN BOSS CUỐI CÙNG':('📜 TRẠM '+(m.round+1)+' / '+m.totalRounds+' · '+esc(q.label))}</div>
      <div class="hw-scroll-role">🤝 <b>Phân công nhóm:</b> ${esc(q.roleAssign||m.groupTask)}</div>
      <div class="hw-scroll-question">🧩 ${formatMath(q.prompt)}</div>
      <div class="hw-scroll-options">
@@ -827,15 +1062,15 @@ function renderHuntBattleModal(m){
      </div>
      <div class="hw-short-box">
       <span style="font-size:12px;font-weight:900;color:#6b4d28">✍️ Hoặc nhập nhanh đáp án:</span>
-      <input type="text" id="huntShortInput" value="${esc(huntState.shortText)}" placeholder="Nhập kết quả số (VD: 3, -2, 0...)" />
+      <input type="text" id="huntShortInput" value="${esc(huntState.shortText)}" placeholder="Nhập kết quả số hoặc biểu thức (VD: 3, 2√2, √33...)" />
      </div>
     </div>
     <div class="hw-scroll-footer">
      <div style="display:flex;gap:8px">
       <button type="button" class="hw-btn-flee" data-action="closeHuntBattle">🏃 Rút lui ra bản đồ</button>
-      <button type="button" class="hw-btn-flee" data-action="hint">💡 NOVA gợi ý</button>
+      <button type="button" class="hw-btn-flee" data-action="hint">💡 NOVA gợi ý (2 Cấp)</button>
      </div>
-     <button type="button" class="hw-btn-attack" data-action="attackHuntMonster">⚔️ TUNG ĐÒN TẤN CÔNG!</button>
+     <button type="button" class="hw-btn-attack" data-action="attackHuntMonster">${isBoss?'⚔️ BẮN ĐẠI PHÁO LASER DIỆT BOSS!':'⚔️ TUNG ĐÒN TẤN CÔNG!'}</button>
     </div>
    </div>
    <div class="hw-monster-stage">
@@ -846,12 +1081,95 @@ function renderHuntBattleModal(m){
      ${renderMonsterSVG(monster.type||'golem',monster.icon)}
     </div>
     ${huntState.monsterDefeated?'<div class="hw-monster-impact">💥</div>':''}
-    <p style="font-size:12px;color:#cbd5e1;margin-top:6px">Chọn đáp án đúng hoặc nhập kết quả rồi nhấn <b>⚔️ Tung đòn tấn công</b> để tiêu diệt Boss và thu hồi chìa khóa tọa độ!</p>
+    <p style="font-size:12px;color:#cbd5e1;margin-top:6px">${isBoss?'Hợp sức tính độ dài vectơ w = 2u + v để kích hoạt Laser kết liễu Boss!':'Chọn đáp án đúng hoặc nhập kết quả rồi nhấn <b>⚔️ Tung đòn tấn công</b> để tiêu diệt quái và thu hồi cổ ngữ!'}</p>
    </div>
   </div>
  </div>`;
 }
 
+function interactNearObject(){
+ const m=world?.current;
+ if(!m||huntState.battleOpen||cipherState.open)return;
+ 
+ if((m.bossReady||world.me?.bossReady)&&Math.hypot(huntState.x-50,huntState.y-18)<=18){
+  huntState.battleOpen=true;
+  huntState.selectedChoice=null;
+  huntState.shortText='';
+  huntState.monsterDefeated=false;
+  huntState.rewardBadge=null;
+  sound('boss_roar');
+  render();
+  return;
+ }
+ 
+ const curSt=m.huntMap?.stations?.[m.round];
+ if(curSt&&Math.hypot(huntState.x-curSt.x,huntState.y-curSt.y)<=12){
+  huntState.battleOpen=true;
+  huntState.selectedChoice=null;
+  huntState.shortText='';
+  huntState.monsterDefeated=false;
+  huntState.rewardBadge=null;
+  render();
+  return;
+ }
+ 
+ if(m.id===3&&Math.hypot(huntState.x-14,huntState.y-52)<=14){
+  questDialogue={
+   avatar:'🧙‍♂️',
+   name:'Vệ Binh Hang Pha Lê Oxyz',
+   role:'Người Canh Cổng Tháp Cổ',
+   text:`<p>Chào các chiến binh Toán học! Tòa <b>Tháp Pha Lê Khoảng Cách</b> đang bị phong ấn bởi một kết giới cổ xưa gồm 5 ổ khóa năng lượng.</p>
+   <p style="margin-top:8px">Nhiệm vụ của các em: Hãy điều khiển nhân vật khám phá 5 mỏ tinh thể, giải đúng 5 bài toán <b>Độ dài vectơ & Khoảng cách giữa hai điểm trong không gian Oxyz</b> để thu thập 5 mảnh cổ tự <b>P - H - A - L - E</b>.</p>
+   <p style="margin-top:8px;color:#fde047">Sau khi thu thập đủ, hãy tới <b>Bàn Giải Mã Trung Tâm</b> tại cuối thung lũng, mở Sổ Mật Thư và ghép chính xác từ khóa <b>PHALE</b> để khai mở cổng tháp!</p>`
+  };
+  sound('magic');
+  render();
+  return;
+ }
+ 
+ if(m.id===3&&Math.hypot(huntState.x-88,huntState.y-50)<=15){
+  cipherState.open=true;
+  cipherState.error=null;
+  sound('crystal');
+  render();
+  return;
+ }
+ 
+ if(m.id===4&&Math.hypot(huntState.x-89,huntState.y-50)<=15){
+  cipherState.open=true;
+  cipherState.error=null;
+  sound('portal');
+  render();
+  return;
+ }
+ 
+ const q=m.challenge;
+ if(m.id===4&&q?.targetGrid){
+  const gx=q.targetGrid[0], gy=q.targetGrid[1];
+  const px=14+(gx/8)*72, py=80-(gy/6)*62;
+  if(Math.hypot(huntState.x-px,huntState.y-py)<=12){
+   sound('gem');
+   huntState.popups.push({
+    id:Date.now(),
+    x:px,
+    y:py-4,
+    text:`🎯 Tọa độ M(${gx}; ${gy}) kích hoạt!`,
+    color:'#2dd4bf',
+    createdAt:performance.now()
+   });
+   render();
+   return;
+  }
+ }
+ 
+ if(m.id===5&&Math.hypot(huntState.x-50,huntState.y-50)<=15){
+  cipherState.open=true;
+  cipherState.error=null;
+  sound('energy');
+  render();
+  return;
+ }
+}
 function updateHuntCamera(){
  const vp=$('#hwViewport'), wd=$('#hwWorld'), pl=$('#hwPlayer');
  if(!vp||!wd||!pl)return;
@@ -1254,6 +1572,35 @@ function sound(type){
    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.35);
    osc.connect(gain).connect(actx.destination);
    osc.start(now); osc.stop(now + 0.36);
+  }else if(type==='crystal'||type==='magic'){
+   [523.25, 659.25, 783.99, 1046.50, 1567.98].forEach((freq, i)=>{
+    const osc=actx.createOscillator(), gain=actx.createGain();
+    osc.type='sine'; osc.frequency.value=freq;
+    gain.gain.setValueAtTime(0.0001, now + i*0.07);
+    gain.gain.exponentialRampToValueAtTime(0.09, now + i*0.07 + 0.02);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + i*0.07 + 0.28);
+    osc.connect(gain).connect(actx.destination);
+    osc.start(now + i*0.07); osc.stop(now + i*0.07 + 0.3);
+   });
+  }else if(type==='boss_roar'){
+   const osc=actx.createOscillator(), gain=actx.createGain();
+   osc.type='sawtooth';
+   osc.frequency.setValueAtTime(160, now);
+   osc.frequency.exponentialRampToValueAtTime(45, now + 0.55);
+   gain.gain.setValueAtTime(0.14, now);
+   gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.55);
+   osc.connect(gain).connect(actx.destination);
+   osc.start(now); osc.stop(now + 0.56);
+  }else if(type==='energy'||type==='shield'||type==='portal'){
+   const osc=actx.createOscillator(), gain=actx.createGain();
+   osc.type='triangle';
+   osc.frequency.setValueAtTime(220, now);
+   osc.frequency.linearRampToValueAtTime(440, now + 0.2);
+   osc.frequency.linearRampToValueAtTime(330, now + 0.4);
+   gain.gain.setValueAtTime(0.08, now);
+   gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.45);
+   osc.connect(gain).connect(actx.destination);
+   osc.start(now); osc.stop(now + 0.46);
   }else if(type==='win'||type==='fanfare'){
    [523.25, 659.25, 783.99, 1046.50, 1318.51].forEach((freq, i)=>{
     const osc=actx.createOscillator(), gain=actx.createGain();
@@ -1433,6 +1780,53 @@ async function submitStageAnswer(payload){
  }
 }
 
+async function submitCipherNotebook(){
+ const m=world?.current;
+ if(!m)return;
+ const word=cipherState.slots.join('').toUpperCase();
+ if(word.length<5){
+  cipherState.error='Vui lòng điền đủ 5 ký tự vào 5 ô mật mã.';
+  render();
+  return;
+ }
+ cipherState.solving=true;
+ cipherState.error=null;
+ render();
+ try{
+  const res=await submit('/api/cipher',{cipher:word});
+  if(res.correct){
+   sound('crystal');
+   sound('win');
+   triggerConfetti(3500);
+   cipherState.successMsg=res.message||'GIẢI MÃ THÀNH CÔNG!';
+   cipherState.error=null;
+   render();
+   setTimeout(()=>{
+    cipherState.open=false;
+    cipherState.slots=[null,null,null,null,null];
+    cipherState.successMsg=null;
+    if(res.bossReady){
+     world.me.bossReady=true;
+     notice('🛡️ LÁ CHẮN THÀNH TRÌ ĐÃ KÍCH HOẠT!','Đại Boss Bóng Đen Lãng Quên đang tiến vào! Hãy tiến lên phía trên để nghênh chiến!',true,{button:'Tiến lên nghênh chiến!'});
+    }else if(res.stageFinished){
+     notice('🏆 KHAI MỞ PHONG ẤN THÀNH CÔNG!',`Đội đã mở khóa ${m.place}! Nhận mảnh số mật mã "${res.digit}" (${res.digitRule})`,true,{digit:res.digit,points:res.points,button:res.nextStage===5?'Tiến tới Mở Rương Lõi Trí Tuệ →':'Bước sang Chặng tiếp theo →'});
+    }
+    updateAfterAction();
+   },1200);
+  }else{
+   sound('wrong');
+   cipherState.error=res.hint||'Mật mã chưa chính xác. Hãy sắp xếp lại các ký tự theo gợi ý!';
+   cipherState.solving=false;
+   render();
+  }
+ }catch(err){
+  sound('wrong');
+  cipherState.error=err.message||'Lỗi khi gửi mật mã. Hãy thử lại.';
+  cipherState.solving=false;
+  render();
+ }
+}
+
 async function handle(action,el){
  try{
   if(action==='toggleFullscreen'){
@@ -1526,7 +1920,82 @@ async function handle(action,el){
    render();
    return;
   }
-  if(action==='closeHuntBattle'){
+  if(action==='openCipherNotebook'){
+   cipherState.open=true;cipherState.error=null;render();return;
+  }
+  if(action==='closeCipherNotebook'){
+   cipherState.open=false;render();return;
+  }
+  if(action==='placeCipherChip'){
+   const ch=el.dataset.char;
+   const emptyIdx=cipherState.slots.indexOf(null);
+   if(emptyIdx!==-1){
+    cipherState.slots[emptyIdx]=ch;
+    sound('step');
+    render();
+   }
+   return;
+  }
+  if(action==='removeCipherSlot'){
+   const slotIdx=Number(el.dataset.slot);
+   if(!isNaN(slotIdx)){
+    cipherState.slots[slotIdx]=null;
+    sound('step');
+    render();
+   }
+   return;
+  }
+  if(action==='resetCipherSlots'){
+   cipherState.slots=[null,null,null,null,null];
+   cipherState.error=null;
+   render();
+   return;
+  }
+  if(action==='submitCipherNotebook'){
+   await submitCipherNotebook();
+   return;
+  }
+  if(action==='openTeamRoles'){
+   showRolesModal=true;render();return;
+  }
+  if(action==='closeTeamRoles'){
+   showRolesModal=false;render();return;
+  }
+  if(action==='clickNPC'){
+   interactNearObject();return;
+  }
+  if(action==='closeQuestDialogue'){
+   questDialogue=null;render();return;
+  }
+  if(action==='clickCrystalAltar'){
+   cipherState.open=true;cipherState.error=null;sound('crystal');render();return;
+  }
+  if(action==='clickMazeChest'){
+   cipherState.open=true;cipherState.error=null;sound('portal');render();return;
+  }
+  if(action==='clickCitadelCore'){
+   cipherState.open=true;cipherState.error=null;sound('energy');render();return;
+  }
+  if(action==='clickTargetBeacon'){
+   sound('gem');
+   notice('🎯 TỌA ĐỘ BÍ MẬT!',`Đội đã tìm thấy vị trí tọa độ (${el.dataset.gx}; ${el.dataset.gy}) trên bản đồ Mê Cung!`,true,{button:'Tuyệt vời'});
+   return;
+  }
+  if(action==='openBossBattle'){
+   huntState.battleOpen=true;
+   huntState.selectedChoice=null;
+   huntState.shortText='';
+   huntState.monsterDefeated=false;
+   huntState.rewardBadge=null;
+   sound('boss_roar');
+   render();
+   return;
+  }
+  if(action==='interactNearObject'){
+   interactNearObject();
+   return;
+  }
+    if(action==='closeHuntBattle'){
    huntState.battleOpen=false;
    render();
    return;
