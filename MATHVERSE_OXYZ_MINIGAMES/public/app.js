@@ -28,7 +28,7 @@ const oxyz3D={
  yaw:38,       // góc xoay ngang (độ)
  pitch:24,     // góc nghiêng dọc (độ)
  showProj:true, // hiện đường gióng tọa độ (x,y,0)
- open:true     // hiện/ẩn hộp 3D
+ open:false    // mặc định thu gọn để ưu tiên toàn màn hình cho game chạy tìm trạm
 };
 
 const missionMeta=[
@@ -124,7 +124,7 @@ function project3DPoint(x,y,z,cx=195,cy=112,scale=19){
  };
 }
 
-function renderOxyz3D(m){
+function renderOxyz3D(m, forceOpen=false){
  const v3=m.visual3D||{
   title:'Mô hình Hệ trục tọa độ Oxyz',
   formula:'\\vec{AB} = (x_B - x_A; y_B - y_A; z_B - z_A)',
@@ -132,10 +132,13 @@ function renderOxyz3D(m){
   vectors:[{from:[1,2,3],to:[4,-2,3],color:'#4ade80',label:'AB'}]
  };
  const hlAxis=m.challenge?.highlightAxis||'all';
- if(!oxyz3D.open){
-  return `<div style="padding:8px 18px;background:#0f172a;border-bottom:1px solid #1e293b;display:flex;justify-content:space-between;align-items:center">
-   <span style="font-size:12px;font-weight:900;color:#7dd3fc">🧊 MÔ HÌNH KHÔNG GIAN 3D OXYZ: ${esc(v3.title)}</span>
-   <button type="button" class="oxyz-btn" data-action="toggle3DPanel">👁️ Mở Mô hình 3D Oxyz</button>
+ if(!oxyz3D.open && !forceOpen){
+  return `<div class="oxyz-compact-bar">
+   <div style="display:flex;align-items:center;gap:8px">
+    <span class="oxyz-compact-tag">🧊 3D OXYZ</span>
+    <span style="font-size:12.5px;font-weight:900;color:#e0f2fe">${esc(v3.title)} · <b style="color:#fde047">${esc(v3.formula||'')}</b></span>
+   </div>
+   <button type="button" class="oxyz-btn" data-action="toggle3DPanel">👁️ Mở Mô hình 3D Oxyz Tra Cứu</button>
   </div>`;
  }
  const O=project3DPoint(0,0,0);
@@ -189,9 +192,11 @@ function renderOxyz3D(m){
   const coords = Array.isArray(pt.coords) ? pt.coords : [Number(pt.x||0), Number(pt.y||0), Number(pt.z||0)];
   const P=project3DPoint(...coords);
   const coordStr=`(${coords.join(';')})`;
+  const rawLabel=String(pt.label||'');
+  const displayLabel=rawLabel.includes('(')?rawLabel:`${rawLabel}${coordStr}`;
   return `<g>
    <circle cx="${P.sx}" cy="${P.sy}" r="5.5" fill="${pt.color||'#facc15'}" stroke="#fff" stroke-width="1.8"/>
-   <text x="${P.sx+7}" y="${P.sy-6}" fill="#ffffff" font-size="11" font-weight="900" style="text-shadow:0 2px 4px #000">${esc(pt.label)}${esc(coordStr)}</text>
+   <text x="${P.sx+7}" y="${P.sy-6}" fill="#ffffff" font-size="11" font-weight="900" style="text-shadow:0 2px 4px #000">${esc(displayLabel)}</text>
   </g>`;
  }).join('');
 
@@ -538,7 +543,7 @@ function teacherScreen(){
     ${[0,1,2,3,4].map(idx=>`<button type="button" class="button sm ${teacherPreviewStage===idx?'primary':'gray'}" data-action="preview3DStage" data-stage="${idx}">Chặng ${idx+1}: ${esc(missionMeta[idx]?.place||'')}</button>`).join('')}
    </div>
   </div>
-  ${renderOxyz3D(world.missions[teacherPreviewStage]||world.stages[teacherPreviewStage])}
+  ${renderOxyz3D(world.missions[teacherPreviewStage]||world.stages[teacherPreviewStage], true)}
  </section>
  <div class="teacher-main"><div><section class="panel"><div class="section-title"><h2>🗺️ Tiến độ trực tiếp qua 5 chặng Oxyz</h2><span class="pill">Tự cập nhật ~2 giây</span></div>${teacherMap(teams)}</section><section class="panel"><div class="section-title"><h2>🏅 Bảng xếp hạng các đội</h2><small>Tính theo XP, sau đó thời điểm hoàn thành</small></div>${standings(teams)}</section><section class="panel"><h2>🎊 Tổng kết và vinh danh</h2>${showAward?`<div class="champion" style="margin-top:14px"><span class="star">🏆</span><strong>QUÁN QUÂN MATHVERSE: ${winners[0].avatar} ${esc(winners[0].name)}</strong><p>${winners[0].score} XP · ${winners[0].completed?'Đã giải mã Lõi Trí Tuệ':'Đang trên hành trình'}</p></div><div class="grid grid-2" style="margin-top:12px"><div class="notice good">🥈 Á quân: ${winners[1]?esc(winners[1].name):'—'}</div><div class="notice good">🥉 Giải ba: ${winners[2]?esc(winners[2].name):'—'}</div><div class="notice">🤝 Giải hợp tác xuất sắc: ${helper&&helper.bonus>0?esc(helper.name):'GV lựa chọn'}</div><div class="notice">🔐 Mở kho báu: ${done}/${teams.length} đội</div></div>`:`<p class="muted" style="margin:10px 0">Khi kết thúc hoạt động, nhấn “Công bố giải thưởng” để chiếu sân khấu vinh danh 3 đội dẫn đầu và giải hợp tác.</p>`}</section></div>
  <aside><section class="panel"><div class="section-title"><h3>🔑 Mã PIN đăng nhập từng đội</h3><span class="teacher-only">CHỈ GV XEM</span></div><div class="notice" style="margin-bottom:12px">Học sinh cùng Wi-Fi mở <strong>${esc(joinBase)}</strong>, nhập mã phòng <strong>${esc(world.room)}</strong> và mã PIN đội:</div>${teams.map(t=>`<div class="team-join"><div class="team-emoji">${t.avatar}</div><div class="team-details"><b>${esc(t.name)}</b><small>Đội ${t.id.split('-')[1]} · PIN: <span class="code">${esc(world.teamCodes[t.id])}</span></small></div><button class="button sm gray" data-action="copy" data-url="${esc(baseUrl+'?room='+world.room+'&team='+t.id)}" title="Sao chép liên kết đội">⧉ Link</button></div>`).join('')}</section>
@@ -662,9 +667,10 @@ function renderHuntGame(m){
   return `<div class="hw-key-slot">🔒 Trạm ${i+1}: Khóa</div>`;
  }).join('');
 
- const quickBtns=[0,1,2].map(i=>{
-  const cls=i<r?'done':i===r?'active':'';
-  return `<button type="button" class="hw-quick-btn ${cls}" data-action="walkToStation" data-idx="${i}">${i<r?'✅':i===r?'🏃 Đi tới':'🔒'} Trạm ${i+1}</button>`;
+ const trackerBadges=[0,1,2].map(i=>{
+  const cls=i<r?'done':i===r?'active':'locked';
+  const label=i<r?`✅ Đền ${i+1}: Đã vượt`:i===r?`🧭 Đang tìm Đền ${i+1}`:`🔒 Đền ${i+1}: Ẩn dấu`;
+  return `<span class="hw-tracker-pill ${cls}">${label}</span>`;
  }).join('');
 
  const pathPts=[hm.spawn,...stList,hm.chest].map(p=>`${Math.round(p.x*12)},${Math.round(p.y*8.2)}`).join(' ');
@@ -723,7 +729,7 @@ function renderHuntGame(m){
  return `<div class="hw-wrapper">
   <div class="hw-hud-top">
    <div class="hw-hud-keys">${keySlots}<div class="hw-key-slot ${r>=3?'earned':''}">🎁 Vật phẩm: <b>${esc(m.item||'Mảnh mật mã')}</b></div></div>
-   <div class="hw-quick-nav">${quickBtns}</div>
+   <div class="hw-quick-nav">${trackerBadges}</div>
   </div>
   <div class="hw-viewport" id="hwViewport">
    <!-- La bàn định hướng Trạm mục tiêu -->
@@ -779,8 +785,15 @@ function renderHuntGame(m){
      <button type="button" class="hw-sprint-btn ${huntState.isSprinting?'active':''}" data-action="toggleSprint" title="Bật/Tắt chạy nhanh (Shift)">⚡ ${huntState.isSprinting?'ĐANG CHẠY NHANH':'TĂNG TỐC'}</button>
     </div>
     <div class="hw-action-panel">
-     <button type="button" class="hw-attack-station-btn" data-action="openHuntBattle">⚔️ ${nearStation?'MỞ CUỘN GIẤY CHIẾN ĐẤU NGAY!':'ĐI TỚI & MỞ TRẠM '+(r+1)}</button>
-     <div class="hw-hint-pill">💡 Chạm/kéo trên bản đồ, dùng phím WASD/Mũi tên. Phím [Space] để chiến đấu!</div>
+     <button type="button" class="hw-attack-station-btn ${nearStation?'pulse-urgent':''}" data-action="openHuntBattle" style="${nearStation?'display:inline-flex':'display:none'}">⚔️ ĐÃ TỚI ĐỀN ${r+1}! BẤM MỞ BÀI TOÁN (Space)</button>
+     <div class="hw-exploring-pill" style="${nearStation?'display:none':'display:flex'}">
+      <span class="hw-exploring-icon">🧭</span>
+      <div>
+       <div style="font-size:12px;font-weight:900;color:#fde047">Đang tự lái tìm Đền ${r+1} · <span class="hw-exploring-dist">Còn ${Math.round(dist*1.5)}m</span></div>
+       <div style="font-size:10.5px;color:#bae6fd">Dùng WASD / Mũi tên hoặc chạm bản đồ để chạy đến Đền!</div>
+      </div>
+     </div>
+     <div class="hw-hint-pill">💡 Lái nhân vật nhặt Vàng 🪙 và Tinh thể Oxyz 💎 trên đường chạy!</div>
     </div>
    </div>
   </div>
@@ -877,10 +890,22 @@ function updateHuntCamera(){
   if(txt)txt.textContent=`${curSt.name} (${Math.round(dist*1.5)}m)`;
 
   const atkBtn=$('.hw-attack-station-btn');
+  const expPill=$('.hw-exploring-pill');
+  const isNear=dist<=10.5;
   if(atkBtn){
-   const isNear=dist<=10.5;
-   atkBtn.innerHTML=isNear?'⚔️ MỞ CUỘN GIẤY CHIẾN ĐẤU NGAY!':`🏃 ĐI TỚI & MỞ TRẠM ${m.round+1}`;
-   atkBtn.classList.toggle('pulse-urgent',isNear);
+   if(isNear){
+    atkBtn.style.display='inline-flex';
+    atkBtn.innerHTML=`⚔️ ĐÃ TỚI ĐỀN ${m.round+1}! BẤM MỞ BÀI TOÁN (Space)`;
+    atkBtn.classList.add('pulse-urgent');
+    if(expPill)expPill.style.display='none';
+   }else{
+    atkBtn.style.display='none';
+    if(expPill){
+     expPill.style.display='flex';
+     const dLabel=expPill.querySelector('.hw-exploring-dist');
+     if(dLabel)dLabel.textContent=`Còn ${Math.round(dist*1.5)}m`;
+    }
+   }
   }
  }
  const vw=vp.clientWidth||800, vh=vp.clientHeight||485;
@@ -1108,17 +1133,19 @@ function stageContent(m){
    <div class="mode-bar-left">
     <span class="mode-bar-title">🎮 CHẾ ĐỘ CHƠI:</span>
     <div class="mode-switcher">
-     <button type="button" class="mode-btn ${mode==='hunt'?'active':''}" data-action="setMode" data-mode="hunt">🗺️ Săn Kho Báu 2D (Map)</button>
+     <button type="button" class="mode-btn ${mode==='hunt'?'active':''}" data-action="setMode" data-mode="hunt">🗺️ Săn Kho Báu 2D (Tự Lái Tìm Đền)</button>
      <button type="button" class="mode-btn ${mode==='defense'?'active':''}" data-action="setMode" data-mode="defense">🏰 Bảo Vệ Thành Trì (Real-time)</button>
     </div>
    </div>
-   <div style="display:flex;align-items:center;gap:10px">
+   <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+    <button type="button" class="oxyz-toggle-btn" data-action="toggle3DPanel">🧊 ${oxyz3D.open?'▲ Đóng 3D Oxyz':'▼ Mở 3D Oxyz & Công thức'}</button>
     <span style="font-size:12px;color:#bae6fd;font-weight:800">🪙 Vàng: <b id="topGoldBadge">${world.me.gold??120}</b> · 🛡️ Khiên: <b>${world.me.health}/3</b></span>
    </div>
   </div>
   ${roles.length?`<div class="role-strip">${roles.map((r,idx)=>`<div class="role-chip ${idx===m.round?'active-role':''}">${esc(r)}</div>`).join('')}</div>`:''}
-  ${renderOxyz3D(m)}
+  <!-- BẢN ĐỒ GAME RPG ĐƯỢC ƯU TIÊN LÊN ĐẦU TIÊN ĐỂ HỌC SINH TỰ LÁI NHÂN VẬT CHẠY TÌM TRẠM -->
   ${mode==='hunt'?renderHuntGame(m):renderCastleDefenseGame(m)}
+  ${renderOxyz3D(m)}
  </div>`;
 }
 
@@ -1487,7 +1514,12 @@ async function handle(action,el){
   if(action==='openHuntBattle'){
    const m=world?.current;if(!m)return;
    const st=m.huntMap?.stations?.[m.round];
-   if(st){huntState.x=st.x;huntState.y=st.y;huntState.targetX=null;huntState.targetY=null;}
+   if(st){
+    const d=Math.hypot(st.x-huntState.x, st.y-huntState.y);
+    if(d > 12){
+     return notice('🧭 Chưa tới Đền', `Đội đang cách Đền ${m.round+1} khoảng ${Math.round(d*1.5)}m. Hãy dùng phím mũi tên / WASD hoặc chạm vào đường mòn để tự lái nhân vật chạy tới Đền nhé!`, false);
+    }
+   }
    huntState.battleOpen=true;
    huntState.selectedChoice=null;
    huntState.shortText='';
@@ -1734,7 +1766,14 @@ window.addEventListener('keydown',e=>{
   huntState.isSprinting=true;
   updateHuntCamera();
  }
- const dir=keyMap[e.code];
+ let dir=keyMap[e.code];
+ if(!dir&&e.key){
+  const k=e.key.toLowerCase();
+  if(k==='w'||k==='arrowup')dir='up';
+  else if(k==='s'||k==='arrowdown')dir='down';
+  else if(k==='a'||k==='arrowleft')dir='left';
+  else if(k==='d'||k==='arrowright')dir='right';
+ }
  if(dir&&session?.role==='student'&&!huntState.battleOpen){
   e.preventDefault();
   huntState.keysPressed.add(dir);
@@ -1747,7 +1786,14 @@ window.addEventListener('keyup',e=>{
   huntState.isSprinting=false;
   updateHuntCamera();
  }
- const dir=keyMap[e.code];
+ let dir=keyMap[e.code];
+ if(!dir&&e.key){
+  const k=e.key.toLowerCase();
+  if(k==='w'||k==='arrowup')dir='up';
+  else if(k==='s'||k==='arrowdown')dir='down';
+  else if(k==='a'||k==='arrowleft')dir='left';
+  else if(k==='d'||k==='arrowright')dir='right';
+ }
  if(dir)huntState.keysPressed.delete(dir);
 });
 
