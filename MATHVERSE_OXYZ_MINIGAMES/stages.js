@@ -1,21 +1,23 @@
 'use strict';
-// Dữ liệu 5 Chặng Game Tương Tác Nhóm MATHVERSE OXYZ (Toán 12 - GDPT 2018)
-// Tích hợp 2 cơ chế: Săn Kho Báu 2D Map (Scavenger Hunt) & Bảo Vệ Thành Trì Thời Gian Thực (Castle Defense)
+// Dữ liệu 5 Chặng Hành Trình MATHVERSE OXYZ (Toán 12 - GDPT 2018)
+// Tích hợp: Bản đồ Lục địa 5 Chặng + Săn Kho Báu 2D + Bảo Vệ Thành Trì + Mô phỏng Hình học 3D Oxyz
 
 const STAGES = [
   {
     id: 1,
     gameType: 'hunt',
     defaultMode: 'hunt',
-    title: 'SĂN KHO BÁU TỌA ĐỘ',
+    title: 'QUẦN ĐẢO RỪNG VECTƠ',
+    subtitle: 'Săn Kho Báu Tọa Độ Vectơ AB',
     place: 'Rừng Vectơ Nguyên Sinh',
     icon: '🏝️',
+    biomeColor: '#10b981',
     tag: 'Tọa độ vectơ AB trong Oxyz',
     time: '5–6 phút',
     item: 'La bàn ba trục',
     digit: '3',
     digitRule: 'Lấy hiệu hoành độ xB − xA = 5 − 2 = 3.',
-    story: 'Bản đồ Rừng Vectơ bị phong ấn bởi 3 Trạm Quái Vật giữ 3 thành phần (x; y; z) của vectơ AB. Cả đội hãy điều khiển nhân vật vượt địa hình, đánh bại từng trạm để thu thập đủ 3 chìa khóa tọa độ và mở Rương Mật Mã!',
+    story: 'Bản đồ Quần Đảo Rừng Vectơ bị phong ấn bởi 3 Đền Cổ giữ 3 thành phần (x; y; z) của vectơ AB. Cả đội hãy điều khiển nhân vật vượt qua cầu gỗ và rừng nguyên sinh, đánh bại Thần Rừng tại từng đền để thu thập đủ 3 chìa khóa tọa độ và mở Rương La Bàn Ba Trục!',
     groupTask: 'TV1 tính trục Ox, TV2 tính trục Oy, TV3 tính trục Oz; Đội trưởng điều khiển nhân vật trên bản đồ và phát lệnh tấn công.',
     teamRoles: [
       '🧭 Thành viên 1: Phụ trách công thức hoành độ xB − xA',
@@ -23,24 +25,36 @@ const STAGES = [
       '🔭 Thành viên 3: Phụ trách công thức cao độ zB − zA',
       '👑 Đội trưởng: Điều khiển nhân vật di chuyển & chốt đáp án tấn công'
     ],
+    visual3D: {
+      title: 'Mô phỏng 3D: Vectơ AB với A(2; −1; 3) và B(5; 1; 7)',
+      type: 'vectorAB',
+      points: [
+        { label: 'A(2;−1;3)', x: 2, y: -1, z: 3, color: '#38bdf8' },
+        { label: 'B(5;1;7)', x: 5, y: 1, z: 7, color: '#facc15' }
+      ],
+      vectors: [
+        { from: [2, -1, 3], to: [5, 1, 7], label: 'AB = (3; 2; 4)', color: '#4ade80' }
+      ],
+      formula: 'AB = (xB − xA ; yB − yA ; zB − zA)'
+    },
     huntMap: {
       theme: 'forest',
-      worldTitle: 'BẢN ĐỒ RỪNG VECTƠ OXYZ',
-      spawn: { x: 14, y: 52 },
-      chest: { x: 86, y: 50, name: 'Rương La Bàn Ba Trục' },
+      worldTitle: 'QUẦN ĐẢO RỪNG VECTƠ OXYZ',
+      spawn: { x: 12, y: 52 },
+      chest: { x: 88, y: 50, name: 'Rương La Bàn Ba Trục' },
       stations: [
-        { x: 34, y: 26, name: 'Trạm I · Đền Hoành Độ Ox', monsterIcon: '👹', monsterName: 'Thần Rừng Hoành Độ', badge: 'ABx = 3' },
-        { x: 54, y: 74, name: 'Trạm II · Đầm Tung Độ Oy', monsterIcon: '🐊', monsterName: 'Thủy Quái Tung Độ', badge: 'ABy = 2' },
-        { x: 72, y: 30, name: 'Trạm III · Đỉnh Cao Độ Oz', monsterIcon: '🦅', monsterName: 'Đại Bàng Cao Độ', badge: 'ABz = 4' }
+        { x: 32, y: 25, name: 'Đền I · Trục Hoành Ox', monsterIcon: '👹', monsterType: 'treant', monsterName: 'Mộc Tinh Hoành Độ', badge: 'ABx = 3' },
+        { x: 54, y: 75, name: 'Đền II · Trục Tung Oy', monsterIcon: '🐊', monsterType: 'hydra', monsterName: 'Thủy Quái Tung Độ', badge: 'ABy = 2' },
+        { x: 73, y: 28, name: 'Đền III · Trục Cao Oz', monsterIcon: '🦅', monsterType: 'griffin', monsterName: 'Đại Bàng Cao Độ', badge: 'ABz = 4' }
       ]
     },
     defenseConfig: {
       castleName: 'Thành Trì Rừng Vectơ',
       theme: 'forest',
       waves: [
-        { name: 'Đợt 1: Quái Hoành Độ Ox', enemies: ['goblin', 'bat', 'goblin'], boss: '👹' },
-        { name: 'Đợt 2: Quái Tung Độ Oy', enemies: ['bat', 'skeleton', 'goblin'], boss: '🐊' },
-        { name: 'Đợt 3: Quái Cao Độ Oz', enemies: ['skeleton', 'orc', 'bat'], boss: '🦅' }
+        { name: 'Đợt 1: Quân đoàn Mộc Tinh Ox', enemies: ['goblin', 'bat', 'goblin', 'skeleton'], boss: '👹' },
+        { name: 'Đợt 2: Quân đoàn Thủy Quái Oy', enemies: ['bat', 'skeleton', 'goblin', 'orc'], boss: '🐊' },
+        { name: 'Đợt 3: Quân đoàn Đại Bàng Oz', enemies: ['skeleton', 'orc', 'bat', 'orc'], boss: '🦅' }
       ]
     },
     challenges: [
@@ -51,10 +65,11 @@ const STAGES = [
         shortAnswer: '3',
         hints: ['Lấy hoành độ điểm cuối B trừ hoành độ điểm đầu A.', 'Tính: xB − xA = 5 − 2 = ?'],
         explain: 'Ta có ABₓ = xB − xA = 5 − 2 = 3.',
-        label: 'Trạm I · Tọa độ X · Đào điểm 1',
-        roleAssign: 'Thành viên 1 (Trục Ox) tính nhanh xB − xA',
-        monster: { icon: '👹', name: 'Thần Rừng Hoành Độ', hp: 100 },
-        keyBadge: 'X=3'
+        label: 'Đền I · Tọa độ X · Khai mở Trục Ox',
+        roleAssign: 'Thành viên 1 (Trục Ox) tính nhanh xB − xA = 5 − 2',
+        monster: { icon: '👹', type: 'treant', name: 'Mộc Tinh Hoành Độ', hp: 120 },
+        keyBadge: 'X=3',
+        highlightAxis: 'x'
       },
       {
         prompt: 'Với A(2; −1; 3) và B(5; 1; 7), thành phần tung độ y của vectơ AB bằng bao nhiêu?',
@@ -63,10 +78,11 @@ const STAGES = [
         shortAnswer: '2',
         hints: ['Cẩn thận khi trừ một số âm: yB − yA.', 'Tính: 1 − (−1) = ?'],
         explain: 'Ta có ABᵧ = yB − yA = 1 − (−1) = 2.',
-        label: 'Trạm II · Tọa độ Y · Đào điểm 2',
+        label: 'Đền II · Tọa độ Y · Khai mở Trục Oy',
         roleAssign: 'Thành viên 2 (Trục Oy) kiểm tra dấu âm 1 − (−1)',
-        monster: { icon: '🐊', name: 'Thủy Quái Tung Độ', hp: 120 },
-        keyBadge: 'Y=2'
+        monster: { icon: '🐊', type: 'hydra', name: 'Thủy Quái Tung Độ', hp: 150 },
+        keyBadge: 'Y=2',
+        highlightAxis: 'y'
       },
       {
         prompt: 'Với A(2; −1; 3) và B(5; 1; 7), thành phần cao độ z của vectơ AB bằng bao nhiêu?',
@@ -75,10 +91,11 @@ const STAGES = [
         shortAnswer: '4',
         hints: ['Lấy cao độ điểm cuối B trừ cao độ điểm đầu A.', 'Tính: zB − zA = 7 − 3 = ?'],
         explain: 'Ta có ABz = zB − zA = 7 − 3 = 4. Vậy vectơ AB = (3; 2; 4).',
-        label: 'Trạm III · Tọa độ Z · Đào điểm 3',
+        label: 'Đền III · Tọa độ Z · Hoàn tất Vectơ AB',
         roleAssign: 'Thành viên 3 (Trục Oz) tính 7 − 3 & Đội trưởng tổng hợp AB=(3;2;4)',
-        monster: { icon: '🦅', name: 'Đại Bàng Cao Độ', hp: 150 },
-        keyBadge: 'Z=4'
+        monster: { icon: '🦅', type: 'griffin', name: 'Đại Bàng Cao Độ', hp: 180 },
+        keyBadge: 'Z=4',
+        highlightAxis: 'z'
       }
     ]
   },
@@ -86,15 +103,17 @@ const STAGES = [
     id: 2,
     gameType: 'defense',
     defaultMode: 'defense',
-    title: 'BẢO VỆ THÀNH TRÌ TRỰC GIAO',
+    title: 'PHÁO ĐÀI VUÔNG GÓC',
+    subtitle: 'Bảo Vệ Thành Trì Tích Vô Hướng',
     place: 'Pháo Đài Vuông Góc',
     icon: '🏰',
+    biomeColor: '#f59e0b',
     tag: 'Tích vô hướng & Hai vectơ vuông góc',
     time: '6–7 phút',
     item: 'Khiên trực giao',
     digit: '0',
     digitRule: 'Lấy kết quả tích vô hướng của đợt tấn công đầu tiên (u·v = 0).',
-    story: 'Ba đợt quân đoàn Quái Vật Không Gian đang tiến vào Pháo Đài Vuông Góc trên 3 làn đường! Các Anh Hùng đang chiến đấu cầm chân chúng. Cả đội hãy giải nhanh tích vô hướng để kiếm Vàng nâng cấp Anh Hùng, tung Kỹ năng và gọi Pháo Kích tiêu diệt từng đợt quái!',
+    story: 'Ba đợt quân đoàn Cơ Giáp Không Gian đang tiến vào Pháo Đài Vuông Góc trên 3 làn đường! 3 Anh Hùng đang chiến đấu cầm chân chúng. Cả đội hãy giải nhanh tích vô hướng u·v để kiếm Vàng nâng cấp Anh Hùng, tung 4 Kỹ năng và kích hoạt Đại Bác Laser tiêu diệt từng đợt quái!',
     groupTask: 'TV1 tính tích x₁x₂, TV2 tính y₁y₂, TV3 tính z₁z₂; Đội trưởng cộng tổng, mua Nâng cấp và tung Kỹ năng Bảo vệ Thành trì.',
     teamRoles: [
       '🏹 Thành viên 1 (Cung Thủ): Tính tích hoành độ x₁·x₂',
@@ -102,15 +121,27 @@ const STAGES = [
       '🛡️ Thành viên 3 (Hiệp Sĩ): Tính tích cao độ z₁·z₂',
       '👑 Đội trưởng (Chỉ huy): Cộng x₁x₂+y₁y₂+z₁z₂, nâng cấp & kích hoạt kỹ năng'
     ],
+    visual3D: {
+      title: 'Mô phỏng 3D: Tích vô hướng & Góc vuông góc (u ⊥ v ⇔ u·v = 0)',
+      type: 'dotProduct',
+      points: [
+        { label: 'O(0;0;0)', x: 0, y: 0, z: 0, color: '#ffffff' }
+      ],
+      vectors: [
+        { from: [0, 0, 0], to: [2, 4, -4], label: 'u = (1; 2; −2)', color: '#38bdf8' },
+        { from: [0, 0, 0], to: [4, 0, 2], label: 'v = (2; 0; 1)', color: '#facc15' }
+      ],
+      formula: 'u · v = x₁x₂ + y₁y₂ + z₁z₂ (Vuông góc khi u · v = 0)'
+    },
     huntMap: {
       theme: 'fortress',
-      worldTitle: 'BẢN ĐỒ PHÁO ĐÀI VUÔNG GÓC',
-      spawn: { x: 14, y: 50 },
-      chest: { x: 86, y: 50, name: 'Rương Khiên Trực Giao' },
+      worldTitle: 'PHÁO ĐÀI VUÔNG GÓC OXYZ',
+      spawn: { x: 12, y: 50 },
+      chest: { x: 88, y: 50, name: 'Rương Khiên Trực Giao' },
       stations: [
-        { x: 35, y: 28, name: 'Cổng Bắc · Đợt Quái 1', monsterIcon: '👾', monsterName: 'Quái Tích Vô Hướng Bắc', badge: 'u·v = 0' },
-        { x: 56, y: 72, name: 'Cổng Đông · Đợt Quái 2', monsterIcon: '👹', monsterName: 'Chiến Binh Cổng Đông', badge: 'a·b = −2' },
-        { x: 74, y: 32, name: 'Cổng Tây · Đợt Quái 3', monsterIcon: '🤖', monsterName: 'Cơ Giáp Cổng Tây', badge: 'c·d = 0' }
+        { x: 34, y: 26, name: 'Cổng Bắc · Đợt Quái 1', monsterIcon: '👾', monsterType: 'golem', monsterName: 'Cơ Giáp Cổng Bắc', badge: 'u·v = 0' },
+        { x: 55, y: 74, name: 'Cổng Đông · Đợt Quái 2', monsterIcon: '👹', monsterType: 'demon', monsterName: 'Chiến Binh Cổng Đông', badge: 'a·b = −2' },
+        { x: 74, y: 30, name: 'Cổng Tây · Đợt Quái 3', monsterIcon: '🤖', monsterType: 'mech', monsterName: 'Pháo Đài Cơ Giáp Tây', badge: 'c·d = 0' }
       ]
     },
     defenseConfig: {
@@ -129,11 +160,12 @@ const STAGES = [
         correct: 1,
         shortAnswer: '0',
         hints: ['Áp dụng công thức: u·v = x₁x₂ + y₁y₂ + z₁z₂.', 'Tính: 1×2 + 2×0 + (−2)×1 = ?'],
-        explain: 'u·v = 1×2 + 2×0 + (−2)×1 = 2 + 0 − 2 = 0. Hai vectơ khác 0 có tích vô hướng bằng 0 nên vuông góc với nhau!',
-        label: 'Sóng quái 1 · Cổng Bắc (Làn 1)',
+        explain: 'u·v = 1×2 + 2×0 + (−2)×1 = 2 + 0 − 2 = 0. Hai vectơ khác 0 có tích vô hướng bằng 0 nên vuông góc (u ⊥ v)!',
+        label: 'Sóng quái 1 · Cổng Bắc (u ⊥ v)',
         roleAssign: 'TV1 tính 1×2, TV2 tính 2×0, TV3 tính (−2)×1 → Cộng lại',
-        monster: { icon: '👾', name: 'Thủ Lĩnh Sóng Quái 1', hp: 140 },
-        keyBadge: 'u·v=0'
+        monster: { icon: '👾', type: 'golem', name: 'Thủ Lĩnh Sóng Quái 1', hp: 140 },
+        keyBadge: 'u·v=0',
+        highlightAxis: 'all'
       },
       {
         prompt: 'ĐỢT 2: Cho a = (2; −1; 3) và b = (1; 1; −1). Tích vô hướng a · b bằng bao nhiêu?',
@@ -142,10 +174,11 @@ const STAGES = [
         shortAnswer: '-2',
         hints: ['Nhân từng cặp tọa độ tương ứng rồi cộng lại.', 'Tính: 2×1 + (−1)×1 + 3×(−1) = ?'],
         explain: 'a·b = 2×1 + (−1)×1 + 3×(−1) = 2 − 1 − 3 = −2.',
-        label: 'Sóng quái 2 · Cổng Đông (Làn 2)',
+        label: 'Sóng quái 2 · Cổng Đông (Góc tù)',
         roleAssign: 'Chú ý dấu âm ở tích thứ hai (−1)×1 và thứ ba 3×(−1)',
-        monster: { icon: '👹', name: 'Ác Quỷ Cổng Đông', hp: 170 },
-        keyBadge: 'a·b=−2'
+        monster: { icon: '👹', type: 'demon', name: 'Ác Quỷ Cổng Đông', hp: 170 },
+        keyBadge: 'a·b=−2',
+        highlightAxis: 'all'
       },
       {
         prompt: 'ĐỢT 3: Cho c = (1; 1; 1) và d = (2; −1; −1). Tích vô hướng c · d bằng bao nhiêu?',
@@ -153,11 +186,12 @@ const STAGES = [
         correct: 2,
         shortAnswer: '0',
         hints: ['Đừng bỏ quên hai dấu trừ ở hai thành phần cuối.', 'Tính: 1×2 + 1×(−1) + 1×(−1) = 2 − 1 − 1 = ?'],
-        explain: 'c·d = 2 − 1 − 1 = 0. Следовательно, hai vectơ c và d vuông góc (c ⊥ d)!',
-        label: 'Sóng quái 3 · Cổng Tây (Làn 3)',
+        explain: 'c·d = 2 − 1 − 1 = 0. Do đó hai vectơ c và d vuông góc (c ⊥ d)!',
+        label: 'Sóng quái 3 · Cổng Tây (c ⊥ d)',
         roleAssign: 'Cả nhóm kiểm tra điều kiện hai vectơ vuông góc c·d = 0',
-        monster: { icon: '🤖', name: 'Cơ Giáp Khổng Lồ', hp: 200 },
-        keyBadge: 'c⊥d'
+        monster: { icon: '🤖', type: 'mech', name: 'Cơ Giáp Khổng Lồ', hp: 210 },
+        keyBadge: 'c⊥d',
+        highlightAxis: 'all'
       }
     ]
   },
@@ -165,15 +199,17 @@ const STAGES = [
     id: 3,
     gameType: 'forge',
     defaultMode: 'hunt',
-    title: 'THUNG LŨNG PHA LÊ KHOẢNG CÁCH',
+    title: 'THUNG LŨNG PHA LÊ',
+    subtitle: 'Rèn Tinh Thể Khoảng Cách AB',
     place: 'Tháp Pha Lê',
     icon: '💠',
+    biomeColor: '#8b5cf6',
     tag: 'Khoảng cách giữa hai điểm AB',
     time: '6 phút',
     item: 'Tinh thể khoảng cách',
     digit: '5',
     digitRule: 'Lấy độ dài đoạn thẳng AB = 5.',
-    story: 'Trong Thung Lũng Pha Lê, 3 Mỏ Tinh Thể (Δx, Δy, Δz) đang bị các Golem Đá canh giữ. Hãy điều khiển nhân vật đi tới từng mỏ tinh thể, giải bài toán hiệu tọa độ và dùng định lý Pitago không gian để rèn Tinh Thể Khoảng Cách AB!',
+    story: 'Trong Thung Lũng Pha Lê huyền bí, 3 Mỏ Tinh Thể (Δx, Δy, Δz) đang bị các Vệ Binh Đá Quý canh giữ. Hãy điều khiển nhân vật đi tới từng mỏ tinh thể, giải bài toán hiệu tọa độ và dùng định lý Pitago không gian để rèn Tinh Thể Khoảng Cách AB = 5!',
     groupTask: 'TV1 tính Δx, TV2 tính Δy, TV3 tính Δz; Đội trưởng lấy căn bậc hai √(Δx² + Δy² + Δz²).',
     teamRoles: [
       '🔷 Thành viên 1: Tính hiệu hoành độ Δx = xB − xA',
@@ -181,24 +217,38 @@ const STAGES = [
       '💎 Thành viên 3: Tính hiệu cao độ Δz = zB − zA',
       '👑 Đội trưởng: Tính độ dài AB = √(Δx² + Δy² + Δz²)'
     ],
+    visual3D: {
+      title: 'Mô phỏng 3D: Khoảng cách AB với A(1; 2; −1) và B(4; 6; −1)',
+      type: 'distanceAB',
+      points: [
+        { label: 'A(1;2;−1)', x: 1, y: 2, z: -1, color: '#c084fc' },
+        { label: 'B(4;6;−1)', x: 4, y: 6, z: -1, color: '#38bdf8' }
+      ],
+      vectors: [
+        { from: [1, 2, -1], to: [4, 2, -1], label: 'Δx = 3', color: '#f87171' },
+        { from: [4, 2, -1], to: [4, 6, -1], label: 'Δy = 4', color: '#4ade80' },
+        { from: [1, 2, -1], to: [4, 6, -1], label: 'AB = √(3²+4²) = 5', color: '#facc15' }
+      ],
+      formula: 'AB = √[(xB − xA)² + (yB − yA)² + (zB − zA)²]'
+    },
     huntMap: {
       theme: 'crystal',
-      worldTitle: 'BẢN ĐỒ THUNG LŨNG PHA LÊ',
-      spawn: { x: 14, y: 50 },
-      chest: { x: 86, y: 50, name: 'Lò Rèn Tinh Thể AB' },
+      worldTitle: 'THUNG LŨNG PHA LÊ KHOẢNG CÁCH',
+      spawn: { x: 12, y: 50 },
+      chest: { x: 88, y: 50, name: 'Lò Rèn Tinh Thể AB' },
       stations: [
-        { x: 32, y: 30, name: 'Mỏ I · Pha Lê Xanh (Δx)', monsterIcon: '🗿', monsterName: 'Golem Tinh Thể Xanh', badge: 'Δx = 3' },
-        { x: 52, y: 70, name: 'Mỏ II · Pha Lê Tím (Δy)', monsterIcon: '🔮', monsterName: 'Phù Thủy Pha Lê Tím', badge: 'Δy = 4' },
-        { x: 73, y: 34, name: 'Mỏ III · Lõi Năng Lượng AB', monsterIcon: '💎', monsterName: 'Vệ Binh Kim Cương', badge: 'AB = 5' }
+        { x: 32, y: 28, name: 'Mỏ I · Pha Lê Xanh (Δx)', monsterIcon: '🗿', monsterType: 'golem', monsterName: 'Golem Tinh Thể Xanh', badge: 'Δx = 3' },
+        { x: 53, y: 72, name: 'Mỏ II · Pha Lê Tím (Δy)', monsterIcon: '🔮', monsterType: 'lich', monsterName: 'Phù Thủy Pha Lê Tím', badge: 'Δy = 4' },
+        { x: 74, y: 32, name: 'Mỏ III · Lõi Năng Lượng AB', monsterIcon: '💎', monsterType: 'crystal_boss', monsterName: 'Vệ Binh Kim Cương', badge: 'AB = 5' }
       ]
     },
     defenseConfig: {
       castleName: 'Tháp Pha Lê Khoảng Cách',
       theme: 'crystal',
       waves: [
-        { name: 'Đợt 1: Golem Tinh Thể Xanh', enemies: ['goblin', 'skeleton', 'goblin'], boss: '🗿' },
-        { name: 'Đợt 2: Phù Thủy Pha Lê Tím', enemies: ['bat', 'skeleton', 'orc'], boss: '🔮' },
-        { name: 'Đợt 3: Vệ Binh Kim Cương', enemies: ['orc', 'skeleton', 'orc'], boss: '💎' }
+        { name: 'Đợt 1: Golem Tinh Thể Xanh', enemies: ['goblin', 'skeleton', 'goblin', 'bat'], boss: '🗿' },
+        { name: 'Đợt 2: Phù Thủy Pha Lê Tím', enemies: ['bat', 'skeleton', 'orc', 'skeleton'], boss: '🔮' },
+        { name: 'Đợt 3: Vệ Binh Kim Cương', enemies: ['orc', 'skeleton', 'orc', 'orc'], boss: '💎' }
       ]
     },
     challenges: [
@@ -211,8 +261,9 @@ const STAGES = [
         explain: 'Ta có Δx = xB − xA = 4 − 1 = 3.',
         label: 'Mỏ I · Pha lê X · Tinh thể xanh',
         roleAssign: 'Thành viên 1 khai thác Pha lê Xanh (Δx = 4 − 1)',
-        monster: { icon: '🗿', name: 'Golem Tinh Thể Xanh', hp: 130 },
-        keyBadge: 'Δx=3'
+        monster: { icon: '🗿', type: 'golem', name: 'Golem Tinh Thể Xanh', hp: 140 },
+        keyBadge: 'Δx=3',
+        highlightAxis: 'x'
       },
       {
         prompt: 'Với hai điểm A(1; 2; −1) và B(4; 6; −1), hiệu tung độ Δy = yB − yA bằng bao nhiêu?',
@@ -223,8 +274,9 @@ const STAGES = [
         explain: 'Ta có Δy = yB − yA = 6 − 2 = 4.',
         label: 'Mỏ II · Pha lê Y · Tinh thể tím',
         roleAssign: 'Thành viên 2 khai thác Pha lê Tím (Δy = 6 − 2)',
-        monster: { icon: '🔮', name: 'Phù Thủy Pha Lê Tím', hp: 150 },
-        keyBadge: 'Δy=4'
+        monster: { icon: '🔮', type: 'lich', name: 'Phù Thủy Pha Lê Tím', hp: 165 },
+        keyBadge: 'Δy=4',
+        highlightAxis: 'y'
       },
       {
         prompt: 'Biết Δx = 3, Δy = 4 và Δz = (−1) − (−1) = 0. Độ dài đoạn thẳng AB bằng bao nhiêu?',
@@ -235,8 +287,9 @@ const STAGES = [
         explain: 'Ta có AB = √(3² + 4² + 0²) = √(9 + 16 + 0) = √25 = 5.',
         label: 'Mỏ III · Rèn Lõi Năng Lượng AB',
         roleAssign: 'Thành viên 3 & Đội trưởng tính √(3² + 4² + 0²)',
-        monster: { icon: '💎', name: 'Vệ Binh Kim Cương', hp: 180 },
-        keyBadge: 'AB=5'
+        monster: { icon: '💎', type: 'crystal_boss', name: 'Vệ Binh Kim Cương', hp: 200 },
+        keyBadge: 'AB=5',
+        highlightAxis: 'all'
       }
     ]
   },
@@ -244,15 +297,17 @@ const STAGES = [
     id: 4,
     gameType: 'maze',
     defaultMode: 'hunt',
-    title: 'THÁM HIỂM MÊ CUNG TRUNG ĐIỂM',
+    title: 'MÊ CUNG TRUNG ĐIỂM',
+    subtitle: 'Giải Mã Tọa Độ Trung Điểm I',
     place: 'Mê Cung Không Gian',
     icon: '🌀',
+    biomeColor: '#06b6d4',
     tag: 'Tọa độ trung điểm đoạn thẳng',
     time: '6–7 phút',
     item: 'Bản đồ mê cung',
     digit: '2',
     digitRule: 'Lấy hoành độ trung điểm xI = 2.',
-    story: 'Cả đội đang đứng giữa Mê Cung Không Gian cổ đại với những bức tường đá đan xen. Hãy dẫn đường cho nhân vật luồn lách qua các ngã rẽ tới 3 Cổng Không Gian (xI, yI, zI), giải mã tọa độ trung điểm I của đoạn thẳng AB để mở lối thoát!',
+    story: 'Cả đội đang đứng giữa Mê Cung Không Gian Atlantis với những bức tường đá cổ đại đan xen. Hãy dẫn đường cho nhân vật luồn lách qua các ngã rẽ tới 3 Cổng Dịch Chuyển (xI, yI, zI), giải mã tọa độ trung điểm I của đoạn thẳng AB để mở lối thoát!',
     groupTask: '3 thành viên tính trung bình cộng từng trục (xA+xB)/2, (yA+yB)/2, (zA+zB)/2; Đội trưởng tìm đường vượt mê cung.',
     teamRoles: [
       '🚪 Thành viên 1: Tính hoành độ trung điểm xI = (xA + xB) / 2',
@@ -260,15 +315,28 @@ const STAGES = [
       '🚪 Thành viên 3: Tính cao độ trung điểm zI = (zA + zB) / 2',
       '👑 Đội trưởng: Dẫn đường vượt tường mê cung & mở 3 Cổng Không Gian'
     ],
+    visual3D: {
+      title: 'Mô phỏng 3D: Trung điểm I(2; 0; 2) của A(0; −2; 4) và B(4; 2; 0)',
+      type: 'midpointI',
+      points: [
+        { label: 'A(0;−2;4)', x: 0, y: -2, z: 4, color: '#38bdf8' },
+        { label: 'I(2;0;2)', x: 2, y: 0, z: 2, color: '#facc15' },
+        { label: 'B(4;2;0)', x: 4, y: 2, z: 0, color: '#f472b6' }
+      ],
+      vectors: [
+        { from: [0, -2, 4], to: [4, 2, 0], label: 'Đoạn thẳng AB', color: '#2dd4bf' }
+      ],
+      formula: 'I = ( (xA+xB)/2 ; (yA+yB)/2 ; (zA+zB)/2 )'
+    },
     huntMap: {
       theme: 'maze',
-      worldTitle: 'BẢN ĐỒ MÊ CUNG TRUNG ĐIỂM I(x;y;z)',
-      spawn: { x: 12, y: 50 },
-      chest: { x: 88, y: 50, name: 'Rương Bản Đồ Mê Cung' },
+      worldTitle: 'MÊ CUNG TRUNG ĐIỂM I(x; y; z)',
+      spawn: { x: 11, y: 50 },
+      chest: { x: 89, y: 50, name: 'Rương Bản Đồ Mê Cung' },
       stations: [
-        { x: 30, y: 22, name: 'Cổng I · Ngã Rẽ Hoành Độ xI', monsterIcon: '👻', monsterName: 'Bóng Ma Ngã Rẽ X', badge: 'xI = 2' },
-        { x: 52, y: 76, name: 'Cổng II · Ngã Rẽ Tung Độ yI', monsterIcon: '🦇', monsterName: 'Dơi Canh Cổng Y', badge: 'yI = 0' },
-        { x: 74, y: 24, name: 'Cổng III · Cửa Thoát Cao Độ zI', monsterIcon: '🐺', monsterName: 'Sói Không Gian Z', badge: 'zI = 2' }
+        { x: 30, y: 22, name: 'Cổng I · Ngã Rẽ Hoành Độ xI', monsterIcon: '👻', monsterType: 'wraith', monsterName: 'Bóng Ma Ngã Rẽ X', badge: 'xI = 2' },
+        { x: 52, y: 78, name: 'Cổng II · Ngã Rẽ Tung Độ yI', monsterIcon: '🦇', monsterType: 'vampire_bat', monsterName: 'Dơi Huyết Không Gian Y', badge: 'yI = 0' },
+        { x: 74, y: 24, name: 'Cổng III · Cửa Thoát Cao Độ zI', monsterIcon: '🐺', monsterType: 'fenrir', monsterName: 'Sói Thần Không Gian Z', badge: 'zI = 2' }
       ]
     },
     defenseConfig: {
@@ -277,7 +345,7 @@ const STAGES = [
       waves: [
         { name: 'Đợt 1: Bóng Ma Ngã Rẽ X', enemies: ['bat', 'goblin', 'bat', 'skeleton'], boss: '👻' },
         { name: 'Đợt 2: Dơi Canh Cổng Y', enemies: ['bat', 'skeleton', 'bat', 'orc'], boss: '🦇' },
-        { name: 'Đợt 3: Sói Không Gian Z', enemies: ['skeleton', 'orc', 'skeleton', 'bat'], boss: '🐺' }
+        { name: 'Đợt 3: Sói Thần Không Gian Z', enemies: ['skeleton', 'orc', 'skeleton', 'bat'], boss: '🐺' }
       ]
     },
     challenges: [
@@ -290,8 +358,9 @@ const STAGES = [
         explain: 'Ta có xI = (xA + xB) / 2 = (0 + 4) / 2 = 2.',
         label: 'Ngã rẽ X · Cánh cửa thứ nhất',
         roleAssign: 'Thành viên 1 tính nhanh (0 + 4) / 2',
-        monster: { icon: '👻', name: 'Bóng Ma Ngã Rẽ X', hp: 140 },
-        keyBadge: 'xI=2'
+        monster: { icon: '👻', type: 'wraith', name: 'Bóng Ma Ngã Rẽ X', hp: 150 },
+        keyBadge: 'xI=2',
+        highlightAxis: 'x'
       },
       {
         prompt: 'Với A(0; −2; 4) và B(4; 2; 0), tung độ yI của trung điểm I bằng bao nhiêu?',
@@ -302,8 +371,9 @@ const STAGES = [
         explain: 'Ta có yI = (yA + yB) / 2 = (−2 + 2) / 2 = 0.',
         label: 'Ngã rẽ Y · Cánh cửa thứ hai',
         roleAssign: 'Thành viên 2 tính (−2 + 2) / 2',
-        monster: { icon: '🦇', name: 'Dơi Canh Cổng Y', hp: 160 },
-        keyBadge: 'yI=0'
+        monster: { icon: '🦇', type: 'vampire_bat', name: 'Dơi Huyết Không Gian Y', hp: 175 },
+        keyBadge: 'yI=0',
+        highlightAxis: 'y'
       },
       {
         prompt: 'Với A(0; −2; 4) và B(4; 2; 0), cao độ zI của trung điểm I bằng bao nhiêu?',
@@ -314,8 +384,9 @@ const STAGES = [
         explain: 'Ta có zI = (zA + zB) / 2 = (4 + 0) / 2 = 2. Vậy trung điểm I(2; 0; 2)!',
         label: 'Ngã rẽ Z · Cửa thoát mê cung',
         roleAssign: 'Thành viên 3 tính (4 + 0) / 2 & Đội trưởng chốt I(2; 0; 2)',
-        monster: { icon: '🐺', name: 'Sói Không Gian Z', hp: 190 },
-        keyBadge: 'zI=2'
+        monster: { icon: '🐺', type: 'fenrir', name: 'Sói Thần Không Gian Z', hp: 205 },
+        keyBadge: 'zI=2',
+        highlightAxis: 'z'
       }
     ]
   },
@@ -323,15 +394,17 @@ const STAGES = [
     id: 5,
     gameType: 'boss',
     defaultMode: 'defense',
-    title: 'ĐẠI CHIẾN BOSS: BÓNG ĐEN LÃNG QUÊN',
+    title: 'THÀNH TRÌ BÓNG ĐEN CUỐI CÙNG',
+    subtitle: 'Đại Chiến Boss Hai Vectơ Cùng Phương',
     place: 'Thành Trì Cuối Cùng',
     icon: '🐲',
+    biomeColor: '#f43f5e',
     tag: 'Điều kiện hai vectơ cùng phương',
     time: '7–8 phút',
     item: 'Chìa khóa Lõi Trí Tuệ',
     digit: '4',
     digitRule: 'Lấy giá trị tham số m = 4 khi hai vectơ cùng phương.',
-    story: 'Boss cuối "Bóng Đen Lãng Quên" cùng đại quân Orc & Rồng Hắc Ám đang tổng tấn công Thành Trì Cuối Cùng! Boss mang 3 lớp giáp tương ứng với bài toán Hai Vectơ Cùng Phương (u = k·v). Hãy hợp sức giải toán, nâng cấp tối đa 3 Anh Hùng và tung toàn bộ Kỹ năng để phá vỡ 3 lớp giáp của Boss!',
+    story: 'Boss cuối "Bóng Đen Lãng Quên" cùng đại quân Rồng Hắc Ám đang tổng tấn công Thành Trì Cuối Cùng! Boss mang 3 lớp giáp tương ứng với bài toán Hai Vectơ Cùng Phương (u = k·v). Hãy hợp sức giải toán, nâng cấp tối đa 3 Anh Hùng và kích hoạt Đại Bác Laser phá vỡ 3 lớp giáp của Boss!',
     groupTask: 'TV1 tìm hệ số tỉ lệ k, TV2 tìm tham số m, TV3 kiểm tra cặp vectơ cùng phương; Đội trưởng chỉ huy chiến trường Thủ Thành.',
     teamRoles: [
       '⚔️ Thành viên 1: Tìm hệ số tỉ lệ k từ hai tọa độ đã biết (u = k·v)',
@@ -339,15 +412,27 @@ const STAGES = [
       '⚡ Thành viên 3: Kiểm tra bộ ba tỉ lệ x₁/x₂ = y₁/y₂ = z₁/z₂',
       '👑 Đội trưởng: Nâng cấp tối đa Anh Hùng, bật Khiên Thành & Mưa Tên diệt Boss'
     ],
+    visual3D: {
+      title: 'Mô phỏng 3D: Hai vectơ cùng phương u = (4; 2; 4) = 2 · v(2; 1; 2)',
+      type: 'collinear',
+      points: [
+        { label: 'O(0;0;0)', x: 0, y: 0, z: 0, color: '#ffffff' }
+      ],
+      vectors: [
+        { from: [0, 0, 0], to: [4, 2, 4], label: 'u = (4; 2; 4) = 2v', color: '#f43f5e' },
+        { from: [0, 0, 0], to: [2, 1, 2], label: 'v = (2; 1; 2)', color: '#facc15' }
+      ],
+      formula: 'u cùng phương v ⇔ u = k · v ⇔ x₁/x₂ = y₁/y₂ = z₁/z₂ = k'
+    },
     huntMap: {
       theme: 'citadel',
-      worldTitle: 'BẢN ĐỒ THÀNH TRÌ BÓNG ĐEN CUỐI CÙNG',
-      spawn: { x: 14, y: 50 },
-      chest: { x: 86, y: 50, name: 'Rương Chìa Khóa Lõi Trí Tuệ' },
+      worldTitle: 'THÀNH TRÌ BÓNG ĐEN CUỐI CÙNG',
+      spawn: { x: 12, y: 50 },
+      chest: { x: 88, y: 50, name: 'Rương Chìa Khóa Lõi Trí Tuệ' },
       stations: [
-        { x: 34, y: 28, name: 'Giáp I · Tiền Đồn Hệ Số k', monsterIcon: '⚔️', monsterName: 'Kỵ Sĩ Hắc Ám (Lớp Giáp 1)', badge: 'k = 2' },
-        { x: 56, y: 72, name: 'Giáp II · Pháp Trận Tham Số m', monsterIcon: '🔥', monsterName: 'Pháp Sư Hắc Ám (Lớp Giáp 2)', badge: 'm = 4' },
-        { x: 75, y: 34, name: 'Giáp III · Điện Thờ Rồng Boss', monsterIcon: '🐲', monsterName: 'Boss Bóng Đen Lãng Quên', badge: 'u = 2v' }
+        { x: 34, y: 26, name: 'Giáp I · Tiền Đồn Hệ Số k', monsterIcon: '⚔️', monsterType: 'dark_knight', monsterName: 'Kỵ Sĩ Hắc Ám (Lớp Giáp 1)', badge: 'k = 2' },
+        { x: 56, y: 74, name: 'Giáp II · Pháp Trận Tham Số m', monsterIcon: '🔥', monsterType: 'warlock', monsterName: 'Pháp Sư Lửa Đen (Lớp Giáp 2)', badge: 'm = 4' },
+        { x: 75, y: 32, name: 'Giáp III · Điện Thờ Rồng Boss', monsterIcon: '🐲', monsterType: 'dragon_boss', monsterName: 'Boss Bóng Đen Lãng Quên', badge: 'u = 2v' }
       ]
     },
     defenseConfig: {
@@ -369,8 +454,9 @@ const STAGES = [
         explain: 'Vì u = k·v nên ta có 2 = k·1 và 4 = k·2, suy ra hệ số tỉ lệ k = 2. Lớp giáp thứ nhất của Boss đã vỡ!',
         label: 'Phá giáp 1 · Xác định hệ số tỉ lệ k',
         roleAssign: 'Thành viên 1 lập tỉ số y_u / y_v = 2 / 1 = 4 / 2',
-        monster: { icon: '⚔️', name: 'Kỵ Sĩ Hắc Ám (Giáp 1)', hp: 180 },
-        keyBadge: 'k=2'
+        monster: { icon: '⚔️', type: 'dark_knight', name: 'Kỵ Sĩ Hắc Ám (Giáp 1)', hp: 190 },
+        keyBadge: 'k=2',
+        highlightAxis: 'y'
       },
       {
         prompt: 'Với u = (m; 2; 4), v = (2; 1; 2) cùng phương và hệ số tỉ lệ k = 2 (tức u = 2v), giá trị của tham số m bằng bao nhiêu?',
@@ -381,8 +467,9 @@ const STAGES = [
         explain: 'Ta có m = k × 2 = 2 × 2 = 4. Lớp giáp thứ hai của Boss đã bị xuyên thủng!',
         label: 'Phá giáp 2 · Tìm tham số m',
         roleAssign: 'Thành viên 2 tính m = k × x_v = 2 × 2',
-        monster: { icon: '🔥', name: 'Pháp Sư Hắc Ám (Giáp 2)', hp: 220 },
-        keyBadge: 'm=4'
+        monster: { icon: '🔥', type: 'warlock', name: 'Pháp Sư Lửa Đen (Giáp 2)', hp: 230 },
+        keyBadge: 'm=4',
+        highlightAxis: 'x'
       },
       {
         prompt: 'Khi m = 4, cặp vectơ nào dưới đây là hai vectơ cùng phương?',
@@ -393,8 +480,9 @@ const STAGES = [
         explain: 'Vì (4; 2; 4) = 2 × (2; 1; 2) nên hai vectơ cùng phương. Boss Bóng Đen Lãng Quên đã bị đánh bại hoàn toàn!',
         label: 'Phá giáp 3 · Đòn quyết định hạ Boss',
         roleAssign: 'Cả đội đồng thanh kiểm tra tỉ lệ 4/2 = 2/1 = 4/2 = 2',
-        monster: { icon: '🐲', name: 'Boss Bóng Đen Lãng Quên', hp: 300 },
-        keyBadge: 'BOSS💥'
+        monster: { icon: '🐲', type: 'dragon_boss', name: 'Boss Bóng Đen Lãng Quên', hp: 320 },
+        keyBadge: 'BOSS💥',
+        highlightAxis: 'all'
       }
     ]
   }

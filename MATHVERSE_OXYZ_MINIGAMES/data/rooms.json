@@ -1,0 +1,810 @@
+{
+  "123456": {
+    "id": "123456",
+    "teacherToken": "DEMO_GV",
+    "createdAt": "2026-11-02T16:41:54.003Z",
+    "paused": false,
+    "clock": {
+      "minutes": 45,
+      "remainingMs": 2700000,
+      "running": false,
+      "startedAt": 0
+    },
+    "teams": [
+      {
+        "name": "Rồng Xanh",
+        "avatar": "🐉",
+        "color": "#36C6E8",
+        "id": "doi-1",
+        "code": "1111",
+        "token": "DEMO_DOI_1",
+        "stage": 5,
+        "round": 0,
+        "health": 3,
+        "wrong": 13,
+        "score": 120,
+        "bonus": 0,
+        "gold": 1540,
+        "heroLevel": 5,
+        "upgrades": {
+          "damage": 3,
+          "speed": 2,
+          "hp": 1,
+          "regen": 1
+        },
+        "completed": true,
+        "finishedAt": "2026-11-03T00:04:12.636Z",
+        "attempts": [
+          1,
+          3,
+          2,
+          7,
+          0
+        ],
+        "hintsUsed": [
+          false,
+          false,
+          false,
+          true,
+          false
+        ],
+        "digits": [
+          {
+            "stage": 1,
+            "digit": "3",
+            "rule": "Lấy hiệu hoành độ xB − xA = 5 − 2 = 3.",
+            "item": "La bàn ba trục"
+          },
+          {
+            "stage": 2,
+            "digit": "0",
+            "rule": "Lấy kết quả tích vô hướng của đợt tấn công đầu tiên (u·v = 0).",
+            "item": "Khiên trực giao"
+          },
+          {
+            "stage": 3,
+            "digit": "5",
+            "rule": "Lấy độ dài đoạn thẳng AB = 5.",
+            "item": "Tinh thể khoảng cách"
+          },
+          {
+            "stage": 4,
+            "digit": "2",
+            "rule": "Lấy hoành độ trung điểm xI = 2.",
+            "item": "Bản đồ mê cung"
+          },
+          {
+            "stage": 5,
+            "digit": "4",
+            "rule": "Lấy giá trị tham số m = 4 khi hai vectơ cùng phương.",
+            "item": "Chìa khóa Lõi Trí Tuệ"
+          }
+        ]
+      },
+      {
+        "name": "Tia Chớp",
+        "avatar": "⚡",
+        "color": "#FFC857",
+        "id": "doi-2",
+        "code": "2222",
+        "token": "DEMO_DOI_2",
+        "stage": 0,
+        "round": 0,
+        "health": 3,
+        "wrong": 0,
+        "score": 0,
+        "bonus": 0,
+        "gold": 120,
+        "heroLevel": 1,
+        "upgrades": {
+          "damage": 1,
+          "speed": 1,
+          "hp": 1,
+          "regen": 1
+        },
+        "completed": false,
+        "finishedAt": null,
+        "attempts": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "hintsUsed": [
+          false,
+          false,
+          false,
+          false,
+          false
+        ],
+        "digits": []
+      },
+      {
+        "name": "Phượng Hoàng",
+        "avatar": "🔥",
+        "color": "#FF758F",
+        "id": "doi-3",
+        "code": "3333",
+        "token": "DEMO_DOI_3",
+        "stage": 0,
+        "round": 0,
+        "health": 3,
+        "wrong": 0,
+        "score": 0,
+        "bonus": 0,
+        "gold": 120,
+        "heroLevel": 1,
+        "upgrades": {
+          "damage": 1,
+          "speed": 1,
+          "hp": 1,
+          "regen": 1
+        },
+        "completed": false,
+        "finishedAt": null,
+        "attempts": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "hintsUsed": [
+          false,
+          false,
+          false,
+          false,
+          false
+        ],
+        "digits": []
+      },
+      {
+        "name": "Ngôi Sao",
+        "avatar": "🌟",
+        "color": "#AB8CFF",
+        "id": "doi-4",
+        "code": "4444",
+        "token": "DEMO_DOI_4",
+        "stage": 0,
+        "round": 0,
+        "health": 3,
+        "wrong": 0,
+        "score": 0,
+        "bonus": 0,
+        "gold": 120,
+        "heroLevel": 1,
+        "upgrades": {
+          "damage": 1,
+          "speed": 1,
+          "hp": 1,
+          "regen": 1
+        },
+        "completed": false,
+        "finishedAt": null,
+        "attempts": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "hintsUsed": [
+          false,
+          false,
+          false,
+          false,
+          false
+        ],
+        "digits": []
+      },
+      {
+        "name": "Cáo Thông Thái",
+        "avatar": "🦊",
+        "color": "#FF9B57",
+        "id": "doi-5",
+        "code": "5555",
+        "token": "DEMO_DOI_5",
+        "stage": 0,
+        "round": 0,
+        "health": 3,
+        "wrong": 0,
+        "score": 0,
+        "bonus": 0,
+        "gold": 120,
+        "heroLevel": 1,
+        "upgrades": {
+          "damage": 1,
+          "speed": 1,
+          "hp": 1,
+          "regen": 1
+        },
+        "completed": false,
+        "finishedAt": null,
+        "attempts": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "hintsUsed": [
+          false,
+          false,
+          false,
+          false,
+          false
+        ],
+        "digits": []
+      },
+      {
+        "name": "Mặt Trăng",
+        "avatar": "🌙",
+        "color": "#9DC4FF",
+        "id": "doi-6",
+        "code": "6666",
+        "token": "DEMO_DOI_6",
+        "stage": 0,
+        "round": 0,
+        "health": 3,
+        "wrong": 0,
+        "score": 0,
+        "bonus": 0,
+        "gold": 120,
+        "heroLevel": 1,
+        "upgrades": {
+          "damage": 1,
+          "speed": 1,
+          "hp": 1,
+          "regen": 1
+        },
+        "completed": false,
+        "finishedAt": null,
+        "attempts": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "hintsUsed": [
+          false,
+          false,
+          false,
+          false,
+          false
+        ],
+        "digits": []
+      }
+    ],
+    "events": [
+      {
+        "at": "2026-11-02T16:41:54.003Z",
+        "text": "NOVA đã mở sẵn phòng 123456 (6 đội, mã PIN 1111 → 6666)."
+      },
+      {
+        "at": "2026-11-02T16:42:19.926Z",
+        "text": "🐉 Rồng Xanh đã hạ mục tiêu lượt 1/3 tại Rừng Vectơ Nguyên Sinh (+120 Vàng)."
+      },
+      {
+        "at": "2026-11-02T16:42:26.179Z",
+        "text": "🐉 Rồng Xanh đã hạ mục tiêu lượt 2/3 tại Rừng Vectơ Nguyên Sinh (+120 Vàng)."
+      },
+      {
+        "at": "2026-11-02T16:42:30.893Z",
+        "text": "🐉 Rồng Xanh trả lời chưa đúng lượt 3 ở Rừng Vectơ Nguyên Sinh; còn 2 khiên."
+      },
+      {
+        "at": "2026-11-02T16:42:35.037Z",
+        "text": "🐉 Rồng Xanh đã VƯỢT CHẶNG 1: Rừng Vectơ Nguyên Sinh. +12 XP, +200 Vàng và mảnh mã 3."
+      },
+      {
+        "at": "2026-11-02T23:53:03.114Z",
+        "text": "🐉 Rồng Xanh nâng cấp Sát thương Anh Hùng lên Lv.2."
+      },
+      {
+        "at": "2026-11-02T23:53:04.299Z",
+        "text": "🐉 Rồng Xanh trả lời chưa đúng lượt 1 ở Pháo Đài Vuông Góc; còn 2 khiên."
+      },
+      {
+        "at": "2026-11-02T23:53:07.906Z",
+        "text": "🐉 Rồng Xanh đã hạ mục tiêu lượt 1/3 tại Pháo Đài Vuông Góc (+120 Vàng)."
+      },
+      {
+        "at": "2026-11-02T23:53:14.308Z",
+        "text": "🐉 Rồng Xanh đã hạ mục tiêu lượt 2/3 tại Pháo Đài Vuông Góc (+120 Vàng)."
+      },
+      {
+        "at": "2026-11-02T23:53:16.980Z",
+        "text": "🐉 Rồng Xanh nâng cấp Tốc độ bắn lên Lv.2."
+      },
+      {
+        "at": "2026-11-02T23:53:19.965Z",
+        "text": "🐉 Rồng Xanh trả lời chưa đúng lượt 3 ở Pháo Đài Vuông Góc; còn 1 khiên."
+      },
+      {
+        "at": "2026-11-02T23:53:22.004Z",
+        "text": "🐉 Rồng Xanh trả lời chưa đúng lượt 3 ở Pháo Đài Vuông Góc; còn 0 khiên."
+      },
+      {
+        "at": "2026-11-02T23:53:23.697Z",
+        "text": "🐉 Rồng Xanh đã VƯỢT CHẶNG 2: Pháo Đài Vuông Góc. +8 XP, +200 Vàng và mảnh mã 0."
+      },
+      {
+        "at": "2026-11-02T23:53:35.852Z",
+        "text": "🐉 Rồng Xanh trả lời chưa đúng lượt 1 ở Tháp Pha Lê; còn 2 khiên."
+      },
+      {
+        "at": "2026-11-02T23:53:39.046Z",
+        "text": "🐉 Rồng Xanh trả lời chưa đúng lượt 1 ở Tháp Pha Lê; còn 1 khiên."
+      },
+      {
+        "at": "2026-11-02T23:53:41.774Z",
+        "text": "🐉 Rồng Xanh đã hạ mục tiêu lượt 1/3 tại Tháp Pha Lê (+120 Vàng)."
+      },
+      {
+        "at": "2026-11-02T23:53:48.948Z",
+        "text": "🐉 Rồng Xanh đã hạ mục tiêu lượt 2/3 tại Tháp Pha Lê (+120 Vàng)."
+      },
+      {
+        "at": "2026-11-02T23:55:07.883Z",
+        "text": "🐉 Rồng Xanh đã VƯỢT CHẶNG 3: Tháp Pha Lê. +12 XP, +200 Vàng và mảnh mã 5."
+      },
+      {
+        "at": "2026-11-02T23:55:11.947Z",
+        "text": "🐉 Rồng Xanh trả lời chưa đúng lượt 1 ở Mê Cung Không Gian; còn 2 khiên."
+      },
+      {
+        "at": "2026-11-02T23:55:15.010Z",
+        "text": "🐉 Rồng Xanh trả lời chưa đúng lượt 1 ở Mê Cung Không Gian; còn 1 khiên."
+      },
+      {
+        "at": "2026-11-02T23:55:17.535Z",
+        "text": "🐉 Rồng Xanh đã hạ mục tiêu lượt 1/3 tại Mê Cung Không Gian (+120 Vàng)."
+      },
+      {
+        "at": "2026-11-02T23:55:58.679Z",
+        "text": "🐉 Rồng Xanh trả lời chưa đúng lượt 2 ở Mê Cung Không Gian; còn 0 khiên."
+      },
+      {
+        "at": "2026-11-02T23:56:01.918Z",
+        "text": "🐉 Rồng Xanh trả lời chưa đúng lượt 2 ở Mê Cung Không Gian; còn 0 khiên."
+      },
+      {
+        "at": "2026-11-02T23:56:04.777Z",
+        "text": "🐉 Rồng Xanh trả lời chưa đúng lượt 2 ở Mê Cung Không Gian; còn 0 khiên."
+      },
+      {
+        "at": "2026-11-02T23:56:07.272Z",
+        "text": "🐉 Rồng Xanh đã hạ mục tiêu lượt 2/3 tại Mê Cung Không Gian (+120 Vàng)."
+      },
+      {
+        "at": "2026-11-02T23:56:19.126Z",
+        "text": "🐉 Rồng Xanh xin gợi ý ở chặng 4 · lượt 3."
+      },
+      {
+        "at": "2026-11-02T23:56:22.453Z",
+        "text": "🐉 Rồng Xanh trả lời chưa đúng lượt 3 ở Mê Cung Không Gian; còn 0 khiên."
+      },
+      {
+        "at": "2026-11-02T23:56:25.492Z",
+        "text": "🐉 Rồng Xanh trả lời chưa đúng lượt 3 ở Mê Cung Không Gian; còn 0 khiên."
+      },
+      {
+        "at": "2026-11-02T23:56:27.884Z",
+        "text": "🐉 Rồng Xanh đã VƯỢT CHẶNG 4: Mê Cung Không Gian. +8 XP, +200 Vàng và mảnh mã 2."
+      },
+      {
+        "at": "2026-11-02T23:56:45.482Z",
+        "text": "🐉 Rồng Xanh nâng cấp Sát thương Anh Hùng lên Lv.3."
+      },
+      {
+        "at": "2026-11-02T23:58:48.101Z",
+        "text": "🐉 Rồng Xanh đang giải mật thư cuối."
+      },
+      {
+        "at": "2026-11-03T00:00:34.339Z",
+        "text": "🐉 Rồng Xanh đang giải mật thư cuối."
+      },
+      {
+        "at": "2026-11-03T00:01:07.509Z",
+        "text": "🐉 Rồng Xanh đang giải mật thư cuối."
+      },
+      {
+        "at": "2026-11-03T00:02:03.455Z",
+        "text": "🐉 Rồng Xanh đang giải mật thư cuối."
+      },
+      {
+        "at": "2026-11-03T00:03:18.963Z",
+        "text": "🐉 Rồng Xanh đang giải mật thư cuối."
+      },
+      {
+        "at": "2026-11-03T00:04:12.636Z",
+        "text": "🏆 Rồng Xanh đã mở Lõi Tri Thức! +20 điểm giải mã."
+      },
+      {
+        "at": "2026-11-03T00:07:38.313Z",
+        "text": "GV ghi nhận Rồng Xanh: 0 điểm hợp tác."
+      }
+    ]
+  },
+  "144807": {
+    "id": "144807",
+    "teacherToken": "3df70653845207df0463f8ab36b2739dec999d55a6ba83f5",
+    "createdAt": "2026-11-02T16:40:45.259Z",
+    "paused": false,
+    "clock": {
+      "minutes": 45,
+      "remainingMs": 2700000,
+      "running": false,
+      "startedAt": 0
+    },
+    "teams": [
+      {
+        "name": "Rồng Xanh",
+        "avatar": "🐉",
+        "color": "#36C6E8",
+        "id": "doi-1",
+        "code": "5638",
+        "token": "b07de94b25415a324ef807b9f374d8ae",
+        "stage": 0,
+        "round": 0,
+        "health": 3,
+        "wrong": 0,
+        "score": 0,
+        "bonus": 0,
+        "gold": 100,
+        "heroLevel": 1,
+        "upgrades": {
+          "damage": 1,
+          "speed": 1,
+          "hp": 1,
+          "regen": 1
+        },
+        "completed": false,
+        "finishedAt": null,
+        "attempts": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "hintsUsed": [
+          false,
+          false,
+          false,
+          false,
+          false
+        ],
+        "digits": []
+      },
+      {
+        "name": "Tia Chớp",
+        "avatar": "⚡",
+        "color": "#FFC857",
+        "id": "doi-2",
+        "code": "6080",
+        "token": "90fdcfdf151d426b0859e8e6af124c58",
+        "stage": 0,
+        "round": 0,
+        "health": 3,
+        "wrong": 0,
+        "score": 0,
+        "bonus": 0,
+        "gold": 100,
+        "heroLevel": 1,
+        "upgrades": {
+          "damage": 1,
+          "speed": 1,
+          "hp": 1,
+          "regen": 1
+        },
+        "completed": false,
+        "finishedAt": null,
+        "attempts": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "hintsUsed": [
+          false,
+          false,
+          false,
+          false,
+          false
+        ],
+        "digits": []
+      },
+      {
+        "name": "Phượng Hoàng",
+        "avatar": "🔥",
+        "color": "#FF758F",
+        "id": "doi-3",
+        "code": "9600",
+        "token": "0d6dbcffbad87aa749f8c5d9d1ac7bbe",
+        "stage": 0,
+        "round": 0,
+        "health": 3,
+        "wrong": 0,
+        "score": 0,
+        "bonus": 0,
+        "gold": 100,
+        "heroLevel": 1,
+        "upgrades": {
+          "damage": 1,
+          "speed": 1,
+          "hp": 1,
+          "regen": 1
+        },
+        "completed": false,
+        "finishedAt": null,
+        "attempts": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "hintsUsed": [
+          false,
+          false,
+          false,
+          false,
+          false
+        ],
+        "digits": []
+      },
+      {
+        "name": "Ngôi Sao",
+        "avatar": "🌟",
+        "color": "#AB8CFF",
+        "id": "doi-4",
+        "code": "2758",
+        "token": "95bb3064713f94000f6e8b5bfda9c6ac",
+        "stage": 0,
+        "round": 0,
+        "health": 3,
+        "wrong": 0,
+        "score": 0,
+        "bonus": 0,
+        "gold": 100,
+        "heroLevel": 1,
+        "upgrades": {
+          "damage": 1,
+          "speed": 1,
+          "hp": 1,
+          "regen": 1
+        },
+        "completed": false,
+        "finishedAt": null,
+        "attempts": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "hintsUsed": [
+          false,
+          false,
+          false,
+          false,
+          false
+        ],
+        "digits": []
+      }
+    ],
+    "events": [
+      {
+        "at": "2026-11-02T16:40:45.259Z",
+        "text": "NOVA đã tạo phòng 144807 với 4 đội."
+      }
+    ]
+  },
+  "695952": {
+    "id": "695952",
+    "teacherToken": "31a599bc9ee5cafc307a14aa5ddd1d36c602126bde9bad2b",
+    "createdAt": "2026-11-03T00:24:00.605Z",
+    "paused": false,
+    "clock": {
+      "minutes": 45,
+      "remainingMs": 2700000,
+      "running": false,
+      "startedAt": 0
+    },
+    "teams": [
+      {
+        "name": "Rồng Xanh",
+        "avatar": "🐉",
+        "color": "#36C6E8",
+        "id": "doi-1",
+        "code": "4040",
+        "token": "f542b6deb4635497f049a0c9eacf05a1",
+        "stage": 1,
+        "round": 0,
+        "health": 3,
+        "wrong": 0,
+        "score": 20,
+        "bonus": 0,
+        "gold": 530,
+        "heroLevel": 2,
+        "upgrades": {
+          "damage": 2,
+          "speed": 1,
+          "hp": 1,
+          "regen": 1
+        },
+        "completed": false,
+        "finishedAt": null,
+        "attempts": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "hintsUsed": [
+          false,
+          false,
+          false,
+          false,
+          false
+        ],
+        "digits": [
+          {
+            "stage": 1,
+            "digit": "3",
+            "rule": "Lấy hiệu hoành độ xB − xA = 5 − 2 = 3.",
+            "item": "La bàn ba trục"
+          }
+        ],
+        "streak": 3
+      },
+      {
+        "name": "Tia Chớp",
+        "avatar": "⚡",
+        "color": "#FFC857",
+        "id": "doi-2",
+        "code": "1989",
+        "token": "595f6d5d51a7d3eb0fc23af6b644184c",
+        "stage": 0,
+        "round": 0,
+        "health": 3,
+        "wrong": 0,
+        "score": 0,
+        "bonus": 0,
+        "gold": 100,
+        "heroLevel": 1,
+        "upgrades": {
+          "damage": 1,
+          "speed": 1,
+          "hp": 1,
+          "regen": 1
+        },
+        "completed": false,
+        "finishedAt": null,
+        "attempts": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "hintsUsed": [
+          false,
+          false,
+          false,
+          false,
+          false
+        ],
+        "digits": [],
+        "streak": 0
+      },
+      {
+        "name": "Phượng Hoàng",
+        "avatar": "🔥",
+        "color": "#FF758F",
+        "id": "doi-3",
+        "code": "3772",
+        "token": "d524a2980467aeaaabf658efdef362ec",
+        "stage": 0,
+        "round": 0,
+        "health": 3,
+        "wrong": 0,
+        "score": 0,
+        "bonus": 0,
+        "gold": 100,
+        "heroLevel": 1,
+        "upgrades": {
+          "damage": 1,
+          "speed": 1,
+          "hp": 1,
+          "regen": 1
+        },
+        "completed": false,
+        "finishedAt": null,
+        "attempts": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "hintsUsed": [
+          false,
+          false,
+          false,
+          false,
+          false
+        ],
+        "digits": [],
+        "streak": 0
+      },
+      {
+        "name": "Ngôi Sao",
+        "avatar": "🌟",
+        "color": "#AB8CFF",
+        "id": "doi-4",
+        "code": "2526",
+        "token": "8733623d09a8d7ee84d9f60f8d1a779c",
+        "stage": 0,
+        "round": 0,
+        "health": 3,
+        "wrong": 0,
+        "score": 0,
+        "bonus": 0,
+        "gold": 100,
+        "heroLevel": 1,
+        "upgrades": {
+          "damage": 1,
+          "speed": 1,
+          "hp": 1,
+          "regen": 1
+        },
+        "completed": false,
+        "finishedAt": null,
+        "attempts": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "hintsUsed": [
+          false,
+          false,
+          false,
+          false,
+          false
+        ],
+        "digits": [],
+        "streak": 0
+      }
+    ],
+    "events": [
+      {
+        "at": "2026-11-03T00:24:00.605Z",
+        "text": "NOVA đã tạo phòng 695952 với 4 đội."
+      },
+      {
+        "at": "2026-11-03T00:24:00.642Z",
+        "text": "🐉 Rồng Xanh đã hạ mục tiêu lượt 1/3 tại Rừng Vectơ Nguyên Sinh (Combo x1, +120 Vàng)."
+      },
+      {
+        "at": "2026-11-03T00:24:00.651Z",
+        "text": "🐉 Rồng Xanh đã hạ mục tiêu lượt 2/3 tại Rừng Vectơ Nguyên Sinh (Combo x2, +150 Vàng)."
+      },
+      {
+        "at": "2026-11-03T00:24:00.667Z",
+        "text": "🐉 Rồng Xanh nâng cấp Sát thương Anh Hùng lên Lv.2."
+      },
+      {
+        "at": "2026-11-03T00:24:00.668Z",
+        "text": "🐉 Rồng Xanh đã VƯỢT CHẶNG 1: Rừng Vectơ Nguyên Sinh (Combo x3). +20 XP, +260 Vàng và mảnh mã 3."
+      }
+    ]
+  }
+}

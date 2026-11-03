@@ -23,20 +23,45 @@ let ROOMS={};
 try{if(fs.existsSync(DATA)){ROOMS=JSON.parse(fs.readFileSync(DATA,'utf8')); console.log('Đã nạp',Object.keys(ROOMS).length,'phòng học');}}catch(e){console.error('Không thể nạp dữ liệu phòng:',e.message);}
 function persist(){fs.mkdirSync(path.dirname(DATA),{recursive:true});const temp=DATA+'.tmp';fs.writeFileSync(temp,JSON.stringify(ROOMS,null,2));fs.renameSync(temp,DATA);}
 function rnd(n=24){return crypto.randomBytes(n).toString('hex');}
+function seedDefaultRoom(){
+ if(ROOMS['123456'])return;
+ ROOMS['123456']={
+  id:'123456',
+  teacherToken:'DEMO_GV',
+  createdAt:new Date().toISOString(),
+  paused:false,
+  clock:{minutes:45,remainingMs:45*60*1000,running:false,startedAt:0},
+  teams:TEAM_POOL.slice(0,6).map((t,i)=>({
+   ...t,
+   id:'doi-'+(i+1),
+   code:String(i+1).repeat(4),
+   token:'DEMO_DOI_'+(i+1),
+   stage:0,round:0,health:3,wrong:0,score:0,bonus:0,
+   gold:120,heroLevel:1,upgrades:{damage:1,speed:1,hp:1,regen:1},
+   completed:false,finishedAt:null,
+   attempts:[0,0,0,0,0],hintsUsed:[false,false,false,false,false],digits:[]
+  })),
+  events:[{at:new Date().toISOString(),text:'NOVA đã mở sẵn phòng 123456 (6 đội, mã PIN 1111 → 6666).'}]
+ };
+ persist();
+}
+seedDefaultRoom();
 function ensureTeamFields(t){
- if(t.gold===undefined)t.gold=100;
+ if(t.gold===undefined)t.gold=120;
  if(t.heroLevel===undefined)t.heroLevel=1;
+ if(t.streak===undefined)t.streak=0;
  if(!t.upgrades)t.upgrades={damage:1,speed:1,hp:1,regen:1};
  return t;
 }
 function publicStage(s,round){
  const q=s.challenges[round];
- return {id:s.id,title:s.title,place:s.place,icon:s.icon,tag:s.tag,time:s.time,
+ return {id:s.id,title:s.title,subtitle:s.subtitle||'',place:s.place,icon:s.icon,tag:s.tag,time:s.time,
+  biomeColor:s.biomeColor||'#3b82f6',item:s.item||'',visual3D:s.visual3D||null,
   story:s.story,groupTask:s.groupTask,gameType:s.gameType,defaultMode:s.defaultMode||(s.id===2||s.id===5?'defense':'hunt'),
   teamRoles:s.teamRoles||[],huntMap:s.huntMap||null,defenseConfig:s.defenseConfig||null,
   allRounds:s.challenges.map((c,i)=>({index:i,label:c.label,keyBadge:c.keyBadge||`Mảnh ${i+1}`,monster:c.monster||{icon:'👾',name:'Quái Vật',hp:100}})),
   round,totalRounds:s.challenges.length,
-  challenge:{label:q.label,prompt:q.prompt,options:q.options,roleAssign:q.roleAssign||'',monster:q.monster||{icon:'👾',name:'Quái Vật Trạm',hp:120},keyBadge:q.keyBadge||'',hasShortAnswer:Boolean(q.shortAnswer)}};
+  challenge:{label:q.label,prompt:q.prompt,options:q.options,roleAssign:q.roleAssign||'',highlightAxis:q.highlightAxis||'all',monster:q.monster||{icon:'👾',name:'Quái Vật Trạm',hp:120,type:'golem'},keyBadge:q.keyBadge||'',hasShortAnswer:Boolean(q.shortAnswer)}};
 }
 function teacherStage(s){return {...s,challenges:s.challenges.map(q=>({...q,answer:String.fromCharCode(65+q.correct)}))};}
 function roomState(room,token){
@@ -46,20 +71,20 @@ function roomState(room,token){
  room.teams.forEach(ensureTeamFields);
  const teams=room.teams.map(t=>({id:t.id,name:t.name,avatar:t.avatar,color:t.color,
   stage:t.stage,round:t.round,score:t.score,bonus:t.bonus,health:t.health,wrong:t.wrong,
-  gold:t.gold,heroLevel:t.heroLevel,upgrades:t.upgrades,
+  gold:t.gold,heroLevel:t.heroLevel,streak:t.streak||0,upgrades:t.upgrades,
   completed:t.completed,finishedAt:t.finishedAt,attempts:teacher?t.attempts:undefined,
   hintsUsed:teacher?t.hintsUsed:undefined,digits:teacher?t.digits:undefined}));
  const elapsed=room.clock.running?Date.now()-room.clock.startedAt:0;
  const clock={running:room.clock.running,remainingMs:Math.max(0,room.clock.remainingMs-elapsed),minutes:room.clock.minutes};
  const base={room:room.id,role:teacher?'teacher':'student',teams,paused:room.paused,clock,
-  stages:STAGES.map(x=>({id:x.id,title:x.title,place:x.place,icon:x.icon,tag:x.tag,time:x.time,gameType:x.gameType,defaultMode:x.defaultMode,totalRounds:x.challenges.length})),
+  stages:STAGES.map(x=>({id:x.id,title:x.title,subtitle:x.subtitle||'',place:x.place,icon:x.icon,tag:x.tag,time:x.time,biomeColor:x.biomeColor||'#3b82f6',item:x.item||'',gameType:x.gameType,defaultMode:x.defaultMode,totalRounds:x.challenges.length})),
   messageOptions:MESSAGE_OPTIONS,lastEvent:room.events.slice(-15).reverse(),
   createdAt:room.createdAt,joinBaseURL:`http://${LAN_IP}:${PORT}`};
  if(teacher)return {...base,teamCodes:Object.fromEntries(room.teams.map(t=>[t.id,t.code])),
    teacherToken:room.teacherToken,missions:STAGES.map(teacherStage),cipher:'30524',cipherWords:TOKEN_WORDS};
  const cur=STAGES[team.stage];return {...base,me:{id:team.id,name:team.name,avatar:team.avatar,color:team.color,
   stage:team.stage,round:team.round,health:team.health,wrong:team.wrong,score:team.score,bonus:team.bonus,
-  gold:team.gold,heroLevel:team.heroLevel,upgrades:team.upgrades,
+  gold:team.gold,heroLevel:team.heroLevel,streak:team.streak||0,upgrades:team.upgrades,
   completed:team.completed,attempts:team.attempts,hintsUsed:team.hintsUsed,digits:team.digits,finishedAt:team.finishedAt},
   current:cur?publicStage(cur,team.round):null,cipherWords:team.stage>=5?TOKEN_WORDS:null};
 }
@@ -87,6 +112,14 @@ function processAction(endpoint,d){
   return{token:t.token,room:r.id,team:t.id};
  }
  if(endpoint==='/api/state')return roomState(r,d.token);
+ if(endpoint==='/api/demoJump'){
+  const t=requireTeam(r,d.token);
+  const stg=Math.max(0,Math.min(5,Number(d.stage)||0));
+  t.stage=stg;t.round=0;t.health=3;t.completed=false;
+  t.digits=STAGES.slice(0,stg).map((s,idx)=>({stage:idx+1,digit:s.digit,rule:s.digitRule,item:s.item}));
+  t.score=stg*20;
+  persist();return{ok:true};
+ }
  if(endpoint==='/api/answer'){
   const t=requireTeam(r,d.token);if(r.paused)throw error('Giáo viên đang tạm dừng trò chơi.');
   if(t.completed||t.stage>=5)throw error('Đội đã vượt qua 5 trạm, hãy giải mật thư cuối.');
@@ -105,7 +138,9 @@ function processAction(endpoint,d){
    isCorrect=(choice===q.correct);
   }
   if(isCorrect){
-   t.round++;let pts=0,digit=null,goldEarned=120;
+   t.streak=(t.streak||0)+1;
+   const comboBonus=Math.min(4,t.streak-1)*30;
+   t.round++;let pts=0,digit=null,goldEarned=120+comboBonus;
    t.gold=(t.gold||100)+goldEarned;
    if(t.round>=s.challenges.length){
     pts=t.attempts[idx]===0&&!t.hintsUsed[idx]?20:t.attempts[idx]<=2?12:8;
@@ -113,18 +148,19 @@ function processAction(endpoint,d){
     t.heroLevel=Math.min(6,(t.heroLevel||1)+1);
     digit=s.digit;
     t.digits.push({stage:idx+1,digit:s.digit,rule:s.digitRule,item:s.item});
-    emit(r,`${t.avatar} ${t.name} đã VƯỢT CHẶNG ${idx+1}: ${s.place}. +${pts} XP, +200 Vàng và mảnh mã ${digit}.`);
+    emit(r,`${t.avatar} ${t.name} đã VƯỢT CHẶNG ${idx+1}: ${s.place} (Combo x${t.streak}). +${pts} XP, +${goldEarned+80} Vàng và mảnh mã ${digit}.`);
    }else{
-    emit(r,`${t.avatar} ${t.name} đã hạ mục tiêu lượt ${round+1}/${s.challenges.length} tại ${s.place} (+${goldEarned} Vàng).`);
+    emit(r,`${t.avatar} ${t.name} đã hạ mục tiêu lượt ${round+1}/${s.challenges.length} tại ${s.place} (Combo x${t.streak}, +${goldEarned} Vàng).`);
    }
-   persist();return{correct:true,points:pts,goldEarned,gold:t.gold,heroLevel:t.heroLevel,explain:q.explain,keyBadge:q.keyBadge,roundFinished:true,stageFinished:digit!==null,
+   persist();return{correct:true,points:pts,goldEarned,comboBonus,streak:t.streak,gold:t.gold,heroLevel:t.heroLevel,explain:q.explain,keyBadge:q.keyBadge,roundFinished:true,stageFinished:digit!==null,
      digit,digitRule:digit!==null?s.digitRule:undefined,item:digit!==null?s.item:undefined,
      nextRound:t.round,nextStage:t.stage,health:t.health,score:t.score};
   }
+  t.streak=0;
   t.attempts[idx]++;t.wrong++;t.health=Math.max(0,t.health-1);
   const attempt=t.attempts[idx];const hint=q.hints[Math.min(attempt-1,q.hints.length-1)];
   emit(r,`${t.avatar} ${t.name} trả lời chưa đúng lượt ${round+1} ở ${s.place}; còn ${t.health} khiên.`);
-  persist();return{correct:false,hint,tries:attempt,health:t.health,gold:t.gold};
+  persist();return{correct:false,streak:0,hint,tries:attempt,health:t.health,gold:t.gold};
  }
  if(endpoint==='/api/upgrade'){
   const t=requireTeam(r,d.token);if(r.paused)throw error('Giáo viên đang tạm dừng trò chơi.');

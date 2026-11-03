@@ -26,13 +26,15 @@ Tài liệu này quản lý lộ trình tổng thể của dự án theo quy tr�
   - [x] Thiết lập quy trình chuẩn Solo Builder (`AGENTS.md`, `BRD.md`, `brief.md`, `CHANGELOG.md`).
 
 ### Phase 2: Nâng cấp 2 Game Engine Tương Tác Nhóm (Săn Kho Báu 2D & Bảo Vệ Thành Trì) `[x]`
-- **Mục tiêu:** Biến 5 chặng Oxyz thành các màn chơi tương tác trực quan, hấp dẫn dựa trên 2 mẫu game `giaoviendoimoi.com/hunt-preview/__demo__` (Săn Kho Báu 2D Map) và `giaoviensangtao.vn/play/castle-defense/thu-nghiem` (Bảo Vệ Thành Trì Real-time).
+- **Mục tiêu:** Biến 5 chặng Oxyz thành các màn chơi tương tác trực quan, hấp dẫn dựa trên 2 mẫu game `giaoviendoimoi.com/hunt-preview/__demo__` (Săn Kho Báu 2D Map) và `giaoviensangtao.vn/play/castle-defense/thu-nghiem` (Bảo Vệ Thành Trì Real-time) kết hợp **Mô phỏng Không gian 3D Oxyz**.
 - **Kết quả đạt được:**
-  - [x] Nâng cấp `stages.js`: Bổ sung cấu hình bản đồ 2D (tọa độ trạm, địa hình, quái vật canh giữ), cấu hình chiến trường Thủ Thành (3 làn đường, đợt quái vật, Boss), câu hỏi trắc nghiệm + trả lời ngắn và nhiệm vụ phân vai nhóm.
-  - [x] Nâng cấp `server.js`: Hỗ trợ chấm điểm `choice` & `shortText`, lưu trạng thái Vàng (`gold`), Cấp độ (`heroLevel`), Nâng cấp (`upgrades`) và đồng bộ với Teacher Dashboard.
-  - [x] Xây dựng **Game Engine 1 – Săn Kho Báu 2D (`HuntMapEngine`)** trong `public/app.js` & `public/style.css`.
-  - [x] Xây dựng **Game Engine 2 – Bảo Vệ Thành Trì (`CastleDefenseEngine`)** trong `public/app.js` & `public/style.css`.
-  - [x] Tích hợp nút chuyển đổi chế độ chơi (**🗺️ Săn Kho Báu 2D** $\leftrightarrow$ **🏰 Bảo Vệ Thành Trì**) ngay trên từng chặng và đồng bộ trọn vẹn sang `CHOI_THU_1_MAY.html`.
+  - [x] Nâng cấp `stages.js`: Bổ sung cấu hình bản đồ 2D (tọa độ trạm, địa hình, quái vật canh giữ), cấu hình chiến trường Thủ Thành (3 làn đường, đợt quái vật, Boss), dữ liệu mô phỏng không gian `visual3D` (tọa độ điểm, vectơ, công thức hình chiếu), câu hỏi trắc nghiệm + trả lời ngắn và nhiệm vụ phân vai nhóm.
+  - [x] Nâng cấp `server.js`: Hỗ trợ chấm điểm `choice` & `shortText`, lưu trạng thái Vàng (`gold`), Cấp độ (`heroLevel`), chuỗi `streak` (Combo trả lời đúng), Nâng cấp (`upgrades`) và đồng bộ với Teacher Dashboard.
+  - [x] Xây dựng **Game Engine 1 – Săn Kho Báu 2D (`HuntMapEngine`)** trong `public/app.js` & `public/style.css`: Địa hình SVG đa lớp (sông suối, cầu gỗ, đền cổ, mỏ pha lê neon, đom đóm), **Mini-Map Radar** thời gian thực, **La bàn định hướng Trạm mục tiêu** và Cuộn giấy chiến đấu với hiệu ứng đòn đánh hạ Boss.
+  - [x] Xây dựng **Game Engine 2 – Bảo Vệ Thành Trì (`CastleDefenseEngine`)** trong `public/app.js` & `public/style.css`: Thành Trì SVG đa tầng, 3 Anh Hùng bắn đạn phép, **Tia Laser Đại Bác Oxyz (`cd-laser-beam`)** quét sạch quái khi giải đúng toán, hiệu ứng rung màn hình (`screen-shake`), 4 Kỹ năng thời tiết (Mưa tên, Bão tuyết, Hồi máu, Khiên lục giác).
+  - [x] Tích hợp **Mô phỏng Hình học Không gian 3D Oxyz Hologram (`renderOxyz3D`)**: Hệ trục tọa độ 3 chiều $Ox, Oy, Oz$, mặt phẳng lưới đáy $Oxy$, đường gióng tọa độ trực quan và các nút tương tác 3D xoay ngang (`↺/↻`), đổi góc nghiêng (`📐`) giúp học sinh hình dung không gian 3 chiều ngay trong câu hỏi.
+  - [x] Thiết kế **Bản đồ Lục địa 5 Chặng Oxyz (`world-journey-map`)** với 5 hòn đảo nổi, hệ thống sao đánh giá (`⭐⭐⭐`), biểu tượng vật phẩm và cho phép học sinh nhấn vào đảo để xem trước hoặc chuyển nhanh chặng.
+  - [x] Nút **⛶ Toàn màn hình** tiện lợi cho trình chiếu lớp học và đồng bộ trọn vẹn sang `CHOI_THU_1_MAY.html`.
 
 ### Phase 3: Hoàn thiện Báo Cáo Biện Pháp (Word 3 trang) `[ ]`
 - **Mục tiêu:** Điền và hoàn chỉnh file `Bien phap gop phan nang cao chat luong DH.docx` theo đúng mẫu và quy định của nhà trường (tối đa 3 trang).

@@ -1,48 +1,36 @@
-# Chi Tiết Kế Hoạch - Phase 2: Nâng Cấp 2 Game Engine Tương Tác Nhóm (Săn Kho Báu 2D & Bảo Vệ Thành Trì)
+# Chi Tiết Kế Hoạch - Phase 2 (Bản Nâng Cấp Đồ Họa AAA & Hành Trình 3D Oxyz)
 
-Tài liệu này định nghĩa chi tiết các đầu việc, kết quả đầu ra và phương thức kiểm thử cho **Phase 2** theo chuẩn quy trình **Solo Builder**.
+Tài liệu này định nghĩa chi tiết các đầu việc nâng cấp đồ họa, hành trình 5 chặng và mô phỏng 3D Oxyz cho **Phase 2** theo chuẩn quy trình **Solo Builder**.
 
 ---
 
 ## 1. Danh Sách Công Việc (Task Checklist)
 
-- [x] **Task 1: Nâng cấp dữ liệu 5 chặng trong `MATHVERSE_OXYZ_MINIGAMES/stages.js`**
+- [x] **Task 1: Nâng cấp dữ liệu 5 chặng & Dữ liệu Mô phỏng 3D Oxyz trong `MATHVERSE_OXYZ_MINIGAMES/stages.js`**
   - *Mô tả chi tiết:*
-    - Cấu hình 5 chặng Toán 12 Oxyz (Vectơ $\vec{AB}$, Tích vô hướng $\vec{u}\cdot\vec{v}$, Khoảng cách $AB$, Tọa độ trung điểm $I$, Hai vectơ cùng phương $\vec{u}=k\vec{v}$).
-    - Bổ sung dữ liệu bản đồ 2D cho từng chặng (chủ đề địa hình `forest`, `fortress`, `crystal`, `maze`, `citadel`, tọa độ 3 trạm quái vật `stations`, loại quái vật canh giữ `monster`, vị trí xuất phát `spawn`, vị trí rương kho báu `chest`).
-    - Bổ sung dữ liệu chiến trường Bảo Vệ Thành Trì (`defenseConfig`: tên thành trì, 3 đợt quái vật `waves`, loại quái vật `goblin`, `bat`, `skeleton`, `orc`, `boss`).
-    - Hỗ trợ cả câu hỏi trắc nghiệm (`abcd`) và trả lời ngắn (`shortAnswer`), kèm phân công vai trò hợp tác nhóm (`teamRoles`: Thành viên 1, Thành viên 2, Thành viên 3, Đội trưởng).
+    - Cấu hình 5 chặng Toán 12 Oxyz với cốt truyện liên hoàn, vật phẩm, danh hiệu chặng, tọa độ địa hình chi tiết.
+    - Bổ sung dữ liệu hình học không gian `visual3D` cho cả 15 lượt chơi (tọa độ điểm $A, B, I$, vectơ $\vec{u}, \vec{v}$, thành phần chiếu lên 3 trục $Ox, Oy, Oz$) để vẽ mô phỏng 3D trực tiếp.
   - *File tác động:* `MATHVERSE_OXYZ_MINIGAMES/stages.js`
 
 - [x] **Task 2: Nâng cấp máy chủ `MATHVERSE_OXYZ_MINIGAMES/server.js`**
   - *Mô tả chi tiết:*
-    - Hỗ trợ kiểm tra đáp án cho cả `choice` (trắc nghiệm) và `shortText` (điền đáp án ngắn).
-    - Lưu trữ và đồng bộ thêm chỉ số của đội (`gold`, `heroLevel`, `upgrades`) và endpoint `/api/upgrade` để hiển thị sinh động trên Dashboard Giáo viên.
+    - Truyền đầy đủ dữ liệu `visual3D`, chuỗi `streak` (Combo trả lời đúng liên tiếp), thưởng Vàng theo Combo và đồng bộ trạng thái nâng cấp đội quân.
   - *File tác động:* `MATHVERSE_OXYZ_MINIGAMES/server.js`
 
-- [x] **Task 3: Xây dựng Giao diện & CSS cho 2 Game Engine trong `MATHVERSE_OXYZ_MINIGAMES/public/style.css`**
+- [x] **Task 3: Thiết kế Đồ họa AAA, Hiệu ứng Hạt, Bản đồ Lục địa & Mô phỏng 3D trong `public/style.css`**
   - *Mô tả chi tiết:*
-    - Thiết kế giao diện **Săn Kho Báu 2D (`hw-viewport`, `hw-world`, `hw-station`, `hw-ring`, `hw-player`, `hw-hud-keys`, `hw-dpad`, `hw-battle-modal`, `hw-letter-card`)** lấy cảm hứng từ `giaoviendoimoi.com/hunt-preview/__demo__`.
-    - Thiết kế giao diện **Bảo Vệ Thành Trì (`cd-game`, `cd-hud`, `cd-battlefield`, `cd-lane-guide`, `cd-castle`, `cd-hero`, `cd-enemy`, `cd-proj`, `cd-skill-dock`, `cd-upgrade-panel`, `cd-question-dock`)** lấy cảm hứng từ `giaoviensangtao.vn/play/castle-defense/thu-nghiem`.
+    - Thiết kế **Bản đồ Hành trình Lục địa Oxyz** với 5 hòn đảo/thành trì nổi kết nối bằng cầu năng lượng và đánh giá 3 sao (`⭐⭐⭐`) mỗi chặng.
+    - Thiết kế địa hình SVG đa lớp cho **Săn Kho Báu 2D** (sông suối sóng sánh, cầu gỗ, đền cổ, mỏ pha lê neon, mê cung đá, núi lửa dung nham), **Mini-Map Radar**, **La bàn chỉ hướng (`Compass Arrow`)** và bụi bước chân.
+    - Thiết kế đồ họa **Bảo Vệ Thành Trì** với Thành Trì SVG đa tầng, hiệu ứng **Tia Laser Đại Bác Oxyz (`cd-laser-beam`)**, mưa tên rơi chéo, bão tuyết đóng băng, cột sáng hồi máu, hiệu ứng rung màn hình (`screen-shake`) và khung **Hologram 3D Oxyz** tương tác.
   - *File tác động:* `MATHVERSE_OXYZ_MINIGAMES/public/style.css`
 
-- [x] **Task 4: Lập trình 2 Game Engine Tương Tác Nhóm trong `MATHVERSE_OXYZ_MINIGAMES/public/app.js`**
+- [x] **Task 4: Lập trình Đồ họa SVG, Mô phỏng 3D Oxyz & Hiệu ứng Chiến đấu trong `public/app.js`**
   - *Mô tả chi tiết:*
-    - **Engine 1 – Săn Kho Báu 2D (`renderHuntGame` + `gameLoop`):** Bản đồ thế giới 2D có địa hình, nhân vật di chuyển bằng WASD/Mũi tên, chạm/click trên bản đồ, D-Pad ảo, hoặc nút Đi tới Trạm; tự động mở Cuộn Giấy Chiến Đấu Quái Vật và hiệu ứng bay mảnh chìa khóa.
-    - **Engine 2 – Bảo Vệ Thành Trì (`renderCastleDefenseGame` + `gameLoop`):** Chiến trường 3 làn đường 60fps, 3 Anh Hùng bắn tên/phép thuật vào Quái vật, giải Toán nhận Vàng + Pháo Kích, nâng cấp 4 chỉ số và kích hoạt 4 Kỹ năng chủ động (Mưa Tên, Băng Giá, Hồi Máu, Khiên Thành).
-    - **Thanh Chuyển Đổi Chế Độ Chơi (Mode Switcher):** Chuyển đổi tức thì giữa **🗺️ Săn Kho Báu 2D** và **🏰 Bảo Vệ Thành Trì** ở bất kỳ chặng nào.
+    - Xây dựng bộ vẽ **Hologram 3D Oxyz (`renderOxyz3D`)**: Phép chiếu trục đo (Isometric/Perspective 3D) vẽ hệ trục $Oxyz$, mặt phẳng lưới $Oxy$, các đường gióng tọa độ $(x, y, z)$, điểm $A, B, I$ và vectơ $\vec{u}, \vec{v}$ có nút xoay góc nhìn 3D trực tiếp!
+    - Xây dựng bộ **SVG Monsters & Heroes Art** sinh động thay thế các biểu tượng đơn điệu.
+    - Nâng cấp `HuntMapEngine`: Thêm Mini-Map Radar, La bàn định hướng trạm, hạt đom đóm môi trường, dấu chân di chuyển và hiệu ứng chiến đấu chém kiếm / nổ phép.
+    - Nâng cấp `CastleDefenseEngine`: Thêm hiệu ứng hạt nổ (`sparks`), tia Laser Đại Bác Pháo Kích khi trả lời đúng, hiệu ứng thời tiết của 4 Kỹ năng (Mưa tên, Bão tuyết, Hồi máu, Khiên Lục Giác) và nút **⛶ Toàn màn hình**.
   - *File tác động:* `MATHVERSE_OXYZ_MINIGAMES/public/app.js`
 
-- [x] **Task 5: Đồng bộ bản chạy thử độc lập `CHOI_THU_1_MAY.html` & Cập nhật `HUONG_DAN_GIAO_VIEN.md`**
-  - *Mô tả chi tiết:*
-    - Đóng gói toàn bộ dữ liệu `stages.js`, `style.css` và `app.js` mới vào `CHOI_THU_1_MAY.html` kèm thanh chuyển nhanh Chặng 1..5 cho chế độ Demo.
-    - Cập nhật tài liệu `HUONG_DAN_GIAO_VIEN.md`.
-  - *File tác động:* `MATHVERSE_OXYZ_MINIGAMES/CHOI_THU_1_MAY.html`, `MATHVERSE_OXYZ_MINIGAMES/HUONG_DAN_GIAO_VIEN.md`
-
----
-
-## 2. Kết Quả Đầu Ra Kỳ Vọng (Expected Outcomes)
-
-- [x] Học sinh khi vào đội được trải nghiệm **2 trò chơi tương tác thực sự** (*Săn Kho Báu 2D* & *Bảo Vệ Thành Trì*).
-- [x] Có nút chuyển đổi linh hoạt giữa 2 chế độ game ở mọi chặng.
-- [x] Đã kiểm thử tự động E2E (`node --check` & API test) đạt 100%.
+- [x] **Task 5: Đóng gói lại `CHOI_THU_1_MAY.html` & Kiểm thử trên Server đang chạy**
+  - *File tác động:* `MATHVERSE_OXYZ_MINIGAMES/CHOI_THU_1_MAY.html`
