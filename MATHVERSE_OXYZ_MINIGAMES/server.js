@@ -294,7 +294,7 @@ function processAction(endpoint,d){
  }
  throw error('Đường dẫn API không tồn tại.',404);
 }
-const MIME={'.html':'text/html; charset=utf-8','.css':'text/css; charset=utf-8','.js':'text/javascript; charset=utf-8','.svg':'image/svg+xml','.png':'image/png','.ico':'image/x-icon'};
+const MIME={'.html':'text/html; charset=utf-8','.css':'text/css; charset=utf-8','.js':'text/javascript; charset=utf-8','.svg':'image/svg+xml','.png':'image/png','.jpg':'image/jpeg','.ico':'image/x-icon','.mp3':'audio/mpeg','.wav':'audio/wav'};
 function send(res,status,data,type='application/json; charset=utf-8'){
  res.writeHead(status,{'Content-Type':type,'Cache-Control':'no-store','X-Content-Type-Options':'nosniff','X-Frame-Options':'DENY'});
  res.end(typeof data==='string'||Buffer.isBuffer(data)?data:JSON.stringify(data));
@@ -309,6 +309,15 @@ const server=http.createServer((req,res)=>{
   req.on('end',()=>{try{const d=JSON.parse(content||'{}');const result=processAction(pathname,d);send(res,200,result);}catch(e){send(res,e.status||400,{error:e.message||'Đã có lỗi xảy ra.'});}});return;
  }
  if(req.method!=='GET')return send(res,405,'Method not allowed','text/plain');
+ if(pathname.startsWith('/images/') || pathname.startsWith('/sounds/')){
+  const safeRel=path.normalize(pathname).replace(/^(\.\.[\/\\])+/, '').replace(/^[\\\/]+/, '');
+  const filePath=path.join(PUBLIC,safeRel);
+  fs.readFile(filePath,(err,buf)=>{
+   if(err)return send(res,404,'Không tìm thấy','text/plain; charset=utf-8');
+   send(res,200,buf,MIME[path.extname(filePath)]||'application/octet-stream');
+  });
+  return;
+ }
  const allowed={'/':'index.html','/index.html':'index.html','/style.css':'style.css','/app.js':'app.js','/icon.svg':'icon.svg'};
  const name=allowed[pathname];if(!name)return send(res,404,'Không tìm thấy','text/plain; charset=utf-8');
  const file=path.join(PUBLIC,name);

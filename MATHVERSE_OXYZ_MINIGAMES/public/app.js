@@ -75,6 +75,19 @@ function isMazeWall(x, y){
 
 
 /* ─── TRẠNG THÁI ENGINE 3: CHẶN ZOMBIE 4 LÀN (ZOMBIE DEFENSE) ─── */
+
+function playZdSound(type){
+ try{
+  const src = type==='hit' ? '/sounds/sfx/correct.mp3' : (type==='miss' ? '/sounds/sfx/incorrect.mp3' : null);
+  if(src){
+   const a = new Audio(src);
+   a.volume = 0.85;
+   a.play().catch(()=>{});
+  }
+ }catch(e){}
+ sound(type==='hit' ? 'laser' : 'wrong');
+}
+
 const zdState = {
  lane: 0,
  shooting: false,
@@ -903,6 +916,10 @@ function renderZombieWalkingSVG(){
 /* ═══════════════════════════════════════════════════════════════════════════
    RENDER ENGINE 3: CHẶN ZOMBIE 4 LÀN (CHẶNG 3 - GIAOVIENDOIMOI STYLE)
    ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   RENDER ENGINE 3: CHẶN ZOMBIE 4 LÀN (EXACT GIAOVIENDOIMOI REA ASSETS)
+   ═══════════════════════════════════════════════════════════════════════════ */
 async function shootZombieLane(laneIdx){
  if(zdState.shooting || busy) return;
  zdState.lane = laneIdx;
@@ -911,13 +928,21 @@ async function shootZombieLane(laneIdx){
  render();
  
  try{
-  await submitStageAnswer({choice: laneIdx});
+  const res = await submitStageAnswer({choice: laneIdx});
+  zdState.hitLane = laneIdx;
+  zdState.hitType = res?.correct ? 'hit' : 'miss';
+  playZdSound(zdState.hitType);
+ }catch(err){
+  zdState.hitLane = laneIdx;
+  zdState.hitType = 'miss';
+  playZdSound('miss');
  }finally{
   setTimeout(()=>{
    zdState.shooting = false;
    zdState.hitLane = null;
+   zdState.hitType = null;
    render();
-  }, 450);
+  }, 480);
  }
 }
 
@@ -931,73 +956,87 @@ function renderZombieDefenseGame(m){
  const lanesHtml = [0, 1, 2, 3].map(i => {
   const isAimed = (zdState.lane === i);
   const isHit = (zdState.hitLane === i);
-  return `<div class="hw-zd-lane ${isAimed?'aimed':''}" data-action="shootZombieLane" data-lane="${i}">
-   <div class="hw-zd-post-badge">${laneLabels[i]}</div>
-   ${(zdState.shooting && zdState.lane === i) ? `
-    <div class="hw-zd-bullet" style="left:88px;right:220px;top:46%"></div>
-   ` : ''}
-   <div class="hw-zd-zombie-group" data-action="shootZombieLane" data-lane="${i}" title="Bắn Zombie ${laneLabels[i]}">
-    <div class="hw-zd-zombie-scroll">
-     <span class="hw-zd-scroll-letter">${laneLabels[i]}</span>
-     <span>${formatMath(opts[i])}</span>
+  const hitClass = isHit ? (zdState.hitType === 'hit' ? 'dying' : 'dying-wrong') : '';
+
+  return `<div class="zd-lane ${i%2 ? 'odd' : 'even'} ${isAimed ? 'aimed' : ''}" style="top:${i*25}%;" data-action="shootZombieLane" data-lane="${i}">
+   <span class="zd-lane-key">${laneLabels[i]}</span>
+   
+   <div class="zd-unit ${hitClass}" data-action="shootZombieLane" data-lane="${i}" title="Bắn Zombie ${laneLabels[i]}">
+    <div class="zd-zombie"></div>
+    <div class="zd-flag">
+     <div class="zd-flag-rope"></div>
+     <div class="zd-flag-cloth">
+      <div class="zd-flag-inner">
+       <div class="zd-flag-key">${laneLabels[i]}</div>
+       <div class="zd-flag-content">
+        <span class="zd-flag-text">${formatMath(opts[i])}</span>
+       </div>
+      </div>
+     </div>
     </div>
-    <div style="position:relative;display:flex;align-items:center">
-     ${renderZombieWalkingSVG()}
-     ${isHit ? '<div style="position:absolute;font-size:36px;top:0;left:10px;animation:pulse 0.4s">💥</div>' : ''}
-    </div>
+    ${isHit ? `
+     <div class="zd-pop ${zdState.hitType==='hit'?'hit':'miss'}">
+      ${zdState.hitType==='hit' ? '💥 CHÍNH XÁC! +XP' : '❌ CHƯA ĐÚNG!'}
+     </div>
+    ` : ''}
    </div>
   </div>`;
  }).join('');
 
- return `<div class="hw-zd-container">
-  <div class="hw-zd-topbar">
-   <div style="display:flex;align-items:center;gap:10px">
+ return `<div class="zd-player-wrap">
+  <div class="zd-hud">
+   <div class="zd-hud-title">
     <span class="tag" style="background:#7c3aed;border-color:#c084fc">🧟 CHẶN ZOMBIE · CHẶNG 3</span>
-    <b style="font-size:14px;color:#fde047">THÁP PHA LÊ KHOẢNG CÁCH</b>
+    <b>THÁP PHA LÊ KHOẢNG CÁCH</b>
    </div>
-   <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-    <span class="pill gold">⭐ ${world.me?.score||0} XP · Lượt ${r+1}/${m.totalRounds}</span>
+   <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+    <span class="zd-hud-score">⭐ ${world.me?.score||0} XP</span>
+    <span class="pill purple" style="font-size:12px">Lượt ${r+1}/${m.totalRounds}</span>
     <button type="button" class="hw-btn-hud ${isReady?'alert':''}" data-action="openCipherNotebook">
      📜 SỔ MẬT THƯ (${isReady?'SẴN SÀNG':'XEM MẢNH'})
     </button>
     <button type="button" class="hw-btn-hud" data-action="openTeamRoles">
-     🤝 PHÂN VAI NHÓM
+     🤝 PHÂN VAI
     </button>
     <button type="button" class="button gray sm" data-action="hint">💡 Gợi ý (2 Cấp)</button>
    </div>
   </div>
 
-  <div class="hw-zd-qcard-wrap">
-   <div class="hw-zd-qcard">
-    <span class="hw-zd-qbadge">CÂU ${r+1} / ${m.totalRounds} · ${esc(q.label)}</span>
-    <div class="hw-zd-qtitle">🧩 ${formatMath(q.prompt)}</div>
-    <div style="font-size:12px;color:#64748b;margin-top:6px">
-     🎯 Bấm vào Zombie hoặc dùng phím W/S (↑/↓) để ngắm và nhấn Bắn (Space/Enter) để tiêu diệt Zombie mang đáp án đúng!
+  <div class="zd-field">
+   <div class="zd-header-band">
+    <div class="zd-card">
+     <span class="zd-card-num">CÂU ${r+1} / ${m.totalRounds} · ${esc(q.label)}</span>
+     <div class="zd-card-text">🧩 ${formatMath(q.prompt)}</div>
     </div>
    </div>
+
+   <div class="zd-lanes-board">
+    <div class="zd-fence"></div>
+
+    <div class="zd-gunner" style="top:calc(${zdState.lane * 25}% + 12px);">
+     <img src="/images/zombie-defense/gunner.png" alt="Gunner" class="zd-gunner-img ${zdState.shooting ? 'recoil' : ''}">
+     ${zdState.shooting ? '<div class="zd-g-muzzle"></div>' : ''}
+    </div>
+
+    ${zdState.shooting ? `
+     <div class="zd-bullet" style="top:calc(${zdState.lane * 25}% + 44px);"></div>
+    ` : ''}
+
+    ${lanesHtml}
+   </div>
   </div>
 
-  <div class="hw-zd-lanes-board">
-   <div class="hw-zd-fence"></div>
-   <div class="hw-zd-shooter-anchor" style="top:${zdState.lane * 25}%">
-    ${renderZombieShooterSVG()}
+  <div class="zd-botbar">
+   <div>
+    ⌨️ <b>Điều khiển:</b> Phím <b>W / S</b> hoặc <b>↑ / ↓</b>: Chọn làn · <b>Space / Enter</b>: Bắn Blaster · Bấm trực tiếp vào Zombie để bắn nhanh!
    </div>
-   ${lanesHtml}
-  </div>
-
-  <div class="hw-zd-botbar">
-   <div style="font-size:12.5px;color:#cbd5e1">
-    ⌨️ <b>Điều khiển:</b> Phím <b>W / S</b> hoặc <b>↑ / ↓</b>: Chọn làn · <b>Space / Enter</b>: Bắn blaster · Bấm trực tiếp vào Zombie để bắn nhanh!
-   </div>
-   <div style="display:flex;gap:8px;align-items:center">
+   <div>
     ${isReady ? `
      <button type="button" class="button gold pulse-urgent" data-action="openCipherNotebook">
       🔓 ĐỦ 5 MẢNH – GIẢI MÃ PHALE MỞ THÁP!
      </button>
     ` : `
-     <span class="pill purple" style="font-size:11.5px">
-      Mảnh rune đã thu thập: ${r}/5 (P - H - A - L - E)
-     </span>
+     <span style="color:#e9d5ff;font-weight:700">Mảnh rune đã thu thập: ${r}/5 (P - H - A - L - E)</span>
     `}
    </div>
   </div>

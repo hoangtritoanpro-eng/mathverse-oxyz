@@ -10,6 +10,25 @@ Tất cả những thay đổi quan trọng của dự án này sẽ được gh
 
 ---
 
+## [2.7.0] - 2026-11-03
+
+### Added & Overhauled (Reverse-Engineered via REA)
+- **Tích Hợp Trọn Vẹn 100% Đồ Họa & Âm Thanh Gốc Của Game Chặn Zombie Từ Giaoviendoimoi.com:**
+  - **Tài nguyên đồ họa nguyên bản (Original High-Res Sprite Sheets):**
+    - `gunner.png`: Chú lính xạ thủ chibi đội mũ cối cầm súng đồ chơi bắn nước/laser cực chuẩn.
+    - `zombie-walk-v2.png`: Sprite sheet 4 khung hình bước chân đi bộ của zombie (`@keyframes zd-walk-frames`, `@keyframes zd-walk-bob`).
+    - `fence.png`: Hàng rào cọc gỗ rào chắn phòng thủ dọc mép trái.
+    - `flag.png`: Cuộn giấy da cổ phấp phới (`@keyframes zd-wave`) hiển thị 4 phương án trả lời kèm vòng tròn chữ cái nâu tròn (`.zd-flag-key`).
+  - **Hệ thống âm thanh nguyên bản (Authentic Audio FX):**
+    - `correct.mp3`: Tiếng hiệu ứng khi bắn trúng zombie đúng.
+    - `incorrect.mp3`: Tiếng hiệu ứng khi bắn trúng zombie sai.
+    - `zombie-lose.mp3` & `congratulations.wav`: Âm thanh hoàn thành và kết thúc.
+  - **Tối ưu hóa máy chủ & ngoại tuyến 100%:**
+    - Cập nhật `server.js` hỗ trợ streaming các file tĩnh `/images/` và `/sounds/`.
+    - Đóng gói toàn bộ 4 hình ảnh dưới dạng Base64 data URL nhúng thẳng vào file [CHOI_THU_1_MAY.html](file:///c:/Users/ADMIN/Downloads/ggvdg%20duyen/MATHVERSE_OXYZ_MINIGAMES/CHOI_THU_1_MAY.html) (~1.5MB), đảm bảo mở chạy offline hoàn toàn không cần kết nối mạng hay máy chủ web.
+
+---
+
 ## [2.6.0] - 2026-11-03
 
 ### Added & Overhauled
