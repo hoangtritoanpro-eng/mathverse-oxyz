@@ -18,13 +18,13 @@
         "id": "doi-1",
         "code": "1111",
         "token": "DEMO_DOI_1",
-        "stage": 1,
-        "round": 2,
-        "health": 0,
-        "wrong": 20,
-        "score": 8,
+        "stage": 4,
+        "round": 0,
+        "health": 3,
+        "wrong": 22,
+        "score": 80,
         "bonus": 0,
-        "gold": 620,
+        "gold": 970,
         "heroLevel": 6,
         "upgrades": {
           "damage": 5,
@@ -36,7 +36,7 @@
         "finishedAt": "2026-11-03T00:04:12.636Z",
         "attempts": [
           5,
-          6,
+          8,
           2,
           7,
           0
@@ -54,9 +54,27 @@
             "digit": "3",
             "rule": "Lấy hiệu hoành độ xB − xA = 5 − 2 = 3.",
             "item": "La bàn ba trục"
+          },
+          {
+            "stage": 2,
+            "digit": "0",
+            "rule": "Lấy kết quả tích vô hướng của đợt tấn công đầu tiên (u·v = 0).",
+            "item": "Khiên trực giao"
+          },
+          {
+            "stage": 3,
+            "digit": "5",
+            "rule": "Lấy độ dài đoạn thẳng AB = 5.",
+            "item": "Tinh thể khoảng cách"
+          },
+          {
+            "stage": 4,
+            "digit": "2",
+            "rule": "Lấy hoành độ trung điểm xI = 2.",
+            "item": "Bản đồ mê cung"
           }
         ],
-        "streak": 1
+        "streak": 2
       },
       {
         "name": "Tia Chớp",
@@ -519,6 +537,22 @@
       {
         "at": "2026-11-03T01:47:50.764Z",
         "text": "🐉 Rồng Xanh đã hạ mục tiêu lượt 2/3 tại Pháo Đài Vuông Góc (Combo x1, +120 Vàng)."
+      },
+      {
+        "at": "2026-11-03T01:51:01.373Z",
+        "text": "🐉 Rồng Xanh trả lời chưa đúng lượt 3 ở Pháo Đài Vuông Góc; còn 0 khiên."
+      },
+      {
+        "at": "2026-11-03T01:51:04.242Z",
+        "text": "🐉 Rồng Xanh trả lời chưa đúng lượt 3 ở Pháo Đài Vuông Góc; còn 0 khiên."
+      },
+      {
+        "at": "2026-11-03T01:51:06.864Z",
+        "text": "🐉 Rồng Xanh đã VƯỢT CHẶNG 2: Pháo Đài Vuông Góc (Combo x1). +8 XP, +200 Vàng và mảnh mã 0."
+      },
+      {
+        "at": "2026-11-03T01:51:17.876Z",
+        "text": "🐉 Rồng Xanh đã hạ mục tiêu lượt 1/3 tại Tháp Pha Lê (Combo x2, +150 Vàng)."
       }
     ]
   },

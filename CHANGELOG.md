@@ -10,6 +10,16 @@ Tất cả những thay đổi quan trọng của dự án này sẽ được gh
 
 ---
 
+## [2.3.2] - 2026-11-03
+
+### Fixed & Improved
+- **Không Tự Động Di Chuyển Khi Bấm "Tiếp Tục Hành Trình":**
+  - Loại bỏ hoàn toàn cơ chế tự động gán tọa độ `targetX, targetY` tới trạm tiếp theo khi học sinh đánh bại quái vật và bấm *“Trở lại bản đồ & Tự lái nhân vật tiếp tục”*.
+  - Nhân vật sẽ đứng yên tại đền vừa chinh phục, trao quyền 100% cho học sinh tự dùng phím mũi tên / WASD / chạm cảm ứng để điều khiển nhân vật chạy tìm đền tiếp theo.
+  - Đồng bộ cập nhật vào tệp độc lập `CHOI_THU_1_MAY.html`.
+
+---
+
 ## [2.3.1] - 2026-11-03
 
 ### Added & Improved

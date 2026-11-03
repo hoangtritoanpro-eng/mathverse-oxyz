@@ -1388,7 +1388,7 @@ function renderHuntBattleModal(m){
      <h2>ĐÁNH BẠI ${esc(monster.name.toUpperCase())}!</h2>
      <div class="hw-letter-card">${esc(huntState.rewardBadge)}</div>
      <p style="max-width:440px;color:#dcfce7;font-weight:700">${esc(huntState.rewardExplain||'')}</p>
-     <button type="button" class="button gold" data-action="finishHuntReward">Tiếp tục hành trình trên bản đồ →</button>
+     <button type="button" class="button gold" data-action="finishHuntReward">🗺️ Trở lại bản đồ & Tự lái nhân vật tiếp tục →</button>
     </div>`:''}
    <div class="hw-battle-scroll">
     <div>
@@ -2081,9 +2081,7 @@ async function handle(action,el){
   if(action==='clickChest'){
    const m=world?.current;if(!m)return;
    if(m.round<3){
-    const st=m.huntMap?.stations?.[m.round];
-    if(st){huntState.targetX=st.x;huntState.targetY=st.y;}
-    return notice('🧰 Rương đang khóa','Hãy đánh bại đủ 3 Trạm Quái Vật (I, II, III) trên bản đồ để mở Rương Mật Mã của chặng!',false);
+    return notice('🧰 Rương đang khóa','Hãy tự điều khiển nhân vật tìm và vượt qua đủ 3 Đền thờ trên bản đồ để mở Rương Mật Mã!',false);
    }
    return;
   }
@@ -2133,10 +2131,11 @@ async function handle(action,el){
    huntState.rewardBadge=null;
    huntState.selectedChoice=null;
    huntState.shortText='';
+   huntState.targetX=null;
+   huntState.targetY=null;
+   huntState.moving=false;
+   huntState.lastAutoStation=-1;
    await refresh(true);
-   const m=world?.current;
-   const nextSt=m?.huntMap?.stations?.[m.round];
-   if(nextSt){huntState.targetX=nextSt.x;huntState.targetY=nextSt.y;}
    return;
   }
 
