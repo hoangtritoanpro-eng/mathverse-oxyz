@@ -12,6 +12,8 @@ function formatMath(str){
    .replace(/\\perp/g, '<span class="math-sym">⊥</span>')
    .replace(/\\sqrt\{([^}]+)\}/g, '<span class="math-sym">√</span>($1)')
    .replace(/\\approx/g, '≈')
+   .replace(/\\pi/g, 'π')
+   .replace(/\\text\{([^}]+)\}/g, '$1')
    .replace(/\^2/g, '²')
    .replace(/\^3/g, '³');
 }
@@ -91,19 +93,23 @@ function playZdSound(type){
 
 
 
-/* ─── TRẠNG THÁI ENGINE 5: DÒ MÌN GIAOVIENDOIMOI (EXACT MATCHING SCREENSHOT) ─── */
+
+/* ─── TRẠNG THÁI ENGINE 5: DÒ MÌN GIAOVIENDOIMOI (EXACT RUNNING SOLDIER & DIRECTION) ─── */
 const msState = {
   aimedPad: 0,
-  jumping: false,
+  walking: false,
   shaking: false,
+  wobble: false,
   lastChoice: null,
   resultType: null,
-  wobble: false,
-  charRow: 0,
-  charCol: 1,
-  prevRow: 0,
-  prevCol: 1,
-  safePath: []
+  posX: 50,
+  posY: 82,
+  blastX: null,
+  blastY: null,
+  direction: 'up',
+  frame: 0,
+  animTimer: null,
+  explodedMines: []
 };
 
 function playMsSound(type){
@@ -117,6 +123,60 @@ function playMsSound(type){
   }catch(e){}
   sound(type==='safe' ? 'laser' : 'wrong');
 }
+
+function startSoldierRunning(dir, durationMs){
+  msState.walking = true;
+  msState.direction = dir;
+  msState.frame = 0;
+  if(msState.animTimer) clearInterval(msState.animTimer);
+  msState.animTimer = setInterval(()=>{
+    msState.frame = (msState.frame === 0 ? 1 : 0);
+    render();
+  }, 110);
+  setTimeout(()=>{
+    if(msState.animTimer) clearInterval(msState.animTimer);
+    msState.animTimer = null;
+    msState.walking = false;
+    msState.frame = 0;
+    render();
+  }, durationMs);
+}
+
+function getSoldierSprite(){
+  if(msState.wobble){
+    return '/images/minesweeper/soldier-down-1.png';
+  }
+  if(!msState.walking){
+    return '/images/minesweeper/soldier-up-1.png';
+  }
+  const f = msState.frame + 1; // 1 hoặc 2
+  if(msState.direction === 'left') return `/images/minesweeper/soldier-left-${f}.png`;
+  if(msState.direction === 'right') return `/images/minesweeper/soldier-right-${f}.png`;
+  if(msState.direction === 'down') return `/images/minesweeper/soldier-down-${f}.png`;
+  return `/images/minesweeper/soldier-up-${f}.png`;
+}
+
+/* ─── TRẠNG THÁI ENGINE 3: CHẶN ZOMBIE 4 LÀN (ZOMBIE DEFENSE) ─── */
+
+function playZdSound(type){
+ try{
+  const src = type==='hit' ? '/sounds/sfx/correct.mp3' : (type==='miss' ? '/sounds/sfx/incorrect.mp3' : null);
+  if(src){
+   const a = new Audio(src);
+   a.volume = 0.85;
+   a.play().catch(()=>{});
+  }
+ }catch(e){}
+ sound(type==='hit' ? 'laser' : 'wrong');
+}
+
+
+
+
+/* ─── TRẠNG THÁI ENGINE 5: DÒ MÌN GIAOVIENDOIMOI (EXACT MATCHING SCREENSHOT) ─── */
+
+
+
 
 /* ─── TRẠNG THÁI ENGINE 3: CHẶN ZOMBIE 4 LÀN (ZOMBIE DEFENSE) ─── */
 
@@ -629,7 +689,7 @@ function mapTrack(stage){
   const totalR = (world?.stages?.[i]?.totalRounds) || 3;
   const filledStars = Math.max(0, Math.min(3, Math.round((curRound / totalR) * 3)));
   const emptyStars = Math.max(0, 3 - filledStars);
-  const stars = stage === -1 ? '⭐⭐⭐' : (i < stage ? '⭐⭐⭐' : (i === stage ? ('⭐'.repeat(filledStars) + '☆'.repeat(emptyStars)) : '☆☆☆'));
+  const stars = stage === -1 ? '⭐⭐⭐' : (i < stage ? '⭐⭐⭐' : (i === stage ? ('⭐'.repeat(Math.max(0, Math.min(3, Math.floor(filledStars) || 0))) + '☆'.repeat(Math.max(0, Math.min(3, Math.floor(emptyStars) || 0)))) : '☆☆☆'));
   const clickAttr=window.IS_DEMO_MODE&&session?.role==='student'?`data-action="demoJumpStage" data-stage="${i}" title="Nhấn để chuyển nhanh tới Chặng ${i+1}"`:'';
   return `<div class="island-card ${state}" style="--biome:${m.biome}" ${clickAttr}>
    <div class="island-orb">
@@ -1335,37 +1395,63 @@ const MS_CHOICE_COORDS_3 = [
   { x: 76, y: 52 }  // C (Bên phải)
 ];
 
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   RENDER ENGINE 5: DÒ MÌN GIAOVIENDOIMOI - CHÚ LÍNH CHẠY BỘ ĐA HƯỚNG & NỔ BOOM
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+
+
+
+
 async function stepMinesweeperPad(choiceIdx){
   if(msState.walking || busy) return;
-  
+  if(msState.explodedMines && msState.explodedMines.includes(choiceIdx)) return;
+
   const totalOpts = (world?.current?.challenge?.options?.length || 4);
   const coords = (totalOpts === 3) ? MS_CHOICE_COORDS_3 : MS_CHOICE_COORDS_4;
   const target = coords[choiceIdx] || { x: 50, y: 50 };
 
-  // 1. Cho nhân vật di chuyển thực tế từ vị trí ban đầu tới đáp án được chọn
-  msState.walking = true;
+  // Tính hướng di chuyển theo góc vectơ
+  const dx = target.x - msState.posX;
+  const dy = target.y - msState.posY;
+  let dir = 'up';
+  if(Math.abs(dx) > Math.abs(dy)){
+    dir = dx < 0 ? 'left' : 'right';
+  }else{
+    dir = dy < 0 ? 'up' : 'down';
+  }
+
+  // 1. Chú lính bắt đầu chạy bộ về phía đáp án
   msState.lastChoice = choiceIdx;
+  startSoldierRunning(dir, 550);
   msState.posX = target.x;
-  msState.posY = target.y + 10;
+  msState.posY = target.y + 6;
   sound('step');
   render();
 
   try{
+    // Chờ chú lính chạy tới gần đáp án (~500ms)
+    await new Promise(r => setTimeout(r, 480));
     const res = await submitStageAnswer({choice: choiceIdx});
-    if(res?.correct){
-      // ĐÚNG: Tiếp đất an toàn, phát sáng và nhận XP
+
+    if(res && res.correct){
+      // ĐÚNG: Đậu lại an toàn trên bãi cỏ, phát hiệu ứng chúc mừng
       msState.resultType = 'correct';
+      msState.walking = false;
       playMsSound('safe');
       render();
+
       setTimeout(()=>{
         // Đặt lại nhân vật về vị trí ban đầu cho câu hỏi kế tiếp
         msState.posX = 50;
-        msState.posY = 80;
-        msState.walking = false;
+        msState.posY = 82;
         msState.lastChoice = null;
         msState.resultType = null;
-        render();
-      }, 750);
+        msState.direction = 'up';
+        msState.explodedMines = [];
+        updateAfterAction();
+      }, 820);
     }else{
       // SAI: ĐẠP PHẢI MÌN!
       msState.resultType = 'wrong';
@@ -1373,13 +1459,20 @@ async function stepMinesweeperPad(choiceIdx){
       msState.blastY = target.y;
       msState.shaking = true;
       msState.wobble = true;
+      if(!msState.explodedMines.includes(choiceIdx)){
+        msState.explodedMines.push(choiceIdx);
+      }
+      if(world?.me){
+        world.me.health = Math.max(0, (world.me.health ?? 3) - 1);
+      }
       playMsSound('mine');
       render();
 
-      // BÙM NỔ XONG THÌ BỊ BẬT VĂNG / QUAY LẠI VỊ TRÍ BAN ĐẦU
+      // BÙM NỔ: Chú lính bị hất văng và chạy lùi lại vị trí ban đầu (50%, 82%)
       setTimeout(()=>{
+        startSoldierRunning('down', 420);
         msState.posX = 50;
-        msState.posY = 80;
+        msState.posY = 82;
         render();
       }, 350);
 
@@ -1391,8 +1484,9 @@ async function stepMinesweeperPad(choiceIdx){
         msState.resultType = null;
         msState.blastX = null;
         msState.blastY = null;
+        msState.direction = 'up';
         render();
-      }, 800);
+      }, 820);
     }
   }catch(err){
     msState.resultType = 'wrong';
@@ -1400,11 +1494,15 @@ async function stepMinesweeperPad(choiceIdx){
     msState.blastY = target.y;
     msState.shaking = true;
     msState.wobble = true;
+    if(!msState.explodedMines.includes(choiceIdx)){
+      msState.explodedMines.push(choiceIdx);
+    }
     playMsSound('mine');
     render();
     setTimeout(()=>{
+      startSoldierRunning('down', 420);
       msState.posX = 50;
-      msState.posY = 80;
+      msState.posY = 82;
       render();
     }, 350);
     setTimeout(()=>{
@@ -1415,8 +1513,9 @@ async function stepMinesweeperPad(choiceIdx){
       msState.resultType = null;
       msState.blastX = null;
       msState.blastY = null;
+      msState.direction = 'up';
       render();
-    }, 800);
+    }, 820);
   }
 }
 
@@ -1435,26 +1534,28 @@ function renderMinesweeperGame(m){
 
   const coords = (opts.length === 3) ? MS_CHOICE_COORDS_3 : MS_CHOICE_COORDS_4;
 
-  // Render các phương án xuất hiện trực tiếp trên bãi cỏ
+  // Render các phương án xuất hiện trực tiếp trên bãi cỏ theo giao diện giaoviendoimoi.com
   const choicesHtml = opts.map((optText, i) => {
     const pos = coords[i] || { x: 25 + i * 20, y: 40 };
     const isAimed = (msState.aimedPad === i);
-    const isChosen = (msState.lastChoice === i);
+    const isExploded = msState.explodedMines && msState.explodedMines.includes(i);
 
-    return `<div class="ms-field-choice ${isAimed ? 'aimed' : ''}" 
+    return `<div class="ms-field-choice ${isAimed ? 'aimed' : ''} ${isExploded ? 'exploded' : ''}" 
                  style="left:${pos.x}%; top:${pos.y}%;"
                  data-action="stepMinesweeperPad" 
                  data-pad="${i}" 
-                 title="Di chuyển đến đáp án ${laneLabels[i]}">
-      <div class="ms-choice-badge">${laneLabels[i]}</div>
+                 title="${isExploded ? 'Mìn đã nổ!' : 'Bấm để chú lính chạy đến đáp án ' + laneLabels[i]}">
+      <div class="ms-choice-badge">${isExploded ? '💥' : laneLabels[i]}</div>
       <div class="ms-choice-text">${formatMath(optText)}</div>
     </div>`;
   }).join('');
 
+  const spriteSrc = getSoldierSprite();
+
   return `<div class="ms-container-wrap ${msState.shaking ? 'shake' : ''}">
     <!-- CỘT TRÁI: BẢNG CÂU HỎI TRẮNG THANH LỊCH CHUẨN GIAOVIENDOIMOI -->
     <div class="ms-left-sidebar">
-      <div class="ms-side-qnum">CÂU ${r+1} / ${m.totalRounds} · ${esc(q.label)}</div>
+      <div class="ms-side-qnum">CÂU ${r+1} / ${m.totalRounds} · ${esc(q.label || 'VECTƠ OXYZ')}</div>
       <div class="ms-side-qtext">
         ${formatMath(q.prompt)}
       </div>
@@ -1480,7 +1581,7 @@ function renderMinesweeperGame(m){
 
       <!-- TOP MINI HUD -->
       <div class="ms-mini-hud">
-        <div style="font-size:12px;font-weight:800;color:#fef08a;background:rgba(0,0,0,0.4);padding:4px 10px;border-radius:12px">
+        <div style="font-size:12px;font-weight:800;color:#fef08a;background:rgba(0,0,0,0.5);padding:5px 12px;border-radius:14px;border:1px solid rgba(255,255,255,0.2)">
           🏰 THÀNH TRÌ LỜI TRÍ TUỆ
         </div>
 
@@ -1492,13 +1593,13 @@ function renderMinesweeperGame(m){
             <span class="${health<3?'lost':''}">💖</span>
           </div>
           <span style="font-size:12px;font-weight:800;color:#bbf7d0">CÂU ${r+1}/${m.totalRounds}</span>
-          <div style="width:60px;height:6px;background:rgba(255,255,255,0.25);border-radius:3px;overflow:hidden">
+          <div style="width:65px;height:7px;background:rgba(255,255,255,0.25);border-radius:4px;overflow:hidden">
             <div style="width:${progressPct}%;height:100%;background:#4ade80"></div>
           </div>
         </div>
 
         <div style="display:flex;gap:6px">
-          <button type="button" class="hw-btn-hud" style="font-size:11.5px;padding:3px 8px" data-action="soundToggle">🔊 Âm thanh</button>
+          <button type="button" class="hw-btn-hud" style="font-size:11.5px;padding:4px 10px" data-action="soundToggle">🔊 Âm thanh</button>
         </div>
       </div>
 
@@ -1509,7 +1610,7 @@ function renderMinesweeperGame(m){
       ${msState.blastX !== null ? `
         <div class="ms-blast-overlay" style="left:${msState.blastX}%; top:${msState.blastY}%;"></div>
         <div class="ms-blast-toast wrong" style="left:${msState.blastX}%; top:${msState.blastY}%;">
-          💥 BÙM! ĐẠP PHẢI MÌN!
+          💥 BÙM! ĐẠP PHẢI MÌN! VĂNG VỀ VỊ TRÍ BAN ĐẦU!
         </div>
       ` : ''}
 
@@ -1520,16 +1621,16 @@ function renderMinesweeperGame(m){
         </div>
       ` : ''}
 
-      <!-- CHÚ LÍNH XẠ THỦ TỰ DO DI CHUYỂN TRÊN BÃI CỎ -->
+      <!-- CHÚ LÍNH XẠ THỦ TỰ DO CHẠY ĐẾN ĐÁP ÁN -->
       <div class="ms-soldier-actor ${msState.walking ? 'walking' : ''} ${msState.wobble ? 'wobble' : ''}" 
            style="left:${msState.posX}%; top:${msState.posY}%;">
-        <img src="/images/minesweeper/soldier-up-1.png" alt="Soldier" class="ms-soldier-img">
+        <img src="${spriteSrc}" alt="Soldier" class="ms-soldier-img">
       </div>
 
       <!-- THANH ĐIỀU HƯỚNG BÊN DƯỚI -->
       <div class="ms-footer-bar">
         <div>
-          🎯 <b>Cách chơi:</b> Nhấp chuột lên đáp án (A, B, C, D) hoặc bấm phím tắt <b>A / B / C / D</b> (<b>1 / 2 / 3 / 4</b>) để chú lính chạy tới. Chọn sai sẽ bị mìn nổ hất văng về vạch xuất phát!
+          🎯 <b>Cách chơi:</b> Bấm chuột lên đáp án (A / B / C / D) để chú lính chạy đến. Nếu đạp phải mìn nổ sẽ bị hất văng quay lại vị trí ban đầu!
         </div>
         <div style="font-weight:700;color:#fef08a">
           Mảnh cổ ngữ: ${r}/5 (B - A - O - V - E)
@@ -1541,6 +1642,7 @@ function renderMinesweeperGame(m){
     ${showRolesModal ? renderTeamRolesModal(m) : ''}
   </div>`;
 }
+
 
 function renderBossRaidGame(m){
  const r = m.round;
@@ -1885,7 +1987,7 @@ function renderHuntBattleModal(m){
     </div>
    </div>
    <div class="hw-monster-stage">
-    <span class="pill gold" style="margin-bottom:8px">🛡️ KHIÊN ĐỘI: ${'🛡️'.repeat(Math.max(0, world.me?.health || 0)) || '0'}</span>
+    <span class="pill gold" style="margin-bottom:8px">🛡️ KHIÊN ĐỘI: ${'🛡️'.repeat(Math.max(0, Math.min(3, Math.floor(world.me?.health || 0)))) || '0'}</span>
     <div class="hw-monster-hp"><i style="width:${huntState.monsterDefeated?0:100}%"></i></div>
     <small style="color:#fde68a;font-weight:900">${esc(monster.name)} · HP: ${huntState.monsterDefeated?0:monster.hp}/${monster.hp}</small>
     <div class="hw-monster-art-wrap ${huntState.monsterDefeated?'defeated':''}">
@@ -2262,7 +2364,19 @@ function renderStageGame(m){
 }
 
 function stageContent(m){
- const mode=activePlayMode||m.defaultMode||(m.id===2||m.id===5?'defense':'hunt');
+ if(m.id === 5 && !m.isBoss){
+   return `<div class="ms-wrapper-outer" style="margin-bottom:16px">
+     ${renderMinesweeperGame(m)}
+     ${renderOxyz3D(m)}
+   </div>`;
+ }
+ if(m.id === 3){
+   return `<div class="zd-wrapper-outer" style="margin-bottom:16px">
+     ${renderZombieDefenseGame(m)}
+     ${renderOxyz3D(m)}
+   </div>`;
+ }
+ const mode=activePlayMode||m.defaultMode||(m.id===2?'defense':'hunt');
  const roles=m.teamRoles||[];
  const streak=world.me?.streak||0;
  return `<div class="question-card">
@@ -2290,8 +2404,7 @@ function stageContent(m){
     <span style="font-size:12px;color:#bae6fd;font-weight:800">🪙 Vàng: <b id="topGoldBadge">${world.me.gold??120}</b> · 🛡️ Khiên: <b>${world.me.health}/3</b></span>
    </div>
   </div>
-  ${roles.length?`<div class="role-strip">${roles.map((r,idx)=>`<div class="role-chip ${idx===m.round?'active-role':''}">${esc(r)}</div>`).join('')}</div>`:''}
-  <!-- BẢN ĐỒ GAME RPG ĐƯỢC ƯU TIÊN LÊN ĐẦU TIÊN ĐỂ HỌC SINH TỰ LÁI NHÂN VẬT CHẠY TÌM TRẠM -->
+  ${roles.length?`<div class="role-strip">${roles.map((r,idx)=>`<div class="role-chip ${idx===m.round?'active-role':''}"><span class="role-num">${idx+1}</span> ${esc(r)}</div>`).join('')}</div>`:''}
   ${renderStageGame(m)}
   ${renderOxyz3D(m)}
  </div>`;
@@ -2566,7 +2679,10 @@ function updateAfterAction(){lastSignature='';lastStudentKey='';setTimeout(()=>r
 async function submitStageAnswer(payload){
  if(world.paused)return notice('Tạm dừng','Giáo viên đang tạm dừng nhiệm vụ.',false);
  const curMode=activePlayMode||world.current?.defaultMode||'hunt';
+ const isMinesweeper = (world.me?.stage === 4 || world.current?.gameType === 'minesweeper');
  const result=await submit('/api/answer',{stage:world.me.stage,round:world.me.round,...payload});
+ if(!result) return null;
+
  if(result.correct){
   const now=performance.now();
   if(curMode==='defense'){
@@ -2585,29 +2701,37 @@ async function submitStageAnswer(payload){
    huntState.monsterDefeated=false;
    huntState.rewardBadge=null;
    activePlayMode=null;
-   notice('🏆 CHINH PHỤC CHẶNG THÀNH CÔNG!',`Đội đã thu hồi vật phẩm "${result.item}"! Quy tắc mật mã: ${result.digitRule}`,true,
+   notice('🏆 CHINH PHỤC CHẶNG THÀNH CÔNG!', 'Đội đã thu hồi vật phẩm "' + (result.item||'Cổ ngữ') + '"! Quy tắc mật mã: ' + (result.digitRule||''), true,
     {explain:result.explain,digit:result.digit,points:result.points,goldEarned:result.goldEarned,streak:result.streak,button:result.nextStage===5?'Tiến tới Mở Rương Lõi Trí Tuệ →':'Bước sang Chặng tiếp theo →'});
    updateAfterAction();
+  }else if(isMinesweeper){
+   // Dò mìn Chặng 5: Để engine tự xử lý hiệu ứng tiếp đất an toàn và nhận mảnh cổ ngữ
+   return result;
   }else if(curMode==='hunt'&&huntState.battleOpen){
    sound('slash');
    triggerConfetti(1600);
    huntState.monsterDefeated=true;
-   huntState.rewardBadge=result.keyBadge||`Lượt ${result.nextRound}`;
+   huntState.rewardBadge=result.keyBadge||('Lượt ' + result.nextRound);
    huntState.rewardExplain=result.explain;
    render();
   }else{
    sound('correct');
-   notice('💥 ĐẠI BÁC LASER OXYZ KHAI HỎA!',`Đợt quái vật thứ ${world.me.round+1} đã bị tia Laser Oxyz quét sạch! Đội nhận +${result.goldEarned||120} Vàng.`,true,
-    {explain:result.explain,goldEarned:result.goldEarned||120,streak:result.streak,button:`Tiếp tục Đợt ${result.nextRound+1}/3 →`});
+   notice('💥 ĐẠI BÁC LASER OXYZ KHAI HỎA!', 'Đợt quái vật thứ ' + (world.me.round+1) + ' đã bị tia Laser Oxyz quét sạch! Đội nhận +' + (result.goldEarned||120) + ' Vàng.', true,
+    {explain:result.explain,goldEarned:result.goldEarned||120,streak:result.streak,button:'Tiếp tục Đợt ' + (result.nextRound+1) + '/3 →'});
    updateAfterAction();
   }
  }else{
   sound('wrong');
   cdState.shakeUntil=performance.now()+450;
+  if(isMinesweeper){
+   // Dò mìn: KHÔNG hiện modal che màn hình, để bãi mìn nổ boom và chú lính văng về gốc!
+   return result;
+  }
   const x=result.health===0?'Đội đã cạn khiên nhưng NOVA đã sạc lại năng lượng để đội thử tiếp! ':'';
   notice('🛡️ CHƯA CHÍNH XÁC – HÃY QUAN SÁT MÔ HÌNH 3D!',x+'Gợi ý từ NOVA: '+result.hint,false,{button:'↺ Thử lại ngay'});
   updateAfterAction();
  }
+ return result;
 }
 
 async function submitCipherNotebook(){

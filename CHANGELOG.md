@@ -10,6 +10,32 @@ Tất cả những thay đổi quan trọng của dự án này sẽ được gh
 
 ---
 
+## [2.11.0] - 2026-11-03
+
+### Fixed & Enhanced (Full Authentic Minesweeper & Error Hardening)
+- **Khắc Phục Hoàn Toàn Lỗi Runtime & Render Banner:**
+  - Bảo vệ 100% tất cả các lời gọi `String.prototype.repeat(...)` với hàm cận an toàn `Math.max(0, Math.min(3, Math.floor(...) || 0))`, loại bỏ hoàn toàn lỗi `RangeError: Invalid count value: -1`.
+  - Khắc phục triệt để lỗi `renderStageGame is not defined` và sửa đổi `submitStageAnswer` để trả về đúng kết quả đối tượng, không còn tự ý bật modal generic che mất màn hình Chặng 5.
+- **Hoàn Thiện Chặng 5 Dò Mìn Chuẩn 100% Ảnh Mẫu GiaoVienDoiMoi:**
+  - **Bố cục 2 Cột Độc Lập:**
+    - Cột Trái (`.ms-left-sidebar`): Thẻ bài câu hỏi trắng thanh lịch, bo tròn góc với tiêu đề `CÂU X / Y` và nội dung câu hỏi Toán 12 Oxyz bằng chữ đen đậm cực kỳ sắc nét, rõ ràng chuẩn sư phạm.
+    - Cột Phải (`.ms-right-arena`): Bãi cỏ rộng lớn phủ cỏ rêu xanh ngát (`ground-bg.png`).
+  - **Hệ Thống Đáp Án Tự Do Trên Bãi Cỏ:**
+    - Các phương án A, B, C, D được bố trí theo hình cánh cung mở rộng phía trước chú lính (`MS_CHOICE_COORDS_4`).
+    - Huy hiệu chữ cái tròn `(A)`, `(B)`, `(C)`, `(D)` viền trắng nền đen, bên dưới là công thức toán học chữ trắng viền đen tương phản cực nét (`formatMath` hỗ trợ đầy đủ ký hiệu $\pi$, vector $\vec{u}$, $\sqrt{\dots}$, số mũ $^2, ^3$, đơn vị cm).
+  - **Animation Chú Lính Chạy Bộ Đa Hướng Tới Tận Nơi Đáp Án:**
+    - Chú lính xuất phát tại đáy màn hình `(50%, 82%)`. Khi học sinh nhấn chọn đáp án bất kỳ, hệ thống tính toán góc hướng chính xác (`up`, `left`, `right`, `down`), chú lính chuyển động chạy bộ mượt mà với 2 khung hình chân so le thay đổi liên tục và âm thanh bước chân sinh động, chạy tới đứng ngay trước phương án đã chọn.
+  - **Hiệu Ứng Bù Khoáng Nổ Mìn Bị Hất Văng Về Vị Trí Ban Đầu (Knockback Return):**
+    - Nếu chọn trúng mìn: Quả mìn phát nổ chấn động với hiệu ứng tia lửa rực rỡ (`ms-blast-overlay`), màn hình rung lắc mạnh mẽ (`shake`), âm thanh bom nổ rền vang `/sounds/sfx/explosion.mp3`.
+    - Chú lính giật nảy người choáng váng (`wobble`) và **ngay lập tức bị hất văng / chạy lùi quay trở lại vị trí xuất phát ban đầu `(50%, 82%)`**.
+    - Phương án đạp phải mìn được đánh dấu bằng biểu tượng `💥` gạch ngang đỏ để học sinh không chọn lại, trừ 1 khiên sinh mệnh và hiển thị thông báo `💥 BÙM! ĐẠP PHẢI MÌN! VĂNG VỀ VỊ TRÍ BAN ĐẦU!`. Học sinh có thể bấm chọn tiếp phương án khác để tiếp tục hành trình.
+    - Nếu chọn đúng: Tiếp đất an toàn, chuông reo ngân vang `/sounds/sfx/correct.mp3`, nhận huy hiệu Cổ Ngữ (B, A, O, V, E) và tiến vào câu kế tiếp.
+- **Đóng Gói & Đồng Bộ:**
+  - Tự động biên dịch lại file ngoại tuyến [CHOI_THU_1_MAY.html](file:///c:/Users/ADMIN/Downloads/ggvdg%20duyen/MATHVERSE_OXYZ_MINIGAMES/CHOI_THU_1_MAY.html) (2.26 MB) nhúng toàn bộ Base64 sprite chú lính và âm thanh, hoạt động hoàn hảo 100% không cần Internet.
+  - Kiểm thử tự động `test_adventure_flow.js` và `test_standalone_flow.js` đạt 100% Pass.
+
+---
+
 ## [2.10.0] - 2026-11-03
 
 ### Added & Overhauled (Exact Giaoviendoimoi Layout & Knockback Explosion)

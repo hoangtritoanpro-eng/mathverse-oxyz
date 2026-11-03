@@ -1194,3 +1194,18 @@
   z-index: 30;
   border-top: 1px solid rgba(255, 255, 255, 0.12);
 }
+
+.ms-field-choice.exploded {
+  opacity: 0.42;
+  filter: grayscale(0.85);
+  pointer-events: none;
+  cursor: not-allowed;
+}
+.ms-field-choice.exploded .ms-choice-text {
+  text-decoration: line-through;
+  color: #fca5a5;
+}
+.ms-field-choice.exploded .ms-choice-badge {
+  background: #dc2626;
+  border-color: #fee2e2;
+}
