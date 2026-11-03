@@ -120,46 +120,117 @@
 
 /* Đường mòn & vật cản trang trí trên bản đồ 2D */
 .hw-path-svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:1}
+.hw-river-flow{animation:riverFlow 4s linear infinite}
+@keyframes riverFlow{from{stroke-dashoffset:0}to{stroke-dashoffset:-120}}
+
+/* Cảnh quan cây cối & Bia đá tọa độ Oxyz */
+.hw-nature-tree{position:absolute;transform:translate(-50%,-80%);pointer-events:none;z-index:4;display:flex;flex-direction:column;align-items:center}
+.hw-tree-shadow{position:absolute;bottom:4px;width:44px;height:18px;border-radius:50%;background:rgba(0,0,0,.35);filter:blur(2px)}
+.hw-tree-crown{font-size:42px;filter:drop-shadow(0 6px 8px rgba(0,0,0,.45));transform-origin:bottom center;animation:treeSway 4s ease-in-out infinite alternate}
+.hw-tree-crown.pine{font-size:46px;animation-delay:1.2s}
+.hw-tree-crown.palm{font-size:40px;animation-delay:.6s}
+@keyframes treeSway{0%{transform:rotate(0deg)}50%{transform:rotate(2.5deg)}100%{transform:rotate(-2deg)}}
+
+.hw-monument{position:absolute;transform:translate(-50%,-50%);z-index:3;width:34px;height:52px;background:linear-gradient(180deg,#64748b,#334155);border:2px solid #94a3b8;border-radius:6px 6px 2px 2px;box-shadow:0 8px 14px rgba(0,0,0,.5);display:grid;place-items:center;cursor:help}
+.hw-monument-rune{font-family:'Courier New',monospace;font-size:13px;font-weight:950;color:#38bdf8;text-shadow:0 0 8px #38bdf8;letter-spacing:1px}
+
 .hw-obstacle{position:absolute;transform:translate(-50%,-50%);font-size:30px;pointer-events:none;z-index:3;filter:drop-shadow(0 5px 5px rgba(0,0,0,.5));user-select:none}
 .hw-wall-block{position:absolute;background:linear-gradient(180deg,#475569,#1e293b);border:2px solid #94a3b8;border-radius:8px;box-shadow:0 6px 0 #0f172a,0 8px 14px rgba(0,0,0,.45);z-index:3;pointer-events:none}
 .theme-maze .hw-wall-block{background:linear-gradient(180deg,#0d9488,#115e59);border-color:#5eead4;box-shadow:0 6px 0 #042f2e}
 .theme-crystal .hw-wall-block{background:linear-gradient(180deg,#7c3aed,#4c1d95);border-color:#c4b5fd;box-shadow:0 6px 0 #2e1065}
 .hw-firefly{position:absolute;width:6px;height:6px;border-radius:50%;background:#fde047;box-shadow:0 0 10px 3px rgba(253,224,71,.75);pointer-events:none;z-index:4;animation:float 3.2s ease-in-out infinite}
+.hw-crystal-spire{position:absolute;transform:translate(-50%,-50%);font-size:34px;z-index:4;pointer-events:none;animation:float 2.8s ease-in-out infinite;filter:drop-shadow(0 0 12px rgba(168,85,247,.8))}
 
-/* Trạm Quái Vật / Câu Hỏi trên bản đồ */
+/* Đền Thờ / Trạm Thử Thách Oxyz Đồ Họa Cực Phẩm */
 .hw-station{position:absolute;transform:translate(-50%,-50%);z-index:12;cursor:pointer;display:flex;flex-direction:column;align-items:center;transition:transform .2s}
-.hw-station:hover{transform:translate(-50%,-50%) scale(1.09)}
-.hw-ring{position:absolute;width:116px;height:116px;border-radius:50%;border:3px dashed rgba(250,204,21,.88);background:radial-gradient(circle,rgba(250,204,21,.26) 0%,rgba(250,204,21,.02) 70%);top:50%;left:50%;transform:translate(-50%,-50%);animation:hwSpin 12s linear infinite;pointer-events:none}
-.hw-station.locked .hw-ring{border-color:rgba(148,163,184,.45);background:radial-gradient(circle,rgba(148,163,184,.12) 0%,transparent 70%);animation:none}
-.hw-station.passed .hw-ring{border-color:rgba(52,211,153,.85);background:radial-gradient(circle,rgba(52,211,153,.25) 0%,transparent 70%);animation:none}
-.hw-station-core{width:68px;height:68px;border-radius:50%;background:radial-gradient(circle at 30% 30%,#334155,#0f172a);border:3px solid #facc15;display:grid;place-items:center;font-size:34px;box-shadow:0 8px 22px rgba(0,0,0,.65);position:relative;z-index:2;animation:float 2.6s ease-in-out infinite}
-.hw-station.locked .hw-station-core{border-color:#64748b;filter:grayscale(.65);opacity:.82;animation:none}
-.hw-station.passed .hw-station-core{border-color:#10b981;background:radial-gradient(circle at 30% 30%,#065f46,#022c22);animation:none}
-.hw-station-label{margin-top:6px;padding:4px 10px;border-radius:99px;background:rgba(15,23,42,.92);border:1.5px solid #facc15;color:#fef08a;font-size:11.5px;font-weight:900;white-space:nowrap;box-shadow:0 4px 10px rgba(0,0,0,.5);z-index:3}
+.hw-station:hover{transform:translate(-50%,-50%) scale(1.08)}
+.hw-shrine-base{position:absolute;width:88px;height:36px;border-radius:50%;background:linear-gradient(180deg,#334155,#0f172a);border:2px solid #64748b;top:60%;left:50%;transform:translate(-50%,-50%);box-shadow:0 10px 24px rgba(0,0,0,.7);pointer-events:none}
+.hw-shrine-pillars{position:absolute;width:96px;height:48px;top:40%;left:50%;transform:translate(-50%,-50%);pointer-events:none;display:flex;justify-content:space-between}
+.hw-pillar{width:10px;height:46px;background:linear-gradient(180deg,#94a3b8,#475569);border:1.5px solid #cbd5e1;border-radius:4px;box-shadow:0 4px 10px rgba(0,0,0,.6)}
+
+.hw-beacon-beam{position:absolute;width:32px;height:240px;bottom:35px;left:50%;transform:translateX(-50%);background:linear-gradient(180deg,transparent,rgba(250,204,21,.15),rgba(250,204,21,.65));border-radius:99px;filter:blur(3px);pointer-events:none;animation:beaconPulse 1.8s infinite alternate}
+@keyframes beaconPulse{0%{opacity:.55;transform:translateX(-50%) scaleX(.85)}100%{opacity:.95;transform:translateX(-50%) scaleX(1.15)}}
+
+.hw-ring{position:absolute;width:124px;height:124px;border-radius:50%;border:3px dashed rgba(250,204,21,.88);background:radial-gradient(circle,rgba(250,204,21,.26) 0%,rgba(250,204,21,.02) 70%);top:50%;left:50%;transform:translate(-50%,-50%);animation:hwSpin 12s linear infinite;pointer-events:none}
+.hw-station.locked .hw-ring{border-color:rgba(148,163,184,.35);background:radial-gradient(circle,rgba(148,163,184,.08) 0%,transparent 70%);animation:none}
+.hw-station.passed .hw-ring{border-color:rgba(52,211,153,.85);background:radial-gradient(circle,rgba(52,211,153,.2) 0%,transparent 70%);animation:none}
+
+.hw-station-core{width:74px;height:74px;border-radius:50%;background:radial-gradient(circle at 30% 30%,#334155,#0f172a);border:3.5px solid #facc15;display:grid;place-items:center;font-size:36px;box-shadow:0 10px 26px rgba(0,0,0,.7),0 0 20px rgba(250,204,21,.5);position:relative;z-index:2;animation:float 2.5s ease-in-out infinite}
+.hw-station.locked .hw-station-core{border-color:#64748b;filter:grayscale(.8);opacity:.8;box-shadow:none;animation:none}
+.hw-station.passed .hw-station-core{border-color:#10b981;background:radial-gradient(circle at 30% 30%,#065f46,#022c22);box-shadow:0 0 22px rgba(16,185,129,.5);animation:none}
+
+.hw-cleared-badge{position:absolute;top:-4px;right:-4px;font-size:20px;background:#10b981;border:2px solid #fff;border-radius:50%;width:26px;height:26px;display:grid;place-items:center}
+.hw-station-info{display:flex;flex-direction:column;align-items:center;gap:3px;margin-top:6px;z-index:3}
+.hw-station-label{padding:4px 12px;border-radius:99px;background:rgba(15,23,42,.94);border:1.5px solid #facc15;color:#fef08a;font-size:12px;font-weight:900;white-space:nowrap;box-shadow:0 4px 12px rgba(0,0,0,.55)}
 .hw-station.passed .hw-station-label{border-color:#34d399;color:#a7f3d0}
 .hw-station.locked .hw-station-label{border-color:#64748b;color:#cbd5e1}
+.hw-station-action-hint{font-size:10px;font-weight:950;color:#fde047;background:rgba(180,83,9,.9);padding:2px 8px;border-radius:6px;animation:pulse 1.2s infinite}
 
 /* Rương kho báu chặng */
-.hw-chest{position:absolute;transform:translate(-50%,-50%);z-index:11;display:flex;flex-direction:column;align-items:center;cursor:pointer}
-.hw-chest-box{width:70px;height:70px;border-radius:18px;background:radial-gradient(circle,#fef08a,#ca8a04);border:3px solid #fff;display:grid;place-items:center;font-size:36px;box-shadow:0 0 28px rgba(250,204,21,.75)}
-.hw-chest.locked .hw-chest-box{filter:grayscale(.7);opacity:.65;box-shadow:none}
+.hw-chest{position:absolute;transform:translate(-50%,-50%);z-index:11;display:flex;flex-direction:column;align-items:center;cursor:pointer;transition:transform .2s}
+.hw-chest:hover{transform:translate(-50%,-50%) scale(1.08)}
+.hw-chest-pedestal{position:absolute;width:82px;height:32px;border-radius:50%;background:#1e293b;border:2px solid #ca8a04;top:65%;left:50%;transform:translate(-50%,-50%);box-shadow:0 8px 20px rgba(0,0,0,.6)}
+.hw-chest-box{width:74px;height:74px;border-radius:20px;background:radial-gradient(circle,#fef08a,#ca8a04);border:3.5px solid #fff;display:grid;place-items:center;font-size:38px;box-shadow:0 0 32px rgba(250,204,21,.85);position:relative;z-index:2;animation:float 2.4s ease-in-out infinite}
+.hw-chest.locked .hw-chest-box{filter:grayscale(.75);opacity:.65;box-shadow:none;animation:none}
 
-/* Nhân vật của Đội trên bản đồ */
-.hw-player{position:absolute;transform:translate(-50%,-50%);z-index:20;pointer-events:none;transition:left 55ms linear,top 55ms linear;display:flex;flex-direction:column;align-items:center}
-.hw-player-torch{position:absolute;width:210px;height:210px;border-radius:50%;background:radial-gradient(circle,rgba(255,243,176,.32) 0%,rgba(56,189,248,.12) 45%,transparent 72%);top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none}
-.hw-player-avatar{width:56px;height:56px;border-radius:50%;background:radial-gradient(circle at 30% 30%,#ffffff,#dbeafe);border:3px solid #38bdf8;box-shadow:0 0 20px rgba(56,189,248,.9),0 8px 14px rgba(0,0,0,.55);display:grid;place-items:center;font-size:30px;position:relative;z-index:2}
-.hw-player.moving .hw-player-avatar{animation:hwBounce .3s infinite alternate}
-.hw-player-name{margin-top:4px;padding:2px 9px;border-radius:99px;background:#0284c7;color:#fff;font-size:11px;font-weight:900;white-space:nowrap;border:1px solid #bae6fd;box-shadow:0 3px 8px rgba(0,0,0,.5)}
-.hw-ripple{position:absolute;width:36px;height:36px;border-radius:50%;border:2.5px solid #38bdf8;transform:translate(-50%,-50%);pointer-events:none;z-index:15;animation:hwRipple .55s ease-out forwards}
+/* Tinh Thể & Quà Tặng Nhặt Trên Bản Đồ (Collectibles) */
+.hw-collectible{position:absolute;transform:translate(-50%,-50%);z-index:10;display:flex;flex-direction:column;align-items:center;pointer-events:none;animation:gemBob 2s ease-in-out infinite alternate}
+@keyframes gemBob{0%{transform:translate(-50%,-50%) translateY(0)}100%{transform:translate(-50%,-50%) translateY(-9px)}}
+.hw-collectible-icon{font-size:28px;filter:drop-shadow(0 0 10px rgba(250,204,21,.9))}
+.hw-collectible.xp .hw-collectible-icon{filter:drop-shadow(0 0 12px #38bdf8)}
+.hw-collectible.shield .hw-collectible-icon{filter:drop-shadow(0 0 12px #4ade80)}
+.hw-collectible-tag{font-size:9.5px;font-weight:950;background:rgba(9,14,26,.88);padding:1px 6px;border-radius:6px;border:1px solid #facc15;color:#fde047;white-space:nowrap;margin-top:2px}
+.hw-collectible.xp .hw-collectible-tag{border-color:#38bdf8;color:#bae6fd}
+.hw-collectible.shield .hw-collectible-tag{border-color:#4ade80;color:#bbf7d0}
 
-/* D-Pad ảo & Hướng dẫn điều khiển trên Viewport */
+/* Chữ số nổi bay lên khi nhặt đồ (Popups) */
+.hw-float-popup{position:absolute;transform:translate(-50%,-100%);z-index:28;font-size:16px;font-weight:950;text-shadow:0 2px 8px rgba(0,0,0,.9);pointer-events:none;animation:floatUpFade 1.2s ease-out forwards}
+@keyframes floatUpFade{0%{opacity:0;transform:translate(-50%,-20%) scale(.6)}20%{opacity:1;transform:translate(-50%,-70%) scale(1.15)}80%{opacity:1;transform:translate(-50%,-120%) scale(1)}100%{opacity:0;transform:translate(-50%,-150%) scale(.85)}}
+
+/* Cọc Tiêu Định Vị Mục Tiêu khi chạm/click trên bản đồ */
+.hw-target-beacon{position:absolute;transform:translate(-50%,-50%);z-index:18;pointer-events:none}
+.hw-target-beacon-sonar{position:absolute;width:64px;height:64px;border-radius:50%;border:2.5px solid #38bdf8;top:50%;left:50%;transform:translate(-50%,-50%);animation:targetSonar 1s cubic-bezier(.25,1,.5,1) infinite}
+@keyframes targetSonar{0%{transform:translate(-50%,-50%) scale(.3);opacity:1}100%{transform:translate(-50%,-50%) scale(2.2);opacity:0}}
+.hw-target-beacon-ring{position:absolute;width:34px;height:34px;border-radius:50%;background:rgba(56,189,248,.35);border:2px solid #bae6fd;top:50%;left:50%;transform:translate(-50%,-50%)}
+.hw-target-beacon-pin{font-size:24px;filter:drop-shadow(0 4px 6px rgba(0,0,0,.6));animation:pinBounce .5s infinite alternate ease-in-out;transform-origin:bottom center}
+@keyframes pinBounce{0%{transform:translateY(0)}100%{transform:translateY(-8px)}}
+.hw-target-beacon-label{position:absolute;top:100%;left:50%;transform:translateX(-50%);background:rgba(9,14,26,.92);border:1px solid #38bdf8;color:#bae6fd;font-size:10px;font-weight:950;padding:2px 7px;border-radius:6px;white-space:nowrap}
+
+/* NHÂN VẬT THÁM HIỂM (HERO CHARACTER) SỐNG ĐỘNG */
+.hw-player{position:absolute;transform:translate(-50%,-50%);z-index:22;pointer-events:none;transition:left 50ms linear,top 50ms linear;display:flex;flex-direction:column;align-items:center}
+.hw-player-torch{position:absolute;width:240px;height:240px;border-radius:50%;background:radial-gradient(circle,rgba(255,243,176,.35) 0%,rgba(56,189,248,.15) 45%,transparent 72%);top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none}
+.hw-player-aura-ring{position:absolute;width:68px;height:68px;border-radius:50%;border:2px solid rgba(56,189,248,.8);box-shadow:0 0 16px rgba(56,189,248,.6);top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;animation:pulse 1.6s infinite}
+.hw-player-shadow{position:absolute;bottom:18px;width:44px;height:16px;border-radius:50%;background:rgba(0,0,0,.45);filter:blur(2px);transition:all .2s}
+
+.hw-hero-chassis{position:relative;transition:transform .15s ease-out;display:grid;place-items:center}
+.hw-player.facing-left .hw-hero-chassis{transform:scaleX(-1)}
+.hw-player.facing-right .hw-hero-chassis{transform:scaleX(1)}
+.hw-player.moving .hw-hero-chassis{animation:heroWalk .26s infinite alternate ease-in-out}
+.hw-player.sprinting .hw-hero-chassis{animation:heroWalk .16s infinite alternate ease-in-out}
+.hw-player.sprinting .hw-player-shadow{box-shadow:0 0 20px #f59e0b,0 0 35px #ef4444}
+@keyframes heroWalk{0%{transform:translateY(0) rotate(0deg)}50%{transform:translateY(-8px) rotate(-3deg)}100%{transform:translateY(0) rotate(3deg)}}
+
+.hw-player-avatar{width:60px;height:60px;border-radius:50%;background:radial-gradient(circle at 30% 30%,#ffffff,#dbeafe);border:3.5px solid #38bdf8;box-shadow:0 0 22px rgba(56,189,248,.95),0 8px 16px rgba(0,0,0,.6);display:grid;place-items:center;font-size:32px;position:relative;z-index:2}
+.hw-hero-crown{position:absolute;top:-12px;font-size:18px;animation:float 2s ease-in-out infinite;z-index:3}
+
+.hw-player-tag{margin-top:4px;display:flex;flex-direction:column;align-items:center;gap:1px;z-index:3}
+.hw-player-name{padding:2px 10px;border-radius:99px;background:#0284c7;color:#fff;font-size:11.5px;font-weight:950;white-space:nowrap;border:1.5px solid #bae6fd;box-shadow:0 3px 10px rgba(0,0,0,.55)}
+.hw-player-role{font-size:9.5px;font-weight:900;background:rgba(15,23,42,.92);color:#fde047;padding:1px 7px;border-radius:99px;border:1px solid rgba(250,204,21,.5);white-space:nowrap}
+
+/* D-Pad ảo & Nút Tăng Tốc Gamepad */
 .hw-controls-overlay{position:absolute;bottom:14px;left:14px;right:14px;display:flex;justify-content:space-between;align-items:flex-end;pointer-events:none;z-index:25}
-.hw-dpad{display:grid;grid-template-columns:repeat(3,42px);grid-template-rows:repeat(2,42px);gap:5px;pointer-events:auto;background:rgba(15,23,42,.82);padding:7px;border-radius:16px;border:1.5px solid rgba(255,255,255,.22);backdrop-filter:blur(4px)}
-.hw-dpad button{width:42px;height:42px;border-radius:10px;border:1px solid rgba(255,255,255,.28);background:rgba(30,41,59,.92);color:#fff;font-size:18px;font-weight:900;display:grid;place-items:center;padding:0}
-.hw-dpad button:active{background:#0284c7;transform:scale(.94)}
+.hw-dpad-wrap{display:flex;flex-direction:column;gap:7px;pointer-events:auto}
+.hw-dpad{display:grid;grid-template-columns:repeat(3,46px);grid-template-rows:repeat(2,46px);gap:6px;background:rgba(15,23,42,.88);padding:8px;border-radius:18px;border:2px solid rgba(255,255,255,.25);backdrop-filter:blur(6px);box-shadow:0 10px 28px rgba(0,0,0,.6)}
+.hw-dpad button{width:46px;height:46px;border-radius:12px;border:1.5px solid rgba(255,255,255,.32);background:linear-gradient(180deg,#334155,#1e293b);color:#f8fafc;font-size:19px;font-weight:950;display:grid;place-items:center;padding:0;box-shadow:0 4px 8px rgba(0,0,0,.45);transition:all .08s}
+.hw-dpad button:active{background:#0284c7;transform:scale(.92);box-shadow:0 0 14px #38bdf8}
+
+.hw-sprint-btn{border:2px solid #ca8a04;background:linear-gradient(135deg,#78350f,#451a03);color:#fef08a;font-size:11.5px;font-weight:950;padding:8px 12px;border-radius:12px;display:inline-flex;align-items:center;justify-content:center;gap:6px;box-shadow:0 6px 14px rgba(0,0,0,.45);cursor:pointer;transition:all .15s}
+.hw-sprint-btn.active{border-color:#fde047;background:linear-gradient(135deg,#eab308,#ca8a04);color:#1e1b4b;box-shadow:0 0 20px rgba(250,204,21,.75)}
+
 .hw-action-panel{pointer-events:auto;display:flex;flex-direction:column;align-items:flex-end;gap:8px}
-.hw-attack-station-btn{border:2px solid #fde047;background:linear-gradient(135deg,#eab308,#ca8a04);color:#1e1b4b;font-weight:950;font-size:14px;padding:11px 18px;border-radius:14px;box-shadow:0 8px 22px rgba(234,179,8,.5);animation:pulse 1.2s infinite}
-.hw-hint-pill{background:rgba(15,23,42,.88);border:1px solid rgba(255,255,255,.2);color:#e2e8f0;padding:6px 12px;border-radius:10px;font-size:11.5px;font-weight:750}
+.hw-attack-station-btn{border:2.5px solid #fde047;background:linear-gradient(135deg,#eab308,#ca8a04);color:#1e1b4b;font-weight:950;font-size:14.5px;padding:12px 20px;border-radius:16px;box-shadow:0 8px 24px rgba(234,179,8,.55);animation:pulse 1.2s infinite;cursor:pointer}
+.hw-attack-station-btn.pulse-urgent{background:linear-gradient(135deg,#ef4444,#dc2626);color:#fff;border-color:#fecaca;box-shadow:0 0 28px rgba(239,68,68,.85)}
+.hw-hint-pill{background:rgba(15,23,42,.92);border:1.5px solid rgba(255,255,255,.25);color:#e2e8f0;padding:7px 14px;border-radius:12px;font-size:12px;font-weight:800;backdrop-filter:blur(4px);box-shadow:0 6px 14px rgba(0,0,0,.4)}
 
 /* Cửa sổ Chiến Đấu Cuộn Giấy Cổ (Battle Scroll Modal giống hunt-preview) */
 .hw-battle-backdrop{position:fixed;inset:0;background:rgba(9,13,26,.85);z-index:70;display:grid;place-items:center;padding:16px;backdrop-filter:blur(6px)}

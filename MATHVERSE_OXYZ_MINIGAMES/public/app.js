@@ -50,12 +50,17 @@ const huntState={
  targetX:null, targetY:null,
  keysPressed:new Set(),
  moving:false,
+ facing:'right',
+ isSprinting:false,
  battleOpen:false,
  selectedChoice:null,
  shortText:'',
  monsterDefeated:false,
  rewardBadge:null,
- lastAutoStation:-1
+ lastAutoStation:-1,
+ lastStepSfxAt:0,
+ collectibles:[],
+ popups:[]
 };
 
 /* ─── TRẠNG THÁI ENGINE 2: BẢO VỆ THÀNH TRÌ (CASTLE DEFENSE) ─── */
@@ -331,32 +336,149 @@ function renderCastleSVG(){
 
 function getTerrainSVG(theme,pathPts){
  let bgShapes='';
+ const defs=`
+  <defs>
+   <linearGradient id="riverWater" x1="0%" y1="0%" x2="100%" y2="100%">
+    <stop offset="0%" stop-color="#0284c7"/>
+    <stop offset="50%" stop-color="#38bdf8"/>
+    <stop offset="100%" stop-color="#0369a1"/>
+   </linearGradient>
+   <linearGradient id="lavaRiver" x1="0%" y1="0%" x2="100%" y2="0%">
+    <stop offset="0%" stop-color="#991b1b"/>
+    <stop offset="35%" stop-color="#dc2626"/>
+    <stop offset="70%" stop-color="#f97316"/>
+    <stop offset="100%" stop-color="#facc15"/>
+   </linearGradient>
+   <linearGradient id="manaStream" x1="0%" y1="0%" x2="100%" y2="100%">
+    <stop offset="0%" stop-color="#6366f1"/>
+    <stop offset="50%" stop-color="#a855f7"/>
+    <stop offset="100%" stop-color="#38bdf8"/>
+   </linearGradient>
+   <linearGradient id="bridgePlankGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+    <stop offset="0%" stop-color="#451a03"/>
+    <stop offset="30%" stop-color="#78350f"/>
+    <stop offset="70%" stop-color="#92400e"/>
+    <stop offset="100%" stop-color="#451a03"/>
+   </linearGradient>
+  </defs>`;
+
  if(theme==='forest'){
   bgShapes=`
-   <!-- Dòng sông cổ uốn lượn & Cầu gỗ -->
-   <path d="M 480 0 C 430 250, 560 520, 460 820" fill="none" stroke="rgba(56,189,248,0.28)" stroke-width="58" stroke-linecap="round"/>
-   <path d="M 480 0 C 430 250, 560 520, 460 820" fill="none" stroke="rgba(186,230,253,0.35)" stroke-width="32" stroke-dasharray="22 18"/>
-   <rect x="440" y="210" width="76" height="34" rx="6" fill="#78350f" stroke="#f59e0b" stroke-width="3"/>
-   <rect x="470" y="545" width="76" height="34" rx="6" fill="#78350f" stroke="#f59e0b" stroke-width="3"/>`;
+   ${defs}
+   <!-- DÒNG SÔNG CỔ TỰ NHIÊN UỐN LƯỢN QUA LỤC ĐỊA -->
+   <path d="M 510 0 C 535 180, 495 300, 516 410 C 538 520, 485 640, 520 820" fill="none" stroke="#14532d" stroke-width="90" stroke-linecap="round"/>
+   <path d="M 510 0 C 535 180, 495 300, 516 410 C 538 520, 485 640, 520 820" fill="none" stroke="#b45309" stroke-width="78" stroke-opacity="0.32" stroke-linecap="round"/>
+   <path d="M 510 0 C 535 180, 495 300, 516 410 C 538 520, 485 640, 520 820" fill="none" stroke="url(#riverWater)" stroke-width="62" stroke-linecap="round"/>
+   <!-- Gợn sóng chuyển động lăn tăn -->
+   <path d="M 510 0 C 535 180, 495 300, 516 410 C 538 520, 485 640, 520 820" fill="none" stroke="rgba(255,255,255,0.45)" stroke-width="4.5" stroke-dasharray="16 26" class="hw-river-flow" stroke-linecap="round"/>
+   <!-- Nhánh suối nhỏ phía Đông -->
+   <path d="M 516 410 Q 640 430 762 422 T 950 460" fill="none" stroke="#0284c7" stroke-width="26" stroke-opacity="0.65" stroke-linecap="round"/>
+   <!-- Bụi hoa súng ven sông -->
+   <circle cx="496" cy="180" r="9" fill="#15803d" stroke="#4ade80" stroke-width="1.5"/>
+   <circle cx="538" cy="630" r="11" fill="#15803d" stroke="#4ade80" stroke-width="1.5"/>
+   <!-- CẦU GỖ CỔ TÍCH CHÍNH TẠI ĐIỂM GIAO ĐƯỜNG MÒN (x=516, y=410, xoay 57 độ theo góc đường) -->
+   <g transform="translate(516, 410) rotate(57)">
+    <rect x="-62" y="-30" width="20" height="60" rx="5" fill="#334155" stroke="#94a3b8" stroke-width="2"/>
+    <rect x="42" y="-30" width="20" height="60" rx="5" fill="#334155" stroke="#94a3b8" stroke-width="2"/>
+    <rect x="-48" y="-26" width="96" height="52" rx="4" fill="url(#bridgePlankGrad)" stroke="#b45309" stroke-width="3" filter="drop-shadow(0 6px 10px rgba(0,0,0,0.45))"/>
+    <line x1="-38" y1="-26" x2="-38" y2="26" stroke="#261005" stroke-width="2.5"/>
+    <line x1="-26" y1="-26" x2="-26" y2="26" stroke="#261005" stroke-width="2.5"/>
+    <line x1="-14" y1="-26" x2="-14" y2="26" stroke="#261005" stroke-width="2.5"/>
+    <line x1="-2"  y1="-26" x2="-2"  y2="26" stroke="#261005" stroke-width="2.5"/>
+    <line x1="10"  y1="-26" x2="10"  y2="26" stroke="#261005" stroke-width="2.5"/>
+    <line x1="22"  y1="-26" x2="22"  y2="26" stroke="#261005" stroke-width="2.5"/>
+    <line x1="34"  y1="-26" x2="34"  y2="26" stroke="#261005" stroke-width="2.5"/>
+    <!-- Lan can gỗ bảo vệ và đèn lồng mạ vàng -->
+    <rect x="-50" y="-28" width="100" height="6" rx="2" fill="#d97706" stroke="#451a03" stroke-width="1.5"/>
+    <rect x="-50" y="22"  width="100" height="6" rx="2" fill="#d97706" stroke="#451a03" stroke-width="1.5"/>
+    <circle cx="-42" cy="-25" r="3.5" fill="#facc15" stroke="#78350f" stroke-width="1"/>
+    <circle cx="0"   cy="-25" r="3.5" fill="#facc15" stroke="#78350f" stroke-width="1"/>
+    <circle cx="42"  cy="-25" r="3.5" fill="#facc15" stroke="#78350f" stroke-width="1"/>
+    <circle cx="-42" cy="25"  r="3.5" fill="#facc15" stroke="#78350f" stroke-width="1"/>
+    <circle cx="0"   cy="25"  r="3.5" fill="#facc15" stroke="#78350f" stroke-width="1"/>
+    <circle cx="42"  cy="25"  r="3.5" fill="#facc15" stroke="#78350f" stroke-width="1"/>
+   </g>
+   <!-- CẦU ĐÁ PHỤ TẠI NHÁNH SUỐI ĐÔNG (x=762, y=422, xoay -60 độ) -->
+   <g transform="translate(762, 422) rotate(-60)">
+    <rect x="-35" y="-20" width="70" height="40" rx="6" fill="#475569" stroke="#94a3b8" stroke-width="2.5"/>
+    <rect x="-28" y="-16" width="56" height="32" rx="3" fill="#64748b" stroke="#cbd5e1" stroke-width="1.5"/>
+    <circle cx="-25" cy="-18" r="3" fill="#38bdf8"/>
+    <circle cx="25"  cy="-18" r="3" fill="#38bdf8"/>
+    <circle cx="-25" cy="18"  r="3" fill="#38bdf8"/>
+    <circle cx="25"  cy="18"  r="3" fill="#38bdf8"/>
+   </g>`;
+ }else if(theme==='fortress'){
+  bgShapes=`
+   ${defs}
+   <!-- SÔNG DUNG NHAM NÚI LỬA NÓNG CHẢY -->
+   <path d="M 510 0 C 490 200, 540 320, 516 410 C 490 510, 530 650, 510 820" fill="none" stroke="#0f172a" stroke-width="96" stroke-linecap="round"/>
+   <path d="M 510 0 C 490 200, 540 320, 516 410 C 490 510, 530 650, 510 820" fill="none" stroke="#dc2626" stroke-width="82" stroke-opacity="0.45" stroke-linecap="round"/>
+   <path d="M 510 0 C 490 200, 540 320, 516 410 C 490 510, 530 650, 510 820" fill="none" stroke="url(#lavaRiver)" stroke-width="64" stroke-linecap="round"/>
+   <!-- Bọt lửa sôi sục -->
+   <circle cx="505" cy="220" r="7" fill="#fef08a" opacity="0.9"/>
+   <circle cx="530" cy="580" r="9" fill="#fef08a" opacity="0.9"/>
+   <!-- CẦU THÉP NÚI LỬA CHỐNG NHIỆT OXYZ -->
+   <g transform="translate(516, 410) rotate(57)">
+    <rect x="-60" y="-28" width="120" height="56" rx="5" fill="#1e293b" stroke="#f97316" stroke-width="3" filter="drop-shadow(0 6px 12px rgba(249,115,22,0.35))"/>
+    <line x1="-40" y1="-28" x2="40" y2="28" stroke="#facc15" stroke-width="2"/>
+    <line x1="-40" y1="28" x2="40" y2="-28" stroke="#facc15" stroke-width="2"/>
+    <circle cx="-45" cy="0" r="5" fill="#ef4444"/>
+    <circle cx="45" cy="0" r="5" fill="#ef4444"/>
+   </g>`;
  }else if(theme==='crystal'){
   bgShapes=`
-   <polygon points="320,120 350,60 380,120" fill="rgba(56,189,248,0.28)" stroke="#7dd3fc" stroke-width="2"/>
-   <polygon points="680,680 715,610 750,680" fill="rgba(192,132,252,0.28)" stroke="#e9d5ff" stroke-width="2"/>
-   <circle cx="600" cy="410" r="110" fill="rgba(56,189,248,0.1)" stroke="rgba(125,211,252,0.3)" stroke-width="2" stroke-dasharray="10 8"/>`;
+   ${defs}
+   <!-- DÒNG SÔNG NĂNG LƯỢNG ÁNH SÁNG TỰ NHIÊN -->
+   <path d="M 510 0 C 530 200, 490 320, 516 410 C 540 520, 480 640, 515 820" fill="none" stroke="#1e1b4b" stroke-width="86" stroke-linecap="round"/>
+   <path d="M 510 0 C 530 200, 490 320, 516 410 C 540 520, 480 640, 515 820" fill="none" stroke="url(#manaStream)" stroke-width="58" stroke-linecap="round"/>
+   <path d="M 510 0 C 530 200, 490 320, 516 410 C 540 520, 480 640, 515 820" fill="none" stroke="#bae6fd" stroke-width="3" stroke-dasharray="14 24" class="hw-river-flow"/>
+   <!-- CẦU PHA LÊ NĂNG LƯỢNG NGỌC BÍCH -->
+   <g transform="translate(516, 410) rotate(57)">
+    <rect x="-56" y="-26" width="112" height="52" rx="8" fill="rgba(30,27,75,0.85)" stroke="#38bdf8" stroke-width="3" filter="drop-shadow(0 0 16px rgba(56,189,248,0.5))"/>
+    <polygon points="-40,-18 -20,-18 -30,-8" fill="#a855f7"/>
+    <polygon points="20,-18 40,-18 30,-8" fill="#a855f7"/>
+    <polygon points="-40,18 -20,18 -30,8" fill="#38bdf8"/>
+    <polygon points="20,18 40,18 30,8" fill="#38bdf8"/>
+   </g>`;
  }else if(theme==='maze'){
   bgShapes=`
-   <circle cx="600" cy="410" r="190" fill="none" stroke="rgba(45,212,191,0.22)" stroke-width="18"/>
-   <circle cx="600" cy="410" r="110" fill="none" stroke="rgba(45,212,191,0.22)" stroke-width="14" stroke-dasharray="40 20"/>`;
+   ${defs}
+   <!-- HỆ THỐNG KÊNH NƯỚC CỔ MÊ CUNG HY LẠP -->
+   <path d="M 516 0 L 516 820" fill="none" stroke="#042f2e" stroke-width="84"/>
+   <path d="M 516 0 L 516 820" fill="none" stroke="#0d9488" stroke-width="56"/>
+   <path d="M 516 0 L 516 820" fill="none" stroke="#5eead4" stroke-width="4" stroke-dasharray="24 20" class="hw-river-flow"/>
+   <g transform="translate(516, 410) rotate(57)">
+    <rect x="-55" y="-26" width="110" height="52" rx="4" fill="#134e4a" stroke="#2dd4bf" stroke-width="3"/>
+    <circle cx="-42" cy="-20" r="4" fill="#99f6e4"/>
+    <circle cx="42" cy="-20" r="4" fill="#99f6e4"/>
+    <circle cx="-42" cy="20" r="4" fill="#99f6e4"/>
+    <circle cx="42" cy="20" r="4" fill="#99f6e4"/>
+   </g>`;
  }else{
   bgShapes=`
-   <path d="M 280 80 Q 600 400 920 720" fill="none" stroke="rgba(249,115,22,0.24)" stroke-width="36" stroke-linecap="round"/>
-   <circle cx="620" cy="410" r="95" fill="rgba(239,68,68,0.14)" stroke="rgba(252,165,165,0.28)" stroke-width="3"/>`;
+   ${defs}
+   <!-- HÀO NƯỚC HOÀNG GIA BAO QUANH ĐIỆN THỜ -->
+   <path d="M 510 0 C 530 200, 490 320, 516 410 C 540 520, 480 640, 515 820" fill="none" stroke="#2e1065" stroke-width="84" stroke-linecap="round"/>
+   <path d="M 510 0 C 530 200, 490 320, 516 410 C 540 520, 480 640, 515 820" fill="none" stroke="#7c3aed" stroke-width="56" stroke-linecap="round"/>
+   <g transform="translate(516, 410) rotate(57)">
+    <rect x="-60" y="-28" width="120" height="56" rx="6" fill="#4c1d95" stroke="#facc15" stroke-width="3" filter="drop-shadow(0 6px 14px rgba(250,204,21,0.4))"/>
+    <circle cx="-45" cy="0" r="6" fill="#facc15"/>
+    <circle cx="45" cy="0" r="6" fill="#facc15"/>
+   </g>`;
  }
+
  return `<svg class="hw-path-svg" viewBox="0 0 1200 820" preserveAspectRatio="none">
   ${bgShapes}
-  <!-- Đường mòn chính dẫn qua các Trạm -->
-  <polyline points="${pathPts}" fill="none" stroke="rgba(0,0,0,0.35)" stroke-width="28" stroke-linecap="round" stroke-linejoin="round"/>
-  <polyline points="${pathPts}" fill="none" stroke="rgba(250,204,21,0.52)" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="18 14"/>
+  <!-- NỀN ĐƯỜNG ĐẤT NỆN RỘNG RÃI -->
+  <polyline points="${pathPts}" fill="none" stroke="rgba(15,23,42,0.85)" stroke-width="52" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- LỚP ĐÁ CUỘI LÁT ĐƯỜNG PHIÊU LƯU (COBBLESTONE TRAIL) -->
+  <polyline points="${pathPts}" fill="none" stroke="rgba(113,113,122,0.72)" stroke-width="40" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- VIỀN CỎ VÀ HOA DẠI DỌC LỀ ĐƯỜNG -->
+  <polyline points="${pathPts}" fill="none" stroke="rgba(63,63,70,0.52)" stroke-width="28" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- VẠCH CHỈ HƯỚNG DẠ QUANG VÀNG KIM CHÍNH GIỮA -->
+  <polyline points="${pathPts}" fill="none" stroke="#facc15" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="16 16"/>
+  <!-- ĐỐM NĂNG LƯỢNG OXYZ PHÁT SÁNG -->
+  <polyline points="${pathPts}" fill="none" stroke="#38bdf8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="4 32"/>
  </svg>`;
 }
 
@@ -443,12 +565,26 @@ function initHuntForStage(m){
   huntState.y=hm.spawn.y;
   huntState.targetX=null;
   huntState.targetY=null;
+  huntState.moving=false;
+  huntState.facing='right';
+  huntState.isSprinting=false;
   huntState.battleOpen=false;
   huntState.selectedChoice=null;
   huntState.shortText='';
   huntState.monsterDefeated=false;
   huntState.rewardBadge=null;
   huntState.lastAutoStation=-1;
+  huntState.lastStepSfxAt=0;
+  // Bố trí 6 Tinh thể & Vật phẩm có thể nhặt được trên đường đi khám phá
+  huntState.collectibles=[
+   {id:'c1',x:22,y:38,type:'gold',val:25,icon:'🪙',label:'+25 Vàng',collected:false},
+   {id:'c2',x:44,y:24,type:'xp',  val:5, icon:'💎',label:'+5 XP',   collected:false},
+   {id:'c3',x:49,y:55,type:'gold',val:30,icon:'🪙',label:'+30 Vàng',collected:false},
+   {id:'c4',x:63,y:60,type:'xp',  val:5, icon:'💎',label:'+5 XP',   collected:false},
+   {id:'c5',x:82,y:38,type:'gold',val:35,icon:'🪙',label:'+35 Vàng',collected:false},
+   {id:'c6',x:38,y:68,type:'shield',val:1,icon:'🛡️',label:'+1 Khiên',collected:false}
+  ];
+  huntState.popups=[];
  }
  return hm;
 }
@@ -458,12 +594,17 @@ function getMapDecorations(theme){
   <div class="hw-firefly" style="left:28%;top:35%;animation-delay:.2s"></div>
   <div class="hw-firefly" style="left:52%;top:48%;animation-delay:1.1s"></div>
   <div class="hw-firefly" style="left:68%;top:25%;animation-delay:.7s"></div>
-  <div class="hw-firefly" style="left:75%;top:68%;animation-delay:1.6s"></div>`;
+  <div class="hw-firefly" style="left:75%;top:68%;animation-delay:1.6s"></div>
+  <div class="hw-firefly" style="left:42%;top:78%;animation-delay:2.1s"></div>`;
+
  if(theme==='maze'){
   return fireflies+`
    <div class="hw-wall-block" style="left:21%;top:10%;width:3.5%;height:52%"></div>
    <div class="hw-wall-block" style="left:41%;top:38%;width:3.5%;height:52%"></div>
    <div class="hw-wall-block" style="left:63%;top:10%;width:3.5%;height:52%"></div>
+   <div class="hw-monument" style="left:16%;top:20%" title="Bia đá Trục Ox"><span class="hw-monument-rune">Ox</span></div>
+   <div class="hw-monument" style="left:58%;top:65%" title="Bia đá Trục Oy"><span class="hw-monument-rune">Oy</span></div>
+   <div class="hw-monument" style="left:80%;top:18%" title="Bia đá Trục Oz"><span class="hw-monument-rune">Oz</span></div>
    <div class="hw-obstacle" style="left:16%;top:22%">🗿</div>
    <div class="hw-obstacle" style="left:48%;top:18%">🕯️</div>
    <div class="hw-obstacle" style="left:82%;top:76%">🏛️</div>`;
@@ -472,28 +613,40 @@ function getMapDecorations(theme){
   return fireflies+`
    <div class="hw-wall-block" style="left:22%;top:58%;width:12%;height:6%"></div>
    <div class="hw-wall-block" style="left:42%;top:22%;width:12%;height:6%"></div>
-   <div class="hw-obstacle" style="left:18%;top:22%">💎</div>
-   <div class="hw-obstacle" style="left:45%;top:48%">🔮</div>
-   <div class="hw-obstacle" style="left:64%;top:75%">🔷</div>
-   <div class="hw-obstacle" style="left:82%;top:22%">✨</div>`;
+   <div class="hw-crystal-spire" style="left:24%;top:20%">💎</div>
+   <div class="hw-crystal-spire" style="left:45%;top:48%">🔮</div>
+   <div class="hw-crystal-spire" style="left:64%;top:75%">🔷</div>
+   <div class="hw-crystal-spire" style="left:82%;top:22%">✨</div>
+   <div class="hw-monument" style="left:38%;top:16%" title="Trục Ox"><span class="hw-monument-rune">Ox</span></div>
+   <div class="hw-monument" style="left:78%;top:72%" title="Trục Oy"><span class="hw-monument-rune">Oy</span></div>`;
  }
  if(theme==='fortress'||theme==='citadel'){
   return fireflies+`
    <div class="hw-wall-block" style="left:23%;top:14%;width:4%;height:26%"></div>
    <div class="hw-wall-block" style="left:62%;top:56%;width:4%;height:28%"></div>
+   <div class="hw-monument" style="left:20%;top:68%" title="Pháp trận Ox"><span class="hw-monument-rune">Ox</span></div>
+   <div class="hw-monument" style="left:70%;top:18%" title="Pháp trận Oy"><span class="hw-monument-rune">Oy</span></div>
+   <div class="hw-monument" style="left:84%;top:68%" title="Pháp trận Oz"><span class="hw-monument-rune">Oz</span></div>
    <div class="hw-obstacle" style="left:18%;top:75%">🔥</div>
    <div class="hw-obstacle" style="left:45%;top:20%">⚔️</div>
    <div class="hw-obstacle" style="left:66%;top:18%">🌋</div>
    <div class="hw-obstacle" style="left:82%;top:74%">🛡️</div>`;
  }
  return fireflies+`
-  <div class="hw-obstacle" style="left:18%;top:22%">🌲</div>
-  <div class="hw-obstacle" style="left:25%;top:72%">🌳</div>
-  <div class="hw-obstacle" style="left:44%;top:46%">🪨</div>
-  <div class="hw-obstacle" style="left:46%;top:18%">🌴</div>
-  <div class="hw-obstacle" style="left:64%;top:62%">🌲</div>
-  <div class="hw-obstacle" style="left:82%;top:24%">🌳</div>
-  <div class="hw-obstacle" style="left:80%;top:76%">⛺</div>`;
+  <!-- CÂY CỐI ĐA TẦNG CÓ BÓNG ĐỔ VÀ CHI TIẾT LÁ XANH -->
+  <div class="hw-nature-tree" style="left:16%;top:20%"><div class="hw-tree-shadow"></div><div class="hw-tree-crown oak">🌳</div></div>
+  <div class="hw-nature-tree" style="left:26%;top:72%"><div class="hw-tree-shadow"></div><div class="hw-tree-crown pine">🌲</div></div>
+  <div class="hw-nature-tree" style="left:44%;top:16%"><div class="hw-tree-shadow"></div><div class="hw-tree-crown palm">🌴</div></div>
+  <div class="hw-nature-tree" style="left:64%;top:62%"><div class="hw-tree-shadow"></div><div class="hw-tree-crown oak">🌳</div></div>
+  <div class="hw-nature-tree" style="left:82%;top:20%"><div class="hw-tree-shadow"></div><div class="hw-tree-crown pine">🌲</div></div>
+  <!-- BIA ĐÁ KHẮC HỆ TRỤC TỌA ĐỘ OXYZ CỔ ĐẠI -->
+  <div class="hw-monument" style="left:21%;top:46%" title="Cột mốc O(0;0;0)"><span class="hw-monument-rune">O</span></div>
+  <div class="hw-monument" style="left:38%;top:18%" title="Cột mốc Trục Hoành Ox"><span class="hw-monument-rune">Ox</span></div>
+  <div class="hw-monument" style="left:60%;top:78%" title="Cột mốc Trục Tung Oy"><span class="hw-monument-rune">Oy</span></div>
+  <div class="hw-monument" style="left:78%;top:22%" title="Cột mốc Trục Cao Oz"><span class="hw-monument-rune">Oz</span></div>
+  <!-- TẢNG ĐÁ & HOA DẠI RỰC RỠ -->
+  <div class="hw-obstacle" style="left:45%;top:47%">🪨</div>
+  <div class="hw-obstacle" style="left:82%;top:74%">⛺</div>`;
 }
 
 function renderHuntGame(m){
@@ -519,9 +672,18 @@ function renderHuntGame(m){
  const stationsHtml=stList.map((st,i)=>{
   const state=i<r?'passed':i===r?'active':'locked';
   return `<div class="hw-station ${state}" style="left:${st.x}%;top:${st.y}%" data-action="clickStation" data-idx="${i}">
+   <div class="hw-shrine-base"></div>
+   <div class="hw-shrine-pillars"><span class="hw-pillar left"></span><span class="hw-pillar right"></span></div>
    <div class="hw-ring"></div>
-   <div class="hw-station-core">${i<r?'✅':st.monsterIcon||'👾'}</div>
-   <div class="hw-station-label">${i<r?`Đã vượt (${esc(st.badge)})`:esc(st.name)}</div>
+   ${state==='active'?'<div class="hw-beacon-beam"></div>':''}
+   <div class="hw-station-core">
+    <div class="hw-station-glyph">${i<r?'🏛️':st.monsterIcon||'👾'}</div>
+    ${i<r?'<div class="hw-cleared-badge">✅</div>':''}
+   </div>
+   <div class="hw-station-info">
+    <div class="hw-station-label">${i<r?`✅ ĐÃ VƯỢT (${esc(st.badge)})`:esc(st.name)}</div>
+    ${state==='active'?'<div class="hw-station-action-hint">⚡ CHẠM ĐỂ CHIẾN ĐẤU</div>':''}
+   </div>
   </div>`;
  }).join('');
 
@@ -536,6 +698,27 @@ function renderHuntGame(m){
   const cls=i<r?'st-done':i===r?'st-active':'st-lock';
   return `<span class="hw-minimap-dot ${cls}" style="left:${st.x}%;top:${st.y}%"></span>`;
  }).join('')+`<span class="hw-minimap-dot chest" style="left:${hm.chest.x}%;top:${hm.chest.y}%"></span>`;
+
+ // Tinh thể thu thập trên bản đồ
+ const collectiblesHtml=(huntState.collectibles||[]).filter(c=>!c.collected).map(c=>`
+  <div class="hw-collectible ${c.type}" id="collectible-${c.id}" style="left:${c.x}%;top:${c.y}%" title="${c.label}">
+   <div class="hw-collectible-glow"></div>
+   <div class="hw-collectible-icon">${c.icon}</div>
+   <span class="hw-collectible-tag">${c.label}</span>
+  </div>`).join('');
+
+ // Popups chữ nổi khi nhặt đồ
+ const popupsHtml=(huntState.popups||[]).map(p=>`
+  <div class="hw-float-popup" style="left:${p.x}%;top:${p.y}%;color:${p.color}">${esc(p.text)}</div>`).join('');
+
+ // Cọc tiêu điểm đến khi click/tap
+ const targetBeaconHtml=(huntState.targetX!==null&&huntState.targetY!==null)?`
+  <div class="hw-target-beacon" id="hwTargetBeacon" style="left:${huntState.targetX}%;top:${huntState.targetY}%">
+   <div class="hw-target-beacon-sonar"></div>
+   <div class="hw-target-beacon-ring"></div>
+   <div class="hw-target-beacon-pin">📍</div>
+   <div class="hw-target-beacon-label">${Math.round(Math.hypot(huntState.targetX-huntState.x,huntState.targetY-huntState.y)*1.5)}m</div>
+  </div>`:'' ;
 
  return `<div class="hw-wrapper">
   <div class="hw-hud-top">
@@ -560,27 +743,44 @@ function renderHuntGame(m){
    <div class="hw-world theme-${esc(hm.theme||'forest')}" id="hwWorld">
     ${getTerrainSVG(hm.theme||'forest',pathPts)}
     ${getMapDecorations(hm.theme)}
+    ${collectiblesHtml}
+    ${popupsHtml}
+    ${targetBeaconHtml}
     ${stationsHtml}
-    <div class="hw-chest ${r<3?'locked':''}" style="left:${hm.chest.x}%;top:${hm.chest.y}%" data-action="clickChest">
-     <div class="hw-chest-box">🧰</div>
-     <div class="hw-station-label">${esc(hm.chest.name||'Rương Mật Mã')}</div>
+    <div class="hw-chest ${r<3?'locked':'ready'}" style="left:${hm.chest.x}%;top:${hm.chest.y}%" data-action="clickChest">
+     <div class="hw-chest-pedestal"></div>
+     <div class="hw-chest-box">${r<3?'🧰':'🎁'}</div>
+     <div class="hw-station-label">${r<3?esc(hm.chest.name||'Rương Mật Mã'):'✨ MỞ RƯƠNG KHO BÁU!'}</div>
     </div>
-    <div class="hw-player ${huntState.moving?'moving':''}" id="hwPlayer" style="left:${huntState.x}%;top:${huntState.y}%">
+    <!-- NHÂN VẬT THÁM HIỂM CỦA ĐỘI VỚI HÀO QUANG & BÓNG ĐỔ -->
+    <div class="hw-player ${huntState.moving?'moving':''} facing-${huntState.facing||'right'} ${huntState.isSprinting?'sprinting':''}" id="hwPlayer" style="left:${huntState.x}%;top:${huntState.y}%">
      <div class="hw-player-torch"></div>
-     <div class="hw-player-avatar">${world.me.avatar}</div>
-     <div class="hw-player-name">${esc(world.me.name)}</div>
+     <div class="hw-player-aura-ring"></div>
+     <div class="hw-player-shadow"></div>
+     <div class="hw-hero-chassis">
+      <div class="hw-player-avatar">${world.me.avatar}</div>
+      <div class="hw-hero-crown">${(world.me.streak||0)>=2?'🔥':'⭐'}</div>
+     </div>
+     <div class="hw-player-tag">
+      <span class="hw-player-name">${esc(world.me.name)}</span>
+      <span class="hw-player-role">Cấp ${world.me.heroLevel||1} · Đội trưởng</span>
+     </div>
+     <div class="hw-footstep-sparks"></div>
     </div>
    </div>
    <div class="hw-controls-overlay">
-    <div class="hw-dpad">
-     <span></span><button type="button" data-dpad="up" title="Đi lên (W / ↑)">▲</button><span></span>
-     <button type="button" data-dpad="left" title="Qua trái (A / ←)">◀</button>
-     <button type="button" data-dpad="down" title="Đi xuống (S / ↓)">▼</button>
-     <button type="button" data-dpad="right" title="Qua phải (D / →)">▶</button>
+    <div class="hw-dpad-wrap">
+     <div class="hw-dpad">
+      <span></span><button type="button" data-dpad="up" title="Đi lên (W / ↑)">▲</button><span></span>
+      <button type="button" data-dpad="left" title="Qua trái (A / ←)">◀</button>
+      <button type="button" data-dpad="down" title="Đi xuống (S / ↓)">▼</button>
+      <button type="button" data-dpad="right" title="Qua phải (D / →)">▶</button>
+     </div>
+     <button type="button" class="hw-sprint-btn ${huntState.isSprinting?'active':''}" data-action="toggleSprint" title="Bật/Tắt chạy nhanh (Shift)">⚡ ${huntState.isSprinting?'ĐANG CHẠY NHANH':'TĂNG TỐC'}</button>
     </div>
     <div class="hw-action-panel">
      <button type="button" class="hw-attack-station-btn" data-action="openHuntBattle">⚔️ ${nearStation?'MỞ CUỘN GIẤY CHIẾN ĐẤU NGAY!':'ĐI TỚI & MỞ TRẠM '+(r+1)}</button>
-     <div class="hw-hint-pill">💡 Chạm lên bản đồ, dùng phím WASD/Mũi tên hoặc bấm "Đi tới Trạm ${r+1}"</div>
+     <div class="hw-hint-pill">💡 Chạm/kéo trên bản đồ, dùng phím WASD/Mũi tên. Phím [Space] để chiến đấu!</div>
     </div>
    </div>
   </div>
@@ -645,8 +845,27 @@ function updateHuntCamera(){
  pl.style.left=huntState.x+'%';
  pl.style.top=huntState.y+'%';
  pl.classList.toggle('moving',huntState.moving);
+ pl.classList.toggle('sprinting',huntState.isSprinting);
+ pl.classList.toggle('facing-left',huntState.facing==='left');
+ pl.classList.toggle('facing-right',huntState.facing==='right');
+
  const miniPl=$('#hwMiniPlayer');
  if(miniPl){miniPl.style.left=huntState.x+'%';miniPl.style.top=huntState.y+'%';}
+
+ const targetBeacon=$('#hwTargetBeacon');
+ if(targetBeacon){
+  if(huntState.targetX!==null&&huntState.targetY!==null){
+   targetBeacon.style.display='block';
+   targetBeacon.style.left=huntState.targetX+'%';
+   targetBeacon.style.top=huntState.targetY+'%';
+   const dToTarget=Math.hypot(huntState.targetX-huntState.x,huntState.targetY-huntState.y);
+   const lbl=targetBeacon.querySelector('.hw-target-beacon-label');
+   if(lbl)lbl.textContent=`${Math.round(dToTarget*1.5)}m`;
+  }else{
+   targetBeacon.style.display='none';
+  }
+ }
+
  const m=world?.current;
  const curSt=m?.huntMap?.stations?.[m.round];
  if(curSt){
@@ -656,6 +875,13 @@ function updateHuntCamera(){
   const arr=$('#hwCompassArrow'), txt=$('#hwCompassText');
   if(arr)arr.style.transform=`rotate(${angleDeg}deg)`;
   if(txt)txt.textContent=`${curSt.name} (${Math.round(dist*1.5)}m)`;
+
+  const atkBtn=$('.hw-attack-station-btn');
+  if(atkBtn){
+   const isNear=dist<=10.5;
+   atkBtn.innerHTML=isNear?'⚔️ MỞ CUỘN GIẤY CHIẾN ĐẤU NGAY!':`🏃 ĐI TỚI & MỞ TRẠM ${m.round+1}`;
+   atkBtn.classList.toggle('pulse-urgent',isNear);
+  }
  }
  const vw=vp.clientWidth||800, vh=vp.clientHeight||485;
  const ww=1200, wh=820;
@@ -1020,6 +1246,43 @@ function sound(type){
    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.18);
    osc.connect(gain).connect(actx.destination);
    osc.start(now); osc.stop(now + 0.19);
+  }else if(type==='coin'||type==='gem'){
+   [880, 1318.51].forEach((freq, i)=>{
+    const osc=actx.createOscillator(), gain=actx.createGain();
+    osc.type='sine'; osc.frequency.value=freq;
+    gain.gain.setValueAtTime(0.0001, now + i*0.06);
+    gain.gain.exponentialRampToValueAtTime(0.08, now + i*0.06 + 0.015);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + i*0.06 + 0.18);
+    osc.connect(gain).connect(actx.destination);
+    osc.start(now + i*0.06); osc.stop(now + i*0.06 + 0.2);
+   });
+  }else if(type==='step'){
+   const osc=actx.createOscillator(), gain=actx.createGain();
+   osc.type='triangle';
+   osc.frequency.setValueAtTime(140, now);
+   osc.frequency.exponentialRampToValueAtTime(70, now + 0.05);
+   gain.gain.setValueAtTime(0.025, now);
+   gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.05);
+   osc.connect(gain).connect(actx.destination);
+   osc.start(now); osc.stop(now + 0.06);
+  }else if(type==='target'){
+   const osc=actx.createOscillator(), gain=actx.createGain();
+   osc.type='sine';
+   osc.frequency.setValueAtTime(587.33, now);
+   osc.frequency.exponentialRampToValueAtTime(880, now + 0.1);
+   gain.gain.setValueAtTime(0.05, now);
+   gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.12);
+   osc.connect(gain).connect(actx.destination);
+   osc.start(now); osc.stop(now + 0.13);
+  }else if(type==='boost'){
+   const osc=actx.createOscillator(), gain=actx.createGain();
+   osc.type='sawtooth';
+   osc.frequency.setValueAtTime(260, now);
+   osc.frequency.exponentialRampToValueAtTime(640, now + 0.2);
+   gain.gain.setValueAtTime(0.06, now);
+   gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.2);
+   osc.connect(gain).connect(actx.destination);
+   osc.start(now); osc.stop(now + 0.22);
   }else if(type==='skill'){
    const osc=actx.createOscillator(), gain=actx.createGain();
    osc.type='sine';
@@ -1185,6 +1448,17 @@ async function handle(action,el){
    return;
   }
   /* ─── ACTIONS CHO SĂN KHO BÁU 2D ─── */
+  if(action==='toggleSprint'){
+   huntState.isSprinting=!huntState.isSprinting;
+   if(huntState.isSprinting)sound('boost');
+   updateHuntCamera();
+   const btn=$('.hw-sprint-btn');
+   if(btn){
+    btn.classList.toggle('active',huntState.isSprinting);
+    btn.innerHTML=`⚡ ${huntState.isSprinting?'ĐANG CHẠY NHANH':'TĂNG TỐC'}`;
+   }
+   return;
+  }
   if(action==='walkToStation'||action==='clickStation'){
    const idx=Number(el.dataset.idx);
    const m=world?.current;if(!m)return;
@@ -1386,27 +1660,25 @@ async function handle(action,el){
  }
 }
 
-/* ─── XỬ LÝ SỰ KIỆN BÀN PHÍM, CHUỘT & D-PAD CHO BẢN ĐỒ 2D ─── */
+/* ─── XỬ LÝ SỰ KIỆN BÀN PHÍM, CHUỘT, CHẠM & D-PAD CHO BẢN ĐỒ 2D ─── */
+let isPointerDraggingMap=false;
+
+function updateTargetFromPointer(e){
+ const wd=$('#hwWorld');if(!wd)return;
+ const rect=wd.getBoundingClientRect();
+ if(rect.width>0&&rect.height>0){
+  const tx=Math.max(6,Math.min(94,(e.clientX-rect.left)/rect.width*100));
+  const ty=Math.max(8,Math.min(92,(e.clientY-rect.top)/rect.height*100));
+  huntState.targetX=tx;
+  huntState.targetY=ty;
+  huntState.lastAutoStation=-1;
+  updateHuntCamera();
+ }
+}
+
 document.addEventListener('click',e=>{
  const el=e.target.closest('[data-action]');
  if(el){e.preventDefault();handle(el.dataset.action,el);return;}
- const vp=e.target.closest('#hwViewport');
- if(vp&&!e.target.closest('.hw-controls-overlay')&&!e.target.closest('.hw-station')&&!e.target.closest('.hw-chest')){
-  const wd=$('#hwWorld');if(!wd)return;
-  const rect=wd.getBoundingClientRect();
-  if(rect.width>0&&rect.height>0){
-   const tx=Math.max(6,Math.min(94,(e.clientX-rect.left)/rect.width*100));
-   const ty=Math.max(8,Math.min(92,(e.clientY-rect.top)/rect.height*100));
-   huntState.targetX=tx;
-   huntState.targetY=ty;
-   huntState.lastAutoStation=-1;
-   const rip=document.createElement('div');
-   rip.className='hw-ripple';
-   rip.style.left=tx+'%';rip.style.top=ty+'%';
-   wd.appendChild(rip);
-   setTimeout(()=>rip.remove(),550);
-  }
- }
 });
 
 document.addEventListener('pointerdown',e=>{
@@ -1415,9 +1687,24 @@ document.addEventListener('pointerdown',e=>{
   e.preventDefault();
   huntState.keysPressed.add(dbtn.dataset.dpad);
   huntState.targetX=null;huntState.targetY=null;
+  return;
+ }
+ const vp=e.target.closest('#hwViewport');
+ if(vp&&!e.target.closest('.hw-controls-overlay')&&!e.target.closest('.hw-station')&&!e.target.closest('.hw-chest')&&!e.target.closest('.hw-hud-top')&&!e.target.closest('.hw-compass')&&!e.target.closest('.hw-minimap')){
+  isPointerDraggingMap=true;
+  updateTargetFromPointer(e);
+  sound('target');
  }
 });
+
+document.addEventListener('pointermove',e=>{
+ if(isPointerDraggingMap){
+  updateTargetFromPointer(e);
+ }
+});
+
 document.addEventListener('pointerup',()=>{
+ isPointerDraggingMap=false;
  ['up','down','left','right'].forEach(k=>huntState.keysPressed.delete(k));
 });
 
@@ -1431,6 +1718,22 @@ window.addEventListener('keydown',e=>{
   }
   return;
  }
+ if(e.code==='Space'&&session?.role==='student'&&!huntState.battleOpen){
+  const m=world?.current;
+  if(m&&m.huntMap?.stations?.[m.round]){
+   const curSt=m.huntMap.stations[m.round];
+   const dist=Math.hypot(curSt.x-huntState.x, curSt.y-huntState.y);
+   if(dist<=12){
+    e.preventDefault();
+    handle('openHuntBattle');
+    return;
+   }
+  }
+ }
+ if((e.key==='Shift'||e.code==='ShiftLeft'||e.code==='ShiftRight')&&session?.role==='student'){
+  huntState.isSprinting=true;
+  updateHuntCamera();
+ }
  const dir=keyMap[e.code];
  if(dir&&session?.role==='student'&&!huntState.battleOpen){
   e.preventDefault();
@@ -1438,7 +1741,12 @@ window.addEventListener('keydown',e=>{
   huntState.targetX=null;huntState.targetY=null;
  }
 });
+
 window.addEventListener('keyup',e=>{
+ if(e.key==='Shift'||e.code==='ShiftLeft'||e.code==='ShiftRight'){
+  huntState.isSprinting=false;
+  updateHuntCamera();
+ }
  const dir=keyMap[e.code];
  if(dir)huntState.keysPressed.delete(dir);
 });
@@ -1466,11 +1774,15 @@ function gameLoop(now){
    if(huntState.keysPressed.has('up'))vy-=1;
    if(huntState.keysPressed.has('down'))vy+=1;
 
+   const speed=(huntState.isSprinting?40:24);
+
    if(vx!==0||vy!==0){
     const len=Math.hypot(vx,vy);
-    huntState.x=Math.max(6,Math.min(94,huntState.x+(vx/len)*24*dt));
-    huntState.y=Math.max(8,Math.min(92,huntState.y+(vy/len)*24*dt));
+    huntState.x=Math.max(6,Math.min(94,huntState.x+(vx/len)*speed*dt));
+    huntState.y=Math.max(8,Math.min(92,huntState.y+(vy/len)*speed*dt));
     huntState.moving=true;
+    if(vx>0.05)huntState.facing='right';
+    else if(vx<-0.05)huntState.facing='left';
    }else if(huntState.targetX!==null&&huntState.targetY!==null){
     const dx=huntState.targetX-huntState.x, dy=huntState.targetY-huntState.y;
     const dist=Math.hypot(dx,dy);
@@ -1479,13 +1791,42 @@ function gameLoop(now){
      huntState.targetX=null;huntState.targetY=null;
      huntState.moving=false;
     }else{
-     huntState.x+=(dx/dist)*28*dt;
-     huntState.y+=(dy/dist)*28*dt;
+     huntState.x+=(dx/dist)*speed*dt;
+     huntState.y+=(dy/dist)*speed*dt;
      huntState.moving=true;
+     if(dx>0.05)huntState.facing='right';
+     else if(dx<-0.05)huntState.facing='left';
     }
    }else{
     huntState.moving=false;
    }
+
+   // Bước chân âm thanh Web Audio
+   if(huntState.moving&&now-huntState.lastStepSfxAt>(huntState.isSprinting?200:320)){
+    huntState.lastStepSfxAt=now;
+    sound('step');
+   }
+
+   // Kiểm tra nhặt tinh thể & quà tặng
+   if(huntState.collectibles?.length){
+    huntState.collectibles.forEach(c=>{
+     if(!c.collected&&Math.hypot(huntState.x-c.x,huntState.y-c.y)<4.2){
+      c.collected=true;
+      sound('coin');
+      if(c.type==='gold')world.me.gold=(world.me.gold||0)+c.val;
+      if(c.type==='xp')world.me.score=(world.me.score||0)+c.val;
+      if(c.type==='shield')world.me.health=Math.min(3,(world.me.health||3)+c.val);
+      huntState.popups.push({id:Date.now()+Math.random(),x:c.x,y:c.y,text:c.label,color:c.type==='xp'?'#38bdf8':'#fde047',createdAt:now});
+      const el=document.getElementById('collectible-'+c.id);
+      if(el)el.style.display='none';
+     }
+    });
+   }
+   // Dọn dẹp popup cũ sau 1.2s
+   if(huntState.popups?.length){
+    huntState.popups=huntState.popups.filter(p=>now-p.createdAt<1200);
+   }
+
    updateHuntCamera();
 
    const curSt=m.huntMap?.stations?.[m.round];

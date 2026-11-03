@@ -21,11 +21,11 @@
         "stage": 0,
         "round": 0,
         "health": 3,
-        "wrong": 13,
+        "wrong": 14,
         "score": 0,
         "bonus": 0,
-        "gold": 1540,
-        "heroLevel": 5,
+        "gold": 2070,
+        "heroLevel": 6,
         "upgrades": {
           "damage": 3,
           "speed": 2,
@@ -35,7 +35,7 @@
         "completed": false,
         "finishedAt": "2026-11-03T00:04:12.636Z",
         "attempts": [
-          1,
+          2,
           3,
           2,
           7,
@@ -49,7 +49,7 @@
           false
         ],
         "digits": [],
-        "streak": 0
+        "streak": 3
       },
       {
         "name": "Tia Chớp",
@@ -400,6 +400,22 @@
       {
         "at": "2026-11-03T00:07:38.313Z",
         "text": "GV ghi nhận Rồng Xanh: 0 điểm hợp tác."
+      },
+      {
+        "at": "2026-11-03T00:46:18.917Z",
+        "text": "🐉 Rồng Xanh trả lời chưa đúng lượt 1 ở Rừng Vectơ Nguyên Sinh; còn 2 khiên."
+      },
+      {
+        "at": "2026-11-03T00:46:21.604Z",
+        "text": "🐉 Rồng Xanh đã hạ mục tiêu lượt 1/3 tại Rừng Vectơ Nguyên Sinh (Combo x1, +120 Vàng)."
+      },
+      {
+        "at": "2026-11-03T00:46:40.182Z",
+        "text": "🐉 Rồng Xanh đã hạ mục tiêu lượt 2/3 tại Rừng Vectơ Nguyên Sinh (Combo x2, +150 Vàng)."
+      },
+      {
+        "at": "2026-11-03T00:46:54.568Z",
+        "text": "🐉 Rồng Xanh đã VƯỢT CHẶNG 1: Rừng Vectơ Nguyên Sinh (Combo x3). +12 XP, +260 Vàng và mảnh mã 3."
       }
     ]
   },
