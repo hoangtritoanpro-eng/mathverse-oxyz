@@ -3,11 +3,24 @@
 const $=sel=>document.querySelector(sel);
 const $$=sel=>Array.from(document.querySelectorAll(sel));
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function formatMath(str){
+ if(!str)return '';
+ return esc(str)
+   .replace(/\\vec\{([A-Za-z0-9]+)\}/g, '<span class="math-vec">$1<i>→</i></span>')
+   .replace(/\\vec\s*([A-Za-z0-9]+)/g, '<span class="math-vec">$1<i>→</i></span>')
+   .replace(/\\cdot/g, '<span class="math-sym">·</span>')
+   .replace(/\\perp/g, '<span class="math-sym">⊥</span>')
+   .replace(/\\sqrt\{([^}]+)\}/g, '<span class="math-sym">√</span>($1)')
+   .replace(/\\approx/g, '≈')
+   .replace(/\^2/g, '²')
+   .replace(/\^3/g, '³');
+}
 const app=$('#app');
 const qs=new URLSearchParams(location.search);
 let session=null, world=null, modal=null, busy=false, showAward=false, soundEnabled=true;
 let lastSignature='', lastStudentKey='', clockBase=null, tickBase=0;
 let activePlayMode=null; // 'hunt' | 'defense'
+let teacherPreviewStage=0;
 window.IS_DEMO_MODE=true;
 
 /* ─── TRẠNG THÁI MÔ HÌNH HÌNH HỌC 3D OXYZ HOLOGRAM ─── */
@@ -391,7 +404,16 @@ function teacherScreen(){
  const helper=[...teams].sort((a,b)=>b.bonus-a.bonus)[0];
  return `<div class="dashboard-head"><div><span class="screen-tag">👩‍🏫 MÀN HÌNH ĐIỀU HÀNH GIÁO VIÊN</span><h2>Mã Phòng Học: <span class="room-number">${esc(world.room)}</span></h2><p class="muted">Học sinh tham gia theo nhóm qua 2 cơ chế: <b>Săn Kho Báu 2D</b> & <b>Bảo Vệ Thành Trì</b> kết hợp <b>Mô hình Không gian 3D Oxyz</b>.</p></div><div class="panel" style="text-align:center;padding:15px 20px"><span class="screen-tag">ĐỒNG HỒ TIẾT HỌC</span><div class="clock" id="clock">45:00</div><div class="controls">${btn(world.clock.running?'⏸ Dừng giờ':'▶ Bắt đầu','timerToggle','sm teal')}${btn('↻','timerReset','sm gray')}<select id="clockMinutes" aria-label="Thời lượng tiết học"><option value="35" ${world.clock.minutes===35?'selected':''}>35 phút</option><option value="40" ${world.clock.minutes===40?'selected':''}>40 phút</option><option value="45" ${world.clock.minutes===45?'selected':''}>45 phút</option><option value="50" ${world.clock.minutes===50?'selected':''}>50 phút</option></select></div></div></div>
  <div class="top-numbers"><div class="metric"><b>${teams.length}</b><small>ĐỘI THÁM HIỂM</small></div><div class="metric"><b>${done}</b><small>ĐÃ MỞ KHO BÁU</small></div><div class="metric"><b>${teams.filter(t=>t.stage>=5).length}</b><small>ĐỦ 5 MẢNH MÃ</small></div><div class="metric"><b>${teams.reduce((a,t)=>a+t.score,0)}</b><small>TỔNG XP LỚP</small></div></div>
- <div class="controls" style="margin-bottom:16px">${window.IS_DEMO_MODE?btn('▶ Vào Đội Rồng Xanh (Trải nghiệm Game)','demoPlay','teal'):''}${btn(world.paused?'▶ Tiếp tục game':'⏸ Tạm dừng lớp học','pauseGame',world.paused?'teal':'gold')}${btn('🏆 Công bố giải thưởng','awards','primary')}${btn('📥 Xuất CSV minh chứng','exportCSV','gray')}${btn('🖨️ In bảng kết quả','print','gray')}<span class="pill ${world.paused?'pink':'green'}">${world.paused?'🔒 Đang tạm dừng để GV giảng bài':'🟢 Học sinh đang làm nhiệm vụ'}</span></div>
+ <div class="controls" style="margin-bottom:16px">${window.IS_DEMO_MODE?btn('▶ Vào Đội Rồng Xanh (Trải nghiệm Game)','demoPlay','teal'):''}${btn('📢 Nhắn gửi toàn lớp','teacherBroadcast','teal')}${btn('💖 Hồi 3 khiên cả lớp','teacherHealAll','gold')}${btn('✨ Thưởng +5 XP cả lớp','teacherBonusAll','primary')}${btn(world.paused?'▶ Tiếp tục game':'⏸ Tạm dừng lớp học','pauseGame',world.paused?'teal':'gold')}${btn('🏆 Công bố giải thưởng','awards','primary')}${btn('📥 Xuất CSV minh chứng','exportCSV','gray')}${btn('🖨️ In bảng kết quả','print','gray')}<span class="pill ${world.paused?'pink':'green'}">${world.paused?'🔒 Đang tạm dừng để GV giảng bài':'🟢 Học sinh đang làm nhiệm vụ'}</span></div>
+ <section class="panel" style="margin-bottom:16px">
+  <div class="section-title">
+   <h2>🧊 Chiếu Mô Hình Không Gian 3D Oxyz Lên Bảng Giảng</h2>
+   <div class="controls">
+    ${[0,1,2,3,4].map(idx=>`<button type="button" class="button sm ${teacherPreviewStage===idx?'primary':'gray'}" data-action="preview3DStage" data-stage="${idx}">Chặng ${idx+1}: ${esc(missionMeta[idx]?.place||'')}</button>`).join('')}
+   </div>
+  </div>
+  ${renderOxyz3D(world.missions[teacherPreviewStage]||world.stages[teacherPreviewStage])}
+ </section>
  <div class="teacher-main"><div><section class="panel"><div class="section-title"><h2>🗺️ Tiến độ trực tiếp qua 5 chặng Oxyz</h2><span class="pill">Tự cập nhật ~2 giây</span></div>${teacherMap(teams)}</section><section class="panel"><div class="section-title"><h2>🏅 Bảng xếp hạng các đội</h2><small>Tính theo XP, sau đó thời điểm hoàn thành</small></div>${standings(teams)}</section><section class="panel"><h2>🎊 Tổng kết và vinh danh</h2>${showAward?`<div class="champion" style="margin-top:14px"><span class="star">🏆</span><strong>QUÁN QUÂN MATHVERSE: ${winners[0].avatar} ${esc(winners[0].name)}</strong><p>${winners[0].score} XP · ${winners[0].completed?'Đã giải mã Lõi Trí Tuệ':'Đang trên hành trình'}</p></div><div class="grid grid-2" style="margin-top:12px"><div class="notice good">🥈 Á quân: ${winners[1]?esc(winners[1].name):'—'}</div><div class="notice good">🥉 Giải ba: ${winners[2]?esc(winners[2].name):'—'}</div><div class="notice">🤝 Giải hợp tác xuất sắc: ${helper&&helper.bonus>0?esc(helper.name):'GV lựa chọn'}</div><div class="notice">🔐 Mở kho báu: ${done}/${teams.length} đội</div></div>`:`<p class="muted" style="margin:10px 0">Khi kết thúc hoạt động, nhấn “Công bố giải thưởng” để chiếu sân khấu vinh danh 3 đội dẫn đầu và giải hợp tác.</p>`}</section></div>
  <aside><section class="panel"><div class="section-title"><h3>🔑 Mã PIN đăng nhập từng đội</h3><span class="teacher-only">CHỈ GV XEM</span></div><div class="notice" style="margin-bottom:12px">Học sinh cùng Wi-Fi mở <strong>${esc(joinBase)}</strong>, nhập mã phòng <strong>${esc(world.room)}</strong> và mã PIN đội:</div>${teams.map(t=>`<div class="team-join"><div class="team-emoji">${t.avatar}</div><div class="team-details"><b>${esc(t.name)}</b><small>Đội ${t.id.split('-')[1]} · PIN: <span class="code">${esc(world.teamCodes[t.id])}</span></small></div><button class="button sm gray" data-action="copy" data-url="${esc(baseUrl+'?room='+world.room+'&team='+t.id)}" title="Sao chép liên kết đội">⧉ Link</button></div>`).join('')}</section>
  <section class="panel"><h3>✨ Cộng điểm hợp tác nhóm (0–10 XP)</h3><div class="form-field"><label>Chọn đội</label><select id="bonusTeam">${teams.map(t=>`<option value="${t.id}">${t.avatar} ${esc(t.name)} (hiện +${t.bonus})</option>`).join('')}</select></div><div class="form-field"><label>Điểm thưởng hợp tác</label><select id="bonusValue">${Array.from({length:11},(_,n)=>`<option value="${n}">${n} XP</option>`).join('')}</select></div>${btn('Lưu điểm hợp tác','setBonus','sm primary block')}</section>
@@ -579,11 +601,11 @@ function renderHuntBattleModal(m){
     <div>
      <div class="hw-scroll-kicker">📜 TRẠM ${m.round+1} / ${m.totalRounds} · ${esc(q.label)}</div>
      <div class="hw-scroll-role">🤝 <b>Phân công nhóm:</b> ${esc(q.roleAssign||m.groupTask)}</div>
-     <div class="hw-scroll-question">🧩 ${esc(q.prompt)}</div>
+     <div class="hw-scroll-question">🧩 ${formatMath(q.prompt)}</div>
      <div class="hw-scroll-options">
       ${q.options.map((opt,i)=>`<button type="button" class="hw-opt-btn ${sel===i?'selected':''}" data-action="selectHuntOpt" data-choice="${i}">
        <span class="opt-letter">${labels[i]}</span>
-       <span>${esc(opt)}</span>
+       <span>${formatMath(opt)}</span>
       </button>`).join('')}
      </div>
      <div class="hw-short-box">
@@ -792,11 +814,11 @@ function renderCastleDefenseGame(m){
       <span class="cd-q-reward">🎁 Giải đúng: +120 Vàng (+Combo) · 💥 Bắn Tia Laser Oxyz Quét Sạch Quái!</span>
      </div>
      <div style="font-size:12.5px;font-weight:800;color:#6b4214;margin-bottom:6px">🤝 Phân công: ${esc(q.roleAssign||m.groupTask)}</div>
-     <div class="cd-q-prompt">🧩 ${esc(q.prompt)}</div>
+     <div class="cd-q-prompt">🧩 ${formatMath(q.prompt)}</div>
      <div class="cd-answers">
       ${q.options.map((opt,i)=>`<button type="button" class="cd-ans-btn" data-action="answer" data-choice="${i}" ${world.paused?'disabled':''}>
        <span class="ans-letter">${labels[i]}</span>
-       <strong>${esc(opt)}</strong>
+       <strong>${formatMath(opt)}</strong>
       </button>`).join('')}
      </div>
      <div class="cd-q-InputRow">
@@ -877,8 +899,11 @@ function finalContent(){
 
 function studentScreen(){
  const me=world.me,rank=[...world.teams].sort((a,b)=>b.score-a.score),mineRank=rank.findIndex(t=>t.id===me.id)+1;
+ const activeBroadcast=(world.lastEvent||[]).find(e=>e.text.includes('📢'));
+ const broadcastHtml=activeBroadcast?`<div class="teacher-broadcast-bar">${esc(activeBroadcast.text)}</div>`:'';
  const demoStageBar=window.IS_DEMO_MODE?`<div class="demo-banner" style="margin:10px 0;padding:10px 14px"><strong>⚡ Chuyển nhanh Chặng (Bản Demo):</strong> ${[0,1,2,3,4].map(idx=>`<button type="button" class="button sm ${me.stage===idx?'primary':'gray'}" data-action="demoJumpStage" data-stage="${idx}">Chặng ${idx+1}</button>`).join('')} <button type="button" class="button sm gold" data-action="demoJumpStage" data-stage="5">🔐 Trạm Giải Mã</button> ${btn('👩‍🏫 Sang Màn Hình GV','demoTeacher','sm teal')}</div>`:'';
  return `<div class="mission-hero"><div class="mission-hero-left"><div class="avatar">${me.avatar}</div><div><div class="eyebrow" style="color:#f7ce71">BIỆT ĐỘI ${esc(me.name).toUpperCase()} • PHÒNG ${world.room}</div><h2>${me.completed?'KHO BÁU ĐÃ ĐƯỢC MỞ!':me.stage===5?'ĐÃ THU ĐỦ 5 MẢNH MẬT MÃ!':'HÀNH TRÌNH GIẢI CỨU LỤC ĐỊA OXYZ'}</h2><p>${me.completed?'Hãy theo dõi bảng xếp hạng và phần vinh danh của giáo viên.':me.stage===5?'Hãy ghép 5 chữ số mật mã để mở Rương Lõi Trí Tuệ!':'Quan sát Mô hình Không gian 3D Oxyz, điều khiển nhân vật trên Bản đồ 2D hoặc Chỉ huy Thành Trì!'}</p></div></div><div style="text-align:right"><span class="pill gold">🪙 ${me.gold??120} Vàng · Lv.${me.heroLevel??1}</span></div></div>
+ ${broadcastHtml}
  ${demoStageBar}
  <div class="panel" style="padding:14px 18px"><div class="flex-between"><h3>🗺️ Bản Đồ Hành Trình 5 Chặng Lục Địa Oxyz (${esc(me.name)})</h3><span class="pill ${me.stage===5?'green':'gold'}">Đã vượt ${me.stage}/5 chặng · Nhấn vào đảo bất kỳ để chuyển chặng</span></div>${mapTrack(me.stage)}</div>
  ${world.paused?'<div class="notice error" style="margin:14px 0"><b>⏸ Giáo viên đang tạm dừng trò chơi để hướng dẫn.</b> Cả nhóm hãy lắng nghe nhé!</div>':''}
@@ -908,22 +933,109 @@ function showModal(){
  el.innerHTML=`<div class="modal" role="dialog" aria-modal="true"><div class="modal-icon">${good?'🎉':'🧩'}</div><h2 class="${good?'success':'failure'}">${esc(modal.title)}</h2><p>${esc(modal.message)}</p>${modal.explain?`<p class="notice good">${esc(modal.explain)}</p>`:''}${modal.digit!==undefined&&modal.digit!==null?`<div class="reward">🔑 MẢNH MẬT MÃ CHẶNG: ${esc(modal.digit)}</div>`:''}${modal.points?`<div class="reward">⭐ +${modal.points} XP</div>`:''}${modal.goldEarned?`<div class="reward">🪙 +${modal.goldEarned} Vàng</div>`:''}${modal.streak>=2?`<div class="reward">🔥 Combo x${modal.streak}</div>`:''}${btn(modal.button||'Tiếp tục hành trình','closeModal',good?'teal block':'primary block')}</div>`;
  document.body.appendChild(el);
 }
-function notice(title,message,good=false,extra={}){modal={title,message,good,...extra};showModal();sound(good);}
-function sound(good){
+function notice(title,message,good=false,extra={}){modal={title,message,good,...extra};showModal();sound(good?'correct':'wrong');}
+function triggerConfetti(duration=2600){
+ const canvas=document.createElement('canvas');
+ canvas.className='confetti-canvas';
+ document.body.appendChild(canvas);
+ const ctx=canvas.getContext('2d');
+ const w=canvas.width=window.innerWidth, h=canvas.height=window.innerHeight;
+ const colors=['#f59e0b','#ef4444','#10b981','#3b82f6','#a855f7','#ec4899','#facc15'];
+ const pieces=Array.from({length:75},()=>({
+  x:Math.random()*w,
+  y:Math.random()*-h*0.5,
+  w:Math.random()*10+6,
+  h:Math.random()*6+4,
+  color:colors[Math.floor(Math.random()*colors.length)],
+  vx:(Math.random()-0.5)*3.5,
+  vy:Math.random()*4+2.5,
+  rot:Math.random()*360,
+  vRot:(Math.random()-0.5)*12
+ }));
+ const start=performance.now();
+ function anim(now){
+  ctx.clearRect(0,0,w,h);
+  pieces.forEach(p=>{
+   p.x+=p.vx; p.y+=p.vy; p.rot+=p.vRot;
+   ctx.save();
+   ctx.translate(p.x,p.y);
+   ctx.rotate(p.rot*Math.PI/180);
+   ctx.fillStyle=p.color;
+   ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h);
+   ctx.restore();
+  });
+  if(now-start<duration){
+   requestAnimationFrame(anim);
+  }else{
+   canvas.remove();
+  }
+ }
+ requestAnimationFrame(anim);
+}
+
+function sound(type){
  if(!soundEnabled)return;
  try{
   const actx=new(window.AudioContext||window.webkitAudioContext)();
-  let base=good?520:230;
-  [0,.11,.22].forEach((offset,i)=>{
-   const osc=actx.createOscillator(),gain=actx.createGain();
-   osc.type='sine';osc.frequency.value=base+(good?i*170:-i*35);
-   gain.gain.setValueAtTime(.0001,actx.currentTime+offset);
-   gain.gain.exponentialRampToValueAtTime(.07,actx.currentTime+offset+.012);
-   gain.gain.exponentialRampToValueAtTime(.0001,actx.currentTime+offset+.13);
+  const now=actx.currentTime;
+  if(type===true||type==='correct'){
+   [523.25, 659.25, 783.99, 1046.50].forEach((freq, i)=>{
+    const osc=actx.createOscillator(), gain=actx.createGain();
+    osc.type='triangle'; osc.frequency.value=freq;
+    gain.gain.setValueAtTime(0.0001, now + i*0.08);
+    gain.gain.exponentialRampToValueAtTime(0.09, now + i*0.08 + 0.02);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + i*0.08 + 0.18);
+    osc.connect(gain).connect(actx.destination);
+    osc.start(now + i*0.08); osc.stop(now + i*0.08 + 0.2);
+   });
+  }else if(type==='laser'){
+   const osc=actx.createOscillator(), gain=actx.createGain();
+   osc.type='sawtooth';
+   osc.frequency.setValueAtTime(880, now);
+   osc.frequency.exponentialRampToValueAtTime(110, now + 0.35);
+   gain.gain.setValueAtTime(0.12, now);
+   gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.35);
    osc.connect(gain).connect(actx.destination);
-   osc.start(actx.currentTime+offset);osc.stop(actx.currentTime+offset+.14);
-  });
-  setTimeout(()=>actx.close(),700);
+   osc.start(now); osc.stop(now + 0.36);
+  }else if(type==='win'||type==='fanfare'){
+   [523.25, 659.25, 783.99, 1046.50, 1318.51].forEach((freq, i)=>{
+    const osc=actx.createOscillator(), gain=actx.createGain();
+    osc.type='triangle'; osc.frequency.value=freq;
+    gain.gain.setValueAtTime(0.0001, now + i*0.11);
+    gain.gain.exponentialRampToValueAtTime(0.11, now + i*0.11 + 0.02);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + i*0.11 + 0.32);
+    osc.connect(gain).connect(actx.destination);
+    osc.start(now + i*0.11); osc.stop(now + i*0.11 + 0.35);
+   });
+  }else if(type==='slash'){
+   const osc=actx.createOscillator(), gain=actx.createGain();
+   osc.type='triangle';
+   osc.frequency.setValueAtTime(440, now);
+   osc.frequency.exponentialRampToValueAtTime(220, now + 0.18);
+   gain.gain.setValueAtTime(0.1, now);
+   gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.18);
+   osc.connect(gain).connect(actx.destination);
+   osc.start(now); osc.stop(now + 0.19);
+  }else if(type==='skill'){
+   const osc=actx.createOscillator(), gain=actx.createGain();
+   osc.type='sine';
+   osc.frequency.setValueAtTime(320, now);
+   osc.frequency.exponentialRampToValueAtTime(960, now + 0.25);
+   gain.gain.setValueAtTime(0.08, now);
+   gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.25);
+   osc.connect(gain).connect(actx.destination);
+   osc.start(now); osc.stop(now + 0.26);
+  }else{
+   [220, 180].forEach((freq, i)=>{
+    const osc=actx.createOscillator(), gain=actx.createGain();
+    osc.type='sawtooth'; osc.frequency.value=freq;
+    gain.gain.setValueAtTime(0.07, now + i*0.1);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + i*0.1 + 0.12);
+    osc.connect(gain).connect(actx.destination);
+    osc.start(now + i*0.1); osc.stop(now + i*0.1 + 0.13);
+   });
+  }
+  setTimeout(()=>actx.close(), 1200);
  }catch(e){}
 }
 
@@ -985,9 +1097,9 @@ async function submitStageAnswer(payload){
  const curMode=activePlayMode||world.current?.defaultMode||'hunt';
  const result=await submit('/api/answer',{stage:world.me.stage,round:world.me.round,...payload});
  if(result.correct){
-  sound(true);
   const now=performance.now();
   if(curMode==='defense'){
+   sound('laser');
    cdState.laserUntil=now+750;
    cdState.shakeUntil=now+500;
    cdState.enemies.forEach(en=>{
@@ -996,6 +1108,8 @@ async function submitStageAnswer(payload){
    cdState.enemies=[];
   }
   if(result.stageFinished){
+   sound('win');
+   triggerConfetti(3200);
    huntState.battleOpen=false;
    huntState.monsterDefeated=false;
    huntState.rewardBadge=null;
@@ -1004,17 +1118,20 @@ async function submitStageAnswer(payload){
     {explain:result.explain,digit:result.digit,points:result.points,goldEarned:result.goldEarned,streak:result.streak,button:result.nextStage===5?'Tiến tới Mở Rương Lõi Trí Tuệ →':'Bước sang Chặng tiếp theo →'});
    updateAfterAction();
   }else if(curMode==='hunt'&&huntState.battleOpen){
+   sound('slash');
+   triggerConfetti(1600);
    huntState.monsterDefeated=true;
    huntState.rewardBadge=result.keyBadge||`Lượt ${result.nextRound}`;
    huntState.rewardExplain=result.explain;
    render();
   }else{
+   sound('correct');
    notice('💥 ĐẠI BÁC LASER OXYZ KHAI HỎA!',`Đợt quái vật thứ ${world.me.round+1} đã bị tia Laser Oxyz quét sạch! Đội nhận +${result.goldEarned||120} Vàng.`,true,
     {explain:result.explain,goldEarned:result.goldEarned||120,streak:result.streak,button:`Tiếp tục Đợt ${result.nextRound+1}/3 →`});
    updateAfterAction();
   }
  }else{
-  sound(false);
+  sound('wrong');
   cdState.shakeUntil=performance.now()+450;
   const x=result.health===0?'Đội đã cạn khiên nhưng NOVA đã sạc lại năng lượng để đội thử tiếp! ':'';
   notice('🛡️ CHƯA CHÍNH XÁC – HÃY QUAN SÁT MÔ HÌNH 3D!',x+'Gợi ý từ NOVA: '+result.hint,false,{button:'↺ Thử lại ngay'});
@@ -1166,7 +1283,7 @@ async function handle(action,el){
    const sk=el.dataset.skill;
    const now=performance.now();
    if((cdState.skillCd[sk]||0)>now)return;
-   sound(true);
+   sound('skill');
    if(sk==='arrowRain'){
     cdState.skillCd.arrowRain=now+12000;
     for(let i=0;i<12;i++){
@@ -1190,7 +1307,7 @@ async function handle(action,el){
    return;
   }
 
-  /* ─── ACTIONS CHUNG ─── */
+  /* ─── ACTIONS CHUNG & GIÁO VIÊN ─── */
   if(action==='hint'){
    if(world.paused)return notice('Tạm dừng','Giáo viên đang tạm dừng nhiệm vụ.',false);
    const result=await submit('/api/hint',{stage:world.me.stage,round:world.me.round});
@@ -1202,8 +1319,13 @@ async function handle(action,el){
    const selected=$('input[name="message"]:checked');
    if(!selected)return notice('Thiếu thông điệp','Hãy chọn một trong ba thông điệp từ mật mã.',false);
    const r=await submit('/api/final',{code,choice:Number(selected.value)});
-   if(r.correct)notice('🏆 GIẢI CỨU THÀNH PHỐ OXYZ THÀNH CÔNG!','Lõi Trí Tuệ đã được khôi phục: '+r.message,true,{points:r.points,button:'Xem bảng vinh danh →'});
-   else notice('MẬT THƯ CHƯA ĐƯỢC MỞ','NOVA gợi ý: '+r.hint,false,{button:'Thử giải mã lại'});
+   if(r.correct){
+    sound('win');
+    triggerConfetti(4500);
+    notice('🏆 GIẢI CỨU THÀNH PHỐ OXYZ THÀNH CÔNG!','Lõi Trí Tuệ đã được khôi phục: '+r.message,true,{points:r.points,button:'Xem bảng vinh danh →'});
+   }else{
+    notice('MẬT THƯ CHƯA ĐƯỢC MỞ','NOVA gợi ý: '+r.hint,false,{button:'Thử giải mã lại'});
+   }
    updateAfterAction();return;
   }
   if(action==='closeModal'){modal=null;$('.modal-backdrop')?.remove();await refresh(true);return;}
@@ -1211,7 +1333,45 @@ async function handle(action,el){
   if(action==='timerToggle'){await submit('/api/teacher',{action:'timer',value:world.clock.running?'pause':'start'});updateAfterAction();return;}
   if(action==='timerReset'){await submit('/api/teacher',{action:'timer',value:'reset'});updateAfterAction();return;}
   if(action==='setBonus'){const team=$('#bonusTeam').value,value=Number($('#bonusValue').value);await submit('/api/teacher',{action:'bonus',team,value});updateAfterAction();return;}
-  if(action==='awards'){showAward=!showAward;render();return;}
+  if(action==='teacherBroadcast'){
+   const msg=prompt('Nhập nội dung nhắc nhở/gợi ý gửi tới toàn bộ học sinh trong lớp:');
+   if(msg&&msg.trim()){
+    await submit('/api/teacher',{action:'broadcast',message:msg.trim()});
+    notice('ĐÃ GỬI THÔNG BÁO','Thông điệp đã được gửi tới toàn thể các đội thám hiểm!',true);
+    updateAfterAction();
+   }
+   return;
+  }
+  if(action==='teacherHealAll'){
+   if(confirm('Nạp đầy 3 khiên bảo vệ cho tất cả các đội trong lớp?')){
+    await submit('/api/teacher',{action:'healAll'});
+    sound('skill');
+    notice('ĐÃ HỒI PHỤC KHIÊN','Tất cả các đội đã được sạc đầy 3 khiên năng lượng!',true);
+    updateAfterAction();
+   }
+   return;
+  }
+  if(action==='teacherBonusAll'){
+   if(confirm('Thưởng nóng +5 XP và +50 Vàng cho tất cả các đội vì tinh thần học tập tích cực?')){
+    await submit('/api/teacher',{action:'bonusAll'});
+    sound('correct');
+    triggerConfetti(2200);
+    notice('ĐÃ THƯỞNG NÓNG','Đã cộng +5 XP và +50 Vàng cho toàn thể các đội!',true);
+    updateAfterAction();
+   }
+   return;
+  }
+  if(action==='preview3DStage'){
+   teacherPreviewStage=Number(el.dataset.stage);
+   render();
+   return;
+  }
+  if(action==='awards'){
+   showAward=!showAward;
+   if(showAward){sound('fanfare');triggerConfetti(3500);}
+   render();
+   return;
+  }
   if(action==='print'){window.print();return;}
   if(action==='exportCSV'){exportCSV();return;}
   if(action==='resetTeam'){const team=$('#resetTeam').value;const name=world.teams.find(t=>t.id===team)?.name;if(!confirm('Đặt lại từ đầu toàn bộ nhiệm vụ và điểm của '+name+'?'))return;await submit('/api/teacher',{action:'resetTeam',team});updateAfterAction();return;}

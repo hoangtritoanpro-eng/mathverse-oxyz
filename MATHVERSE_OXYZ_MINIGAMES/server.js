@@ -208,6 +208,16 @@ function processAction(endpoint,d){
     else if(d.value==='reset'){r.clock.running=false;r.clock.remainingMs=r.clock.minutes*60*1000;r.clock.startedAt=0;}
     else if(Number.isInteger(Number(d.value))&&[35,40,45,50].includes(Number(d.value))){clockPause(r);r.clock.minutes=Number(d.value);r.clock.remainingMs=r.clock.minutes*60*1000;}
     else throw error('Tác vụ đồng hồ không hợp lệ.');
+  }else if(action==='broadcast'){
+    const msg=String(d.message||'').trim();
+    if(!msg)throw error('Nội dung nhắn gửi không được để trống.');
+    emit(r,`📢 THÔNG BÁO TỪ GV: ${msg}`);
+  }else if(action==='healAll'){
+    r.teams.forEach(t=>{ t.health=3; });
+    emit(r,`💖 GIÁO VIÊN ĐÃ HỒI ĐẦY 3 KHIÊN CHO TẤT CẢ CÁC ĐỘI!`);
+  }else if(action==='bonusAll'){
+    r.teams.forEach(t=>{ t.score+=5; t.gold=(t.gold||120)+50; });
+    emit(r,`✨ GIÁO VIÊN THƯỞNG NÓNG +5 XP VÀ +50 VÀNG CHO TOÀN BỘ CÁC ĐỘI!`);
   }else if(action==='resetTeam'){
     const t=r.teams.find(t=>t.id===d.team);if(!t)throw error('Không tìm thấy đội.');
     t.stage=0;t.round=0;t.health=3;t.wrong=0;t.score=0;t.bonus=0;t.gold=100;t.heroLevel=1;t.upgrades={damage:1,speed:1,hp:1,regen:1};t.completed=false;t.finishedAt=null;t.attempts=[0,0,0,0,0];t.hintsUsed=[false,false,false,false,false];t.digits=[];
