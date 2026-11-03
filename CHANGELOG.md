@@ -10,6 +10,26 @@ Tất cả những thay đổi quan trọng của dự án này sẽ được gh
 
 ---
 
+## [2.5.0] - 2026-11-03
+
+### Added & Overhauled
+- **Thiết Kế 5 Chặng Thành 5 Trò Chơi Tương Tác Hoàn Toàn Riêng Biệt (5 Unique Game Engines):**
+  - **Chặng 1: 🗺️ SĂN KHO BÁU 2D (Island Treasure Explorer RPG):**
+    - Bản đồ quần đảo nhiệt đới 2D top-down, tự do lái nhân vật thám hiểm (WASD/D-Pad), vượt cầu gỗ, tránh tảng đá nhặt rương kho báu và tìm 3 Đền thờ cổ trục $Ox, Oy, Oz$.
+  - **Chặng 2: 🏰 BẢO VỆ THÀNH TRÌ (3-Lane Castle Defense Real-time):**
+    - Game thủ thành thời gian thực 3 làn đường, nâng cấp 3 Anh Hùng, tung 4 kỹ năng thời tiết và khai hỏa Đại Bác Laser Oxyz quét sạch các đợt quái.
+  - **Chặng 3: 🔮 LÒ RÈN TINH THỂ & THÁP PHA LÊ (Crystal Forge & Alchemist Cauldron):**
+    - Giao diện phòng rèn thuật giả kim huyền bí, Vạc Năng Lượng Pitago xoay tròn plasma, 5 bệ rèn tinh thể pha lê tương ứng 5 bài toán độ dài/khoảng cách, thu thập đủ 5 viên để kích hoạt Bàn Giải Mã mở cổng Tháp Pha Lê Cổ.
+  - **Chặng 4: 🌀 MÊ CUNG TỌA ĐỘ Ô VUÔNG (Interactive Grid Maze & Teleport Waypoints):**
+    - Bàn cờ mê cung ô vuông $8 \times 6$ có hệ trục $Ox, Oy$ vạch số rõ ràng. Học sinh điều khiển nhân vật chạy từng ô trong mê cung, đạp lên đúng phiến đá tại tọa độ trung điểm/trọng tâm đã tính toán để mở cổng dịch chuyển và giải mã rương vàng `TRUNG`.
+  - **Chặng 5: 🐲 ĐẤU TRƯỜNG DIỆT BOSS TỐI THƯỢNG (Epic Boss Raid Arena):**
+    - Màn Đấu Boss tổ đội hoành tráng: Boss rồng "Bóng Đen Lãng Quên" (500 HP) bay lượn ở trung tâm. Học sinh giải 5 bài toán vectơ cùng phương để sạc 5 Trụ Phép bao quanh, kích hoạt Khiên Năng Lượng `BAOVE` và bắn **Đại Pháo Laser Oxyz Tối Thượng** quét sạch Boss.
+- **Cập Nhật Toàn Diện Bản Đồ Hành Trình 5 Chặng:**
+  - Nhãn hiển thị chế độ game trên từng hòn đảo: `🗺️ Săn Kho Báu 2D`, `🏰 Thủ Thành 3 Làn`, `🔮 Lò Rèn Pha Lê`, `🌀 Mê Cung Tọa Độ`, `🐲 Đấu Trường Boss`.
+- **Đồng Bộ:** Đóng gói toàn bộ 5 game engines vào tệp ngoại tuyến `CHOI_THU_1_MAY.html` (~268KB) và cập nhật live server.
+
+---
+
 ## [2.4.0] - 2026-11-03
 
 ### Added & Overhauled

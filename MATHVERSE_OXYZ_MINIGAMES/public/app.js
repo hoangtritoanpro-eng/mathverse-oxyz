@@ -32,11 +32,11 @@ const oxyz3D={
 };
 
 const missionMeta=[
- {icon:'🏝️',place:'Rừng Vectơ Khởi Nguyên',sub:'Tọa độ vectơ AB',biome:'#10b981',mode:'🗺️ Săn Kho Báu'},
- {icon:'🏰',place:'Pháo Đài Góc Vuông',sub:'Tích vô hướng u·v',biome:'#3b82f6',mode:'🏰 Thủ Thành'},
- {icon:'💠',place:'Tháp Pha Lê Khoảng Cách',sub:'Độ dài & Khoảng cách',biome:'#a855f7',mode:'🗺️ Săn Kho Báu'},
- {icon:'🌀',place:'Mê Cung Trung Điểm',sub:'Trung điểm & Trọng tâm',biome:'#14b8a6',mode:'🗺️ Săn Kho Báu'},
- {icon:'🐲',place:'Thành Trì Lõi Trí Tuệ',sub:'Cùng phương & Tổng hợp',biome:'#ef4444',mode:'🏰 Thủ Thành'}
+ {icon:'🏝️',place:'Rừng Vectơ Khởi Nguyên',sub:'Tọa độ vectơ AB',biome:'#10b981',mode:'🗺️ Săn Kho Báu 2D'},
+ {icon:'🏰',place:'Pháo Đài Góc Vuông',sub:'Tích vô hướng u·v',biome:'#3b82f6',mode:'🏰 Thủ Thành 3 Làn'},
+ {icon:'💠',place:'Tháp Pha Lê Khoảng Cách',sub:'Độ dài & Khoảng cách',biome:'#a855f7',mode:'🔮 Lò Rèn Pha Lê'},
+ {icon:'🌀',place:'Mê Cung Trung Điểm',sub:'Trung điểm & Trọng tâm',biome:'#14b8a6',mode:'🌀 Mê Cung Tọa Độ'},
+ {icon:'🐲',place:'Thành Trì Lõi Trí Tuệ',sub:'Cùng phương & Tổng hợp',biome:'#ef4444',mode:'🐲 Đấu Trường Boss'}
 ];
 const labels=['A','B','C','D'];
 const initialRoom=(qs.get('room')||'').trim().toUpperCase();
@@ -54,6 +54,24 @@ const cipherState = {
 let showRolesModal = false;
 let questDialogue = null;
 let currentHintLevel = 0;
+
+
+/* ─── TRẠNG THÁI ENGINE 4: MÊ CUNG TỌA ĐỘ Ô VUÔNG (GRID MAZE) ─── */
+const mazeState = {
+ x: 0,
+ y: 0,
+ walls: new Set(['1,1', '1,2', '1,4', '2,4', '3,1', '3,5', '4,2', '4,4', '5,1', '5,3', '6,3', '6,5', '7,2', '7,4']),
+ waypoints: [
+  {x: 4, y: 3, label: 'M(4; 3)', badge: 'Mảnh T'},
+  {x: 3, y: 3, label: 'G(3; 3)', badge: 'Mảnh R'},
+  {x: 4, y: 1, label: 'D(4; -2)', badge: 'Mảnh U'},
+  {x: 2, y: 1, label: 'G₂(2; 1)', badge: 'Mảnh N'},
+  {x: 3, y: 2, label: 'K(3; 1)', badge: 'Mảnh G'}
+ ]
+};
+function isMazeWall(x, y){
+ return mazeState.walls.has(x + ',' + y);
+}
 
 const huntState={
  stageId:-1,
@@ -816,6 +834,288 @@ function renderGridOverlay(m){
  </div>`;
 }
 
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   RENDER ENGINE 3: LÒ RÈN TINH THỂ & THÁP PHA LÊ (CHẶNG 3 - CRYSTAL FORGE)
+   ═══════════════════════════════════════════════════════════════════════════ */
+function renderCrystalForgeGame(m){
+ const r = m.round;
+ const roundsMeta = m.allRounds || [];
+ const isReady = Boolean(m.cipherReady || world.me?.cipherReady);
+ const gemIcons = ['🔷', '🔮', '💎', '💖', '👑'];
+ const gemNames = ['Pha Lê Lam (P)', 'Pha Lê Lục (H)', 'Hoàng Kim (A)', 'Hồng Ngọc (L)', 'Lõi Tối Thượng (E)'];
+ const gemMath = ['Δx = 3', '|u| = 3', 'MN = 2√2', 'AB = 7', 'CD = 13'];
+
+ const anvilsHtml = [0, 1, 2, 3, 4].map(idx => {
+  const isForged = idx < r;
+  const isActive = idx === r;
+  const isLocked = idx > r;
+  const cls = isForged ? 'forged' : (isActive ? 'active' : 'locked');
+  return `<div class="hw-anvil-card ${cls}" data-action="${isActive?'openHuntBattle':'clickAnvilInfo'}" data-idx="${idx}" title="${gemNames[idx]}">
+   <span class="hw-anvil-icon">${gemIcons[idx]}</span>
+   <div style="font-size:11px;font-weight:900;color:${isForged?'#86efac':(isActive?'#fde047':'#94a3b8')}">
+    ${isForged ? ('✅ ' + gemMath[idx]) : (isActive ? '🔥 ĐANG RÈN' : '🔒 Khóa')}
+   </div>
+   <div style="font-size:10px;color:#e2e8f0;margin-top:2px">${gemNames[idx]}</div>
+   ${isActive ? '<button type="button" class="button gold sm" style="margin-top:6px;padding:3px 8px;font-size:10px" data-action="openHuntBattle">⚔️ ĐÚC NGAY</button>' : ''}
+  </div>`;
+ }).join('');
+
+ return `<div class="hw-forge-wrapper">
+  <div class="hw-forge-head">
+   <div>
+    <span class="tag" style="background:#581c87;border-color:#c084fc">🔮 LÒ RÈN TINH THỂ OXYZ · CHẶNG 3</span>
+    <h3 style="margin:4px 0 0;font-size:17px;font-weight:900">VẠC NĂNG LƯỢNG PITAGO & THÁP PHA LÊ KHÔNG GIAN</h3>
+    <p style="margin:2px 0 0;font-size:12px;color:#e9d5ff">Tính toán độ dài và khoảng cách trong Oxyz để đúc 5 viên tinh thể, thu thập 5 mảnh rune P-H-A-L-E giải mã mở tháp!</p>
+   </div>
+   <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+    <button type="button" class="hw-btn-hud ${isReady?'alert':''}" data-action="openCipherNotebook">
+     📜 SỔ MẬT THƯ (${isReady?'SẴN SÀNG':'XEM MẢNH'})
+    </button>
+    <button type="button" class="hw-btn-hud" data-action="openTeamRoles">
+     🤝 PHÂN VAI NHÓM
+    </button>
+   </div>
+  </div>
+
+  <div class="hw-forge-layout">
+   <div class="hw-forge-chamber">
+    <div style="font-size:12px;font-weight:900;color:#c084fc;letter-spacing:1px;text-transform:uppercase">
+     ⚡ VẠC NĂNG LƯỢNG PITAGO: AB = √(Δx² + Δy² + Δz²)
+    </div>
+    <div class="hw-cauldron-art">
+     <div class="hw-cauldron-glow"></div>
+     <div class="hw-cauldron-rays"></div>
+     <div class="hw-cauldron-pot">⚗️</div>
+    </div>
+    <span class="pill gold" style="font-size:11.5px">
+     TIẾN ĐỘ LÒ RÈN: ĐÃ ĐÚC ${Math.min(5, r)}/5 TINH THỂ NĂNG LƯỢNG
+    </span>
+    <div class="hw-anvils-row">
+     ${anvilsHtml}
+    </div>
+   </div>
+
+   <div class="hw-spire-panel">
+    <div style="font-size:12px;font-weight:900;color:#fde047;margin-bottom:8px">THÁP PHA LÊ CỔ ĐẠI</div>
+    <div style="position:relative;width:100px;height:120px;display:grid;place-items:center;margin:8px 0">
+     <div class="hw-crystal-barrier ${isReady?'unlocked':''}"></div>
+     <div style="font-size:56px;filter:drop-shadow(0 0 20px ${isReady?'#4ade80':'#c084fc'});animation:float 3s infinite">💠</div>
+    </div>
+    <div style="font-size:12px;color:#e2e8f0;margin:6px 0;line-height:1.4">
+     ${isReady ? '✨ Toàn bộ 5 tinh thể đã nạp đầy năng lượng! Hãy mở Sổ Mật Thư và ghép "PHALE" để mở cổng!' : ('Cần đúc thêm ' + (5 - r) + ' tinh thể để kích hoạt Bàn Giải Mã Trung Tâm.')}
+    </div>
+    ${isReady ? `
+     <button type="button" class="button gold block pulse-urgent" data-action="openCipherNotebook" style="margin-top:10px">
+      🔓 GIẢI MÃ PHALE MỞ THÁP!
+     </button>
+    ` : `
+     <button type="button" class="button primary block" data-action="clickNPC" style="margin-top:10px;font-size:12px">
+      🧙‍♂️ Lời khuyên Vệ Binh Hang
+     </button>
+    `}
+   </div>
+  </div>
+
+  ${huntState.battleOpen ? renderHuntBattleModal(m) : ''}
+  ${cipherState.open ? renderCipherNotebookModal(m) : ''}
+  ${showRolesModal ? renderTeamRolesModal(m) : ''}
+  ${questDialogue ? renderQuestDialogueModal() : ''}
+ </div>`;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   RENDER ENGINE 4: MÊ CUNG TỌA ĐỘ Ô VUÔNG (CHẶNG 4 - GRID MAZE)
+   ═══════════════════════════════════════════════════════════════════════════ */
+function renderGridMazeGame(m){
+ const r = m.round;
+ const isReady = Boolean(m.cipherReady || world.me?.cipherReady);
+ const curTarget = mazeState.waypoints[Math.min(r, 4)] || {x: 4, y: 3, label: 'M(4; 3)'};
+ const isNearPad = (mazeState.x === curTarget.x && mazeState.y === curTarget.y);
+
+ // Build 9x7 cells (x = 0..8, y = 0..6)
+ let cellsHtml = '';
+ for (let y = 6; y >= 0; y--) {
+  for (let x = 0; x <= 8; x++) {
+   const isWall = isMazeWall(x, y);
+   const isPlayer = (mazeState.x === x && mazeState.y === y);
+   const wpIdx = mazeState.waypoints.findIndex(w => w.x === x && w.y === y);
+   const isPad = wpIdx !== -1;
+   const isClearedPad = isPad && wpIdx < r;
+   const isActivePad = isPad && wpIdx === r;
+   const isChest = (x === 8 && y === 5);
+
+   let cellContent = '';
+   if (isPlayer) {
+    cellContent = `<div class="hw-maze-player">${world.me.avatar}</div>`;
+   } else if (isChest) {
+    cellContent = isReady ? '👑' : '🔒';
+   } else if (isActivePad) {
+    cellContent = '🎯';
+   } else if (isClearedPad) {
+    cellContent = '🏛️';
+   }
+
+   const cellCls = isWall ? 'wall' : (isChest ? 'chest-cell' : (isActivePad ? 'pad' : (isClearedPad ? 'pad cleared' : '')));
+   cellsHtml += `<div class="hw-grid-cell ${cellCls}" data-action="clickMazeCell" data-x="${x}" data-y="${y}" title="Ô (${x}; ${y})">
+    ${cellContent}
+   </div>`;
+  }
+ }
+
+ return `<div class="hw-maze-wrapper">
+  <div class="hw-forge-head">
+   <div>
+    <span class="tag" style="background:#0f766e;border-color:#2dd4bf">🌀 MÊ CUNG TỌA ĐỘ Ô VUÔNG · CHẶNG 4</span>
+    <h3 style="margin:4px 0 0;font-size:17px;font-weight:900">BÀN CỜ MÊ CUNG OXY & CỔNG DỊCH CHUYỂN TRUNG ĐIỂM</h3>
+    <p style="margin:2px 0 0;font-size:12px;color:#99f6e4">Dùng phím WASD / Mũi tên hoặc chạm ô để dẫn đường cho nhân vật đến đúng tọa độ trung điểm/trọng tâm đã tính toán!</p>
+   </div>
+   <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+    <button type="button" class="hw-btn-hud ${isReady?'alert':''}" data-action="openCipherNotebook">
+     📜 SỔ MẬT THƯ (${isReady?'SẴN SÀNG':'XEM MẢNH'})
+    </button>
+    <button type="button" class="hw-btn-hud" data-action="openTeamRoles">
+     🤝 PHÂN VAI NHÓM
+    </button>
+   </div>
+  </div>
+
+  <div class="hw-maze-board-container">
+   <div class="hw-maze-grid-board">
+    ${cellsHtml}
+   </div>
+   <div class="hw-maze-axis-x">
+    <span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span>
+   </div>
+   <div class="hw-maze-axis-y">
+    <span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span>
+   </div>
+  </div>
+
+  <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-top:10px">
+   <div style="display:flex;align-items:center;gap:10px">
+    <div style="background:rgba(15,118,110,.4);border:1.5px solid #2dd4bf;border-radius:12px;padding:8px 14px">
+     <div style="font-size:10.5px;color:#99f6e4">TỌA ĐỘ HIỆN TẠI CỦA ĐỘI:</div>
+     <b style="font-size:14px;color:#fde047">(${mazeState.x}; ${mazeState.y})</b>
+    </div>
+    <div style="background:rgba(250,204,21,.15);border:1.5px solid #facc15;border-radius:12px;padding:8px 14px">
+     <div style="font-size:10.5px;color:#fde047">MỤC TIÊU TRẠM ${Math.min(5, r+1)}:</div>
+     <b style="font-size:14px;color:#fff">${curTarget.label}</b>
+    </div>
+   </div>
+
+   <div style="display:flex;gap:8px;align-items:center">
+    ${isNearPad ? `
+     <button type="button" class="button gold pulse-urgent" data-action="openHuntBattle">
+      ⚔️ ĐÃ ĐẾN Ô ${curTarget.label} – BẤM MỞ BÀI TOÁN! (Space/E)
+     </button>
+    ` : `
+     <button type="button" class="button gray sm" data-action="autoStepToMazeTarget">
+      🧭 Chỉ đường đến ${curTarget.label}
+     </button>
+    `}
+    ${isReady ? `
+     <button type="button" class="button teal pulse-urgent" data-action="openCipherNotebook">
+      👑 MỞ PHÒNG KHO BÁU (GHÉP MÃ TRUNG)
+     </button>
+    ` : ''}
+   </div>
+  </div>
+
+  ${huntState.battleOpen ? renderHuntBattleModal(m) : ''}
+  ${cipherState.open ? renderCipherNotebookModal(m) : ''}
+  ${showRolesModal ? renderTeamRolesModal(m) : ''}
+ </div>`;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   RENDER ENGINE 5: ĐẤU TRƯỜNG DIỆT BOSS TỐI THƯỢNG (CHẶNG 5 - BOSS RAID)
+   ═══════════════════════════════════════════════════════════════════════════ */
+function renderBossRaidGame(m){
+ const r = m.round;
+ const isBoss = Boolean(m.isBoss || world.me?.bossReady);
+ const isShieldOn = Boolean(m.bossReady || world.me?.bossReady);
+ const pylonNames = ['Trụ I · Cổ ngữ B', 'Trụ II · Cổ ngữ A', 'Trụ III · Cổ ngữ O', 'Trụ IV · Cổ ngữ V', 'Trụ V · Cổ ngữ E'];
+ const pylonMath = ['u = kv (k=-2)', 'w = u + v', 'Ngược hướng', 'D(5; 3; -1)', 'm = 3'];
+
+ const pylonsHtml = [0, 1, 2, 3, 4].map(idx => {
+  const isCharged = idx < r;
+  const isActive = idx === r;
+  const cls = isCharged ? 'charged' : (isActive ? 'active' : '');
+  return `<div class="hw-pylon-box ${cls}" data-action="${isActive?'openHuntBattle':'clickPylonInfo'}" data-idx="${idx}" title="${pylonNames[idx]}">
+   <div style="font-size:24px">${isCharged?'⚡':'🛡️'}</div>
+   <b style="font-size:11px;color:${isCharged?'#fde047':(isActive?'#38bdf8':'#94a3b8')};display:block;margin-top:2px">
+    ${isCharged ? ('✅ ' + pylonMath[idx]) : (isActive ? '⚡ CẦN SẠC' : '🔒 Khóa')}
+   </b>
+   <small style="font-size:10px;color:#cbd5e1">${pylonNames[idx]}</small>
+   ${isActive ? '<button type="button" class="button primary sm" style="margin-top:4px;padding:2px 6px;font-size:9.5px" data-action="openHuntBattle">⚔️ SẠC TRỤ</button>' : ''}
+  </div>`;
+ }).join('');
+
+ return `<div class="hw-raid-wrapper">
+  <div class="hw-forge-head">
+   <div>
+    <span class="tag" style="background:#7f1d1d;border-color:#ef4444">🐲 ĐẤU TRƯỜNG DIỆT BOSS · CHẶNG 5</span>
+    <h3 style="margin:4px 0 0;font-size:17px;font-weight:900">ĐẠI CHIẾN BOSS BÓNG ĐEN LÃNG QUÊN & ĐẠI PHÁO LASER OXYZ</h3>
+    <p style="margin:2px 0 0;font-size:12px;color:#fca5a5">Giải 5 bài toán vectơ cùng phương để sạc 5 Trụ Phép, kích hoạt Khiên BAOVE và khai hỏa Laser diệt Boss!</p>
+   </div>
+   <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+    <button type="button" class="hw-btn-hud ${m.cipherReady?'alert':''}" data-action="openCipherNotebook">
+     📜 SỔ MẬT THƯ (${m.cipherReady?'SẴN SÀNG':'XEM MẢNH'})
+    </button>
+    <button type="button" class="hw-btn-hud" data-action="openTeamRoles">
+     🤝 PHÂN VAI NHÓM
+    </button>
+   </div>
+  </div>
+
+  <div class="hw-raid-arena-stage">
+   <div class="hw-boss-hud" style="width:100%;max-width:440px">
+    <div class="flex-between" style="width:100%">
+     <span class="hw-boss-name">🐲 BOSS BÓNG ĐEN LÃNG QUÊN</span>
+     <span class="pill red" style="font-size:10px">CẤP ĐỘ: BOSS TỐI THƯỢNG</span>
+    </div>
+    <div class="hw-boss-hp-bar" style="width:100%">
+     <div class="hw-boss-hp-fill" style="width:${huntState.monsterDefeated?0:100}%"></div>
+    </div>
+    <small style="color:#fca5a5;font-weight:900;margin-top:3px">
+     HP: ${huntState.monsterDefeated?0:500}/500 · ${isShieldOn ? '🛡️ Lá chắn BAOVE đã kích hoạt! Bấm nghênh chiến Boss!' : 'Phong ấn bởi 5 Trụ Phép'}
+    </small>
+   </div>
+
+   <div class="hw-raid-boss-center">
+    ${isShieldOn ? '<div class="hw-shield-dome"></div>' : ''}
+    <div class="hw-raid-boss-sprite">${huntState.monsterDefeated?'💥':'🐲'}</div>
+    ${huntState.monsterDefeated ? `
+     <div style="background:rgba(16,185,129,.9);color:#fff;padding:8px 18px;border-radius:12px;font-weight:900;font-size:16px;box-shadow:0 0 25px #10b981;margin-top:10px">
+      🎉 THÀNH TRÌ ĐÃ ĐƯỢC BẢO VỆ!
+     </div>
+    ` : (isShieldOn ? `
+     <button type="button" class="hw-btn-attack pulse-urgent" data-action="openBossBattle" style="margin-top:12px">
+      ⚔️ NGHÊNH CHIẾN BOSS CUỐI (Space/E)
+     </button>
+    ` : (m.cipherReady ? `
+     <button type="button" class="button gold pulse-urgent" data-action="openCipherNotebook" style="margin-top:12px">
+      🛡️ GHÉP BAOVE KÍCH HOẠT LÁ CHẮN THÀNH TRÌ!
+     </button>
+    ` : `
+     <div style="font-size:12px;color:#fca5a5;margin-top:8px">
+      ⚡ Hãy sạc đủ 5 Trụ Phép để dựng Màng Chắn Năng Lượng trước khi nghênh chiến Boss!
+     </div>
+    `))}
+   </div>
+
+   <div class="hw-raid-pylons-circle">
+    ${pylonsHtml}
+   </div>
+  </div>
+
+  ${huntState.battleOpen ? renderHuntBattleModal(m) : ''}
+  ${cipherState.open ? renderCipherNotebookModal(m) : ''}
+  ${showRolesModal ? renderTeamRolesModal(m) : ''}
+ </div>`;
+}
+
 function renderHuntGame(m){
  const hm=initHuntForStage(m);
  const r=m.round;
@@ -1462,7 +1762,7 @@ function stageContent(m){
   </div>
   ${roles.length?`<div class="role-strip">${roles.map((r,idx)=>`<div class="role-chip ${idx===m.round?'active-role':''}">${esc(r)}</div>`).join('')}</div>`:''}
   <!-- BẢN ĐỒ GAME RPG ĐƯỢC ƯU TIÊN LÊN ĐẦU TIÊN ĐỂ HỌC SINH TỰ LÁI NHÂN VẬT CHẠY TÌM TRẠM -->
-  ${mode==='hunt'?renderHuntGame(m):renderCastleDefenseGame(m)}
+  ${renderStageGame(m)}
   ${renderOxyz3D(m)}
  </div>`;
 }
@@ -1920,6 +2220,52 @@ async function handle(action,el){
    render();
    return;
   }
+  
+  if(action==='clickMazeCell'){
+   const cx = Number(el.dataset.x), cy = Number(el.dataset.y);
+   if(!isNaN(cx) && !isNaN(cy) && !isMazeWall(cx, cy)){
+    mazeState.x = cx; mazeState.y = cy;
+    sound('step');
+    const curWp = mazeState.waypoints[Math.min(world.current.round, 4)];
+    if(curWp && cx === curWp.x && cy === curWp.y){
+     sound('gem');
+     huntState.battleOpen = true;
+     huntState.selectedChoice = null;
+     huntState.shortText = '';
+     huntState.monsterDefeated = false;
+     huntState.rewardBadge = null;
+    }
+    render();
+   }
+   return;
+  }
+  if(action==='autoStepToMazeTarget'){
+   const curWp = mazeState.waypoints[Math.min(world.current.round, 4)];
+   if(curWp){
+    mazeState.x = curWp.x; mazeState.y = curWp.y;
+    sound('gem');
+    huntState.battleOpen = true;
+    huntState.selectedChoice = null;
+    huntState.shortText = '';
+    huntState.monsterDefeated = false;
+    huntState.rewardBadge = null;
+    render();
+   }
+   return;
+  }
+  if(action==='clickAnvilInfo'){
+   sound('step');
+   const idx = Number(el.dataset.idx);
+   notice('🔮 BỆ RÈN TINH THỂ', `Đây là Bệ rèn số ${idx+1}. Hãy hoàn thành các lượt trước để kích hoạt bệ rèn này!`, false);
+   return;
+  }
+  if(action==='clickPylonInfo'){
+   sound('step');
+   const idx = Number(el.dataset.idx);
+   notice('⚡ TRỤ PHÉP THÀNH TRÌ', `Trụ phép số ${idx+1} đang bảo vệ kết giới. Hãy giải lần lượt từng trụ theo thứ tự!`, false);
+   return;
+  }
+
   if(action==='openCipherNotebook'){
    cipherState.open=true;cipherState.error=null;render();return;
   }

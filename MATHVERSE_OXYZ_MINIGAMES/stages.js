@@ -197,8 +197,8 @@ const STAGES = [
   },
   {
     id: 3,
-    gameType: 'crystal_tower',
-    defaultMode: 'hunt',
+    gameType: 'forge',
+    defaultMode: 'forge',
     title: 'THÁP PHA LÊ KHOẢNG CÁCH',
     subtitle: 'Tìm 5 Tinh Thể & Mở Khóa Tháp Pha Lê',
     place: 'Thung Lũng Tháp Pha Lê',
@@ -349,8 +349,8 @@ const STAGES = [
   },
   {
     id: 4,
-    gameType: 'coordinate_maze',
-    defaultMode: 'hunt',
+    gameType: 'maze',
+    defaultMode: 'maze',
     title: 'MÊ CUNG TRUNG ĐIỂM',
     subtitle: 'Khám Phá Tọa Độ Ô Vuông & Ghép Mật Thư TRUNG',
     place: 'Mê Cung Không Gian Cổ Đại',
@@ -502,8 +502,8 @@ const STAGES = [
   },
   {
     id: 5,
-    gameType: 'citadel_boss',
-    defaultMode: 'defense',
+    gameType: 'boss_raid',
+    defaultMode: 'boss_raid',
     title: 'THÀNH TRÌ LỜI TRÍ TUỆ',
     subtitle: 'Nạp Năng Lượng 5 Trụ Phép & Diệt Boss Cuối Oxyz',
     place: 'Thánh Điện Phép Thuật Oxyz',

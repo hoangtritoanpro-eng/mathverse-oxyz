@@ -19,12 +19,12 @@
         "code": "1111",
         "token": "DEMO_DOI_1",
         "stage": 2,
-        "round": 0,
-        "health": 3,
-        "wrong": 38,
+        "round": 4,
+        "health": 0,
+        "wrong": 43,
         "score": 40,
         "bonus": 0,
-        "gold": 2320,
+        "gold": 2800,
         "heroLevel": 6,
         "upgrades": {
           "damage": 5,
@@ -37,7 +37,7 @@
         "attempts": [
           11,
           13,
-          2,
+          7,
           7,
           5
         ],
@@ -645,6 +645,42 @@
       {
         "at": "2026-11-03T02:32:16.656Z",
         "text": "🐉 Rồng Xanh đã VƯỢT CHẶNG 2: Pháo Đài Vuông Góc (Combo x1). +8 XP, +200 Vàng và mảnh mã 0."
+      },
+      {
+        "at": "2026-11-03T02:50:39.451Z",
+        "text": "🐉 Rồng Xanh trả lời chưa đúng lượt 1 ở Thung Lũng Tháp Pha Lê; còn 2 khiên."
+      },
+      {
+        "at": "2026-11-03T02:50:40.953Z",
+        "text": "🐉 Rồng Xanh trả lời chưa đúng lượt 1 ở Thung Lũng Tháp Pha Lê; còn 1 khiên."
+      },
+      {
+        "at": "2026-11-03T02:50:42.247Z",
+        "text": "🐉 Rồng Xanh đã hạ mục tiêu lượt 1/5 tại Thung Lũng Tháp Pha Lê (Combo x1, +120 Vàng)."
+      },
+      {
+        "at": "2026-11-03T02:50:43.759Z",
+        "text": "🐉 Rồng Xanh trả lời chưa đúng lượt 2 ở Thung Lũng Tháp Pha Lê; còn 0 khiên."
+      },
+      {
+        "at": "2026-11-03T02:50:45.209Z",
+        "text": "🐉 Rồng Xanh đã hạ mục tiêu lượt 2/5 tại Thung Lũng Tháp Pha Lê (Combo x1, +120 Vàng)."
+      },
+      {
+        "at": "2026-11-03T02:50:47.077Z",
+        "text": "🐉 Rồng Xanh trả lời chưa đúng lượt 3 ở Thung Lũng Tháp Pha Lê; còn 0 khiên."
+      },
+      {
+        "at": "2026-11-03T02:50:48.291Z",
+        "text": "🐉 Rồng Xanh đã hạ mục tiêu lượt 3/5 tại Thung Lũng Tháp Pha Lê (Combo x1, +120 Vàng)."
+      },
+      {
+        "at": "2026-11-03T02:50:49.687Z",
+        "text": "🐉 Rồng Xanh trả lời chưa đúng lượt 4 ở Thung Lũng Tháp Pha Lê; còn 0 khiên."
+      },
+      {
+        "at": "2026-11-03T02:50:50.879Z",
+        "text": "🐉 Rồng Xanh đã hạ mục tiêu lượt 4/5 tại Thung Lũng Tháp Pha Lê (Combo x1, +120 Vàng)."
       }
     ]
   },
@@ -2068,6 +2104,624 @@
       {
         "at": "2026-11-03T00:37:16.667Z",
         "text": "🐉 Rồng Xanh đã VƯỢT CHẶNG 1: Rừng Vectơ Nguyên Sinh (Combo x3). +20 XP, +260 Vàng và mảnh mã 3."
+      }
+    ]
+  },
+  "756478": {
+    "id": "756478",
+    "teacherToken": "a81c5431d05dafcbc72e3702ec084260493225c2835ff5e2",
+    "createdAt": "2026-11-03T02:47:28.303Z",
+    "paused": false,
+    "clock": {
+      "minutes": 45,
+      "remainingMs": 2700000,
+      "running": false,
+      "startedAt": 0
+    },
+    "teams": [
+      {
+        "name": "Rồng Xanh",
+        "avatar": "🐉",
+        "color": "#36C6E8",
+        "id": "doi-1",
+        "code": "9838",
+        "token": "c160a1def04bee07ba5342ae94d3f4c4",
+        "stage": 2,
+        "round": 4,
+        "health": 0,
+        "wrong": 20,
+        "score": 16,
+        "bonus": 0,
+        "gold": 1520,
+        "heroLevel": 3,
+        "upgrades": {
+          "damage": 1,
+          "speed": 1,
+          "hp": 1,
+          "regen": 1
+        },
+        "completed": false,
+        "finishedAt": null,
+        "attempts": [
+          4,
+          6,
+          10,
+          0,
+          0
+        ],
+        "hintsUsed": [
+          false,
+          false,
+          false,
+          false,
+          false
+        ],
+        "digits": [
+          {
+            "stage": 1,
+            "digit": "3",
+            "rule": "Lấy hiệu hoành độ xB − xA = 5 − 2 = 3.",
+            "item": "La bàn ba trục"
+          },
+          {
+            "stage": 2,
+            "digit": "0",
+            "rule": "Lấy kết quả tích vô hướng của đợt tấn công đầu tiên (u·v = 0).",
+            "item": "Khiên trực giao"
+          }
+        ],
+        "streak": 1
+      },
+      {
+        "name": "Tia Chớp",
+        "avatar": "⚡",
+        "color": "#FFC857",
+        "id": "doi-2",
+        "code": "5706",
+        "token": "d70082a83086cc5711295406530fb470",
+        "stage": 0,
+        "round": 0,
+        "health": 3,
+        "wrong": 0,
+        "score": 0,
+        "bonus": 0,
+        "gold": 100,
+        "heroLevel": 1,
+        "upgrades": {
+          "damage": 1,
+          "speed": 1,
+          "hp": 1,
+          "regen": 1
+        },
+        "completed": false,
+        "finishedAt": null,
+        "attempts": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "hintsUsed": [
+          false,
+          false,
+          false,
+          false,
+          false
+        ],
+        "digits": [],
+        "streak": 0
+      },
+      {
+        "name": "Phượng Hoàng",
+        "avatar": "🔥",
+        "color": "#FF758F",
+        "id": "doi-3",
+        "code": "4695",
+        "token": "3a49294c787c4d5f0344eac1fb0dc326",
+        "stage": 0,
+        "round": 0,
+        "health": 3,
+        "wrong": 0,
+        "score": 0,
+        "bonus": 0,
+        "gold": 100,
+        "heroLevel": 1,
+        "upgrades": {
+          "damage": 1,
+          "speed": 1,
+          "hp": 1,
+          "regen": 1
+        },
+        "completed": false,
+        "finishedAt": null,
+        "attempts": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "hintsUsed": [
+          false,
+          false,
+          false,
+          false,
+          false
+        ],
+        "digits": [],
+        "streak": 0
+      },
+      {
+        "name": "Ngôi Sao",
+        "avatar": "🌟",
+        "color": "#AB8CFF",
+        "id": "doi-4",
+        "code": "6853",
+        "token": "31de805a463ea5a23c0aab4d9ff3354a",
+        "stage": 0,
+        "round": 0,
+        "health": 3,
+        "wrong": 0,
+        "score": 0,
+        "bonus": 0,
+        "gold": 100,
+        "heroLevel": 1,
+        "upgrades": {
+          "damage": 1,
+          "speed": 1,
+          "hp": 1,
+          "regen": 1
+        },
+        "completed": false,
+        "finishedAt": null,
+        "attempts": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "hintsUsed": [
+          false,
+          false,
+          false,
+          false,
+          false
+        ],
+        "digits": [],
+        "streak": 0
+      }
+    ],
+    "events": [
+      {
+        "at": "2026-11-03T02:47:28.303Z",
+        "text": "NOVA đã tạo phòng 756478 với 4 đội."
+      },
+      {
+        "at": "2026-11-03T02:47:51.497Z",
+        "text": "GV đã khởi động lại hành trình của Rồng Xanh."
+      },
+      {
+        "at": "2026-11-03T02:52:59.691Z",
+        "text": "🐉 Rồng Xanh trả lời chưa đúng lượt 1 ở Rừng Vectơ Nguyên Sinh; còn 2 khiên."
+      },
+      {
+        "at": "2026-11-03T02:53:01.143Z",
+        "text": "🐉 Rồng Xanh đã hạ mục tiêu lượt 1/3 tại Rừng Vectơ Nguyên Sinh (Combo x1, +120 Vàng)."
+      },
+      {
+        "at": "2026-11-03T02:53:02.539Z",
+        "text": "🐉 Rồng Xanh đã hạ mục tiêu lượt 2/3 tại Rừng Vectơ Nguyên Sinh (Combo x2, +150 Vàng)."
+      },
+      {
+        "at": "2026-11-03T02:53:04.021Z",
+        "text": "🐉 Rồng Xanh trả lời chưa đúng lượt 3 ở Rừng Vectơ Nguyên Sinh; còn 1 khiên."
+      },
+      {
+        "at": "2026-11-03T02:53:05.245Z",
+        "text": "🐉 Rồng Xanh trả lời chưa đúng lượt 3 ở Rừng Vectơ Nguyên Sinh; còn 0 khiên."
+      },
+      {
+        "at": "2026-11-03T02:53:08.173Z",
+        "text": "🐉 Rồng Xanh trả lời chưa đúng lượt 3 ở Rừng Vectơ Nguyên Sinh; còn 0 khiên."
+      },
+      {
+        "at": "2026-11-03T02:53:09.280Z",
+        "text": "🐉 Rồng Xanh đã VƯỢT CHẶNG 1: Rừng Vectơ Nguyên Sinh (Combo x1). +8 XP, +200 Vàng và mảnh mã 3."
+      },
+      {
+        "at": "2026-11-03T02:53:10.654Z",
+        "text": "🐉 Rồng Xanh đã hạ mục tiêu lượt 1/3 tại Pháo Đài Vuông Góc (Combo x2, +150 Vàng)."
+      },
+      {
+        "at": "2026-11-03T02:53:11.875Z",
+        "text": "🐉 Rồng Xanh trả lời chưa đúng lượt 2 ở Pháo Đài Vuông Góc; còn 2 khiên."
+      },
+      {
+        "at": "2026-11-03T02:53:13.215Z",
+        "text": "🐉 Rồng Xanh trả lời chưa đúng lượt 2 ở Pháo Đài Vuông Góc; còn 1 khiên."
+      },
+      {
+        "at": "2026-11-03T02:53:14.408Z",
+        "text": "🐉 Rồng Xanh trả lời chưa đúng lượt 2 ở Pháo Đài Vuông Góc; còn 0 khiên."
+      },
+      {
+        "at": "2026-11-03T02:53:15.505Z",
+        "text": "🐉 Rồng Xanh trả lời chưa đúng lượt 2 ở Pháo Đài Vuông Góc; còn 0 khiên."
+      },
+      {
+        "at": "2026-11-03T02:53:16.625Z",
+        "text": "🐉 Rồng Xanh đã hạ mục tiêu lượt 2/3 tại Pháo Đài Vuông Góc (Combo x1, +120 Vàng)."
+      },
+      {
+        "at": "2026-11-03T02:53:17.875Z",
+        "text": "🐉 Rồng Xanh trả lời chưa đúng lượt 3 ở Pháo Đài Vuông Góc; còn 0 khiên."
+      },
+      {
+        "at": "2026-11-03T02:53:18.905Z",
+        "text": "🐉 Rồng Xanh trả lời chưa đúng lượt 3 ở Pháo Đài Vuông Góc; còn 0 khiên."
+      },
+      {
+        "at": "2026-11-03T02:53:20.577Z",
+        "text": "🐉 Rồng Xanh đã VƯỢT CHẶNG 2: Pháo Đài Vuông Góc (Combo x1). +8 XP, +200 Vàng và mảnh mã 0."
+      },
+      {
+        "at": "2026-11-03T02:54:02.090Z",
+        "text": "🐉 Rồng Xanh trả lời chưa đúng lượt 1 ở Thung Lũng Tháp Pha Lê; còn 2 khiên."
+      },
+      {
+        "at": "2026-11-03T02:54:04.003Z",
+        "text": "🐉 Rồng Xanh trả lời chưa đúng lượt 1 ở Thung Lũng Tháp Pha Lê; còn 1 khiên."
+      },
+      {
+        "at": "2026-11-03T02:54:06.264Z",
+        "text": "🐉 Rồng Xanh trả lời chưa đúng lượt 1 ở Thung Lũng Tháp Pha Lê; còn 0 khiên."
+      },
+      {
+        "at": "2026-11-03T02:54:08.723Z",
+        "text": "🐉 Rồng Xanh đã hạ mục tiêu lượt 1/5 tại Thung Lũng Tháp Pha Lê (Combo x1, +120 Vàng)."
+      },
+      {
+        "at": "2026-11-03T02:54:19.007Z",
+        "text": "🐉 Rồng Xanh trả lời chưa đúng lượt 2 ở Thung Lũng Tháp Pha Lê; còn 0 khiên."
+      },
+      {
+        "at": "2026-11-03T02:54:21.353Z",
+        "text": "🐉 Rồng Xanh trả lời chưa đúng lượt 2 ở Thung Lũng Tháp Pha Lê; còn 0 khiên."
+      },
+      {
+        "at": "2026-11-03T02:54:23.963Z",
+        "text": "🐉 Rồng Xanh trả lời chưa đúng lượt 2 ở Thung Lũng Tháp Pha Lê; còn 0 khiên."
+      },
+      {
+        "at": "2026-11-03T02:54:25.759Z",
+        "text": "🐉 Rồng Xanh đã hạ mục tiêu lượt 2/5 tại Thung Lũng Tháp Pha Lê (Combo x1, +120 Vàng)."
+      },
+      {
+        "at": "2026-11-03T02:54:42.403Z",
+        "text": "🐉 Rồng Xanh trả lời chưa đúng lượt 3 ở Thung Lũng Tháp Pha Lê; còn 0 khiên."
+      },
+      {
+        "at": "2026-11-03T02:54:44.464Z",
+        "text": "🐉 Rồng Xanh đã hạ mục tiêu lượt 3/5 tại Thung Lũng Tháp Pha Lê (Combo x1, +120 Vàng)."
+      },
+      {
+        "at": "2026-11-03T02:54:48.483Z",
+        "text": "🐉 Rồng Xanh trả lời chưa đúng lượt 4 ở Thung Lũng Tháp Pha Lê; còn 0 khiên."
+      },
+      {
+        "at": "2026-11-03T02:54:50.629Z",
+        "text": "🐉 Rồng Xanh trả lời chưa đúng lượt 4 ở Thung Lũng Tháp Pha Lê; còn 0 khiên."
+      },
+      {
+        "at": "2026-11-03T02:54:52.581Z",
+        "text": "🐉 Rồng Xanh trả lời chưa đúng lượt 4 ở Thung Lũng Tháp Pha Lê; còn 0 khiên."
+      },
+      {
+        "at": "2026-11-03T02:54:54.717Z",
+        "text": "🐉 Rồng Xanh đã hạ mục tiêu lượt 4/5 tại Thung Lũng Tháp Pha Lê (Combo x1, +120 Vàng)."
+      }
+    ]
+  },
+  "860264": {
+    "id": "860264",
+    "teacherToken": "9508aef5860e9bea9406e6d820f5cc8e4900174c7f4c9a9e",
+    "createdAt": "2026-11-03T03:02:16.363Z",
+    "paused": false,
+    "clock": {
+      "minutes": 45,
+      "remainingMs": 2700000,
+      "running": false,
+      "startedAt": 0
+    },
+    "teams": [
+      {
+        "name": "Rồng Xanh",
+        "avatar": "🐉",
+        "color": "#36C6E8",
+        "id": "doi-1",
+        "code": "4023",
+        "token": "be693354aef98b0c5b83f4a732a08c19",
+        "stage": 5,
+        "round": 0,
+        "health": 3,
+        "wrong": 0,
+        "score": 115,
+        "bonus": 0,
+        "gold": 3800,
+        "heroLevel": 4,
+        "upgrades": {
+          "damage": 1,
+          "speed": 1,
+          "hp": 1,
+          "regen": 1
+        },
+        "completed": true,
+        "finishedAt": "2026-11-03T03:02:16.412Z",
+        "attempts": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "hintsUsed": [
+          false,
+          false,
+          false,
+          false,
+          true
+        ],
+        "digits": [
+          {
+            "stage": 1,
+            "digit": "3",
+            "rule": "Lấy hiệu hoành độ xB − xA = 5 − 2 = 3.",
+            "item": "La bàn ba trục"
+          },
+          {
+            "stage": 2,
+            "digit": "0",
+            "rule": "Lấy kết quả tích vô hướng của đợt tấn công đầu tiên (u·v = 0).",
+            "item": "Khiên trực giao"
+          },
+          {
+            "stage": 3,
+            "digit": "5",
+            "rule": "Lấy độ dài khoảng cách rèn được AB = 5.",
+            "item": "Lõi Tháp Pha Lê"
+          },
+          {
+            "stage": 4,
+            "digit": "2",
+            "rule": "Lấy hoành độ trung điểm xI = 2.",
+            "item": "Bản Đồ Cổ & Chìa Khóa Vàng"
+          },
+          {
+            "stage": 5,
+            "digit": "4",
+            "rule": "Lấy giá trị tham số m = 4 khi hai vectơ cùng phương.",
+            "item": "Lõi Năng Lượng Khiên Vĩnh Cửu"
+          }
+        ],
+        "streak": 16,
+        "cipherReady": false,
+        "bossReady": false
+      },
+      {
+        "name": "Tia Chớp",
+        "avatar": "⚡",
+        "color": "#FFC857",
+        "id": "doi-2",
+        "code": "3493",
+        "token": "208451d857e34307c27e1fa3ea7384bf",
+        "stage": 0,
+        "round": 0,
+        "health": 3,
+        "wrong": 0,
+        "score": 0,
+        "bonus": 0,
+        "gold": 100,
+        "heroLevel": 1,
+        "upgrades": {
+          "damage": 1,
+          "speed": 1,
+          "hp": 1,
+          "regen": 1
+        },
+        "completed": false,
+        "finishedAt": null,
+        "attempts": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "hintsUsed": [
+          false,
+          false,
+          false,
+          false,
+          false
+        ],
+        "digits": [],
+        "streak": 0
+      },
+      {
+        "name": "Phượng Hoàng",
+        "avatar": "🔥",
+        "color": "#FF758F",
+        "id": "doi-3",
+        "code": "8625",
+        "token": "b6037785601c3b400031a5182a0a42bc",
+        "stage": 0,
+        "round": 0,
+        "health": 3,
+        "wrong": 0,
+        "score": 0,
+        "bonus": 0,
+        "gold": 100,
+        "heroLevel": 1,
+        "upgrades": {
+          "damage": 1,
+          "speed": 1,
+          "hp": 1,
+          "regen": 1
+        },
+        "completed": false,
+        "finishedAt": null,
+        "attempts": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "hintsUsed": [
+          false,
+          false,
+          false,
+          false,
+          false
+        ],
+        "digits": [],
+        "streak": 0
+      },
+      {
+        "name": "Ngôi Sao",
+        "avatar": "🌟",
+        "color": "#AB8CFF",
+        "id": "doi-4",
+        "code": "6074",
+        "token": "3f54af517eb3b198fc797a12696e7fc3",
+        "stage": 0,
+        "round": 0,
+        "health": 3,
+        "wrong": 0,
+        "score": 0,
+        "bonus": 0,
+        "gold": 100,
+        "heroLevel": 1,
+        "upgrades": {
+          "damage": 1,
+          "speed": 1,
+          "hp": 1,
+          "regen": 1
+        },
+        "completed": false,
+        "finishedAt": null,
+        "attempts": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "hintsUsed": [
+          false,
+          false,
+          false,
+          false,
+          false
+        ],
+        "digits": [],
+        "streak": 0
+      }
+    ],
+    "events": [
+      {
+        "at": "2026-11-03T03:02:16.363Z",
+        "text": "NOVA đã tạo phòng 860264 với 4 đội."
+      },
+      {
+        "at": "2026-11-03T03:02:16.371Z",
+        "text": "🐉 Rồng Xanh đã hạ mục tiêu lượt 1/5 tại Thung Lũng Tháp Pha Lê (Combo x1, +120 Vàng)."
+      },
+      {
+        "at": "2026-11-03T03:02:16.373Z",
+        "text": "🐉 Rồng Xanh đã hạ mục tiêu lượt 2/5 tại Thung Lũng Tháp Pha Lê (Combo x2, +150 Vàng)."
+      },
+      {
+        "at": "2026-11-03T03:02:16.376Z",
+        "text": "🐉 Rồng Xanh đã hạ mục tiêu lượt 3/5 tại Thung Lũng Tháp Pha Lê (Combo x3, +180 Vàng)."
+      },
+      {
+        "at": "2026-11-03T03:02:16.378Z",
+        "text": "🐉 Rồng Xanh đã hạ mục tiêu lượt 4/5 tại Thung Lũng Tháp Pha Lê (Combo x4, +210 Vàng)."
+      },
+      {
+        "at": "2026-11-03T03:02:16.380Z",
+        "text": "📜 🐉 Rồng Xanh đã thu thập đủ 5 mảnh mật thư tại Thung Lũng Tháp Pha Lê! Hãy mở Sổ Mật Thư để giải mã!"
+      },
+      {
+        "at": "2026-11-03T03:02:16.382Z",
+        "text": "💠 🐉 Rồng Xanh đã giải mã thành công PHALE và mở cổng Tháp Pha Lê (+20 XP)!"
+      },
+      {
+        "at": "2026-11-03T03:02:16.385Z",
+        "text": "🐉 Rồng Xanh đã hạ mục tiêu lượt 1/5 tại Mê Cung Không Gian Cổ Đại (Combo x6, +240 Vàng)."
+      },
+      {
+        "at": "2026-11-03T03:02:16.386Z",
+        "text": "🐉 Rồng Xanh đã hạ mục tiêu lượt 2/5 tại Mê Cung Không Gian Cổ Đại (Combo x7, +240 Vàng)."
+      },
+      {
+        "at": "2026-11-03T03:02:16.388Z",
+        "text": "🐉 Rồng Xanh đã hạ mục tiêu lượt 3/5 tại Mê Cung Không Gian Cổ Đại (Combo x8, +240 Vàng)."
+      },
+      {
+        "at": "2026-11-03T03:02:16.390Z",
+        "text": "🐉 Rồng Xanh đã hạ mục tiêu lượt 4/5 tại Mê Cung Không Gian Cổ Đại (Combo x9, +240 Vàng)."
+      },
+      {
+        "at": "2026-11-03T03:02:16.391Z",
+        "text": "📜 🐉 Rồng Xanh đã thu thập đủ 5 mảnh mật thư tại Mê Cung Không Gian Cổ Đại! Hãy mở Sổ Mật Thư để giải mã!"
+      },
+      {
+        "at": "2026-11-03T03:02:16.393Z",
+        "text": "🌀 🐉 Rồng Xanh đã giải mã thành công TRUNG và mở Phòng Kho Báu Trung Tâm (+20 XP)!"
+      },
+      {
+        "at": "2026-11-03T03:02:16.394Z",
+        "text": "🐉 Rồng Xanh đã hạ mục tiêu lượt 1/5 tại Thánh Điện Phép Thuật Oxyz (Combo x11, +240 Vàng)."
+      },
+      {
+        "at": "2026-11-03T03:02:16.396Z",
+        "text": "🐉 Rồng Xanh đã hạ mục tiêu lượt 2/5 tại Thánh Điện Phép Thuật Oxyz (Combo x12, +240 Vàng)."
+      },
+      {
+        "at": "2026-11-03T03:02:16.398Z",
+        "text": "🐉 Rồng Xanh đã hạ mục tiêu lượt 3/5 tại Thánh Điện Phép Thuật Oxyz (Combo x13, +240 Vàng)."
+      },
+      {
+        "at": "2026-11-03T03:02:16.400Z",
+        "text": "🐉 Rồng Xanh đã hạ mục tiêu lượt 4/5 tại Thánh Điện Phép Thuật Oxyz (Combo x14, +240 Vàng)."
+      },
+      {
+        "at": "2026-11-03T03:02:16.402Z",
+        "text": "📜 🐉 Rồng Xanh đã thu thập đủ 5 mảnh mật thư tại Thánh Điện Phép Thuật Oxyz! Hãy mở Sổ Mật Thư để giải mã!"
+      },
+      {
+        "at": "2026-11-03T03:02:16.404Z",
+        "text": "🛡️ 🐉 Rồng Xanh đã ghép BAOVE kích hoạt Lá Chắn Thành Trì! ĐẠI BOSS BÓNG ĐEN XUẤT HIỆN!"
+      },
+      {
+        "at": "2026-11-03T03:02:16.406Z",
+        "text": "🐉 Rồng Xanh xin gợi ý cấp 1 ở chặng 5."
+      },
+      {
+        "at": "2026-11-03T03:02:16.408Z",
+        "text": "🐉 Rồng Xanh xin gợi ý cấp 2 ở chặng 5."
+      },
+      {
+        "at": "2026-11-03T03:02:16.410Z",
+        "text": "🏆 🐉 Rồng Xanh đã bắn Đại Pháo Laser tiêu diệt BOSS BÓNG ĐEN LÃNG QUÊN! THÀNH TRÌ ĐÃ ĐƯỢC BẢO VỆ! +15 XP."
+      },
+      {
+        "at": "2026-11-03T03:02:16.412Z",
+        "text": "🏆 Rồng Xanh đã mở Lõi Tri Thức! +20 điểm giải mã."
       }
     ]
   },
