@@ -90,7 +90,8 @@ function playZdSound(type){
 
 
 
-/* ─── TRẠNG THÁI ENGINE 5: DÒ MÌN BÃI ĐÁ RỪNG THẦN (MINESWEEPER GIAOVIENDOIMOI) ─── */
+
+/* ─── TRẠNG THÁI ENGINE 5: DÒ MÌN GIAOVIENDOIMOI (EXACT MATCHING SCREENSHOT) ─── */
 const msState = {
   aimedPad: 0,
   jumping: false,
@@ -116,6 +117,27 @@ function playMsSound(type){
   }catch(e){}
   sound(type==='safe' ? 'laser' : 'wrong');
 }
+
+/* ─── TRẠNG THÁI ENGINE 3: CHẶN ZOMBIE 4 LÀN (ZOMBIE DEFENSE) ─── */
+
+function playZdSound(type){
+ try{
+  const src = type==='hit' ? '/sounds/sfx/correct.mp3' : (type==='miss' ? '/sounds/sfx/incorrect.mp3' : null);
+  if(src){
+   const a = new Audio(src);
+   a.volume = 0.85;
+   a.play().catch(()=>{});
+  }
+ }catch(e){}
+ sound(type==='hit' ? 'laser' : 'wrong');
+}
+
+
+
+/* ─── TRẠNG THÁI ENGINE 5: DÒ MÌN BÃI ĐÁ RỪNG THẦN (MINESWEEPER GIAOVIENDOIMOI) ─── */
+
+
+
 
 /* ─── TRẠNG THÁI ENGINE 3: CHẶN ZOMBIE 4 LÀN (ZOMBIE DEFENSE) ─── */
 
@@ -1296,50 +1318,109 @@ function renderGridMazeGame(m){
 /* ═══════════════════════════════════════════════════════════════════════════
    RENDER ENGINE 5: DÒ MÌN BÃI ĐÁ RỪNG THẦN - DI CHUYỂN BƯỚC ĐÁ THỰC TẾ
    ═══════════════════════════════════════════════════════════════════════════ */
-async function stepMinesweeperPad(padIdx){
-  if(msState.jumping || busy) return;
-  msState.aimedPad = padIdx;
-  msState.jumping = true;
-  msState.lastChoice = padIdx;
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   RENDER ENGINE 5: DÒ MÌN GIAOVIENDOIMOI - BẢO MẬT & HIỆU ỨNG BOOM QUAY VỀ GỐC
+   ═══════════════════════════════════════════════════════════════════════════ */
+const MS_CHOICE_COORDS_4 = [
+  { x: 18, y: 52 }, // A (Bên trái)
+  { x: 39, y: 25 }, // B (Phía trên bên trái)
+  { x: 61, y: 25 }, // C (Phía trên bên phải)
+  { x: 82, y: 52 }  // D (Bên phải)
+];
+
+const MS_CHOICE_COORDS_3 = [
+  { x: 24, y: 52 }, // A (Bên trái)
+  { x: 50, y: 24 }, // B (Chính giữa trên)
+  { x: 76, y: 52 }  // C (Bên phải)
+];
+
+async function stepMinesweeperPad(choiceIdx){
+  if(msState.walking || busy) return;
+  
+  const totalOpts = (world?.current?.challenge?.options?.length || 4);
+  const coords = (totalOpts === 3) ? MS_CHOICE_COORDS_3 : MS_CHOICE_COORDS_4;
+  const target = coords[choiceIdx] || { x: 50, y: 50 };
+
+  // 1. Cho nhân vật di chuyển thực tế từ vị trí ban đầu tới đáp án được chọn
+  msState.walking = true;
+  msState.lastChoice = choiceIdx;
+  msState.posX = target.x;
+  msState.posY = target.y + 10;
   sound('step');
   render();
 
   try{
-    const res = await submitStageAnswer({choice: padIdx});
+    const res = await submitStageAnswer({choice: choiceIdx});
     if(res?.correct){
-      msState.resultType = 'safe';
-      msState.prevRow = msState.charRow;
-      msState.prevCol = msState.charCol;
-      msState.charRow += 1;
-      msState.charCol = padIdx;
-      msState.safePath.push({row: msState.charRow, col: padIdx});
+      // ĐÚNG: Tiếp đất an toàn, phát sáng và nhận XP
+      msState.resultType = 'correct';
       playMsSound('safe');
+      render();
+      setTimeout(()=>{
+        // Đặt lại nhân vật về vị trí ban đầu cho câu hỏi kế tiếp
+        msState.posX = 50;
+        msState.posY = 80;
+        msState.walking = false;
+        msState.lastChoice = null;
+        msState.resultType = null;
+        render();
+      }, 750);
     }else{
-      msState.resultType = 'mine';
+      // SAI: ĐẠP PHẢI MÌN!
+      msState.resultType = 'wrong';
+      msState.blastX = target.x;
+      msState.blastY = target.y;
       msState.shaking = true;
       msState.wobble = true;
       playMsSound('mine');
+      render();
+
+      // BÙM NỔ XONG THÌ BỊ BẬT VĂNG / QUAY LẠI VỊ TRÍ BAN ĐẦU
+      setTimeout(()=>{
+        msState.posX = 50;
+        msState.posY = 80;
+        render();
+      }, 350);
+
+      setTimeout(()=>{
+        msState.walking = false;
+        msState.shaking = false;
+        msState.wobble = false;
+        msState.lastChoice = null;
+        msState.resultType = null;
+        msState.blastX = null;
+        msState.blastY = null;
+        render();
+      }, 800);
     }
   }catch(err){
-    msState.resultType = 'mine';
+    msState.resultType = 'wrong';
+    msState.blastX = target.x;
+    msState.blastY = target.y;
     msState.shaking = true;
     msState.wobble = true;
     playMsSound('mine');
-  }finally{
     render();
     setTimeout(()=>{
-      msState.jumping = false;
+      msState.posX = 50;
+      msState.posY = 80;
+      render();
+    }, 350);
+    setTimeout(()=>{
+      msState.walking = false;
       msState.shaking = false;
       msState.wobble = false;
       msState.lastChoice = null;
       msState.resultType = null;
+      msState.blastX = null;
+      msState.blastY = null;
       render();
-    }, 650);
+    }, 800);
   }
 }
 
 function renderMinesweeperGame(m){
-  // Nếu đã giải mã BAOVE và vào màn Boss cuối thì render màn Đại Chiến Boss
   if(m.isBoss){
     return renderBossRaidGame(m);
   }
@@ -1352,163 +1433,107 @@ function renderMinesweeperGame(m){
   const health = Math.max(0, Math.min(3, world.me?.health ?? 3));
   const progressPct = Math.round(((r) / m.totalRounds) * 100);
 
-  // Đồng bộ hàng của nhân vật theo round hiện tại nếu cần
-  if(!msState.jumping && msState.charRow !== r){
-    msState.charRow = r;
-  }
+  const coords = (opts.length === 3) ? MS_CHOICE_COORDS_3 : MS_CHOICE_COORDS_4;
 
-  // Tính tọa độ camera dịch chuyển (cameraY) để luôn bám theo nhân vật và hàng đá hiện tại
-  // Hàng 0 (Home): Y = 960px. Mỗi hàng cách nhau 160px.
-  // Khi r = 0, cameraY = -600px. Khi r tăng, cameraY dịch xuống tương ứng
-  const targetWorldY = 960 - (r * 160);
-  const cameraY = -(targetWorldY - 320);
+  // Render các phương án xuất hiện trực tiếp trên bãi cỏ
+  const choicesHtml = opts.map((optText, i) => {
+    const pos = coords[i] || { x: 25 + i * 20, y: 40 };
+    const isAimed = (msState.aimedPad === i);
+    const isChosen = (msState.lastChoice === i);
 
-  // Tính tọa độ pixel hiện tại của nhân vật
-  let charPixelX = 50; // %
-  let charPixelY = 960; // px
-  if(msState.jumping && msState.lastChoice !== null){
-    // Đang nhảy tới phiến đá được chọn ở hàng r + 1
-    charPixelX = 14 + msState.lastChoice * 24;
-    charPixelY = 960 - (r + 1) * 160 + 55;
-  } else if(r === 0){
-    charPixelX = 50;
-    charPixelY = 960 + 35;
-  } else {
-    // Đang đứng an toàn trên phiến đá của hàng r
-    charPixelX = 14 + msState.charCol * 24;
-    charPixelY = 960 - (r) * 160 + 55;
-  }
-
-  // Render các hàng đá (Rows 1..5)
-  const rowsHtml = [5, 4, 3, 2, 1].map(rowNum => {
-    const rowIdx = rowNum - 1;
-    const isCurrentRow = (rowIdx === r);
-    const rowTop = 960 - (rowNum * 160);
-    const rowOptions = (rowIdx === r) ? opts : ['···', '···', '···', '···'];
-
-    const pads = [0, 1, 2, 3].map(colIdx => {
-      const isAimed = (isCurrentRow && msState.aimedPad === colIdx);
-      const isChosen = (isCurrentRow && msState.lastChoice === colIdx);
-      const isPassedSafe = msState.safePath.some(p => p.row === rowNum && p.col === colIdx);
-      
-      let padClass = '';
-      if(isChosen){
-        padClass = (msState.resultType === 'safe') ? 'correct' : 'wrong';
-      } else if(isPassedSafe){
-        padClass = 'correct';
-      } else if(isAimed){
-        padClass = 'aimed';
-      }
-
-      return `<div class="ms-pad ${padClass}" 
-                    style="${!isCurrentRow && !isPassedSafe ? 'opacity:0.65;filter:grayscale(0.3);' : ''}"
-                    data-action="${isCurrentRow ? 'stepMinesweeperPad' : ''}" 
-                    data-pad="${colIdx}" 
-                    title="${isCurrentRow ? `Nhảy tới phiến đá ${laneLabels[colIdx]}` : ''}">
-        <div class="ms-pad-key">${laneLabels[colIdx]}</div>
-        <div class="ms-pad-answer">${isCurrentRow ? formatMath(rowOptions[colIdx]) : (isPassedSafe ? '⭐ An Toàn' : '🔒 Hàng ' + rowNum)}</div>
-        ${isChosen ? `
-          <div class="ms-score-popup ${msState.resultType==='safe'?'safe':'mine'}" style="left:50%;top:-15px">
-            ${msState.resultType==='safe' ? '💎 AN TOÀN! +20 XP' : '💥 ĐẠP PHẢI MÌN!'}
-          </div>
-        ` : ''}
-      </div>`;
-    }).join('');
-
-    return `<div class="ms-row-track ${isCurrentRow ? 'current-row' : ''}" style="top:${rowTop}px">
-      ${pads}
+    return `<div class="ms-field-choice ${isAimed ? 'aimed' : ''}" 
+                 style="left:${pos.x}%; top:${pos.y}%;"
+                 data-action="stepMinesweeperPad" 
+                 data-pad="${i}" 
+                 title="Di chuyển đến đáp án ${laneLabels[i]}">
+      <div class="ms-choice-badge">${laneLabels[i]}</div>
+      <div class="ms-choice-text">${formatMath(optText)}</div>
     </div>`;
   }).join('');
 
-  return `<div class="ms-player-wrap ${msState.shaking ? 'shake' : ''}">
-    <!-- TOP HUD -->
-    <div class="ms-top-hud">
-      <div class="ms-hud-title">
-        <span class="tag" style="background:#15803d;border-color:#4ade80">💣 DÒ MÌN · CHẶNG 5</span>
-        <b>THÀNH TRÌ LỜI TRÍ TUỆ</b>
+  return `<div class="ms-container-wrap ${msState.shaking ? 'shake' : ''}">
+    <!-- CỘT TRÁI: BẢNG CÂU HỎI TRẮNG THANH LỊCH CHUẨN GIAOVIENDOIMOI -->
+    <div class="ms-left-sidebar">
+      <div class="ms-side-qnum">CÂU ${r+1} / ${m.totalRounds} · ${esc(q.label)}</div>
+      <div class="ms-side-qtext">
+        ${formatMath(q.prompt)}
       </div>
-      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
-        <div class="ms-hud-lives" title="Số khiên sinh mệnh">
-          <span class="${health<1?'lost':''}">💖</span>
-          <span class="${health<2?'lost':''}">💖</span>
-          <span class="${health<3?'lost':''}">💖</span>
-        </div>
-        <div class="ms-hud-depth-wrap">
-          <span class="ms-hud-depth-label">Tiến độ: Hàng ${r+1} / ${m.totalRounds}</span>
-          <div class="ms-hud-depth-bar">
-            <div class="ms-hud-depth-fill" style="width:${progressPct}%"></div>
-          </div>
-        </div>
-        <span class="pill gold" style="font-weight:800">⭐ ${world.me?.score||0} XP</span>
-        <button type="button" class="hw-btn-hud ${isReady?'alert':''}" data-action="openCipherNotebook">
-          📜 SỔ MẬT THƯ (${isReady?'SẴN SÀNG':'XEM MẢNH'})
-        </button>
-        <button type="button" class="hw-btn-hud" data-action="openTeamRoles">
-          🤝 PHÂN VAI
-        </button>
+
+      <div class="ms-side-footer">
         <button type="button" class="button gray sm" data-action="hint">💡 Gợi ý (2 Cấp)</button>
-      </div>
-    </div>
-
-    <!-- ARENA -->
-    <div class="ms-arena">
-      <!-- Question Banner Card (Cố định ở trên đầu Arena) -->
-      <div class="ms-question-banner">
-        <div class="ms-question-num">CÂU ${r+1} / ${m.totalRounds} · ${esc(q.label)}</div>
-        <div class="ms-question-text">🧩 ${formatMath(q.prompt)}</div>
-      </div>
-
-      <!-- WORLD WITH CAMERA TRANSLATION -->
-      <div class="ms-world" style="transform: translateY(${cameraY}px)">
-        <div class="ms-ground"></div>
-
-        <!-- Cổng Thành Trì Golden Portal ở đỉnh bãi đá -->
-        <div style="position:absolute;top:25px;left:50%;transform:translateX(-50%);text-align:center;z-index:15">
-          <div style="font-size:38px;filter:drop-shadow(0 0 14px #facc15)">🏰</div>
-          <div style="font-size:12px;font-weight:800;color:#fef08a;text-shadow:0 2px 4px rgba(0,0,0,0.8)">CỔNG THÀNH TRÌ OXYZ (KHIÊN BAOVE)</div>
-        </div>
-
-        <!-- 5 Hàng Phiến Đá Câu Hỏi -->
-        ${rowsHtml}
-
-        <!-- Hàng 0: Home Starting Pad -->
-        <div style="position:absolute;top:960px;left:50%;transform:translateX(-50%);z-index:12">
-          <div class="ms-pad-home">
-            🚩 ĐIỂM XUẤT PHÁT
-          </div>
-        </div>
-
-        <!-- NHÂN VẬT THỰC SỰ DI CHUYỂN TRÊN BẢN ĐỒ -->
-        <div class="ms-char-mover" style="left:${charPixelX}%; top:${charPixelY}px">
-          <div class="ms-char-sprite ${msState.jumping ? 'jumping' : ''} ${msState.wobble ? 'wobble' : ''}">
-            <img src="/images/minesweeper/wobble-char.png" alt="Hero Character" onerror="this.src='/images/zombie-defense/gunner.png'">
-          </div>
-        </div>
-      </div>
-
-      <!-- VIRTUAL CONTROLLER OVERLAY FOR EASY NAVIGATION -->
-      <div class="ms-dpad-wrap">
-        <button type="button" class="ms-dpad-btn" data-action="aimMsPadPrev" title="Chọn đá bên trái (A / ◀)">◀</button>
-        <button type="button" class="ms-dpad-btn" data-action="aimMsPadNext" title="Chọn đá bên phải (D / ▶)">▶</button>
-        <button type="button" class="ms-dpad-btn" style="width:auto;padding:0 14px;background:#22c55e;color:#fff;font-size:13px" data-action="jumpMsPadAimed" title="Nhảy tới đá đang ngắm (Space / Enter)">
-          ⬆ BƯỚC LÊN ĐÁ [${laneLabels[msState.aimedPad]}]
-        </button>
-      </div>
-    </div>
-
-    <!-- BOTTOM BAR -->
-    <div class="ms-botbar">
-      <div>
-        ⌨️ <b>Điều khiển:</b> Bấm trực tiếp lên phiến đá phía trước, hoặc bấm <b>A / B / C / D</b> (<b>1 / 2 / 3 / 4</b>) hoặc dùng nút <b>◀ / ▶ / ⬆ BƯỚC LÊN ĐÁ</b> để nhân vật tự nhảy tới!
-      </div>
-      <div>
+        <button type="button" class="hw-btn-hud" data-action="openTeamRoles">🤝 PHÂN VAI NHÓM</button>
         ${isReady ? `
           <button type="button" class="button gold pulse-urgent" data-action="openCipherNotebook">
-            🔓 ĐỦ 5 MẢNH – GIẢI MÃ BAOVE MỞ KHIÊN DIỆT BOSS!
+            🔓 GIẢI MÃ BAOVE MỞ THÀNH!
           </button>
         ` : `
-          <span style="color:#bbf7d0;font-weight:700">Mảnh cổ ngữ đã thu thập: ${r}/5 (B - A - O - V - E)</span>
+          <button type="button" class="hw-btn-hud" data-action="openCipherNotebook">
+            📜 SỔ MẬT THƯ (${r}/5 MẢNH)
+          </button>
         `}
+      </div>
+    </div>
+
+    <!-- CỘT PHẢI: CHIẾN TRƯỜNG BÃI CỎ DÒ MÌN CHÂN THẬT -->
+    <div class="ms-right-arena">
+      <div class="ms-arena-ground"></div>
+
+      <!-- TOP MINI HUD -->
+      <div class="ms-mini-hud">
+        <div style="font-size:12px;font-weight:800;color:#fef08a;background:rgba(0,0,0,0.4);padding:4px 10px;border-radius:12px">
+          🏰 THÀNH TRÌ LỜI TRÍ TUỆ
+        </div>
+
+        <div class="ms-hud-pills-center">
+          <span style="color:#fde047;font-weight:900;font-size:14px">⭐ ${world.me?.score||0} XP</span>
+          <div class="ms-hud-lives" title="Khiên sinh mệnh">
+            <span class="${health<1?'lost':''}">💖</span>
+            <span class="${health<2?'lost':''}">💖</span>
+            <span class="${health<3?'lost':''}">💖</span>
+          </div>
+          <span style="font-size:12px;font-weight:800;color:#bbf7d0">CÂU ${r+1}/${m.totalRounds}</span>
+          <div style="width:60px;height:6px;background:rgba(255,255,255,0.25);border-radius:3px;overflow:hidden">
+            <div style="width:${progressPct}%;height:100%;background:#4ade80"></div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:6px">
+          <button type="button" class="hw-btn-hud" style="font-size:11.5px;padding:3px 8px" data-action="soundToggle">🔊 Âm thanh</button>
+        </div>
+      </div>
+
+      <!-- CÁC ĐÁP ÁN TRÊN BÃI CỎ -->
+      ${choicesHtml}
+
+      <!-- HIỆU ỨNG VỤ NỔ BOOM NẾU ĐẠP PHẢI MÌN -->
+      ${msState.blastX !== null ? `
+        <div class="ms-blast-overlay" style="left:${msState.blastX}%; top:${msState.blastY}%;"></div>
+        <div class="ms-blast-toast wrong" style="left:${msState.blastX}%; top:${msState.blastY}%;">
+          💥 BÙM! ĐẠP PHẢI MÌN!
+        </div>
+      ` : ''}
+
+      <!-- HIỆU ỨNG TIẾP ĐẤT AN TOÀN NẾU ĐÚNG -->
+      ${(msState.resultType === 'correct' && msState.lastChoice !== null) ? `
+        <div class="ms-blast-toast correct" style="left:${coords[msState.lastChoice]?.x||50}%; top:${coords[msState.lastChoice]?.y||50}%;">
+          💎 CHÍNH XÁC! +20 XP
+        </div>
+      ` : ''}
+
+      <!-- CHÚ LÍNH XẠ THỦ TỰ DO DI CHUYỂN TRÊN BÃI CỎ -->
+      <div class="ms-soldier-actor ${msState.walking ? 'walking' : ''} ${msState.wobble ? 'wobble' : ''}" 
+           style="left:${msState.posX}%; top:${msState.posY}%;">
+        <img src="/images/minesweeper/soldier-up-1.png" alt="Soldier" class="ms-soldier-img">
+      </div>
+
+      <!-- THANH ĐIỀU HƯỚNG BÊN DƯỚI -->
+      <div class="ms-footer-bar">
+        <div>
+          🎯 <b>Cách chơi:</b> Nhấp chuột lên đáp án (A, B, C, D) hoặc bấm phím tắt <b>A / B / C / D</b> (<b>1 / 2 / 3 / 4</b>) để chú lính chạy tới. Chọn sai sẽ bị mìn nổ hất văng về vạch xuất phát!
+        </div>
+        <div style="font-weight:700;color:#fef08a">
+          Mảnh cổ ngữ: ${r}/5 (B - A - O - V - E)
+        </div>
       </div>
     </div>
 

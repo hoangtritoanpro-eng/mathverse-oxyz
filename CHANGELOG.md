@@ -10,6 +10,24 @@ Tất cả những thay đổi quan trọng của dự án này sẽ được gh
 
 ---
 
+## [2.10.0] - 2026-11-03
+
+### Added & Overhauled (Exact Giaoviendoimoi Layout & Knockback Explosion)
+- **Chuẩn Hóa 100% Giao Diện Game Dò Mìn Bãi Cỏ Theo Đúng Ảnh Mẫu Giaoviendoimoi:**
+  - **Bố cục 2 Cột Chuyên Nghiệp:**
+    - Cột Trái (`.ms-left-sidebar`): Khung thẻ trắng thanh lịch hiển thị nhãn `CÂU X` và bài toán Toán 12 Oxyz bằng chữ to đậm màu xanh thẫm, kèm các nút thao tác hỗ trợ (Gợi ý 2 cấp, Phân vai, Sổ mật thư).
+    - Cột Phải (`.ms-right-arena`): Toàn cảnh bãi cỏ xanh ngát trải dài (`ground-bg.png`).
+  - **Phương Án Trả Lời Trực Quan Trên Bãi Cỏ:**
+    - Vòng tròn huy hiệu màu đen viền trắng hiển thị `(A)`, `(B)`, `(C)`, `(D)` đặt ngay trên bãi cỏ với chữ số công thức màu trắng to viền đen tương phản cực nét, bố trí theo hình cánh cung mở rộng.
+  - **Bộ Sprite Chú Lính Xạ Thủ Mũ Cối Gốc (Original Soldier Sprite Sheet):**
+    - Sử dụng bộ sprite chính thức trích xuất từ Giaoviendoimoi (`soldier-up-1.png`, `soldier-up-2.png`, v.v.): Chú lính mũ cối xanh đeo ba lô sau lưng (`back-view`) bước đi nhịp nhàng trên bãi cỏ.
+  - **Hiệu Ứng Bù Khoáng Bị Nổ Mìn Bật Văng Về Vị Trí Ban Đầu (Knockback Explosion FX):**
+    - **Đạp phải Mìn (Chọn sai):** Khi chú lính chạy đến phương án sai, mìn nổ tung chấn động (`.ms-blast-overlay`), màn hình rung lắc dữ dội (`ms-screenshake`), âm thanh tiếng nổ rền vang `/sounds/sfx/explosion.mp3`, nhãn báo `💥 BÙM! ĐẠP PHẢI MÌN!`, chú lính bị hất văng lùi giật ngược lại vị trí xuất phát ban đầu `(50%, 80%)`, trừ 1 khiên sinh mệnh và hiện gợi ý để chọn lại.
+    - **An Toàn (Chọn đúng):** Tiếp đất an toàn, nhãn nổi `💎 CHÍNH XÁC! +20 XP`, chuông ngân thần kỳ `/sounds/sfx/correct.mp3`, nhận Cổ ngữ và nhân vật sẵn sàng cho câu hỏi tiếp theo.
+  - **Đồng bộ hóa Tự động:** Nhúng toàn bộ sprite chú lính vào file [CHOI_THU_1_MAY.html](file:///c:/Users/ADMIN/Downloads/ggvdg%20duyen/MATHVERSE_OXYZ_MINIGAMES/CHOI_THU_1_MAY.html) (offline) và máy chủ trực tiếp.
+
+---
+
 ## [2.9.0] - 2026-11-03
 
 ### Added & Overhauled
