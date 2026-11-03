@@ -2602,6 +2602,25 @@ function renderCastleDefenseGame(m){
  </div>`;
 }
 
+
+function getGameModeBadge(m){
+ if (m.id === 1) return '🗺️ SĂN KHO BÁU 2D (Tự Lái Tìm Đền)';
+ if (m.id === 2) return '🏰 THỦ THÀNH CHIẾN THUẬT (3 Làn Real-time)';
+ if (m.id === 3) return '🔮 LÒ RÈN TINH THỂ (Đúc Năng Lượng & Mở Tháp)';
+ if (m.id === 4) return '🌀 MÊ CUNG TỌA ĐỘ Ô VUÔNG (Lưới Oxy & Cổng Dịch Chuyển)';
+ if (m.id === 5) return '🐲 ĐẤU TRƯỜNG DIỆT BOSS (Đại Chiến Rồng & Laser Oxyz)';
+ return '🎮 Game Tương Tác Oxyz';
+}
+
+function renderStageGame(m){
+ if (m.id === 1) return renderHuntGame(m);
+ if (m.id === 2) return renderCastleDefenseGame(m);
+ if (m.id === 3) return renderCrystalForgeGame(m);
+ if (m.id === 4) return renderGridMazeGame(m);
+ if (m.id === 5) return renderBossRaidGame(m);
+ return renderHuntGame(m);
+}
+
 function stageContent(m){
  const mode=activePlayMode||m.defaultMode||(m.id===2||m.id===5?'defense':'hunt');
  const roles=m.teamRoles||[];
