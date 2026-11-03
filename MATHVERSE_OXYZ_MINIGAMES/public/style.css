@@ -921,8 +921,9 @@
 }
 
 
+
 /* ═══════════════════════════════════════════════════════════════════════════
-   CHẶNG 5: DÒ MÌN BÃI ĐÁ RỪNG THẦN (MINESWEEPER GIAOVIENDOIMOI REA ENGINE)
+   CHẶNG 5: DÒ MÌN BÃI ĐÁ RỪNG THẦN - NHÂN VẬT TỰ DO DI CHUYỂN & NHẢY ĐÁ
    ═══════════════════════════════════════════════════════════════════════════ */
 .ms-player-wrap {
   position: relative;
@@ -1015,6 +1016,15 @@
   overflow: hidden;
   background: #543f29;
 }
+.ms-world {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 1100px;
+  will-change: transform;
+  transition: transform 0.65s cubic-bezier(0.25, 1, 0.5, 1);
+}
 .ms-ground {
   position: absolute;
   inset: 0;
@@ -1054,47 +1064,40 @@
   color: #14532d;
 }
 
-.ms-field-board {
+/* Row of stepping stone pads */
+.ms-row-track {
   position: absolute;
-  top: 100px;
   left: 0;
   right: 0;
-  bottom: 0;
   display: flex;
-  flex-direction: column;
+  align-items: center;
   justify-content: space-around;
-  padding: 10px 24px 20px;
+  padding: 0 20px;
+}
+.ms-row-track.current-row {
+  filter: drop-shadow(0 0 16px rgba(250, 204, 21, 0.45));
 }
 
-.ms-forward-pads {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 14px;
-  width: 100%;
-  max-width: 920px;
-  margin: 0 auto;
-  z-index: 10;
-}
 .ms-pad {
   position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  padding: 12px 8px;
-  min-height: 140px;
-  border-radius: 22px;
+  gap: 4px;
+  width: 175px;
+  height: 115px;
+  border-radius: 24px;
   background: radial-gradient(circle at 38% 30%, #6f8f3e, #4f6b2a 55%, #3c5220);
   box-shadow: inset 0 2px 5px rgba(255,255,255,0.22), inset 0 -4px 9px rgba(0,0,0,0.5), 0 6px 14px rgba(0,0,0,0.45);
-  border: 2px solid rgba(255,255,255,0.15);
+  border: 2px solid rgba(255,255,255,0.18);
   cursor: pointer;
   transition: transform 0.15s, filter 0.15s, box-shadow 0.15s;
 }
 .ms-pad:hover {
-  transform: translateY(-4px) scale(1.02);
-  filter: brightness(1.18);
-  box-shadow: inset 0 2px 5px rgba(255,255,255,0.3), inset 0 -4px 9px rgba(0,0,0,0.5), 0 10px 20px rgba(0,0,0,0.55), 0 0 16px rgba(134, 239, 172, 0.4);
+  transform: translateY(-4px) scale(1.03);
+  filter: brightness(1.2);
+  box-shadow: inset 0 2px 5px rgba(255,255,255,0.3), inset 0 -4px 9px rgba(0,0,0,0.5), 0 10px 20px rgba(0,0,0,0.55), 0 0 16px rgba(134, 239, 172, 0.5);
 }
 .ms-pad.aimed {
   border-color: #fde047;
@@ -1104,7 +1107,6 @@
   background: radial-gradient(circle at 38% 30%, #76c043, #438e1b 55%, #275d0d) !important;
   border-color: #86efac !important;
   box-shadow: 0 0 24px #4ade80, inset 0 2px 5px rgba(255,255,255,0.4) !important;
-  transform: scale(1.04);
 }
 .ms-pad.correct .ms-pad-answer {
   color: #bbf7d0;
@@ -1141,64 +1143,79 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
   background: rgba(0, 0, 0, 0.65);
   border: 2px solid rgba(255, 255, 255, 0.7);
   color: #efffef;
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 900;
   flex-shrink: 0;
   text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9);
 }
 .ms-pad-answer {
-  font-size: 13.5px;
+  font-size: 13px;
   font-weight: 800;
   color: #fff;
   text-align: center;
   line-height: 1.25;
   word-break: break-word;
   text-shadow: 0 2px 6px rgba(0, 0, 0, 0.9);
-  padding: 0 4px;
+  padding: 0 6px;
 }
 
-.ms-home-row {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  position: relative;
-  z-index: 15;
-}
+/* Home starting pad */
 .ms-pad-home {
   position: relative;
-  width: 140px;
-  height: 72px;
-  border-radius: 36px;
+  width: 180px;
+  height: 75px;
+  border-radius: 38px;
   background: radial-gradient(circle at 45% 35%, #84a84d, #5a7d2e 60%, #436121);
   box-shadow: inset 0 2px 6px rgba(255,255,255,0.3), 0 8px 18px rgba(0,0,0,0.5);
-  border: 2px solid rgba(255,255,255,0.25);
+  border: 2.5px solid rgba(255,255,255,0.35);
   display: flex;
   align-items: center;
   justify-content: center;
+  font-size: 13px;
+  font-weight: 800;
+  color: #fef08a;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.8);
 }
-.ms-char {
+
+/* Moving Hero Character */
+.ms-char-mover {
   position: absolute;
-  top: -46px;
   width: 68px;
   height: 72px;
+  margin-left: -34px;
+  margin-top: -55px;
+  z-index: 30;
+  pointer-events: none;
+  transition: left 0.45s cubic-bezier(0.2, 0.8, 0.2, 1), top 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.ms-char-sprite {
+  width: 100%;
+  height: 100%;
   filter: drop-shadow(0 6px 8px rgba(0, 0, 0, 0.55));
   animation: ms-bob 2s ease-in-out infinite;
-  pointer-events: none;
-  transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1), left 0.25s, top 0.25s;
+  transition: transform 0.2s;
 }
-.ms-char img {
+.ms-char-sprite img {
   width: 100%;
   height: 100%;
   object-fit: contain;
 }
-.ms-char.wobble {
+.ms-char-sprite.jumping {
+  animation: ms-char-leap 0.45s ease-in-out;
+}
+.ms-char-sprite.wobble {
   animation: ms-wobble 0.5s ease;
+}
+@keyframes ms-char-leap {
+  0% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-42px) scale(1.3); }
+  100% { transform: translateY(0) scale(1); }
 }
 @keyframes ms-bob {
   0%, 100% { transform: translateY(0) scaleY(1); }
@@ -1215,7 +1232,7 @@
   position: absolute;
   z-index: 35;
   pointer-events: none;
-  font-size: 26px;
+  font-size: 24px;
   font-weight: 900;
   letter-spacing: 1px;
   animation: ms-score-float 1.1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
@@ -1234,6 +1251,42 @@
   20% { opacity: 1; transform: translate(-50%, -16px) scale(1.2); }
   60% { opacity: 1; transform: translate(-50%, -48px) scale(1); }
   100% { opacity: 0; transform: translate(-50%, -80px) scale(0.85); }
+}
+
+/* Control Pad Floating Overlay for mobile & PC */
+.ms-dpad-wrap {
+  position: absolute;
+  left: 20px;
+  bottom: 16px;
+  z-index: 28;
+  display: flex;
+  gap: 8px;
+  background: rgba(0, 0, 0, 0.45);
+  padding: 6px 10px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+.ms-dpad-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1.5px solid rgba(255, 255, 255, 0.4);
+  color: #fff;
+  font-size: 18px;
+  font-weight: 900;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.12s;
+}
+.ms-dpad-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(1.08);
+}
+.ms-dpad-btn:active {
+  transform: scale(0.92);
 }
 
 .ms-botbar {

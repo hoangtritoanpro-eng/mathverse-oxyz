@@ -89,6 +89,7 @@ function playZdSound(type){
 }
 
 
+
 /* ─── TRẠNG THÁI ENGINE 5: DÒ MÌN BÃI ĐÁ RỪNG THẦN (MINESWEEPER GIAOVIENDOIMOI) ─── */
 const msState = {
   aimedPad: 0,
@@ -96,7 +97,12 @@ const msState = {
   shaking: false,
   lastChoice: null,
   resultType: null,
-  wobble: false
+  wobble: false,
+  charRow: 0,
+  charCol: 1,
+  prevRow: 0,
+  prevCol: 1,
+  safePath: []
 };
 
 function playMsSound(type){
@@ -110,6 +116,26 @@ function playMsSound(type){
   }catch(e){}
   sound(type==='safe' ? 'laser' : 'wrong');
 }
+
+/* ─── TRẠNG THÁI ENGINE 3: CHẶN ZOMBIE 4 LÀN (ZOMBIE DEFENSE) ─── */
+
+function playZdSound(type){
+ try{
+  const src = type==='hit' ? '/sounds/sfx/correct.mp3' : (type==='miss' ? '/sounds/sfx/incorrect.mp3' : null);
+  if(src){
+   const a = new Audio(src);
+   a.volume = 0.85;
+   a.play().catch(()=>{});
+  }
+ }catch(e){}
+ sound(type==='hit' ? 'laser' : 'wrong');
+}
+
+
+/* ─── TRẠNG THÁI ENGINE 5: DÒ MÌN BÃI ĐÁ RỪNG THẦN (MINESWEEPER GIAOVIENDOIMOI) ─── */
+
+
+
 
 const zdState = {
  lane: 0,
@@ -1266,18 +1292,27 @@ function renderGridMazeGame(m){
 /* ═══════════════════════════════════════════════════════════════════════════
    RENDER ENGINE 5: DÒ MÌN BÃI ĐÁ RỪNG THẦN (CHẶNG 5 - GIAOVIENDOIMOI REA)
    ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   RENDER ENGINE 5: DÒ MÌN BÃI ĐÁ RỪNG THẦN - DI CHUYỂN BƯỚC ĐÁ THỰC TẾ
+   ═══════════════════════════════════════════════════════════════════════════ */
 async function stepMinesweeperPad(padIdx){
   if(msState.jumping || busy) return;
   msState.aimedPad = padIdx;
   msState.jumping = true;
+  msState.lastChoice = padIdx;
   sound('step');
   render();
 
   try{
     const res = await submitStageAnswer({choice: padIdx});
-    msState.lastChoice = padIdx;
     if(res?.correct){
       msState.resultType = 'safe';
+      msState.prevRow = msState.charRow;
+      msState.prevCol = msState.charCol;
+      msState.charRow += 1;
+      msState.charCol = padIdx;
+      msState.safePath.push({row: msState.charRow, col: padIdx});
       playMsSound('safe');
     }else{
       msState.resultType = 'mine';
@@ -1286,7 +1321,6 @@ async function stepMinesweeperPad(padIdx){
       playMsSound('mine');
     }
   }catch(err){
-    msState.lastChoice = padIdx;
     msState.resultType = 'mine';
     msState.shaking = true;
     msState.wobble = true;
@@ -1300,7 +1334,7 @@ async function stepMinesweeperPad(padIdx){
       msState.lastChoice = null;
       msState.resultType = null;
       render();
-    }, 600);
+    }, 650);
   }
 }
 
@@ -1318,25 +1352,71 @@ function renderMinesweeperGame(m){
   const health = Math.max(0, Math.min(3, world.me?.health ?? 3));
   const progressPct = Math.round(((r) / m.totalRounds) * 100);
 
-  // Render 4 answer stepping stone pads
-  const padsHtml = [0, 1, 2, 3].map(i => {
-    const isAimed = (msState.aimedPad === i);
-    const isChosen = (msState.lastChoice === i);
-    let padClass = '';
-    if(isChosen){
-      padClass = (msState.resultType === 'safe') ? 'correct' : 'wrong';
-    } else if(isAimed){
-      padClass = 'aimed';
-    }
+  // Đồng bộ hàng của nhân vật theo round hiện tại nếu cần
+  if(!msState.jumping && msState.charRow !== r){
+    msState.charRow = r;
+  }
 
-    return `<div class="ms-pad ${padClass}" data-action="stepMinesweeperPad" data-pad="${i}" title="Bước lên phiến đá ${laneLabels[i]}">
-      <div class="ms-pad-key">${laneLabels[i]}</div>
-      <div class="ms-pad-answer">${formatMath(opts[i])}</div>
-      ${isChosen ? `
-        <div class="ms-score-popup ${msState.resultType==='safe'?'safe':'mine'}" style="left:50%;top:-10px">
-          ${msState.resultType==='safe' ? '💎 AN TOÀN! +20 XP' : '💥 ĐẠP PHẢI MÌN!'}
-        </div>
-      ` : ''}
+  // Tính tọa độ camera dịch chuyển (cameraY) để luôn bám theo nhân vật và hàng đá hiện tại
+  // Hàng 0 (Home): Y = 960px. Mỗi hàng cách nhau 160px.
+  // Khi r = 0, cameraY = -600px. Khi r tăng, cameraY dịch xuống tương ứng
+  const targetWorldY = 960 - (r * 160);
+  const cameraY = -(targetWorldY - 320);
+
+  // Tính tọa độ pixel hiện tại của nhân vật
+  let charPixelX = 50; // %
+  let charPixelY = 960; // px
+  if(msState.jumping && msState.lastChoice !== null){
+    // Đang nhảy tới phiến đá được chọn ở hàng r + 1
+    charPixelX = 14 + msState.lastChoice * 24;
+    charPixelY = 960 - (r + 1) * 160 + 55;
+  } else if(r === 0){
+    charPixelX = 50;
+    charPixelY = 960 + 35;
+  } else {
+    // Đang đứng an toàn trên phiến đá của hàng r
+    charPixelX = 14 + msState.charCol * 24;
+    charPixelY = 960 - (r) * 160 + 55;
+  }
+
+  // Render các hàng đá (Rows 1..5)
+  const rowsHtml = [5, 4, 3, 2, 1].map(rowNum => {
+    const rowIdx = rowNum - 1;
+    const isCurrentRow = (rowIdx === r);
+    const rowTop = 960 - (rowNum * 160);
+    const rowOptions = (rowIdx === r) ? opts : ['···', '···', '···', '···'];
+
+    const pads = [0, 1, 2, 3].map(colIdx => {
+      const isAimed = (isCurrentRow && msState.aimedPad === colIdx);
+      const isChosen = (isCurrentRow && msState.lastChoice === colIdx);
+      const isPassedSafe = msState.safePath.some(p => p.row === rowNum && p.col === colIdx);
+      
+      let padClass = '';
+      if(isChosen){
+        padClass = (msState.resultType === 'safe') ? 'correct' : 'wrong';
+      } else if(isPassedSafe){
+        padClass = 'correct';
+      } else if(isAimed){
+        padClass = 'aimed';
+      }
+
+      return `<div class="ms-pad ${padClass}" 
+                    style="${!isCurrentRow && !isPassedSafe ? 'opacity:0.65;filter:grayscale(0.3);' : ''}"
+                    data-action="${isCurrentRow ? 'stepMinesweeperPad' : ''}" 
+                    data-pad="${colIdx}" 
+                    title="${isCurrentRow ? `Nhảy tới phiến đá ${laneLabels[colIdx]}` : ''}">
+        <div class="ms-pad-key">${laneLabels[colIdx]}</div>
+        <div class="ms-pad-answer">${isCurrentRow ? formatMath(rowOptions[colIdx]) : (isPassedSafe ? '⭐ An Toàn' : '🔒 Hàng ' + rowNum)}</div>
+        ${isChosen ? `
+          <div class="ms-score-popup ${msState.resultType==='safe'?'safe':'mine'}" style="left:50%;top:-15px">
+            ${msState.resultType==='safe' ? '💎 AN TOÀN! +20 XP' : '💥 ĐẠP PHẢI MÌN!'}
+          </div>
+        ` : ''}
+      </div>`;
+    }).join('');
+
+    return `<div class="ms-row-track ${isCurrentRow ? 'current-row' : ''}" style="top:${rowTop}px">
+      ${pads}
     </div>`;
   }).join('');
 
@@ -1354,7 +1434,7 @@ function renderMinesweeperGame(m){
           <span class="${health<3?'lost':''}">💖</span>
         </div>
         <div class="ms-hud-depth-wrap">
-          <span class="ms-hud-depth-label">Độ sâu: Câu ${r+1} / ${m.totalRounds}</span>
+          <span class="ms-hud-depth-label">Tiến độ: Hàng ${r+1} / ${m.totalRounds}</span>
           <div class="ms-hud-depth-bar">
             <div class="ms-hud-depth-fill" style="width:${progressPct}%"></div>
           </div>
@@ -1372,36 +1452,54 @@ function renderMinesweeperGame(m){
 
     <!-- ARENA -->
     <div class="ms-arena">
-      <div class="ms-ground"></div>
-
-      <!-- Question Banner Card -->
+      <!-- Question Banner Card (Cố định ở trên đầu Arena) -->
       <div class="ms-question-banner">
         <div class="ms-question-num">CÂU ${r+1} / ${m.totalRounds} · ${esc(q.label)}</div>
         <div class="ms-question-text">🧩 ${formatMath(q.prompt)}</div>
       </div>
 
-      <!-- Field Board with Stepping Stone Pads -->
-      <div class="ms-field-board">
-        <!-- Forward Answer Pads -->
-        <div class="ms-forward-pads">
-          ${padsHtml}
+      <!-- WORLD WITH CAMERA TRANSLATION -->
+      <div class="ms-world" style="transform: translateY(${cameraY}px)">
+        <div class="ms-ground"></div>
+
+        <!-- Cổng Thành Trì Golden Portal ở đỉnh bãi đá -->
+        <div style="position:absolute;top:25px;left:50%;transform:translateX(-50%);text-align:center;z-index:15">
+          <div style="font-size:38px;filter:drop-shadow(0 0 14px #facc15)">🏰</div>
+          <div style="font-size:12px;font-weight:800;color:#fef08a;text-shadow:0 2px 4px rgba(0,0,0,0.8)">CỔNG THÀNH TRÌ OXYZ (KHIÊN BAOVE)</div>
         </div>
 
-        <!-- Home Pad with Bobbing Character -->
-        <div class="ms-home-row">
+        <!-- 5 Hàng Phiến Đá Câu Hỏi -->
+        ${rowsHtml}
+
+        <!-- Hàng 0: Home Starting Pad -->
+        <div style="position:absolute;top:960px;left:50%;transform:translateX(-50%);z-index:12">
           <div class="ms-pad-home">
-            <div class="ms-char ${msState.wobble ? 'wobble' : ''}" style="${msState.jumping && msState.aimedPad !== null ? `transform: translateY(-90px) scale(1.1); transition: transform 0.25s ease;` : ''}">
-              <img src="/images/minesweeper/wobble-char.png" alt="Wobble Hero" onerror="this.src='/images/zombie-defense/gunner.png'">
-            </div>
+            🚩 ĐIỂM XUẤT PHÁT
           </div>
         </div>
+
+        <!-- NHÂN VẬT THỰC SỰ DI CHUYỂN TRÊN BẢN ĐỒ -->
+        <div class="ms-char-mover" style="left:${charPixelX}%; top:${charPixelY}px">
+          <div class="ms-char-sprite ${msState.jumping ? 'jumping' : ''} ${msState.wobble ? 'wobble' : ''}">
+            <img src="/images/minesweeper/wobble-char.png" alt="Hero Character" onerror="this.src='/images/zombie-defense/gunner.png'">
+          </div>
+        </div>
+      </div>
+
+      <!-- VIRTUAL CONTROLLER OVERLAY FOR EASY NAVIGATION -->
+      <div class="ms-dpad-wrap">
+        <button type="button" class="ms-dpad-btn" data-action="aimMsPadPrev" title="Chọn đá bên trái (A / ◀)">◀</button>
+        <button type="button" class="ms-dpad-btn" data-action="aimMsPadNext" title="Chọn đá bên phải (D / ▶)">▶</button>
+        <button type="button" class="ms-dpad-btn" style="width:auto;padding:0 14px;background:#22c55e;color:#fff;font-size:13px" data-action="jumpMsPadAimed" title="Nhảy tới đá đang ngắm (Space / Enter)">
+          ⬆ BƯỚC LÊN ĐÁ [${laneLabels[msState.aimedPad]}]
+        </button>
       </div>
     </div>
 
     <!-- BOTTOM BAR -->
     <div class="ms-botbar">
       <div>
-        ⌨️ <b>Điều khiển:</b> Nhấp chuột lên phiến đá hoặc bấm phím <b>A / B / C / D</b> (hoặc <b>1 / 2 / 3 / 4</b>) để chọn đường đi tránh mìn!
+        ⌨️ <b>Điều khiển:</b> Bấm trực tiếp lên phiến đá phía trước, hoặc bấm <b>A / B / C / D</b> (<b>1 / 2 / 3 / 4</b>) hoặc dùng nút <b>◀ / ▶ / ⬆ BƯỚC LÊN ĐÁ</b> để nhân vật tự nhảy tới!
       </div>
       <div>
         ${isReady ? `
@@ -2630,6 +2728,24 @@ async function handle(action,el){
   
   
   
+  
+  if(action==='aimMsPadPrev'){
+    msState.aimedPad = Math.max(0, msState.aimedPad - 1);
+    sound('step');
+    render();
+    return;
+  }
+  if(action==='aimMsPadNext'){
+    msState.aimedPad = Math.min(3, msState.aimedPad + 1);
+    sound('step');
+    render();
+    return;
+  }
+  if(action==='jumpMsPadAimed'){
+    await stepMinesweeperPad(msState.aimedPad);
+    return;
+  }
+
   if(action==='stepMinesweeperPad'){
     const p = Number(el.dataset.pad);
     if(!isNaN(p)) await stepMinesweeperPad(p);

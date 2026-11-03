@@ -10,6 +10,24 @@ Tất cả những thay đổi quan trọng của dự án này sẽ được gh
 
 ---
 
+## [2.9.0] - 2026-11-03
+
+### Added & Overhauled
+- **Nâng Cấp Cơ Chế Di Chuyển Thực Tế Cho Game Dò Mìn Bãi Đá (Chặng 5):**
+  - **Hệ Thống 5 Hàng Phiến Đá Hành Trình (Journey Path Grid):**
+    - Bản đồ bãi đá trải dài 1200px gồm Điểm xuất phát (Hàng 0), 5 Hàng phiến đá câu hỏi (Hàng 1 $\to$ 5) và Cổng Thành Trì Oxyz (Hàng 6) ở đỉnh.
+  - **Camera Dịch Chuyển Theo Nhân Vật (World Camera Tracking):**
+    - Camera tự động trượt mượt mà (`transform: translateY(...)`) theo từng bước tiến của nhân vật khi vượt qua từng hàng câu hỏi.
+  - **Nhân Vật Thật Sự Nhảy & Di Chuyển Giữa Các Phiến Đá (Physical Character Leaping):**
+    - Khi người chơi chọn phiến đá (click chuột, chạm cảm ứng, phím A/B/C/D hoặc nút D-pad), nhân vật thực hiện động tác nhảy vút theo quỹ đạo parabol (`@keyframes ms-char-leap`) từ vị trí an toàn trước đó tới đúng phiến đá mục tiêu.
+    - **Bước lên đá đúng:** Nhân vật tiếp đất an toàn trên phiến đá, phiến đá bừng sáng xanh ngọc (`.correct`), camera tiến lên hàng tiếp theo.
+    - **Đạp phải mìn nổ:** Mìn phát nổ chấn động, rung màn hình (`ms-screenshake`), nhân vật chao đảo (`.wobble`) và lùi về phiến đá an toàn trước đó để học sinh thử lại.
+  - **Thanh Điều Khiển Ảo & Phím Tắt Tiện Lợi:**
+    - Cụm phím điều hướng ảo (`◀`, `▶`, `⬆ BƯỚC LÊN ĐÁ`) hỗ trợ trải nghiệm tối ưu trên cả điện thoại di động và máy tính.
+  - **Đồng bộ hóa 100%:** Cập nhật đồng bộ vào `CHOI_THU_1_MAY.html` (offline) và máy chủ trực tiếp.
+
+---
+
 ## [2.8.0] - 2026-11-03
 
 ### Added & Overhauled (Reverse-Engineered via REA)
