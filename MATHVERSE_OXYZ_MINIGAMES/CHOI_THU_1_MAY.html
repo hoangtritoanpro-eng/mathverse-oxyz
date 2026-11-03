@@ -1401,7 +1401,10 @@ function mapTrack(stage){
  const curRound=world?.me?.round||0;
  return `<div class="world-journey-map">${missionMeta.map((m,i)=>{
   const state=stage===-1?'current':i<stage?'done':i===stage?'current':'locked';
-  const stars=stage===-1?'⭐⭐⭐':i<stage?'⭐⭐⭐':i===stage?('⭐'.repeat(curRound)+'☆'.repeat(3-curRound)):'☆☆☆';
+  const totalR = (world?.stages?.[i]?.totalRounds) || 3;
+  const filledStars = Math.max(0, Math.min(3, Math.round((curRound / totalR) * 3)));
+  const emptyStars = Math.max(0, 3 - filledStars);
+  const stars = stage === -1 ? '⭐⭐⭐' : (i < stage ? '⭐⭐⭐' : (i === stage ? ('⭐'.repeat(filledStars) + '☆'.repeat(emptyStars)) : '☆☆☆'));
   const clickAttr=window.IS_DEMO_MODE&&session?.role==='student'?`data-action="demoJumpStage" data-stage="${i}" title="Nhấn để chuyển nhanh tới Chặng ${i+1}"`:'';
   return `<div class="island-card ${state}" style="--biome:${m.biome}" ${clickAttr}>
    <div class="island-orb">
@@ -2242,7 +2245,7 @@ function renderHuntBattleModal(m){
     </div>
    </div>
    <div class="hw-monster-stage">
-    <span class="pill gold" style="margin-bottom:8px">🛡️ KHIÊN ĐỘI: ${'🛡️'.repeat(world.me.health)||'0'}</span>
+    <span class="pill gold" style="margin-bottom:8px">🛡️ KHIÊN ĐỘI: ${'🛡️'.repeat(Math.max(0, world.me?.health || 0)) || '0'}</span>
     <div class="hw-monster-hp"><i style="width:${huntState.monsterDefeated?0:100}%"></i></div>
     <small style="color:#fde68a;font-weight:900">${esc(monster.name)} · HP: ${huntState.monsterDefeated?0:monster.hp}/${monster.hp}</small>
     <div class="hw-monster-art-wrap ${huntState.monsterDefeated?'defeated':''}">
