@@ -197,10 +197,10 @@ const STAGES = [
   },
   {
     id: 3,
-    gameType: 'forge',
-    defaultMode: 'forge',
+    gameType: 'zombie_defense',
+    defaultMode: 'zombie',
     title: 'THÁP PHA LÊ KHOẢNG CÁCH',
-    subtitle: 'Tìm 5 Tinh Thể & Mở Khóa Tháp Pha Lê',
+    subtitle: 'Chặn Quân Đoàn Zombie Bằng Công Thức Khoảng Cách',
     place: 'Thung Lũng Tháp Pha Lê',
     icon: '💠',
     biomeColor: '#8b5cf6',
@@ -212,7 +212,7 @@ const STAGES = [
     cipher: 'PHALE',
     cipherHint: 'Tên của tòa tháp cổ được rèn từ 5 viên tinh thể ánh sáng (5 ký tự: P - H - A - L - E)!',
     cipherLetters: ['P', 'H', 'A', 'L', 'E'],
-    story: 'Tòa tháp cổ Tháp Pha Lê Khoảng Cách đang bị kết giới phong ấn tối thượng! NPC Vệ Binh Hang Tinh Thể giao nhiệm vụ cho đội thám hiểm: Hãy khám phá thung lũng hang động pha lê, tìm kiếm 5 viên pha lê thất lạc gắn với 5 bài toán độ dài và khoảng cách. Mỗi viên pha lê sẽ hé lộ một ký tự mật thư cổ. Hãy thu thập đủ 5 viên và ghép thành mật thư "PHALE" trên Bàn Giải Mã Trung Tâm để bừng sáng ngọn tháp và mở cánh cổng phong ấn!',
+    story: 'Quân đoàn Zombie Pha Lê đang tiến công trên 4 làn cỏ! Mỗi Zombie vác theo một tấm bia đáp án A, B, C, D. Hãy điều khiển xạ thủ ngắm bắn chính xác vào Zombie mang kết quả đúng của bài toán độ dài/khoảng cách để hạ gục Zombie và thu hồi 5 mảnh cổ tự PHALE mở cổng Tháp Pha Lê!',
     groupTask: 'Phân vai nhóm: TV1 giải bài toán khoảng cách, TV2 giải độ dài vectơ, TV3 tính căn bậc hai, TV4 ghi chép ký tự mật thư, Đội trưởng điều khiển nhân vật khám phá và ghép mã.',
     teamRoles: [
       '🧭 TV1 (Thám Hiểm & Dẫn Đường): Xác định vị trí 5 mỏ pha lê và cầu đá trên bản đồ',

@@ -10,6 +10,27 @@ Tất cả những thay đổi quan trọng của dự án này sẽ được gh
 
 ---
 
+## [2.6.0] - 2026-11-03
+
+### Added & Overhauled
+- **Thiết Kế Lại Chặng 3: 🧟 CHẶN ZOMBIE 4 LÀN (Zombie Defense 4-Lane Shooter Game - Chuẩn Giaoviendoimoi):**
+  - **Bối cảnh & Giao diện:**
+    - Khung cảnh bãi cỏ xanh 4 làn đường ngang (tương ứng 4 đáp án A, B, C, D).
+    - Bên trái: Hàng rào gỗ phòng thủ kiên cố (`.hw-zd-fence`) cùng chú lính xạ thủ chibi đội mũ cối cầm súng Blaster Laser cực ngầu (`renderZombieShooterSVG`).
+    - Bên phải: Đội quân Zombie hoạt hình ngộ nghĩnh bước đi nhịp nhàng từ phải sang trái (`renderZombieWalkingSVG`), hai tay giơ cuộn giấy da cổ mang nội dung 4 phương án A, B, C, D của bài toán Toán 12 Oxyz.
+    - Thẻ câu hỏi nổi bật phía trên (`CÂU X / 5`) kèm nhãn chủ đề và hướng dẫn thao tác chi tiết.
+  - **Cơ chế Điều khiển & Bắn Súng Đa Dạng (Flexible Controls):**
+    - **Click/Tap trực tiếp:** Bấm vào zombie hoặc làn bất kỳ để lính di chuyển nòng súng và khai hỏa tia laser tiêu diệt zombie.
+    - **Bàn phím PC:** Phím `W` / `S` hoặc `↑` / `↓` để chuyển làn ngắm bắn; phím `Space` hoặc `Enter` để khai hỏa tia laser. Hỗ trợ phím tắt số `1`–`4` hoặc chữ `A`–`D` bắn tức thì làn tương ứng.
+    - **Mobile:** Chạm trực tiếp vào zombie đang tiến tới.
+  - **Hiệu ứng Bắn Nổ & Tiến trình Mật Thư:**
+    - Khi bắn trúng zombie mang đáp án đúng: Tia laser xanh neon rực sáng toàn làn, nổ tia lửa `💥`, zombie tan biến và rơi ra Mảnh Tinh Thể Phong Ấn (`P`, `H`, `A`, `L`, `E`).
+    - Bắn sai không bị kẹt hay thua vĩnh viễn: Tia đạn dội ngược, hiển thị gợi ý sư phạm 2 cấp và bảo lưu tiến độ để học sinh tiếp tục thử sức.
+    - Đủ 5 mảnh kích hoạt nút mở Sổ Mật Thư `PHALE` để mở cổng Tháp Pha Lê Cổ.
+- **Đồng bộ hóa Tự động:** Cập nhật trọn vẹn vào `CHOI_THU_1_MAY.html` (chạy offline 100% không cần mạng) và máy chủ Live Server.
+
+---
+
 ## [2.5.0] - 2026-11-03
 
 ### Added & Overhauled

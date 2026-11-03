@@ -34,7 +34,7 @@ const oxyz3D={
 const missionMeta=[
  {icon:'🏝️',place:'Rừng Vectơ Khởi Nguyên',sub:'Tọa độ vectơ AB',biome:'#10b981',mode:'🗺️ Săn Kho Báu 2D'},
  {icon:'🏰',place:'Pháo Đài Góc Vuông',sub:'Tích vô hướng u·v',biome:'#3b82f6',mode:'🏰 Thủ Thành 3 Làn'},
- {icon:'💠',place:'Tháp Pha Lê Khoảng Cách',sub:'Độ dài & Khoảng cách',biome:'#a855f7',mode:'🔮 Lò Rèn Pha Lê'},
+ {icon:'💠',place:'Tháp Pha Lê Khoảng Cách',sub:'Độ dài & Khoảng cách',biome:'#a855f7',mode:'🧟 Chặn Zombie 4 Làn'},
  {icon:'🌀',place:'Mê Cung Trung Điểm',sub:'Trung điểm & Trọng tâm',biome:'#14b8a6',mode:'🌀 Mê Cung Tọa Độ'},
  {icon:'🐲',place:'Thành Trì Lõi Trí Tuệ',sub:'Cùng phương & Tổng hợp',biome:'#ef4444',mode:'🐲 Đấu Trường Boss'}
 ];
@@ -72,6 +72,15 @@ const mazeState = {
 function isMazeWall(x, y){
  return mazeState.walls.has(x + ',' + y);
 }
+
+
+/* ─── TRẠNG THÁI ENGINE 3: CHẶN ZOMBIE 4 LÀN (ZOMBIE DEFENSE) ─── */
+const zdState = {
+ lane: 0,
+ shooting: false,
+ hitLane: null,
+ hitType: null
+};
 
 const huntState={
  stageId:-1,
@@ -841,6 +850,163 @@ function renderGridOverlay(m){
 /* ═══════════════════════════════════════════════════════════════════════════
    RENDER ENGINE 3: LÒ RÈN TINH THỂ & THÁP PHA LÊ (CHẶNG 3 - CRYSTAL FORGE)
    ═══════════════════════════════════════════════════════════════════════════ */
+
+function renderZombieShooterSVG(){
+ return `<svg viewBox="0 0 100 120" width="68" height="82" style="filter:drop-shadow(0 4px 8px rgba(0,0,0,0.4))">
+  <ellipse cx="45" cy="112" rx="28" ry="7" fill="rgba(0,0,0,0.3)"/>
+  <rect x="32" y="80" width="10" height="26" rx="4" fill="#854d0e"/>
+  <rect x="48" y="80" width="10" height="26" rx="4" fill="#713f12"/>
+  <path d="M28 102 h16 v10 h-18 z" fill="#3f2305"/>
+  <path d="M46 102 h16 v10 h-18 z" fill="#2d1904"/>
+  <rect x="28" y="48" width="34" height="34" rx="8" fill="#2563eb"/>
+  <rect x="30" y="76" width="30" height="6" fill="#1e293b"/>
+  <rect x="42" y="75" width="6" height="8" fill="#facc15" rx="1"/>
+  <path d="M48 54 l24 8 l-4 10 l-22 -6 z" fill="#3b82f6"/>
+  <circle cx="70" cy="62" r="5" fill="#fbcfe8"/>
+  <rect x="62" y="56" width="28" height="12" rx="3" fill="#ea580c"/>
+  <rect x="66" y="52" width="14" height="6" rx="2" fill="#38bdf8"/>
+  <rect x="88" y="59" width="8" height="6" rx="1" fill="#facc15"/>
+  <circle cx="94" cy="62" r="3" fill="#ef4444"/>
+  <circle cx="44" cy="34" r="16" fill="#fed7aa"/>
+  <ellipse cx="48" cy="34" rx="3.5" ry="4.5" fill="#1e293b"/>
+  <circle cx="49.5" cy="32.5" r="1.5" fill="#fff"/>
+  <path d="M44 42 q4 3 8 0" stroke="#9a3412" stroke-width="2" fill="none"/>
+  <path d="M24 30 q20 -24 40 0 c2 4 -4 8 -8 7 q-12 -6 -24 0 c-4 1 -10 -3 -8 -7 z" fill="#15803d"/>
+  <rect x="25" y="28" width="38" height="4" rx="2" fill="#166534"/>
+  <polygon points="44,20 45.5,24 50,24 46.5,26.5 48,31 44,28 40,31 41.5,26.5 38,24 42.5,24" fill="#facc15"/>
+ </svg>`;
+}
+
+function renderZombieWalkingSVG(){
+ return `<svg viewBox="0 0 100 120" width="64" height="78" style="filter:drop-shadow(0 4px 8px rgba(0,0,0,0.3))">
+  <ellipse cx="48" cy="112" rx="26" ry="6" fill="rgba(0,0,0,0.25)"/>
+  <rect x="34" y="78" width="11" height="28" rx="4" fill="#334155"/>
+  <rect x="49" y="80" width="11" height="26" rx="4" fill="#1e293b"/>
+  <circle cx="39" cy="108" r="5" fill="#475569"/>
+  <circle cx="54" cy="108" r="5" fill="#334155"/>
+  <rect x="28" y="46" width="34" height="34" rx="6" fill="#e2e8f0"/>
+  <path d="M28 66 l8 8 l8 -6 l8 8 l10 -6 v14 h-34 z" fill="#64748b"/>
+  <path d="M40 52 l-22 10 l3 8 l20 -8 z" fill="#86efac"/>
+  <circle cx="18" cy="62" r="5" fill="#4ade80"/>
+  <circle cx="48" cy="30" r="18" fill="#86efac"/>
+  <path d="M34 18 l4 -8 l6 6 l6 -8 l6 8 l4 -6 l4 8 z" fill="#334155"/>
+  <circle cx="42" cy="28" r="6" fill="#fff" stroke="#1e293b" stroke-width="1.5"/>
+  <circle cx="43" cy="28" r="2.5" fill="#dc2626"/>
+  <circle cx="54" cy="27" r="5" fill="#fff" stroke="#1e293b" stroke-width="1.5"/>
+  <circle cx="53" cy="27" r="2" fill="#1e293b"/>
+  <path d="M40 38 q8 6 16 0 z" fill="#450a0a"/>
+  <rect x="44" y="38" width="3" height="4" fill="#fff"/>
+ </svg>`;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   RENDER ENGINE 3: CHẶN ZOMBIE 4 LÀN (CHẶNG 3 - GIAOVIENDOIMOI STYLE)
+   ═══════════════════════════════════════════════════════════════════════════ */
+async function shootZombieLane(laneIdx){
+ if(zdState.shooting || busy) return;
+ zdState.lane = laneIdx;
+ zdState.shooting = true;
+ sound('laser');
+ render();
+ 
+ try{
+  await submitStageAnswer({choice: laneIdx});
+ }finally{
+  setTimeout(()=>{
+   zdState.shooting = false;
+   zdState.hitLane = null;
+   render();
+  }, 450);
+ }
+}
+
+function renderZombieDefenseGame(m){
+ const r = m.round;
+ const q = m.challenge;
+ const isReady = Boolean(m.cipherReady || world.me?.cipherReady);
+ const laneLabels = ['A', 'B', 'C', 'D'];
+ const opts = q.options || ['?', '?', '?', '?'];
+
+ const lanesHtml = [0, 1, 2, 3].map(i => {
+  const isAimed = (zdState.lane === i);
+  const isHit = (zdState.hitLane === i);
+  return `<div class="hw-zd-lane ${isAimed?'aimed':''}" data-action="shootZombieLane" data-lane="${i}">
+   <div class="hw-zd-post-badge">${laneLabels[i]}</div>
+   ${(zdState.shooting && zdState.lane === i) ? `
+    <div class="hw-zd-bullet" style="left:88px;right:220px;top:46%"></div>
+   ` : ''}
+   <div class="hw-zd-zombie-group" data-action="shootZombieLane" data-lane="${i}" title="Bắn Zombie ${laneLabels[i]}">
+    <div class="hw-zd-zombie-scroll">
+     <span class="hw-zd-scroll-letter">${laneLabels[i]}</span>
+     <span>${formatMath(opts[i])}</span>
+    </div>
+    <div style="position:relative;display:flex;align-items:center">
+     ${renderZombieWalkingSVG()}
+     ${isHit ? '<div style="position:absolute;font-size:36px;top:0;left:10px;animation:pulse 0.4s">💥</div>' : ''}
+    </div>
+   </div>
+  </div>`;
+ }).join('');
+
+ return `<div class="hw-zd-container">
+  <div class="hw-zd-topbar">
+   <div style="display:flex;align-items:center;gap:10px">
+    <span class="tag" style="background:#7c3aed;border-color:#c084fc">🧟 CHẶN ZOMBIE · CHẶNG 3</span>
+    <b style="font-size:14px;color:#fde047">THÁP PHA LÊ KHOẢNG CÁCH</b>
+   </div>
+   <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+    <span class="pill gold">⭐ ${world.me?.score||0} XP · Lượt ${r+1}/${m.totalRounds}</span>
+    <button type="button" class="hw-btn-hud ${isReady?'alert':''}" data-action="openCipherNotebook">
+     📜 SỔ MẬT THƯ (${isReady?'SẴN SÀNG':'XEM MẢNH'})
+    </button>
+    <button type="button" class="hw-btn-hud" data-action="openTeamRoles">
+     🤝 PHÂN VAI NHÓM
+    </button>
+    <button type="button" class="button gray sm" data-action="hint">💡 Gợi ý (2 Cấp)</button>
+   </div>
+  </div>
+
+  <div class="hw-zd-qcard-wrap">
+   <div class="hw-zd-qcard">
+    <span class="hw-zd-qbadge">CÂU ${r+1} / ${m.totalRounds} · ${esc(q.label)}</span>
+    <div class="hw-zd-qtitle">🧩 ${formatMath(q.prompt)}</div>
+    <div style="font-size:12px;color:#64748b;margin-top:6px">
+     🎯 Bấm vào Zombie hoặc dùng phím W/S (↑/↓) để ngắm và nhấn Bắn (Space/Enter) để tiêu diệt Zombie mang đáp án đúng!
+    </div>
+   </div>
+  </div>
+
+  <div class="hw-zd-lanes-board">
+   <div class="hw-zd-fence"></div>
+   <div class="hw-zd-shooter-anchor" style="top:${zdState.lane * 25}%">
+    ${renderZombieShooterSVG()}
+   </div>
+   ${lanesHtml}
+  </div>
+
+  <div class="hw-zd-botbar">
+   <div style="font-size:12.5px;color:#cbd5e1">
+    ⌨️ <b>Điều khiển:</b> Phím <b>W / S</b> hoặc <b>↑ / ↓</b>: Chọn làn · <b>Space / Enter</b>: Bắn blaster · Bấm trực tiếp vào Zombie để bắn nhanh!
+   </div>
+   <div style="display:flex;gap:8px;align-items:center">
+    ${isReady ? `
+     <button type="button" class="button gold pulse-urgent" data-action="openCipherNotebook">
+      🔓 ĐỦ 5 MẢNH – GIẢI MÃ PHALE MỞ THÁP!
+     </button>
+    ` : `
+     <span class="pill purple" style="font-size:11.5px">
+      Mảnh rune đã thu thập: ${r}/5 (P - H - A - L - E)
+     </span>
+    `}
+   </div>
+  </div>
+
+  ${cipherState.open ? renderCipherNotebookModal(m) : ''}
+  ${showRolesModal ? renderTeamRolesModal(m) : ''}
+ </div>`;
+}
+
 function renderCrystalForgeGame(m){
  const r = m.round;
  const roundsMeta = m.allRounds || [];
@@ -1738,7 +1904,7 @@ function renderCastleDefenseGame(m){
 function getGameModeBadge(m){
  if (m.id === 1) return '🗺️ SĂN KHO BÁU 2D (Tự Lái Tìm Đền)';
  if (m.id === 2) return '🏰 THỦ THÀNH CHIẾN THUẬT (3 Làn Real-time)';
- if (m.id === 3) return '🔮 LÒ RÈN TINH THỂ (Đúc Năng Lượng & Mở Tháp)';
+ if (m.id === 3) return '🧟 CHẶN ZOMBIE 4 LÀN (Ngắm Bắn Đáp Án Đúng)';
  if (m.id === 4) return '🌀 MÊ CUNG TỌA ĐỘ Ô VUÔNG (Lưới Oxy & Cổng Dịch Chuyển)';
  if (m.id === 5) return '🐲 ĐẤU TRƯỜNG DIỆT BOSS (Đại Chiến Rồng & Laser Oxyz)';
  return '🎮 Game Tương Tác Oxyz';
@@ -1747,7 +1913,7 @@ function getGameModeBadge(m){
 function renderStageGame(m){
  if (m.id === 1) return renderHuntGame(m);
  if (m.id === 2) return renderCastleDefenseGame(m);
- if (m.id === 3) return renderCrystalForgeGame(m);
+ if (m.id === 3) return renderZombieDefenseGame(m);
  if (m.id === 4) return renderGridMazeGame(m);
  if (m.id === 5) return renderBossRaidGame(m);
  return renderHuntGame(m);
@@ -2243,6 +2409,13 @@ async function handle(action,el){
    return;
   }
   
+  
+  if(action==='shootZombieLane'){
+   const l = Number(el.dataset.lane);
+   if(!isNaN(l)) await shootZombieLane(l);
+   return;
+  }
+
   if(action==='clickMazeCell'){
    const cx = Number(el.dataset.x), cy = Number(el.dataset.y);
    if(!isNaN(cx) && !isNaN(cy) && !isMazeWall(cx, cy)){
