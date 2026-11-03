@@ -10,6 +10,24 @@ Tất cả những thay đổi quan trọng của dự án này sẽ được gh
 
 ---
 
+## [2.8.0] - 2026-11-03
+
+### Added & Overhauled (Reverse-Engineered via REA)
+- **Tích Hợp Game Dò Mìn Bãi Đá (Minesweeper) Từ Giaoviendoimoi.com Vào Chặng 5:**
+  - **Bối cảnh & Đồ họa gốc trích xuất từ Giaoviendoimoi:**
+    - `ground-bg.png`: Nền đất lát đá rêu phong cổ đại (`.ms-ground`).
+    - `wobble-char.png`: Nhân vật phiêu lưu nhảy nhót nhấp nhô (`.ms-char`, `@keyframes ms-bob`, `@keyframes ms-wobble`) đứng trên phiến đá xuất phát (`.ms-pad-home`).
+    - Các phiến đá dẫn đường phía trước (`.ms-pad`): Vỏ đá cẩm thạch màu xanh rêu với vòng tròn chữ cái tròn A, B, C, D (`.ms-pad-key`) và công thức toán học (`.ms-pad-answer`).
+  - **Cơ chế Dò Mìn & Hiệu ứng Chân Thực:**
+    - **Bước lên đá an toàn (Đúng):** Phiến đá phát sáng xanh ngọc bích rực rỡ (`.ms-pad.correct`), âm thanh leng keng thần kỳ `/sounds/sfx/correct.mp3`, nhãn điểm bay nổi `💎 AN TOÀN! +20 XP`, thu hồi mảnh cổ ngữ phong ấn (`B - A - O - V - E`).
+    - **Đạp phải mìn nổ (Sai):** Phiến đá bùng cháy đỏ rực (`.ms-pad.wrong`), rung lắc toàn màn hình (`ms-screenshake`), âm thanh bom mìn nổ rền vang `/sounds/sfx/explosion.mp3`, nhân vật chới với giật lùi, trừ 1 khiên sinh mệnh (3 trái tim 💖💖💖) và hiển thị gợi ý sư phạm để học sinh thử lại.
+  - **Mở Khóa Khiên & Đại Chiến Boss Cuối:**
+    - Vượt qua 5 câu hỏi thu đủ 5 cổ ngữ để ghép mật thư `BAOVE` trên Sổ Mật Thư.
+    - Kích hoạt Khiên Ma Pháp và bước vào trận chiến kết liễu Đại Boss "Bóng Đen Lãng Quên" bằng Đại Pháo Laser Oxyz.
+  - **Đồng bộ hóa 100% Offline:** Nhúng toàn bộ sprite sheet vào file [CHOI_THU_1_MAY.html](file:///c:/Users/ADMIN/Downloads/ggvdg%20duyen/MATHVERSE_OXYZ_MINIGAMES/CHOI_THU_1_MAY.html) dưới dạng Base64 data URLs.
+
+---
+
 ## [2.7.0] - 2026-11-03
 
 ### Added & Overhauled (Reverse-Engineered via REA)
