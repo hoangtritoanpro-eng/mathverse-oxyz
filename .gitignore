@@ -1,6 +1,11 @@
 # Git ignore
 node_modules/
 data/rooms.json
+MATHVERSE_OXYZ_MINIGAMES/data/rooms.json
 scratch/
 rea/
+*.mp4
+*.aac
+*.m4a
+*.mp3
 

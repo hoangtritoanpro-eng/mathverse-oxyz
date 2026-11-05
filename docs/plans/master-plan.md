@@ -11,7 +11,7 @@ Tài liệu này quản lý lộ trình tổng thể của dự án theo quy tr�
 | :--- | :--- | :---: | :--- |
 | **Phase 1** | Khởi tạo Khung Hệ thống & Server LAN | `[x]` | Khung 5 chặng, server LAN Node.js, dashboard GV và quy trình Solo Builder. |
 | **Phase 2** | Nâng cấp 2 Game Engine Tương Tác Nhóm (Săn Kho Báu 2D & Bảo Vệ Thành Trì) | `[x]` | Tích hợp 2 cơ chế game tương tác thực thụ (`hunt-preview` & `castle-defense`) vào 5 chặng Oxyz cho học sinh chơi nhóm. |
-| **Phase 3** | Hoàn thiện Báo Cáo Biện Pháp (Word 3 trang) | `[ ]` | Soạn thảo nội dung biện pháp, số liệu minh chứng và xuất file `.docx` hoàn chỉnh. |
+| **Phase 3** | Hoàn thiện Báo Cáo Biện Pháp (Word 3 trang) | `[x]` | Soạn thảo nội dung biện pháp, số liệu minh chứng và xuất file `.docx` hoàn chỉnh. |
 | **Phase 4** | Kế hoạch bài dạy (Giáo án), Slide & Nghiệm thu | `[ ]` | Soạn giáo án 45 phút, bộ slide thuyết trình 30 phút và kiểm thử toàn diện. |
 
 ---
@@ -36,8 +36,14 @@ Tài liệu này quản lý lộ trình tổng thể của dự án theo quy tr�
   - [x] Thiết kế **Bản đồ Lục địa 5 Chặng Oxyz (`world-journey-map`)** với 5 hòn đảo nổi, hệ thống sao đánh giá (`⭐⭐⭐`), biểu tượng vật phẩm và cho phép học sinh nhấn vào đảo để xem trước hoặc chuyển nhanh chặng.
   - [x] Nút **⛶ Toàn màn hình** tiện lợi cho trình chiếu lớp học và đồng bộ trọn vẹn sang `CHOI_THU_1_MAY.html`.
 
-### Phase 3: Hoàn thiện Báo Cáo Biện Pháp (Word 3 trang) `[ ]`
+### Phase 3: Hoàn thiện Báo Cáo Biện Pháp (Word 3 trang) `[x]`
 - **Mục tiêu:** Điền và hoàn chỉnh file `Bien phap gop phan nang cao chat luong DH.docx` theo đúng mẫu và quy định của nhà trường (tối đa 3 trang).
+- **Kết quả đạt được:**
+  - [x] Lập kế hoạch chi tiết `docs/plans/phase-3.md` bám sát Thông tư 22/2019/TT-BGDĐT và Kế hoạch 96/KH-S1PCT của Trường THPT số 1 Phan Chu Trinh.
+  - [x] Soạn thảo nội dung khoa học sư phạm: Lý do & thực trạng, 4 mục tiêu, 3 giải pháp cốt lõi (5 chặng game Mathverse Oxyz, phân vai chuyên trách $Ox, Oy, Oz$, mạng LAN Zero-dependency & mô hình 3D Oxyz), hiệu quả học tập và minh chứng đối chứng (Lớp 12A1 vs 12A2) với 2 bảng số liệu rõ ràng.
+  - [x] Xây dựng script tự động hóa `scratch/build_bien_phap_docx.py` tạo file Word OpenXML chuẩn xác.
+  - [x] Kiểm tra và xác thực bằng Word COM Automation (`scratch/check_word.ps1`): Văn bản đạt chính xác **3 trang in A4** (Words = 1724, Lines = 143), căn lề chuẩn, font Times New Roman, đầy đủ bảng số liệu và bảng chữ ký xác nhận của Hiệu trưởng & GV Đinh Thị Thảo Nguyên.
+  - [x] Xuất bản file in ấn `Bien_phap_gop_phan_nang_cao_chat_luong_DH.pdf` và tạo artifact trực quan hóa 3 trang in `Bao_Cao_Bien_Phap_3_Trang.md`.
 
 ### Phase 4: Kế hoạch bài dạy (Giáo án), Slide & Nghiệm thu `[ ]`
 - **Mục tiêu:** Chuẩn bị đầy đủ tài liệu phục vụ buổi thuyết trình 30 phút (10/11/2026) và tiết dạy thực hành (11/11 – 17/11/2026).
