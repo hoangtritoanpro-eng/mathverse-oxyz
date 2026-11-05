@@ -9,6 +9,29 @@ Tất cả những thay đổi quan trọng của dự án này sẽ được gh
 
 ---
 
+## [3.3.0] - 2026-11-06
+
+### Added & Overhauled (High-Detail Character Artworks & Vector Animations)
+- **Thiết Kế Lại Toàn Bộ Nhân Vật Game Bằng Đồ Họa Vector SVG Đa Tầng Chi Tiết:**
+  - Thay thế toàn bộ các emoji đơn điệu bằng tác phẩm đồ họa vector chất lượng cao, có chiều sâu, hiệu ứng ánh sáng gradient, bóng đổ và hoạt họa thở/bước đi:
+  - **Bộ 3 Anh Hùng Thủ Thành (Chặng 2):**
+    - **Cung Thủ Ox (`CHAR_ARCHER_SVG`):** Áo choàng xanh navy, mũ gắn lông vũ đỏ, bao tên da sau lưng, cung liên hợp giương sẵn mũi tên năng lượng xanh cyan lấp lánh và hào quang phong ấn.
+    - **Pháp Sư Oy (`CHAR_MAGE_SVG`):** Áo chùng tím thêu chỉ vàng, mũ phù thủy cao chót vót, râu dài hiền triết, tay cầm quyền trượng pha lê ma thuật tím với quả cầu năng lượng xoay vần.
+    - **Hiệp Sĩ Oz (`CHAR_PALADIN_SVG`):** Bộ giáp thép sáng loáng viền vàng hoàng gia, mũ giáp cánh chim, áo choàng đỏ thắm, khiên sắt khắc quốc huy sư tử và đại thanh kiếm ánh sáng uy nghiêm.
+  - **Đại Boss Rồng Bóng Đen Lãng Quên (Chặng 5 - `CHAR_DRAGON_SVG`):**
+    - Thiết kế đại boss rồng khổng lồ: Đôi cánh dơi hắc ám xòe rộng với tĩnh mạch tím, sừng rồng cong vút phát sáng đỏ rực, mắt lửa địa ngục vàng-đỏ, hàm răng nanh sắc nhọn và hiệu ứng trôi nổi bồng bềnh (`boss-dragon-hover`).
+  - **Đội Quân Quái Vật Lâu Đài (Castle Defense):**
+    - **Goblin Tiên Phong (`CHAR_GOBLIN_SVG`):** Da xanh lục, tai dài nhọn hoắt, mắt đỏ hung hãn, áo giáp da và cầm song đao sẵn sàng đột kích.
+    - **Dơi Quỷ Hắc Ám (`CHAR_BAT_SVG`):** Cánh màng tím sẫm, mắt đỏ rực và hoạt ảnh đập cánh liên hồi.
+    - **Bộ Xương Chiến Binh (`CHAR_SKELETON_SVG`):** Hốc mắt xanh linh hồn phát sáng, khung xương sườn chi tiết, khiên tròn kim loại và đao liêm rỉ sét.
+    - **Orc Thiết Giáp (`CHAR_ORC_SVG`):** Quái thú cơ bắp đỏ au, mũ sắt sừng trâu, rìu chiến hai lưỡi khổng lồ.
+  - **Nhân Vật Thám Hiểm Oxyz (Chặng 1 Săn Kho Báu & Chặng 4 Mê Cung - `CHAR_EXPLORER_SVG`):**
+    - Chibi thám hiểm đáng yêu với mũ rộng vành, balo dã ngoại có túi ngủ, tay cầm ngọn đuốc pha lê tọa độ phát sáng soi đường và hoạt ảnh bước chân sinh động khi di chuyển.
+  - **Đồng bộ hóa sang CHOI_THU_1_MAY.html:**
+    - Rebuild bản offline (~2.30 MB), kiểm thử toàn diện cả 5 chặng đạt 100% Pass.
+
+---
+
 ## [3.2.0] - 2026-11-05
 
 ### Added & Upgraded (Magictools Game UI, Kenney 3D Tactile Buttons & Particle Juice Engine)

@@ -1419,7 +1419,7 @@ function renderGridMazeGame(m){
 
       let cellContent = '';
       if (isPlayer) {
-        cellContent = `<div class="hw-maze-player">${world.me.avatar}</div>`;
+        cellContent = `<div class="hw-maze-player">${CHAR_EXPLORER_SVG}</div>`;
       } else if (isChest) {
         cellContent = isReady ? '👑' : '🔒';
       } else if (isActivePad) {
@@ -1824,7 +1824,7 @@ function renderBossRaidGame(m){
 
     <div class="hw-raid-boss-center" style="margin:10px 0">
      <div class="hw-shield-dome"></div>
-     <div class="hw-raid-boss-sprite">${huntState.monsterDefeated?'💥':'🐲'}</div>
+     <div class="hw-raid-boss-sprite">${huntState.monsterDefeated?'💥':CHAR_DRAGON_SVG}</div>
     </div>
 
     <!-- BẢNG ĐIỀU KHIỂN ĐẠI PHÁO LASER OXYZ TRỰC TIẾP -->
@@ -2034,7 +2034,7 @@ function renderHuntGame(m){
      <div class="hw-player-aura-ring"></div>
      <div class="hw-player-shadow"></div>
      <div class="hw-hero-chassis">
-      <div class="hw-player-avatar">${world.me.avatar}</div>
+      <div class="hw-player-avatar">${CHAR_EXPLORER_SVG}</div>
       <div class="hw-hero-crown">${(world.me.streak||0)>=2?'🔥':'⭐'}</div>
      </div>
      <div class="hw-player-tag">
@@ -2297,7 +2297,7 @@ function spawnCastleWaveEnemies(m){
  if(!m||!m.defenseConfig)return;
  const w=m.defenseConfig.waves?.[m.round]||{name:'Đợt tấn công',enemies:['goblin','bat','skeleton'],boss:'👹'};
  const list=w.enemies||['goblin','bat','skeleton'];
- const spriteMap={goblin:'👺',bat:'🦇',skeleton:'💀',orc:'👹'};
+ const spriteMap={goblin:CHAR_GOBLIN_SVG,bat:CHAR_BAT_SVG,skeleton:CHAR_SKELETON_SVG,orc:CHAR_ORC_SVG};
  list.forEach((kind,idx)=>{
   const hp=75+m.id*20+m.round*15;
   cdState.enemies.push({
@@ -2317,7 +2317,7 @@ function spawnCastleWaveEnemies(m){
   x:94,
   hp:bossHp, maxHp:bossHp,
   speed:1.45,
-  sprite:w.boss||m.challenge?.monster?.icon||'👹',
+  sprite:CHAR_ORC_SVG,
   isBoss:true
  });
 }
@@ -2415,9 +2415,9 @@ function renderCastleDefenseGame(m){
       <span class="cd-castle-tag">${esc(me.name)}</span>
      </div>
 
-     <div class="cd-hero" style="top:44%"><div class="cd-hero-sprite">🏹</div><span class="cd-hero-label">Cung Thủ Ox</span></div>
-     <div class="cd-hero" style="top:65%"><div class="cd-hero-sprite">🧙‍♂️</div><span class="cd-hero-label">Pháp Sư Oy</span></div>
-     <div class="cd-hero" style="top:86%"><div class="cd-hero-sprite">🛡️</div><span class="cd-hero-label">Hiệp Sĩ Oz</span></div>
+     <div class="cd-hero" style="top:44%"><div class="cd-hero-sprite">${CHAR_ARCHER_SVG}</div><span class="cd-hero-label">Cung Thủ Ox</span></div>
+     <div class="cd-hero" style="top:65%"><div class="cd-hero-sprite">${CHAR_MAGE_SVG}</div><span class="cd-hero-label">Pháp Sư Oy</span></div>
+     <div class="cd-hero" style="top:86%"><div class="cd-hero-sprite">${CHAR_PALADIN_SVG}</div><span class="cd-hero-label">Hiệp Sĩ Oz</span></div>
 
      <div id="cdDynamicLayer"></div>
     </div>
