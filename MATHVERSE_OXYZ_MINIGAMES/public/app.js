@@ -327,7 +327,10 @@ function renderOxyz3D(m, forceOpen=false){
  const wOz=hlAxis==='z'||hlAxis==='all'?3.2:1.8;
 
  return `<div style="padding:10px 16px;background:#090f1d;border-bottom:1px solid #1e293b">
-  <div class="oxyz-hologram-box">
+  <div class="oxyz-hologram-box arwes-frame">
+   <div class="arwes-scanner-line"></div>
+   <div class="arwes-corner tl"></div><div class="arwes-corner tr"></div>
+   <div class="arwes-corner bl"></div><div class="arwes-corner br"></div>
    <div class="oxyz-hologram-head">
     <div class="oxyz-hologram-title">🧊 MÔ HÌNH HÌNH HỌC 3D OXYZ TRỰC QUAN: ${esc(v3.title)}</div>
     <div class="oxyz-controls">
@@ -813,7 +816,10 @@ function renderCipherNotebookModal(m){
  `).join('') : `<span style="color:#94a3b8;font-size:12.5px;font-style:italic">Đã xếp hết các mảnh ký tự vào ô phía trên.</span>`;
 
  return `<div class="hw-cipher-backdrop">
-  <div class="hw-cipher-modal">
+  <div class="hw-cipher-modal arwes-frame gold">
+   <div class="arwes-scanner-line"></div>
+   <div class="arwes-corner tl"></div><div class="arwes-corner tr"></div>
+   <div class="arwes-corner bl"></div><div class="arwes-corner br"></div>
    <div class="hw-cipher-header">
     <div>
      <h3 style="margin:0;font-size:16px;font-weight:900">📜 SỔ MẬT THƯ CỔ ĐẠI · ${esc(m.title)}</h3>
@@ -2527,7 +2533,14 @@ function stageContent(m){
 
 function finalContent(){
  const words=Object.entries(world.cipherWords||{});
- return `<div class="final-wrap"><div class="panel"><div class="section-title"><h2>🔐 MỞ RƯƠNG LÕI TRÍ TUỆ OXYZ</h2><span class="pill gold">TRẠM CUỐI</span></div><p>Chúc mừng! Cả đội đã chinh phục đủ 5 chặng Lục địa Oxyz. Hãy đọc 5 chữ số mật mã theo thứ tự Chặng 1 → 5, nhập mật mã mở kho báu và chọn thông điệp chiến thắng!</p>${inv(world.me.digits)}<div class="form-field"><label>Nhập mật mã 5 chữ số (theo thứ tự Chặng 1 → 5)</label><input id="finalCode" type="text" class="mono" placeholder="? ? ? ? ?" inputmode="numeric" maxlength="5" autocomplete="off" /></div><h3 style="margin:18px 0 8px">Bảng giải mã từ ngữ</h3><div class="words">${words.map(([k,v])=>`<span class="word-chip">Số ${esc(k)} = ${esc(v)}</span>`).join('')}</div><h3 style="margin:18px 0 8px">Chọn thông điệp nhận được</h3>${world.messageOptions.map((msg,i)=>`<label class="final-option"><input type="radio" name="message" value="${i}" ${i===0?'checked':''}/> ${labels[i]}. ${esc(msg)}</label>`).join('')}${btn('🔓 MỞ RƯƠNG KHO BÁU TRI THỨC','final','gold block')}</div></div>`;
+ return `<div class="final-wrap"><div class="panel arwes-frame gold" style="padding:24px 26px">
+  <div class="arwes-scanner-line"></div>
+  <div class="arwes-corner tl"></div><div class="arwes-corner tr"></div>
+  <div class="arwes-corner bl"></div><div class="arwes-corner br"></div>
+  <div class="section-title">
+   <h2 class="arwes-decrypt-auto" data-text="🔐 MỞ RƯƠNG LÕI TRÍ TUỆ OXYZ">🔐 MỞ RƯƠNG LÕI TRÍ TUỆ OXYZ</h2>
+   <span class="arwes-badge gold">TRẠM CUỐI · CYBER CORE</span>
+  </div><p>Chúc mừng! Cả đội đã chinh phục đủ 5 chặng Lục địa Oxyz. Hãy đọc 5 chữ số mật mã theo thứ tự Chặng 1 → 5, nhập mật mã mở kho báu và chọn thông điệp chiến thắng!</p>${inv(world.me.digits)}<div class="form-field"><label>Nhập mật mã 5 chữ số (theo thứ tự Chặng 1 → 5)</label><input id="finalCode" type="text" class="mono" placeholder="? ? ? ? ?" inputmode="numeric" maxlength="5" autocomplete="off" /></div><h3 style="margin:18px 0 8px">Bảng giải mã từ ngữ</h3><div class="words">${words.map(([k,v])=>`<span class="word-chip">Số ${esc(k)} = ${esc(v)}</span>`).join('')}</div><h3 style="margin:18px 0 8px">Chọn thông điệp nhận được</h3>${world.messageOptions.map((msg,i)=>`<label class="final-option"><input type="radio" name="message" value="${i}" ${i===0?'checked':''}/> ${labels[i]}. ${esc(msg)}</label>`).join('')}${btn('🔓 MỞ RƯƠNG KHO BÁU TRI THỨC','final','gold block')}</div></div>`;
 }
 
 function studentScreen(){
@@ -2541,8 +2554,57 @@ function studentScreen(){
  ${demoStageBar}
  <div class="panel" style="padding:14px 18px"><div class="flex-between"><h3>🗺️ Bản Đồ Hành Trình 5 Chặng Lục Địa Oxyz (${esc(me.name)})</h3><span class="pill ${me.stage===5?'green':'gold'}">Đã vượt ${me.stage}/5 chặng · Nhấn vào đảo bất kỳ để chuyển chặng</span></div>${mapTrack(me.stage)}</div>
  ${world.paused?'<div class="notice error" style="margin:14px 0"><b>⏸ Giáo viên đang tạm dừng trò chơi để hướng dẫn.</b> Cả nhóm hãy lắng nghe nhé!</div>':''}
- <div class="mission-wrapper"><div>${me.completed?`<div class="panel champion"><span class="star">🏆</span><h2>ĐỘI ${esc(me.name).toUpperCase()} ĐÃ CHIẾN THẮNG!</h2><p style="margin-top:9px;font-size:19px;font-weight:850;color:#8e5b18">“TƯ DUY VÀ HỢP TÁC MỞ KHO BÁU”</p><div class="top-numbers" style="justify-content:center"><div class="metric"><b>${me.score} XP</b><small>TỔNG ĐIỂM ĐỘI</small></div><div class="metric"><b>#${mineRank}</b><small>THỨ HẠNG HIỆN TẠI</small></div></div></div>`:me.stage>=5?finalContent():stageContent(world.current)}</div>
+ <div class="mission-wrapper"><div>${me.completed?`<div class="panel champion arwes-frame gold" style="padding:26px 20px">
+  <div class="arwes-scanner-line"></div>
+  <div class="arwes-corner tl"></div><div class="arwes-corner tr"></div>
+  <div class="arwes-corner bl"></div><div class="arwes-corner br"></div>
+  <span class="star">🏆</span>
+  <h2 class="arwes-decrypt-auto" data-text="ĐỘI ${esc(me.name).toUpperCase()} ĐÃ CHIẾN THẮNG!">ĐỘI ${esc(me.name).toUpperCase()} ĐÃ CHIẾN THẮNG!</h2>
+  <p class="arwes-decrypt-auto" data-text="“TƯ DUY VÀ HỢP TÁC MỞ KHO BÁU”" style="margin-top:9px;font-size:20px;font-weight:900;color:#facc15;font-family:'Consolas',monospace">“TƯ DUY VÀ HỢP TÁC MỞ KHO BÁU”</p><div class="top-numbers" style="justify-content:center"><div class="metric"><b>${me.score} XP</b><small>TỔNG ĐIỂM ĐỘI</small></div><div class="metric"><b>#${mineRank}</b><small>THỨ HẠNG HIỆN TẠI</small></div></div></div>`:me.stage>=5?finalContent():stageContent(world.current)}</div>
  <aside class="team-sidebar"><div class="panel"><h3>🎒 Túi Mật Mã (5 Chặng)</h3><p class="muted" style="font-size:12px;margin-top:4px">Thu thập đủ 5 chữ số từ 5 chặng để mở Rương Kho Báu.</p>${inv(me.digits)}<div class="top-numbers" id="studentSidebarMetrics"><div class="metric"><b>${me.score}</b><small>XP CỦA ĐỘI</small></div><div class="metric"><b>#${mineRank}</b><small>HẠNG TẠM THỜI</small></div></div></div><div class="panel"><h3>🏅 Bảng xếp hạng lớp</h3><div style="margin-top:10px" id="studentSidebarRanks">${standings(world.teams,true)}</div></div><div class="panel"><h3>🧑‍🤝‍🧑 Cẩm nang Chiến thuật</h3><p style="font-size:12.5px;margin-top:6px">• <b>🧊 Mô hình 3D Oxyz:</b> Xoay góc nhìn 3D để kiểm tra tọa độ điểm và vectơ.<br/>• <b>🗺️ Săn Kho Báu 2D:</b> Theo dõi La bàn & Radar để dẫn đội tới Trạm I, II, III.<br/>• <b>🏰 Bảo Vệ Thành Trì:</b> Giải đúng liên tiếp để kích hoạt <b>Đại Bác Laser Oxyz</b> & nhận thưởng Combo Vàng!</p></div></aside></div>`;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ARWES DECRYPT / CIPHER TEXT ANIMATION ENGINE (Inspired by @arwes/text)
+   ═══════════════════════════════════════════════════════════════════════════ */
+const ARWES_GLYPHS = '0123456789ABCDEFΔΩΣλφψ⌘⚙⚡%#@&*+~';
+
+function runArwesDecrypt(el, targetText, duration = 1100, onComplete = null) {
+ if (!el) return;
+ const text = targetText || el.getAttribute('data-text') || el.textContent || '';
+ if (!text.trim()) return;
+ const len = text.length;
+ const startTime = performance.now();
+ el.classList.add('arwes-decrypt-text');
+ 
+ function update(now) {
+  const elapsed = now - startTime;
+  const progress = Math.min(1, elapsed / duration);
+  const lockIndex = Math.floor(progress * len);
+  
+  let out = '';
+  for (let i = 0; i < len; i++) {
+   if (i < lockIndex) {
+    out += text[i];
+   } else if (text[i] === ' ' || text[i] === '\n') {
+    out += text[i];
+   } else {
+    out += ARWES_GLYPHS[Math.floor(Math.random() * ARWES_GLYPHS.length)];
+   }
+  }
+  
+  el.textContent = out;
+  if (Math.random() < 0.35) sound('cipher');
+  
+  if (progress < 1) {
+   requestAnimationFrame(update);
+  } else {
+   el.textContent = text;
+   if (onComplete) onComplete();
+  }
+ }
+ requestAnimationFrame(update);
 }
 
 function render(){
@@ -2551,6 +2613,12 @@ function render(){
  app.innerHTML=layout(session.role==='teacher'?teacherScreen():studentScreen());
  updateClock();
  updateHuntCamera();
+
+ document.querySelectorAll('.arwes-decrypt-auto:not(.decrypted)').forEach(el => {
+  el.classList.add('decrypted');
+  const target = el.getAttribute('data-text') || el.textContent;
+  runArwesDecrypt(el, target, 1100);
+ });
  $('.award-backdrop')?.remove();
  if(showAward&&session.role==='teacher'){
   const aw=document.createElement('div');aw.innerHTML=awardScreen();document.body.appendChild(aw.firstElementChild);
@@ -2612,6 +2680,48 @@ function sound(type){
  try{
   const actx=new(window.AudioContext||window.webkitAudioContext)();
   const now=actx.currentTime;
+  if(type==='bleep'){
+   const osc=actx.createOscillator(), gain=actx.createGain();
+   osc.type='sine';
+   osc.frequency.setValueAtTime(1420, now);
+   osc.frequency.exponentialRampToValueAtTime(980, now + 0.04);
+   gain.gain.setValueAtTime(0.04, now);
+   gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.045);
+   osc.connect(gain).connect(actx.destination);
+   osc.start(now); osc.stop(now + 0.05);
+   return;
+  }else if(type==='cipher'){
+   const freq = 800 + Math.random() * 1100;
+   const osc=actx.createOscillator(), gain=actx.createGain();
+   osc.type='triangle';
+   osc.frequency.setValueAtTime(freq, now);
+   gain.gain.setValueAtTime(0.02, now);
+   gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.025);
+   osc.connect(gain).connect(actx.destination);
+   osc.start(now); osc.stop(now + 0.028);
+   return;
+  }else if(type==='assemble'||type==='powerup'){
+   [329.63, 440, 659.25, 880, 1318.51].forEach((freq, i)=>{
+    const osc=actx.createOscillator(), gain=actx.createGain();
+    osc.type='sine'; osc.frequency.value=freq;
+    gain.gain.setValueAtTime(0.0001, now + i*0.045);
+    gain.gain.exponentialRampToValueAtTime(0.06, now + i*0.045 + 0.015);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + i*0.045 + 0.2);
+    osc.connect(gain).connect(actx.destination);
+    osc.start(now + i*0.045); osc.stop(now + i*0.045 + 0.22);
+   });
+   return;
+  }else if(type==='scan'){
+   [880, 1760].forEach((freq, i)=>{
+    const osc=actx.createOscillator(), gain=actx.createGain();
+    osc.type='sine'; osc.frequency.value=freq;
+    gain.gain.setValueAtTime(0.03, now + i*0.035);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + i*0.035 + 0.06);
+    osc.connect(gain).connect(actx.destination);
+    osc.start(now + i*0.035); osc.stop(now + i*0.035 + 0.07);
+   });
+   return;
+  }
   if(type===true||type==='correct'){
    [523.25, 659.25, 783.99, 1046.50].forEach((freq, i)=>{
     const osc=actx.createOscillator(), gain=actx.createGain();
@@ -3352,7 +3462,7 @@ function updateTargetFromPointer(e){
 
 document.addEventListener('click',e=>{
  const el=e.target.closest('[data-action]');
- if(el){e.preventDefault();handle(el.dataset.action,el);return;}
+ if(el){e.preventDefault();sound('bleep');handle(el.dataset.action,el);return;}
 });
 
 document.addEventListener('pointerdown',e=>{

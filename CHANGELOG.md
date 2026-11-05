@@ -9,6 +9,25 @@ Tất cả những thay đổi quan trọng của dự án này sẽ được gh
 
 ---
 
+## [3.1.0] - 2026-11-05
+
+### Added & Integrated (Arwes Futuristic Sci-Fi UI, Decrypt Engine & Audio Bleeps)
+- **Tích Hợp Triết Lý Thiết Kế Arwes (Futuristic Sci-Fi UI Framework) vào Mathverse Oxyz:**
+  - **Khung Viền Sci-Fi Đa Lớp (Chamfered Cyber Frames & Brackets):**
+    - Áp dụng kỹ thuật `clip-path: polygon(...)` vát góc 45 độ, viền sáng neon Cyan (`#00f8ff`), Gold (`#facc15`) và 4 góc định vị bracket (`.arwes-corner`) phát sáng.
+    - Tia laser quét ngang liên tục (`.arwes-scanner-line`) trên các khung bảng điều khiển.
+    - Nâng cấp **Mô hình 3D Oxyz Hologram Box**, **Modal Sổ Mật Thư Cổ Đại**, **Màn hình Mở Rương Trạm Cuối (Cyber Core)** và **Bảng Vinh Quang Đội Chiến Thắng**.
+  - **Công Nghệ Giải Mã Chữ Hoạt Họa Arwes (Decrypt / Cipher Text Engine):**
+    - Xây dựng hàm `runArwesDecrypt(el, targetText, duration, onComplete)`: Chạy ngẫu nhiên các ký tự công nghệ (`0-9`, `A-Z`, `Δ`, `Ω`, `Σ`, `λ`, `φ`, `ψ`, `⌘`, `⚙`, `⚡`) kết hợp tiếng lách cách điện tử `sound('cipher')` trước khi chốt lại văn bản tiếng Việt chính xác.
+    - Tự động áp dụng cho: Tiêu đề mở rương trạm cuối, tên đội chiến thắng, và thông điệp chung cuộc *"TƯ DUY VÀ HỢP TÁC MỞ KHO BÁU"*.
+  - **Hệ Thống Âm Thanh Sci-Fi Web Audio API (Arwes Bleeps):**
+    - Bổ sung các dải âm điện tử tần số cao: `bleep` (click phím bấm, độ trễ 0.04s), `cipher` (dữ liệu giải mã), `assemble / powerup` (kích hoạt cổng không gian), `scan` (quét radar và góc xoay 3D).
+    - Tự động phát âm thanh `sound('bleep')` khi học sinh thao tác trên các nút bấm giao diện.
+  - **Đồng bộ hóa toàn diện sang bản chạy đơn độc lập:**
+    - Biên dịch lại [CHOI_THU_1_MAY.html](file:///c:/Users/ADMIN/Downloads/ggvdg%20duyen/MATHVERSE_OXYZ_MINIGAMES/CHOI_THU_1_MAY.html) (~2.29 MB) tích hợp trọn vẹn Arwes styles và Decrypt engine, kiểm thử tự động 100% Pass.
+
+---
+
 ## [3.0.0] - 2026-11-05
 
 ### Added & Completed (Phase 3 – Hoàn Thiện Báo Cáo Biện Pháp GVG Chuẩn 3 Trang Word)
