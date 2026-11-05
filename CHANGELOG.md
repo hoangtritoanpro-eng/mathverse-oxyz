@@ -9,6 +9,15 @@ Tất cả những thay đổi quan trọng của dự án này sẽ được gh
 
 ---
 
+## [3.3.1] - 2026-11-06
+
+### Fixed (Global Character SVGs Scope Definition)
+- **Sửa Lỗi `CHAR_EXPLORER_SVG is not defined`:**
+  - Chuyển toàn bộ các khai báo hằng số đồ họa `CHAR_*_SVG` (Cung thủ, Pháp sư, Hiệp sĩ, Rồng boss, Quái vật, Nhà thám hiểm) lên đầu file `public/app.js` ngay sau `'use strict'`, đảm bảo phạm vi toàn cục (Global Scope) trước khi các hàm render màn hình khởi động hoặc mê cung được gọi.
+  - Tái biên dịch file chạy thử offline [CHOI_THU_1_MAY.html](file:///c:/Users/ADMIN/Downloads/ggvdg%20duyen/MATHVERSE_OXYZ_MINIGAMES/CHOI_THU_1_MAY.html) (~2.31 MB), kiểm thử toàn diện 100% Pass.
+
+---
+
 ## [3.3.0] - 2026-11-06
 
 ### Added & Overhauled (High-Detail Character Artworks & Vector Animations)
