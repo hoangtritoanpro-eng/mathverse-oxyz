@@ -10,6 +10,31 @@ Tất cả những thay đổi quan trọng của dự án này sẽ được gh
 
 ---
 
+## [2.12.0] - 2026-11-05
+
+### Added & Overhauled (Complete 5 Interactive Stage Games & Unified Quick Navigation)
+- **Hoàn Thiện Toàn Diện 5 Game Tương Tác Độc Lập Cho 5 Chặng Toán 12 Oxyz:**
+  - **Chặng 1 – 🗺️ SĂN KHO BÁU 2D (Quần Đảo Rừng Vectơ - Island Explorer RPG):**
+    - Tọa độ vectơ $\overrightarrow{AB} = (x_B-x_A; y_B-y_A; z_B-z_A)$ qua 3 Đền Cổ ($Ox, Oy, Oz$).
+    - Hỗ trợ tự lái bằng **WASD / Phím mũi tên / D-Pad / Chạm bản đồ**, đồng thời bổ sung nút **`🏃 Tự chạy tới Đền`** và tự động mở Cuộn Giấy Chiến Đấu khi chạm vào Đền đang mở. Vượt đủ 3 Đền nhận mảnh số **`3`**.
+  - **Chặng 2 – 🏰 THỦ THÀNH CHIẾN THUẬT 3 LÀN (Pháo Đài Vuông Góc - Real-time Castle Defense):**
+    - Tích vô hướng $\vec{u}\cdot\vec{v}$ và điều kiện hai vectơ vuông góc $\vec{u}\perp\vec{v} \Leftrightarrow \vec{u}\cdot\vec{v} = 0$.
+    - Cập nhật `initCastleForStage` tự động triệu hồi đội quân quái vật + Boss mới ngay khi chuyển qua Đợt 1, Đợt 2, Đợt 3; kết hợp 3 Anh Hùng bắn tự động 60fps, 4 Kỹ năng thời tiết, 4 Nâng cấp Vàng và khai hỏa **Đại Bác Laser Oxyz** nhận mảnh số **`0`**.
+  - **Chặng 3 – 🧟 CHẶN ZOMBIE 4 LÀN (Tháp Pha Lê Khoảng Cách - Zombie Defense chuẩn GiaoVienDoiMoi):**
+    - Độ dài vectơ $|\vec{u}|$ và khoảng cách hai điểm $AB$ qua 5 câu hỏi thu thập 5 mảnh cổ tự `P - H - A - L - E`.
+    - Tách biệt luồng phản hồi trực tiếp trên 4 làn cỏ: bắn trúng Zombie hiện hiệu ứng ngã gục + nhận mảnh Rune; bắn sai hiện thanh gợi ý công thức NOVA ngay trên HUD; hoàn thành đủ 5 câu tự động mở **📜 Bàn Giải Mã Cổ Tự `PHALE`** nhận mảnh số **`5`**.
+  - **Chặng 4 – 🌀 MÊ CUNG TỌA ĐỘ Ô VUÔNG (Mê Cung Trung Điểm - Interactive 2-Column Coordinate Grid Maze):**
+    - Tọa độ trung điểm $M$, trọng tâm tam giác $G$ và điểm đối xứng qua 5 Trạm tọa độ thu thập 5 mảnh `T - R - U - N - G`.
+    - Nâng cấp giao diện 2 Cột trực quan: Cột trái hiển thị đề bài, 4 nút chọn đáp án tọa độ `A, B, C, D` và cụm phím D-Pad; Cột phải là bàn cờ mê cung $9\times 7$ có trục $Ox, Oy$ với thuật toán tìm đường thông minh (BFS) giúp nhân vật tự bước qua các ô không có tường tới Cổng Dịch Chuyển. Ghép mã `TRUNG` nhận mảnh số **`2`**.
+  - **Chặng 5 – 💣 DÒ MÌN BÃI CỎ & 🐲 ĐẠI CHIẾN BOSS CUỐI (Thành Trì Lời Trí Tuệ):**
+    - **Giai đoạn 1 (5 Câu Dò Mìn Bãi Cỏ chuẩn GiaoVienDoiMoi):** Chú lính chạy bộ đa hướng tới đáp án trên bãi cỏ; nếu đạp phải mìn nổ BÙM rung màn hình và văng lùi về vị trí xuất phát `(50%, 82%)`; nếu đúng nhận mảnh cổ ngữ `B - A - O - V - E`.
+    - **Giai đoạn 2 (Ghép mã `BAOVE` & Đấu Trường Boss 500 HP):** Kích hoạt Lá Chắn Thành Trì và hiển thị trực tiếp **Bảng Điều Khiển Đại Pháo Laser Oxyz** ngay trên màn hình đấu Boss ($\vec{w} = 2\vec{u} + \vec{v}, |\vec{w}| = \sqrt{33}$) để kết liễu Boss Bóng Đen và nhận mảnh số **`4`**.
+- **Thanh Chuyển Nhanh 5 Chặng Game & Đồng Bộ Offline:**
+  - Hiển thị thanh **🎮 Chuyển nhanh 5 Game Tương Tác** và cho phép nhấp trực tiếp vào 5 Hòn Đảo trên cả bản Server LAN (`http://localhost:3000`) và bản Offline ([CHOI_THU_1_MAY.html](file:///c:/Users/ADMIN/Downloads/ggvdg%20duyen/MATHVERSE_OXYZ_MINIGAMES/CHOI_THU_1_MAY.html)).
+  - Kiểm thử tự động toàn trình `scratch/test_all_5_stages.js` và `scratch/test_standalone_flow.js` đạt 100% Pass.
+
+---
+
 ## [2.11.0] - 2026-11-03
 
 ### Fixed & Enhanced (Full Authentic Minesweeper & Error Hardening)

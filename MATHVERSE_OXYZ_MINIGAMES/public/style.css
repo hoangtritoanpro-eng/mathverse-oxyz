@@ -1209,3 +1209,11 @@
   background: #dc2626;
   border-color: #fee2e2;
 }
+
+/* CHẶNG 4: NÚT ĐÁP ÁN MÊ CUNG TỌA ĐỘ */
+.maze-ans-btn:hover {
+  border-color: #0d9488 !important;
+  background: #f0fdfa !important;
+  transform: translateX(4px);
+  box-shadow: 0 4px 12px rgba(13, 148, 136, 0.2);
+}
