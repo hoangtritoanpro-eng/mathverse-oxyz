@@ -9,6 +9,24 @@ Tất cả những thay đổi quan trọng của dự án này sẽ được gh
 
 ---
 
+## [3.2.0] - 2026-11-05
+
+### Added & Upgraded (Magictools Game UI, Kenney 3D Tactile Buttons & Particle Juice Engine)
+- **Khai Thác Kho Tàng Magictools Đột Phá Giao Diện Mathverse Oxyz:**
+  - **Kenney UI 3D Tactile Buttons:**
+    - Toàn bộ nút bấm `.button` (Primary, Gold, Teal, Red, Gray) và `.hw-btn-hud` được nâng cấp hiệu ứng 3D khối: viền nổi 5px, highlight gradient mặt trên, và hiệu ứng thụt xuống màn hình (`transform: translateY(3px)`) khi nhấn chuột tạo cảm giác cơ học xúc giác chân thực.
+    - Nút đáp án mê cung `.maze-ans-btn` có hiệu ứng đổ bóng nổi 3D và đổi màu teal phát sáng khi rê chuột.
+  - **Hệ Thống Chữ Nổi & Combo (Floating Combat Text - FCT):**
+    - Tự động xuất hiện chữ nổi bay lượn bezier với hiệu ứng hào quang: `+20 XP ⭐`, `+240 🪙`, `COMBO x3 🔥`, `−1 💔` khi học sinh thực hiện các thao tác toán học trong game.
+  - **Động Cơ Hiệu Ứng Pháo Hoa & Hạt Năng Lượng (Canvas Particle Confetti System):**
+    - Tích hợp động cơ hạt vật lý 60fps thuần trên HTML5 Canvas: phun trào 55–110 mảnh pháo hoa đa sắc (sao vàng, kim cương, hạt rune lấp lánh) khi chinh phục thành công mỗi chặng và khi giải mã mở rương kho báu cuối.
+  - **Huy Hiệu Phân Vai Nhóm Rực Rỡ (Role Badges):**
+    - Bộ huy hiệu chuyên biệt: $Ox$ (Sky Blue), $Oy$ (Neon Purple), $Oz$ (Amber Gold), Đội trưởng (Emerald).
+  - **Đồng bộ hóa sang CHOI_THU_1_MAY.html:**
+    - Rebuild bản offline đơn file (~2.30 MB), kiểm thử toàn bộ 5 chặng đạt 100% Pass.
+
+---
+
 ## [3.1.0] - 2026-11-05
 
 ### Added & Integrated (Arwes Futuristic Sci-Fi UI, Decrypt Engine & Audio Bleeps)

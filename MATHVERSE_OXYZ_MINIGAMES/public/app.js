@@ -2565,6 +2565,135 @@ function studentScreen(){
 }
 
 
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   MAGICTOOLS GAME JUICE & PARTICLE SYSTEM (Inspired by magictools)
+   ═══════════════════════════════════════════════════════════════════════════ */
+(function() {
+  window.spawnJuiceFloater = function(text, type = 'xp', x = null, y = null) {
+    try {
+      const el = document.createElement('div');
+      el.className = 'game-juice-floater ' + type;
+      el.textContent = text;
+      
+      const posX = (x !== null) ? x : (window.innerWidth / 2 + (Math.random() - 0.5) * 60);
+      const posY = (y !== null) ? y : (window.innerHeight * 0.42 + (Math.random() - 0.5) * 40);
+      
+      el.style.left = posX + 'px';
+      el.style.top = posY + 'px';
+      
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), 1100);
+    } catch (e) {
+      console.warn('Juice floater error:', e);
+    }
+  };
+
+  let pCanvas = null;
+  let pCtx = null;
+  let particles = [];
+  let animId = null;
+
+  function ensureCanvas() {
+    if (!pCanvas) {
+      pCanvas = document.getElementById('juiceParticleCanvas');
+      if (!pCanvas) {
+        pCanvas = document.createElement('canvas');
+        pCanvas.id = 'juiceParticleCanvas';
+        document.body.appendChild(pCanvas);
+      }
+      pCtx = pCanvas.getContext('2d');
+      resize();
+      window.addEventListener('resize', resize);
+    }
+  }
+
+  function resize() {
+    if (pCanvas) {
+      pCanvas.width = window.innerWidth;
+      pCanvas.height = window.innerHeight;
+    }
+  }
+
+  window.spawnConfettiParticles = function(originX = null, originY = null, count = 55) {
+    try {
+      ensureCanvas();
+      const x = (originX !== null) ? originX : (window.innerWidth / 2);
+      const y = (originY !== null) ? originY : (window.innerHeight * 0.35);
+      const colors = ['#f59e0b', '#38bdf8', '#4ade80', '#ec4899', '#a855f7', '#fbbf24', '#00f8ff', '#f43f5e'];
+
+      for (let i = 0; i < count; i++) {
+        const angle = (Math.random() * Math.PI * 2);
+        const speed = Math.random() * 9 + 4;
+        particles.push({
+          x, y,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed - 5,
+          size: Math.random() * 8 + 4,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          rotation: Math.random() * 360,
+          vr: (Math.random() - 0.5) * 14,
+          shape: Math.random() > 0.4 ? 'rect' : 'circle',
+          alpha: 1,
+          life: 0,
+          maxLife: 70 + Math.random() * 30
+        });
+      }
+
+      if (!animId) loop();
+    } catch (e) {
+      console.warn('Particle error:', e);
+    }
+  };
+
+  function loop() {
+    if (!particles.length) {
+      if (pCtx && pCanvas) pCtx.clearRect(0, 0, pCanvas.width, pCanvas.height);
+      animId = null;
+      return;
+    }
+
+    pCtx.clearRect(0, 0, pCanvas.width, pCanvas.height);
+
+    for (let i = particles.length - 1; i >= 0; i--) {
+      const p = particles[i];
+      p.x += p.vx;
+      p.y += p.vy;
+      p.vy += 0.36; // gravity
+      p.vx *= 0.98; // air drag
+      p.rotation += p.vr;
+      p.life++;
+
+      if (p.life > p.maxLife * 0.6) {
+        p.alpha -= 0.035;
+      }
+
+      if (p.alpha <= 0 || p.y > pCanvas.height + 25) {
+        particles.splice(i, 1);
+        continue;
+      }
+
+      pCtx.save();
+      pCtx.translate(p.x, p.y);
+      pCtx.rotate((p.rotation * Math.PI) / 180);
+      pCtx.globalAlpha = Math.max(0, p.alpha);
+      pCtx.fillStyle = p.color;
+
+      if (p.shape === 'rect') {
+        pCtx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 0.65);
+      } else {
+        pCtx.beginPath();
+        pCtx.arc(0, 0, p.size / 2, 0, Math.PI * 2);
+        pCtx.fill();
+      }
+
+      pCtx.restore();
+    }
+
+    animId = requestAnimationFrame(loop);
+  }
+})();
+
 /* ═══════════════════════════════════════════════════════════════════════════
    ARWES DECRYPT / CIPHER TEXT ANIMATION ENGINE (Inspired by @arwes/text)
    ═══════════════════════════════════════════════════════════════════════════ */
@@ -2916,6 +3045,14 @@ async function submitStageAnswer(payload){
 
  if(result.correct){
   const now=performance.now();
+  if(window.spawnJuiceFloater){
+    window.spawnJuiceFloater('+20 XP ⭐', 'xp');
+    if(result.goldEarned) window.spawnJuiceFloater('+' + result.goldEarned + ' 🪙', 'gold');
+    if(result.streak && result.streak >= 2) window.spawnJuiceFloater('COMBO x' + result.streak + ' 🔥', 'combo');
+  }
+  if(window.spawnConfettiParticles && (result.stageFinished || result.cipherReady)){
+    window.spawnConfettiParticles(window.innerWidth / 2, window.innerHeight * 0.35, 65);
+  }
   if(m?.id === 2 || gType === 'defense'){
    sound('laser');
    cdState.laserUntil=now+750;
