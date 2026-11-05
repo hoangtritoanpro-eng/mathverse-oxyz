@@ -10,6 +10,19 @@ Tất cả những thay đổi quan trọng của dự án này sẽ được gh
 
 ---
 
+## [2.13.0] - 2026-11-05
+
+### Added (Chặng 3 – Zombie tiến công khi bắn trượt)
+- **Zombie bò dần về hàng rào:** 4 zombie liên tục tiến từ phải sang trái theo thời gian thực (vòng lặp 60fps `zdTick`), tạo áp lực thời gian cho đội; khi chạm hàng rào sẽ đập rào (`zd-bash`).
+- **Bắn trượt → zombie tăng tốc & lao tới cắn xạ thủ:**
+  - Zombie mang đáp án sai gầm lên, chạy nước rút (tăng tốc dần) vượt qua hàng rào và lao thẳng tới xạ thủ trong ~1 giây.
+  - Khi chạm: xạ thủ bị cắn (giật lùi, chớp đỏ), sân rung, tiếng nổ, nhãn `🧟 ZOMBIE ĐÃ LAO TỚI CẮN! −1 KHIÊN 💔`; sau đó zombie bị đẩy về điểm xuất phát để đội trả lời lại.
+  - Cả bầy chạy nước rút ×7 trong 1,5 giây, và tốc độ nền tăng thêm 60% sau mỗi lần trượt (hiển thị `🧟 Tốc độ zombie x1.6, x2.2…` trên HUD). Tốc độ đặt lại khi sang câu mới.
+- Đạn bay tới đúng vị trí hiện tại của zombie; zombie được dựng ở tầng sân chơi để có thể vượt hàng rào và đè lên xạ thủ.
+- Đồng bộ vào `CHOI_THU_1_MAY.html`; thêm `scratch/test_zd_charge.js` kiểm thử logic.
+
+---
+
 ## [2.12.0] - 2026-11-05
 
 ### Added & Overhauled (Complete 5 Interactive Stage Games & Unified Quick Navigation)

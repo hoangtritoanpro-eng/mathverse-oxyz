@@ -988,28 +988,31 @@ function renderZombieWalkingSVG(){
    ═══════════════════════════════════════════════════════════════════════════ */
 async function shootZombieLane(laneIdx){
   if(zdState.shooting || busy) return;
-  const isReady = Boolean(world?.current?.cipherReady || world?.me?.cipherReady);
+  const m = world?.current;
+  const isReady = Boolean(m?.cipherReady || world?.me?.cipherReady);
   if(isReady){
     cipherState.open = true;
     cipherState.error = null;
     render();
     return;
   }
+  if(m) zdEnsureRound(m);
   zdState.lane = laneIdx;
   zdState.shooting = true;
   zdState.hintMsg = null;
   zdState.rewardMsg = null;
+  zdState.firedAt = performance.now();
   sound('laser');
   render();
 
   try{
     const res = await submitStageAnswer({choice: laneIdx});
-    zdState.hitLane = laneIdx;
-    zdState.hitType = res?.correct ? 'hit' : 'miss';
-    playZdSound(zdState.hitType);
-
     if(res?.correct){
-      const piece = res.cipherPiece || world?.current?.challenge?.cipherPiece || '';
+      zdState.hitLane = laneIdx;
+      zdState.hitType = 'hit';
+      zdState.lanes[laneIdx].dead = true;
+      playZdSound('hit');
+      const piece = res.cipherPiece || m?.challenge?.cipherPiece || '';
       zdState.rewardMsg = `💥 TIÊU DIỆT ZOMBIE! +${res.goldEarned||120} VÀNG ${piece ? '· NHẬN MẢNH [' + piece + ']' : ''}`;
       render();
       setTimeout(()=>{
@@ -1026,44 +1029,156 @@ async function shootZombieLane(laneIdx){
     }else{
       if(world?.me && res?.health !== undefined) world.me.health = res.health;
       zdState.hintMsg = res?.hint || 'Hãy kiểm tra lại công thức độ dài AB = √((xB-xA)² + (yB-yA)² + (zB-zA)²) nhé!';
+      playZdSound('miss');
+      zdStartCharge(laneIdx);
       render();
-      setTimeout(()=>{
-        zdState.shooting = false;
-        zdState.hitLane = null;
-        zdState.hitType = null;
-        render();
-      }, 520);
     }
   }catch(err){
-    zdState.hitLane = laneIdx;
-    zdState.hitType = 'miss';
     playZdSound('miss');
-    setTimeout(()=>{
-      zdState.shooting = false;
-      zdState.hitLane = null;
-      zdState.hitType = null;
-      render();
-    }, 520);
+    zdStartCharge(laneIdx);
+    render();
   }
 }
 
+/* ─── CƠ CHẾ ZOMBIE TIẾN CÔNG: BÒ DẦN VỀ HÀNG RÀO, BẮN TRƯỢT → TĂNG TỐC & LAO TỚI CẮN NGƯỜI CHƠI ─── */
+const ZD_BASE_SPEED = 0.012;   // tiến độ/giây khi bò chậm (≈ 80 giây mới chạm hàng rào)
+const ZD_SPEED_STEP = 0.6;     // mỗi lần bắn trượt: tốc độ nền tăng thêm 60%
+const ZD_RUSH_MULT = 7;        // hệ số chạy nước rút của cả bầy ngay sau khi bắn trượt
+const ZD_RUSH_MS = 1500;
+const ZD_CHARGE_MS = 1000;     // thời gian zombie bị bắn trượt lao từ vị trí hiện tại tới người chơi
+
+function zdFreshLanes(){
+  return [0,1,2,3].map(()=>({s:0, s0:0, charging:false, chargeStart:0, impacted:false, dead:false, respawn:false}));
+}
+
+function zdEnsureRound(m){
+  const key = m.id + '-' + m.round;
+  if(zdState.roundKey !== key || !zdState.lanes){
+    zdState.roundKey = key;
+    zdState.lanes = zdFreshLanes();
+    zdState.speedLevel = 0;
+    zdState.rushUntil = 0;
+    zdState.playerHitUntil = 0;
+    zdState.biteMsg = null;
+  }
+}
+
+/* s ∈ [0,1]: từ điểm xuất phát bên phải → sát hàng rào; s ∈ [1,2]: vượt hàng rào → chạm người chơi */
+function zdLeftCss(s){
+  const a = Math.min(1, Math.max(0, s));
+  const b = Math.max(0, Math.min(1, s - 1));
+  return `calc((100% - 313px) * ${(1 - a).toFixed(4)} + ${(112 * a - 92 * b).toFixed(1)}px)`;
+}
+
+function zdSpeedMult(){
+  return 1 + ZD_SPEED_STEP * (zdState.speedLevel || 0);
+}
+
+function zdStartCharge(laneIdx){
+  if(!zdState.lanes) zdState.lanes = zdFreshLanes();
+  const now = performance.now();
+  const L = zdState.lanes[laneIdx];
+  zdState.speedLevel = (zdState.speedLevel || 0) + 1;
+  zdState.rushUntil = now + ZD_RUSH_MS;
+  L.charging = true;
+  L.impacted = false;
+  L.respawn = false;
+  L.s0 = L.s;
+  L.chargeStart = now;
+  sound('boss_roar');
+}
+
+function zdImpact(laneIdx){
+  const now = performance.now();
+  zdState.playerHitUntil = now + 850;
+  zdState.biteMsg = '🧟 ZOMBIE ĐÃ LAO TỚI CẮN! −1 KHIÊN 💔';
+  try{
+    const a = new Audio('/sounds/sfx/explosion.mp3');
+    a.volume = 0.55;
+    a.play().catch(()=>{});
+  }catch(e){}
+  sound('wrong');
+  const gun = document.getElementById('zdGunner');
+  if(gun){ gun.classList.remove('hurt'); void gun.offsetWidth; gun.classList.add('hurt'); }
+  const board = document.getElementById('zdBoard');
+  if(board){ board.classList.remove('shake'); void board.offsetWidth; board.classList.add('shake'); }
+
+  setTimeout(()=>{
+    const L = zdState.lanes?.[laneIdx];
+    if(L){
+      // Zombie bị đẩy lùi về điểm xuất phát để đội làm lại câu hỏi
+      L.charging = false;
+      L.impacted = false;
+      L.s = 0;
+      L.respawn = true;
+    }
+    zdState.shooting = false;
+    zdState.biteMsg = null;
+    render();
+    setTimeout(()=>{ if(L) L.respawn = false; }, 600);
+  }, 900);
+}
+
+function zdTick(now, dt, m){
+  zdEnsureRound(m);
+  if(m.cipherReady || world.me?.cipherReady || cipherState.open || world.paused) return;
+  const rushing = now < (zdState.rushUntil || 0);
+  const speed = ZD_BASE_SPEED * zdSpeedMult() * (rushing ? ZD_RUSH_MULT : 1);
+  zdState.lanes.forEach((L, i)=>{
+    if(L.dead) return;
+    if(L.charging){
+      const t = Math.min(1, (now - L.chargeStart) / ZD_CHARGE_MS);
+      L.s = L.s0 + (2 - L.s0) * t * t; // tăng tốc dần (ease-in) khi lao tới
+      if(t >= 1 && !L.impacted){
+        L.impacted = true;
+        zdImpact(i);
+      }
+    }else{
+      L.s = Math.min(1, L.s + speed * dt);
+    }
+    const el = document.getElementById('zdUnit' + i);
+    if(el){
+      el.style.left = zdLeftCss(L.s);
+      el.classList.toggle('rushing', rushing || L.charging);
+      el.classList.toggle('charging', L.charging);
+      el.classList.toggle('at-fence', !L.charging && L.s >= 0.999);
+    }
+  });
+  const spd = document.getElementById('zdSpeedPill');
+  if(spd) spd.textContent = `🧟 Tốc độ zombie x${zdSpeedMult().toFixed(1)}`;
+}
+
 function renderZombieDefenseGame(m){
+  zdEnsureRound(m);
   const r = m.round;
   const q = m.challenge;
   const isReady = Boolean(m.cipherReady || world.me?.cipherReady);
   const laneLabels = ['A', 'B', 'C', 'D'];
   const opts = q.options || ['?', '?', '?', '?'];
   const health = Math.max(0, Math.min(3, world.me?.health ?? 3));
+  const now = performance.now();
+  const rushing = now < (zdState.rushUntil || 0);
+  const playerHurt = now < (zdState.playerHitUntil || 0);
+  const firing = now - (zdState.firedAt || 0) < 320;
 
   const lanesHtml = [0, 1, 2, 3].map(i => {
     const isAimed = (zdState.lane === i);
-    const isHit = (zdState.hitLane === i);
-    const hitClass = isHit ? (zdState.hitType === 'hit' ? 'dying' : 'dying-wrong') : '';
-
     return `<div class="zd-lane ${i%2 ? 'odd' : 'even'} ${isAimed ? 'aimed' : ''}" style="top:${i*25}%;" data-action="shootZombieLane" data-lane="${i}">
      <span class="zd-lane-key">${laneLabels[i]}</span>
-     
-     <div class="zd-unit ${hitClass}" data-action="shootZombieLane" data-lane="${i}" title="Bấm để bắn Zombie mang đáp án ${laneLabels[i]}">
+    </div>`;
+  }).join('');
+
+  const unitsHtml = [0, 1, 2, 3].map(i => {
+    const L = zdState.lanes[i];
+    const isHit = (zdState.hitLane === i && zdState.hitType === 'hit');
+    const cls = [
+      isHit ? 'dying' : '',
+      (rushing || L.charging) ? 'rushing' : '',
+      L.charging ? 'charging' : '',
+      (!L.charging && L.s >= 0.999) ? 'at-fence' : '',
+      L.respawn ? 'respawn' : ''
+    ].join(' ');
+    return `<div class="zd-unit ${cls}" id="zdUnit${i}" style="top:calc(${i*25}% + 12.5%);left:${zdLeftCss(L.s)}" data-action="shootZombieLane" data-lane="${i}" title="Bấm để bắn Zombie mang đáp án ${laneLabels[i]}">
       <div class="zd-zombie"></div>
       <div class="zd-flag">
        <div class="zd-flag-rope"></div>
@@ -1076,14 +1191,12 @@ function renderZombieDefenseGame(m){
         </div>
        </div>
       </div>
-      ${isHit ? `
-       <div class="zd-pop ${zdState.hitType==='hit'?'hit':'miss'}">
-        ${zdState.hitType==='hit' ? '💥 CHÍNH XÁC! +XP' : '❌ CHƯA ĐÚNG!'}
-       </div>
-      ` : ''}
-     </div>
-    </div>`;
+      ${isHit ? `<div class="zd-pop hit">💥 CHÍNH XÁC! +XP</div>` : ''}
+      ${L.charging ? `<div class="zd-pop miss">❌ TRƯỢT! ZOMBIE LAO TỚI!</div>` : ''}
+     </div>`;
   }).join('');
+
+  const aimL = zdState.lanes[zdState.lane] || {s:0};
 
   return `<div class="zd-player-wrap">
    <div class="zd-hud">
@@ -1094,6 +1207,7 @@ function renderZombieDefenseGame(m){
     <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
      <span class="zd-hud-score">⭐ ${world.me?.score||0} XP · 🪙 ${world.me?.gold||120}</span>
      <span title="Khiên bảo vệ">${'💖'.repeat(health)}${'🖤'.repeat(Math.max(0,3-health))}</span>
+     <span class="pill ${zdState.speedLevel ? 'red' : 'purple'}" id="zdSpeedPill" style="font-size:12px">🧟 Tốc độ zombie x${zdSpeedMult().toFixed(1)}</span>
      <span class="pill purple" style="font-size:12px">Câu ${Math.min(r+1, m.totalRounds)}/${m.totalRounds}</span>
      <button type="button" class="hw-btn-hud ${isReady?'alert':''}" data-action="openCipherNotebook">
       📜 SỔ MẬT THƯ (${Math.min(r,5)}/5 MẢNH)
@@ -1107,7 +1221,7 @@ function renderZombieDefenseGame(m){
    </div>
 
    ${zdState.rewardMsg ? `<div style="background:linear-gradient(90deg,#15803d,#22c55e);color:#fff;padding:8px 16px;font-weight:900;text-align:center;font-size:14px">🎉 ${esc(zdState.rewardMsg)}</div>` : ''}
-   ${zdState.hintMsg ? `<div style="background:linear-gradient(90deg,#991b1b,#dc2626);color:#fff;padding:8px 16px;font-weight:800;text-align:center;font-size:13px">💡 Chưa trúng đích! Gợi ý từ NOVA: ${esc(zdState.hintMsg)}</div>` : ''}
+   ${zdState.hintMsg ? `<div style="background:linear-gradient(90deg,#991b1b,#dc2626);color:#fff;padding:8px 16px;font-weight:800;text-align:center;font-size:13px">💡 Bắn trượt – zombie đã tăng tốc! Gợi ý từ NOVA: ${esc(zdState.hintMsg)}</div>` : ''}
 
    <div class="zd-field">
     <div class="zd-header-band">
@@ -1117,19 +1231,22 @@ function renderZombieDefenseGame(m){
      </div>
     </div>
 
-    <div class="zd-lanes-board">
+    <div class="zd-lanes-board" id="zdBoard">
+     ${lanesHtml}
+
      <div class="zd-fence"></div>
 
-     <div class="zd-gunner" style="top:calc(${zdState.lane * 25}% + 12px);">
-      <img src="/images/zombie-defense/gunner.png" alt="Gunner" class="zd-gunner-img ${zdState.shooting ? 'recoil' : ''}">
-      ${zdState.shooting ? '<div class="zd-g-muzzle"></div>' : ''}
+     <div class="zd-gunner ${playerHurt ? 'hurt' : ''}" id="zdGunner" style="top:calc(${zdState.lane * 25}% + 12px);">
+      <img src="/images/zombie-defense/gunner.png" alt="Gunner" class="zd-gunner-img ${firing ? 'recoil' : ''}">
+      ${firing ? '<div class="zd-g-muzzle"></div>' : ''}
+      ${zdState.biteMsg ? `<div class="zd-bite-pop">${esc(zdState.biteMsg)}</div>` : ''}
      </div>
 
-     ${zdState.shooting ? `
-      <div class="zd-bullet" style="top:calc(${zdState.lane * 25}% + 44px);"></div>
+     ${firing ? `
+      <div class="zd-bullet" style="top:calc(${zdState.lane * 25}% + 44px);--zd-target:calc(${zdLeftCss(Math.min(1, aimL.s))} + 20px);"></div>
      ` : ''}
 
-     ${lanesHtml}
+     ${unitsHtml}
 
      ${isReady ? `
       <div style="position:absolute;inset:0;background:rgba(15,23,42,0.78);backdrop-filter:blur(4px);z-index:35;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:20px;text-align:center">
@@ -1146,7 +1263,7 @@ function renderZombieDefenseGame(m){
 
    <div class="zd-botbar">
     <div>
-     ⌨️ <b>Điều khiển:</b> Nhấp chuột trực tiếp vào Zombie (A / B / C / D) hoặc dùng phím <b>W / S</b> (<b>↑ / ↓</b>) chọn làn + <b>Space / Enter</b> để bắn!
+     ⌨️ <b>Điều khiển:</b> Nhấp chuột vào Zombie (A / B / C / D) hoặc phím <b>W / S</b> (<b>↑ / ↓</b>) chọn làn + <b>Space / Enter</b> để bắn! ⚠️ Bắn trượt: zombie <b>tăng tốc</b> và <b>lao tới cắn</b> xạ thủ!
     </div>
     <div>
      ${isReady ? `
@@ -3402,6 +3519,7 @@ function gameLoop(now){
  if(session?.role==='student'&&world?.current&&!world.paused&&!world.me?.completed&&world.me?.stage<5){
   const m=world.current;
   const mode = (m.id === 2) ? 'defense' : (m.id === 1 ? 'hunt' : m.gameType);
+   if(m.id === 3 && document.getElementById('zdBoard')) zdTick(now, dt, m);
 
   if(mode==='hunt'&&!huntState.battleOpen&&$('#hwViewport')){
    let vx=0,vy=0;
