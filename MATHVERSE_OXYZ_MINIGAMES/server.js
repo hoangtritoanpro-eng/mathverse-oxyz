@@ -51,11 +51,13 @@ function getTeamChallenges(s,team){
 }
 
 function seedDefaultRoom(){
+ const now=Date.now();
  ROOMS['123456']={
   id:'123456',
   teacherToken:'DEMO_GV',
   createdAt:new Date().toISOString(),
   paused:false,
+  ended:false,
   clock:{minutes:6,remainingMs:6*60*1000,running:false,startedAt:0},
   teams:TEAM_POOL.slice(0,6).map((t,i)=>({
    ...t,
@@ -67,7 +69,10 @@ function seedDefaultRoom(){
    completed:false,finishedAt:null,
    attempts:[0,0,0,0,0],hintsUsed:[false,false,false,false,false],digits:[],
    stagePicks:rollStagePicks(),
-   correctCount:0
+   correctCount:0,
+   answerLog:[],
+   lastActiveAt:now,
+   stageEnteredAt:now
   })),
   events:[{at:new Date().toISOString(),text:'Rồng Xanh đã mở sẵn phòng 123456 (Thời lượng 6 phút, 6 đội, mã PIN 1111 → 6666).'}]
  };
@@ -80,11 +85,48 @@ function ensureTeamFields(t){
  if(t.heroLevel===undefined)t.heroLevel=1;
  if(t.streak===undefined)t.streak=0;
  if(t.correctCount===undefined)t.correctCount=0;
+ if(!Array.isArray(t.answerLog))t.answerLog=[];
+ if(!t.lastActiveAt)t.lastActiveAt=Date.now();
+ if(!t.stageEnteredAt)t.stageEnteredAt=Date.now();
  if(!t.upgrades)t.upgrades={damage:1,speed:1,hp:1,regen:1};
  if(!t.stagePicks||!Array.isArray(t.stagePicks)||t.stagePicks.length<5){
   t.stagePicks=rollStagePicks();
  }
  return t;
+}
+
+function computePedagogicalStats(room){
+ let nbCorrect=0,nbTotal=0,thCorrect=0,thTotal=0;
+ const qMap={};
+ STAGES.forEach(s=>{
+  (s.questionBank||[]).forEach(q=>{
+   qMap[q.id]={id:q.id,stage:s.id,level:s.id<=3?'NHẬN BIẾT':'THÔNG HIỂU',prompt:q.prompt,correctCount:0,totalCount:0,pct:null};
+  });
+ });
+ (room.teams||[]).forEach(t=>{
+  (t.answerLog||[]).forEach(entry=>{
+   if(entry.stage<=3){
+    nbTotal++;
+    if(entry.correct)nbCorrect++;
+   }else{
+    thTotal++;
+    if(entry.correct)thCorrect++;
+   }
+   if(entry.qId&&qMap[entry.qId]){
+    qMap[entry.qId].totalCount++;
+    if(entry.correct)qMap[entry.qId].correctCount++;
+   }
+  });
+ });
+ const byQuestion=Object.values(qMap).map(q=>({
+  ...q,
+  pct:q.totalCount>0?Math.round((q.correctCount/q.totalCount)*100):null
+ }));
+ return {
+  nhanBiet:{correct:nbCorrect,total:nbTotal,pct:nbTotal>0?Math.round((nbCorrect/nbTotal)*100):0},
+  thongHieu:{correct:thCorrect,total:thTotal,pct:thTotal>0?Math.round((thCorrect/thTotal)*100):0},
+  byQuestion
+ };
 }
 
 function publicStage(s,round,team){
@@ -127,23 +169,34 @@ function teacherStage(s){
 
 function roomState(room,token){
  const teacher=token===room.teacherToken;
+ const isDisplay=token==='DISPLAY';
  const team=room.teams.find(t=>t.token===token);
- if(!teacher&&!team)throw error('Mã truy cập không hợp lệ.',403);
+ if(!teacher&&!isDisplay&&!team)throw error('Mã truy cập không hợp lệ.',403);
  room.teams.forEach(ensureTeamFields);
+ const now=Date.now();
  const teams=room.teams.map(t=>({id:t.id,name:t.name,avatar:t.avatar,color:t.color,
   stage:t.stage,round:t.round,score:t.score,bonus:t.bonus,health:t.health,wrong:t.wrong,
   gold:t.gold,heroLevel:t.heroLevel,streak:t.streak||0,correctCount:t.correctCount||0,upgrades:t.upgrades,
   cipherReady:Boolean(t.cipherReady),bossReady:Boolean(t.bossReady),
-  completed:t.completed,finishedAt:t.finishedAt,attempts:teacher?t.attempts:undefined,
-  hintsUsed:teacher?t.hintsUsed:undefined,digits:teacher?t.digits:undefined}));
+  completed:t.completed,finishedAt:t.finishedAt,
+  online:Boolean((now-(t.lastActiveAt||0))<15*60*1000),
+  stuckSec:Math.floor((now-(t.stageEnteredAt||now))/1000),
+  attempts:teacher?t.attempts:undefined,
+  hintsUsed:teacher?t.hintsUsed:undefined,
+  digits:teacher?t.digits:undefined,
+  answerLog:teacher?(t.answerLog||[]):undefined}));
  const elapsed=room.clock.running?Date.now()-room.clock.startedAt:0;
  const clock={running:room.clock.running,remainingMs:Math.max(0,room.clock.remainingMs-elapsed),minutes:room.clock.minutes};
- const base={room:room.id,role:teacher?'teacher':'student',teams,paused:room.paused,clock,
+ const base={room:room.id,role:teacher?'teacher':(isDisplay?'display':'student'),teams,paused:room.paused,ended:Boolean(room.ended),clock,
   stages:STAGES.map(x=>({id:x.id,title:x.title,subtitle:x.subtitle||'',shortName:x.shortName||x.place,place:x.place,icon:x.icon,sealIcon:x.sealIcon||'💠',levelBadge:x.levelBadge,timeSeconds:x.timeSeconds||60,tag:x.tag,time:x.time,biomeColor:x.biomeColor||'#3b82f6',item:x.item||'',gameType:x.gameType,defaultMode:x.defaultMode,totalRounds:3})),
   messageOptions:MESSAGE_OPTIONS,lastEvent:room.events.slice(-15).reverse(),
   createdAt:room.createdAt,joinBaseURL:`http://${LAN_IP}:${PORT}`};
+ if(isDisplay)return base;
  if(teacher)return {...base,teamCodes:Object.fromEntries(room.teams.map(t=>[t.id,t.code])),
-   teacherToken:room.teacherToken,missions:STAGES.map(teacherStage),cipher:'30524',cipherWords:TOKEN_WORDS};
+   teacherToken:room.teacherToken,missions:STAGES.map(teacherStage),
+   pedagogicalStats:computePedagogicalStats(room),
+   cipher:'30524',cipherWords:TOKEN_WORDS};
+ team.lastActiveAt=now;
  const cur=STAGES[team.stage];return {...base,me:{id:team.id,name:team.name,avatar:team.avatar,color:team.color,
   stage:team.stage,round:team.round,health:team.health,wrong:team.wrong,score:team.score,bonus:team.bonus,
   gold:team.gold,heroLevel:team.heroLevel,streak:team.streak||0,correctCount:team.correctCount||0,upgrades:team.upgrades,
@@ -164,9 +217,10 @@ function processAction(endpoint,d){
  if(endpoint==='/api/create'){
   let size=Number(d.teamCount||6);if(!Number.isInteger(size)||size<4||size>8)throw error('Chọn 4–8 đội.');
   let roomId;do{roomId=String(100000+crypto.randomInt(900000));}while(ROOMS[roomId]);
-  const r={id:roomId,teacherToken:rnd(),createdAt:new Date().toISOString(),paused:false,
+  const now=Date.now();
+  const r={id:roomId,teacherToken:rnd(),createdAt:new Date().toISOString(),paused:false,ended:false,
     clock:{minutes:6,remainingMs:6*60*1000,running:false,startedAt:0},
-    teams:TEAM_POOL.slice(0,size).map((t,i)=>({...t,id:'doi-'+(i+1),code:String(1000+crypto.randomInt(9000)),token:rnd(16),stage:0,round:0,health:3,wrong:0,score:0,bonus:0,gold:120,heroLevel:1,upgrades:{damage:1,speed:1,hp:1,regen:1},completed:false,finishedAt:null,attempts:[0,0,0,0,0],hintsUsed:[false,false,false,false,false],digits:[],stagePicks:rollStagePicks(),correctCount:0})),events:[]};
+    teams:TEAM_POOL.slice(0,size).map((t,i)=>({...t,id:'doi-'+(i+1),code:String(1000+crypto.randomInt(9000)),token:rnd(16),stage:0,round:0,health:3,wrong:0,score:0,bonus:0,gold:120,heroLevel:1,upgrades:{damage:1,speed:1,hp:1,regen:1},completed:false,finishedAt:null,attempts:[0,0,0,0,0],hintsUsed:[false,false,false,false,false],digits:[],stagePicks:rollStagePicks(),correctCount:0,answerLog:[],lastActiveAt:now,stageEnteredAt:now})),events:[]};
   emit(r,'Rồng Xanh đã tạo phòng '+roomId+' (6 phút) với '+size+' đội.');ROOMS[roomId]=r;persist();return{room:roomId,teacherToken:r.teacherToken};
  }
  const r=getRoom(d);
@@ -174,6 +228,7 @@ function processAction(endpoint,d){
   const t=r.teams.find(t=>t.id===d.team&&t.code===String(d.code||'').trim());
   if(!t)throw error('Sai mã đội hoặc mã phòng. Hãy hỏi giáo viên.',403);
   ensureTeamFields(t);
+  t.lastActiveAt=Date.now();
   return{token:t.token,room:r.id,team:t.id};
  }
  if(endpoint==='/api/state')return roomState(r,d.token);
@@ -182,29 +237,33 @@ function processAction(endpoint,d){
   const stg=Math.max(0,Math.min(5,Number(d.stage)||0));
   t.stage=stg;t.round=0;t.health=3;t.completed=false;
   t.cipherReady=false;t.bossReady=false;
+  t.stageEnteredAt=Date.now();
   t.digits=STAGES.slice(0,stg).map((s,idx)=>({stage:idx+1,digit:s.digit,rule:s.digitRule,item:s.item}));
   t.score=stg*20;
   persist();return{ok:true};
  }
  if(endpoint==='/api/stageTimeout'){
   const t=requireTeam(r,d.token);
-  if(t.stage<5){
+  if(t.stage<5&&!r.paused&&!r.ended){
    const s=STAGES[t.stage];
    emit(r,`⏱️ ${t.avatar} ${t.name} đã hết thời gian tại Chặng ${t.stage+1} (${s.place}), tự động chuyển sang chặng tiếp theo.`);
-   t.stage++;t.round=0;t.health=3;
+   t.stage++;t.round=0;t.health=3;t.stageEnteredAt=Date.now();
    if(t.stage>=5)t.completed=true;
    persist();
   }
   return{ok:true,nextStage:t.stage};
  }
  if(endpoint==='/api/answer'){
-  const t=requireTeam(r,d.token);if(r.paused)throw error('Giáo viên đang tạm dừng trò chơi.');
+  const t=requireTeam(r,d.token);
+  if(r.ended)throw error('Lượt thi đã kết thúc.');
+  if(r.paused)throw error('Giáo viên đang tạm dừng trò chơi.');
   if(t.completed||t.stage>=5)throw error('Đội đã vượt qua 5 chặng, hãy khôi phục Tâm Thạch Vectơ.');
   const idx=t.stage,s=STAGES[idx];
   const chList=getTeamChallenges(s,t);
   const round=t.round;
   const q=chList[round]||chList[chList.length-1];
   if(Number(d.stage)!==idx||Number(d.round)!==round)throw error('Nhiệm vụ vừa thay đổi, hãy nạp lại màn hình để tiếp tục.');
+  t.lastActiveAt=Date.now();
   let isCorrect=false;
   if(q.isInteractive && d.interactiveDone){
    isCorrect=true;
@@ -219,6 +278,16 @@ function processAction(endpoint,d){
    if(!Number.isInteger(choice)||choice<0||choice>3)throw error('Vui lòng chọn một đáp án rồi nhấn Xác nhận.');
    isCorrect=(choice===q.correct);
   }
+  if(!q.isInteractive){
+   t.answerLog.push({
+    stage:idx+1,
+    qId:q.id||`${idx+1}.${round}`,
+    level:idx<3?'NHẬN BIẾT':'THÔNG HIỂU',
+    choice:Number(d.choice),
+    correct:isCorrect,
+    at:new Date().toISOString()
+   });
+  }
   if(isCorrect){
    t.streak=(t.streak||0)+1;
    if(!q.isInteractive)t.correctCount=(t.correctCount||0)+1;
@@ -232,6 +301,7 @@ function processAction(endpoint,d){
     pts+=stageBonus;
     t.score+=stageBonus;
     t.stage++;t.round=0;t.health=3;t.gold+=100;
+    t.stageEnteredAt=Date.now();
     t.heroLevel=Math.min(6,(t.heroLevel||1)+1);
     digit=s.digit;
     t.digits.push({stage:idx+1,digit:s.digit,rule:s.digitRule,item:s.item});
@@ -258,19 +328,24 @@ function processAction(endpoint,d){
   return{correct:false,streak:0,hint,tries:attempt,health:t.health,gold:t.gold};
  }
  if(endpoint==='/api/hint'){
-  const t=requireTeam(r,d.token);if(r.paused)throw error('Giáo viên đang tạm dừng trò chơi.');
+  const t=requireTeam(r,d.token);
+  if(r.ended)throw error('Lượt thi đã kết thúc.');
+  if(r.paused)throw error('Giáo viên đang tạm dừng trò chơi.');
   if(t.stage>=5)throw error('Đã hoàn thành năm chặng.');
   const i=t.stage,s=STAGES[i];
   const chList=getTeamChallenges(s,t);
   const q=chList[t.round]||chList[0];
   t.hintsUsed[i]=true;
+  t.lastActiveAt=Date.now();
   const level=Number(d.level)||1;
   const hintIndex=Math.max(0,Math.min(level-1,(q.hints||[]).length-1));
   emit(r,`${t.avatar} ${t.name} nhận gợi ý từ Rồng Xanh ở chặng ${i+1}.`);persist();
   return{hint:(q.hints&&q.hints[hintIndex])||s.dragonIntro,level:hintIndex+1,totalLevels:(q.hints||[]).length||1};
  }
  if(endpoint==='/api/final'){
-  const t=requireTeam(r,d.token);if(r.paused)throw error('Giáo viên đang tạm dừng trò chơi.');
+  const t=requireTeam(r,d.token);
+  if(r.ended)throw error('Lượt thi đã kết thúc.');
+  if(r.paused)throw error('Giáo viên đang tạm dừng trò chơi.');
   if(t.stage<5)throw error('Hãy hoàn thành 5 chặng trước.');
   if(t.completed)throw error('Đội đã khôi phục Tâm Thạch Vectơ rồi!');
   const code=String(d.code||'30524').replace(/\s/g,'');const choice=Number(d.choice??0);
@@ -290,10 +365,31 @@ function processAction(endpoint,d){
     t.score+=b-t.bonus;t.bonus=b;emit(r,`GV ghi nhận ${t.name}: ${b} điểm hợp tác.`);
   }else if(action==='pause'){
     r.paused=!r.paused;if(r.paused)clockPause(r);emit(r,r.paused?'Giáo viên đã tạm dừng nhiệm vụ.':'Các nhiệm vụ tiếp tục hoạt động.');
+  }else if(action==='startContest'){
+    r.ended=false;r.paused=false;
+    if(!r.clock.running){
+     if(r.clock.remainingMs<=0)r.clock.remainingMs=r.clock.minutes*60*1000;
+     r.clock.startedAt=Date.now();
+     r.clock.running=true;
+    }
+    emit(r,'🚀 Giáo viên đã BẮT ĐẦU lượt thi Hành Trình Giải Cứu Lục Địa OXYZ (6 phút)!');
+  }else if(action==='pauseContest'){
+    r.paused=true;clockPause(r);
+    emit(r,'⏸ Giáo viên đã TẠM DỪNG lượt thi và đóng băng đồng hồ chủ.');
+  }else if(action==='resumeContest'){
+    r.ended=false;r.paused=false;
+    if(!r.clock.running&&r.clock.remainingMs>0){
+     r.clock.startedAt=Date.now();
+     r.clock.running=true;
+    }
+    emit(r,'▶ Giáo viên đã TIẾP TỤC lượt thi.');
+  }else if(action==='endContest'){
+    r.ended=true;r.paused=false;clockPause(r);
+    emit(r,'🏁 Giáo viên đã KẾT THÚC lượt thi và công bố bảng tổng kết!');
   }else if(action==='timer'){
-    if(d.value==='start'){if(!r.clock.running){r.clock.startedAt=Date.now();r.clock.running=true;}}
+    if(d.value==='start'){r.ended=false;r.paused=false;if(!r.clock.running){r.clock.startedAt=Date.now();r.clock.running=true;}}
     else if(d.value==='pause'){clockPause(r);}
-    else if(d.value==='reset'){r.clock.running=false;r.clock.remainingMs=r.clock.minutes*60*1000;r.clock.startedAt=0;}
+    else if(d.value==='reset'){r.ended=false;r.paused=false;r.clock.running=false;r.clock.remainingMs=r.clock.minutes*60*1000;r.clock.startedAt=0;}
     else if(Number.isInteger(Number(d.value))&&[6,10,15,35,40,45,50].includes(Number(d.value))){clockPause(r);r.clock.minutes=Number(d.value);r.clock.remainingMs=r.clock.minutes*60*1000;}
     else throw error('Tác vụ đồng hồ không hợp lệ.');
   }else if(action==='broadcast'){
@@ -308,7 +404,8 @@ function processAction(endpoint,d){
     emit(r,`✨ GIÁO VIÊN THƯỞNG NÓNG +5 XP VÀ +50 VÀNG CHO TOÀN BỘ CÁC ĐỘI!`);
   }else if(action==='resetTeam'){
     const t=r.teams.find(t=>t.id===d.team);if(!t)throw error('Không tìm thấy đội.');
-    t.stage=0;t.round=0;t.health=3;t.wrong=0;t.score=0;t.bonus=0;t.gold=120;t.heroLevel=1;t.completed=false;t.finishedAt=null;t.attempts=[0,0,0,0,0];t.hintsUsed=[false,false,false,false,false];t.digits=[];t.stagePicks=rollStagePicks();t.correctCount=0;
+    const now=Date.now();
+    t.stage=0;t.round=0;t.health=3;t.wrong=0;t.score=0;t.bonus=0;t.gold=120;t.heroLevel=1;t.completed=false;t.finishedAt=null;t.attempts=[0,0,0,0,0];t.hintsUsed=[false,false,false,false,false];t.digits=[];t.stagePicks=rollStagePicks();t.correctCount=0;t.answerLog=[];t.lastActiveAt=now;t.stageEnteredAt=now;
     emit(r,`GV đã khởi động lại hành trình của ${t.name} (chọn ngẫu nhiên bộ câu hỏi mới).`);
   }else throw error('Tác vụ không được hỗ trợ.');
   persist();return{ok:true};
@@ -331,7 +428,7 @@ const server=http.createServer((req,res)=>{
   req.on('end',()=>{try{const d=JSON.parse(content||'{}');const result=processAction(pathname,d);send(res,200,result);}catch(e){send(res,e.status||400,{error:e.message||'Đã có lỗi xảy ra.'});}});return;
  }
  if(req.method!=='GET')return send(res,405,'Method not allowed','text/plain');
- if(pathname.startsWith('/images/') || pathname.startsWith('/sounds/')){
+ if(pathname.startsWith('/images/') || pathname.startsWith('/sounds/') || pathname.startsWith('/assets/')){
   const safeRel=path.normalize(pathname).replace(/^(\.\.[\/\\])+/, '').replace(/^[\\\/]+/, '');
   const filePath=path.join(PUBLIC,safeRel);
   fs.readFile(filePath,(err,buf)=>{

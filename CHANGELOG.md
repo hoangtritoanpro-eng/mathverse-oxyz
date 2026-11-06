@@ -9,6 +9,29 @@ Tất cả những thay đổi quan trọng của dự án này sẽ được gh
 
 ---
 
+## [4.2.0] - 2026-11-06
+
+### Added & Upgraded (Màn Hình Học Sinh Minimal Fantasy RPG & Màn Hình Giáo Viên Trung Tâm Chỉ Huy + Trình Chiếu)
+- **Tích hợp bộ tài nguyên hình ảnh chuẩn hóa vào `public/assets/` (`RongXanh.png`, `Stage_01_Rung_Vecto.png` .. `Stage_05_Thanh_Tri.png`):**
+  - Tự động đổi ảnh nền cảnh chơi theo đúng chặng hiện tại (`Stage_01` → `Stage_05`) và hiển thị linh vật Rồng Xanh (`RongXanh.png`) xuyên suốt màn hình học sinh.
+- **Nâng cấp Màn Hình Học Sinh theo chuẩn Minimal Fantasy RPG (`03_PROMPT_MAN_HINH_HOC_SINH.md` & `01_Giao_dien_hoc_sinh_1920x1080.png`):**
+  - **Top Bar tối giản (58px):** Icon kim cương + `MATHVERSE OXYZ`, thanh chọn chế độ (`SĂN KHO BÁU 2D`, `THỦ THÀNH`, `3D OXYZ`, `BẢN ĐỒ LỤC ĐỊA`), đồng hồ tổng 6 phút, pill `Đội: <Tên thật>`, `<Vàng thật> VÀNG`, và cụm nút âm thanh/toàn màn hình/cài đặt.
+  - **Thanh Bản Đồ 5 Chặng (88px):** 5 thẻ gọn (`01 Hiệu vectơ`, `02 Tổng vectơ`, `03 Hình bình hành`, `04 Trung điểm`, `05 Trọng tâm`) kèm nhãn mức độ (`NHẬN BIẾT` / `THÔNG HIỂU`), trạng thái mở khóa/hoàn thành và tooltip công thức khi di chuột.
+  - **Khung Tương Tác Chính (Chiếm ~72% diện tích) + Cột Phụ Phải (~28%):**
+    - Bên trái: Sơ đồ hình học vectơ SVG tương tác trực tiếp với mũi tên toán học trên mọi ký hiệu vectơ (`svgVecLabel`) và dấu `?` trên vectơ cần tìm để tuyệt đối không làm lộ đáp án trước khi nộp; Khung câu hỏi đơn với 3 nút đáp án lớn `A`, `B`, `C`, hiển thị đầy đủ dấu mũi tên trên đầu mọi ký hiệu vectơ kể cả vectơ-không ($\vec{0}$), và nút vàng `XÁC NHẬN` (tự động khóa khi chưa chọn đáp án).
+    - Thanh đáy gọn: `ẤN VECTƠ` (5 ô) | `Chìa khóa: X/3` | `Đội 4 thành viên · Đang thảo luận` cùng nút mở ngăn kéo `Nhiệm vụ` và `Kiến thức 3D`.
+    - Cột phải 3 thẻ gọn: `TÚI ẤN VECTƠ` (5 ô), `TIẾN TRÌNH ĐỘI` (`X/5 ấn`, thanh tiến độ, XP & Hạng), và `RỒNG XANH ĐỒNG HÀNH` (bong bóng thoại 1 câu + ảnh `RongXanh.png` + nút `GỢI Ý TỪ RỒNG XANH`).
+- **Xây dựng Màn Hình Giáo Viên – Trung Tâm Chỉ Huy & Chế Độ Trình Chiếu Lớp Học (`04_PROMPT_MAN_HINH_GIAO_VIEN.md` & `02_Giao_dien_giao_vien_1920x1080.png`):**
+  - **Header Chỉ Huy:** Logo `MATHVERSE OXYZ` | `TRUNG TÂM CHỈ HUY · GIÁO VIÊN` | `PHÒNG <mã phòng>` + badge trạng thái `LIVE` / `TẠM DỪNG` / `KẾT THÚC`.
+  - **4 Thẻ KPI Thời Gian Thực:** `ĐỘI ĐANG CHƠI`, `CHẶNG HIỆN TẠI`, `CÂU ĐÚNG TOÀN LỚP`, `THỜI GIAN CÒN LẠI` (đồng bộ đồng hồ chủ 360 giây).
+  - **Thanh Hành Trình 5 Chặng & Bảng Xếp Hạng Trực Tiếp:** Hiển thị `Hạng`, `Đội chơi`, `Chặng`, thanh `Tiến độ`, số câu `Đúng` (`X/10`), `XP` và thanh tóm tắt đáy (`Trực tuyến · Đang trả lời · Cần hỗ trợ`). Nhấn vào từng đội mở Modal Chi Tiết Từng Đội (nhật ký từng câu trả lời, thời gian, lịch sử dùng gợi ý, cộng điểm thưởng hợp tác).
+  - **Thống Kê Sư Phạm Theo Mức Độ (`computePedagogicalStats`):** Tự động tổng hợp tỷ lệ trả lời đúng thực tế cho nhóm **NHẬN BIẾT** (Chặng 1–3) và **THÔNG HIỂU** (Chặng 4–5) theo công thức `số câu đúng / tổng số câu đã trả lời hợp lệ`, kèm bảng chi tiết 15 câu (`1.1`–`5.3`) và cảnh báo đội cần hỗ trợ.
+  - **6 Nút Điều Khiển Lượt Thi Có Phân Quyền (`RBAC`):** `BẮT ĐẦU`, `TẠM DỪNG`, `TIẾP TỤC`, `TRÌNH CHIẾU`, `CHI TIẾT TỪNG ĐỘI`, `KẾT THÚC` (có hộp thoại xác nhận trước khi kết thúc sớm).
+  - **Chế Độ Trình Chiếu Lớp Học (`?view=display` / `token: 'DISPLAY'`):** Giao diện máy chiếu chuyên biệt trên bảng lớn, ẩn hoàn toàn đáp án, mã PIN và nút điều khiển của giáo viên.
+- **Đồng bộ Bản Chơi Thử Độc Lập (`CHOI_THU_1_MAY.html`):** Đóng gói lại toàn bộ giao diện v4.2 cho phép chạy trực tiếp trên 1 máy không cần server.
+
+---
+
 ## [4.1.0] - 2026-11-06
 
 ### Added & Integrated (Tích Hợp Toàn Bộ Bộ Ảnh Nhân Vật Rồng Xanh, Giao Diện Mở Đầu & Cảnh Nền 5 Chặng)

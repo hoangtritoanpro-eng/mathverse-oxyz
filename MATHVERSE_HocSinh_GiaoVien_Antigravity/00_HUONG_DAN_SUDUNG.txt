@@ -1,0 +1,16 @@
+MATHVERSE OXYZ — BỘ THIẾT KẾ GIAO DIỆN CHO ANTIGRAVITY
+
+01_Giao_dien_hoc_sinh_1920x1080.png: ảnh mẫu giao diện học sinh.
+02_Giao_dien_giao_vien_1920x1080.png: ảnh mẫu giao diện giáo viên.
+03_PROMPT_MAN_HINH_HOC_SINH.md: câu lệnh triển khai màn hình học sinh.
+04_PROMPT_MAN_HINH_GIAO_VIEN.md: câu lệnh triển khai màn hình giáo viên.
+assets/RongXanh.png: linh vật đã dựng.
+assets/Stage_*.png: nền 5 chặng.
+
+Cách dùng:
+1. Mở dự án MATHVERSE OXYZ hiện có trong Antigravity.
+2. Đưa hai ảnh mẫu và thư mục assets vào workspace, sử dụng các file prompt tương ứng.
+3. Yêu cầu Antigravity phân tích dự án trước khi chỉnh sửa; tuyệt đối không thay HTML bằng một ảnh chụp giao diện.
+4. Triển khai giao diện học sinh trước, rồi giáo viên và màn trình chiếu; kiểm tra đồng bộ phòng và đồng hồ.
+
+Lưu ý: Ảnh giao diện và các chỉ số nhìn thấy trong ảnh là minh họa, không phải giao diện lập trình có thể bấm được.

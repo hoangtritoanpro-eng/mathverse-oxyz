@@ -35,6 +35,7 @@ Tài liệu này quản lý lộ trình tổng thể của dự án theo quy tr�
   - [x] Tích hợp **Mô phỏng Hình học Không gian 3D Oxyz Hologram (`renderOxyz3D`)**: Hệ trục tọa độ 3 chiều $Ox, Oy, Oz$, mặt phẳng lưới đáy $Oxy$, đường gióng tọa độ trực quan và các nút tương tác 3D xoay ngang (`↺/↻`), đổi góc nghiêng (`📐`) giúp học sinh hình dung không gian 3 chiều ngay trong câu hỏi.
   - [x] Thiết kế **Bản đồ Lục địa 5 Chặng Oxyz (`world-journey-map`)** với 5 hòn đảo nổi, hệ thống sao đánh giá (`⭐⭐⭐`), biểu tượng vật phẩm và cho phép học sinh nhấn vào đảo để xem trước hoặc chuyển nhanh chặng.
   - [x] Nút **⛶ Toàn màn hình** tiện lợi cho trình chiếu lớp học và đồng bộ trọn vẹn sang `CHOI_THU_1_MAY.html`.
+  - [x] Nâng cấp toàn diện **Màn Hình Học Sinh Minimal Fantasy RPG (`v4.2`)** & **Màn Hình Giáo Viên Trung Tâm Chỉ Huy + Trình Chiếu Lớp Học (`?view=display`)** theo đúng bộ đặc tả `MATHVERSE_HocSinh_GiaoVien_Antigravity` (tích hợp `/assets/RongXanh.png`, `/assets/Stage_01..05.png`, ký hiệu mũi tên vectơ $\vec{AB}, \vec{0}$ trên cả HTML và SVG, thống kê sư phạm `NHẬN BIẾT` / `THÔNG HIỂU` thời gian thực và 6 nút điều khiển có phân quyền).
 
 ### Phase 3: Hoàn thiện Báo Cáo Biện Pháp (Word 3 trang) `[x]`
 - **Mục tiêu:** Điền và hoàn chỉnh file `Bien phap gop phan nang cao chat luong DH.docx` theo đúng mẫu và quy định của nhà trường (tối đa 3 trang).
