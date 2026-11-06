@@ -345,7 +345,16 @@ let showRolesModal = false;
 let questDialogue = null;
 let currentHintLevel = 0;
 
-let mvBriefingCollapsed = false;
+let mvBriefingCollapsed = true;
+let mvSidebarCollapsed = false;
+const SHORT_STAGE_NAMES = ['Hiệu vectơ', 'Tổng vectơ', 'Hình bình hành', 'Trung điểm', 'Trọng tâm'];
+const STAGE_FORMULAS_SHORT = [
+  'vectơ AB = (xB − xA; yB − yA; zB − zA)',
+  'u · v = x1·x2 + y1·y2 + z1·z2 (Vuông góc ⇔ u · v = 0)',
+  'ABCD là hình bình hành ⇔ vectơ AB = vectơ DC; Độ dài AB = √(Δx² + Δy² + Δz²)',
+  'Trung điểm M = ((xA+xB)/2; (yA+yB)/2; (zA+zB)/2)',
+  'Trọng tâm G = ((xA+xB+xC)/3; (yA+yB+yC)/3; (zA+zB+zC)/3)'
+];
 
 const CHAR_GREEN_DRAGON_MASCOT_SVG = `<svg viewBox="0 0 140 130" class="mv-dragon-mascot" xmlns="http://www.w3.org/2000/svg">
   <defs>
@@ -679,42 +688,39 @@ function layout(content){
  const isStudent = session?.role === 'student';
  const meName = world?.me?.name || (session?.role === 'teacher' ? 'Giáo Viên' : 'Khách');
  const meAvatar = world?.me?.avatar || (session?.role === 'teacher' ? '👩‍🏫' : '🧑‍🚀');
+ const goldVal = (world?.me?.gold ?? 120).toLocaleString('vi-VN');
+ const xpVal = (world?.me?.score ?? 0).toLocaleString('vi-VN');
+ const lvVal = world?.me?.heroLevel ?? 1;
+
  return `<nav class="navbar mv-topnav">
-  <div class="mv-brand" data-action="scrollTop" title="MATHVERSE OXYZ – Trang chủ hành trình">
-   <span class="mv-brand-emblem">
-    <svg viewBox="0 0 36 36" width="34" height="34" xmlns="http://www.w3.org/2000/svg">
-     <polygon points="18,2 34,18 18,34 2,18" fill="rgba(26,182,181,0.25)" stroke="#1AB6B5" stroke-width="2"/>
-     <polygon points="18,6 22,14 30,18 22,22 18,30 14,22 6,18 14,14" fill="#A5F3FC"/>
-     <circle cx="18" cy="18" r="3" fill="#FEF08A"/>
-    </svg>
-   </span>
+  <div class="mv-brand" data-action="scrollTop" title="MATHVERSE OXYZ">
+   <span class="mv-brand-dragon">${CHAR_GREEN_DRAGON_MASCOT_SVG}</span>
    <span>MATHVERSE <span class="mv-brand-oxyz">OXYZ</span></span>
   </div>
   <div class="mv-nav-center">
-   <button type="button" class="mv-nav-pill" data-action="toggleBriefing" title="Chương trình Toán 12 GDPT 2018 – Nhiệm vụ chặng">
-    🎓 TOÁN 12 (GDPT 2018)
+   <button type="button" class="mv-nav-pill ${isStudent && stg === 0 ? 'gold-active' : ''}" ${isStudent ? 'data-action="demoJumpStage" data-stage="0"' : 'data-action="scrollTop"'} title="Chế độ Săn Kho Báu 2D">
+    🗺️ 2D
    </button>
-   <button type="button" class="mv-nav-pill ${isStudent && stg === 0 ? 'gold-active' : ''}" ${isStudent ? 'data-action="demoJumpStage" data-stage="0"' : 'data-action="scrollTop"'} title="Chế độ Săn Kho Báu 2D trên bản đồ">
-    🗺️ SĂN KHO BÁU 2D
+   <button type="button" class="mv-nav-pill ${isStudent && (stg === 1 || stg === 2) ? 'gold-active' : ''}" ${isStudent ? 'data-action="demoJumpStage" data-stage="1"' : 'data-action="scrollTop"'} title="Chế độ Thủ Thành Chiến Thuật">
+    🏰 Thủ thành
    </button>
-   <button type="button" class="mv-nav-pill ${isStudent && (stg === 1 || stg === 2) ? 'gold-active' : ''}" ${isStudent ? 'data-action="demoJumpStage" data-stage="1"' : 'data-action="scrollTop"'} title="Chế độ Thủ Thành & Phòng Thủ Chiến Thuật">
-    🏰 THỦ THÀNH
-   </button>
-   <button type="button" class="mv-nav-pill ${oxyz3D.open ? 'cyan-active' : ''}" data-action="toggle3DPanel" title="Bật/Tắt Mô hình Không gian 3D Oxyz">
-    🧊 3D OXYZ
+   <button type="button" class="mv-nav-pill ${oxyz3D.open ? 'cyan-active' : ''}" data-action="toggle3DPanel" title="Mô hình Không gian 3D Oxyz & Công thức">
+    🧊 3D Oxyz
    </button>
   </div>
   <div class="mv-nav-right">
-   <button type="button" class="mv-icon-btn" data-action="toggleSound" title="${soundEnabled ? 'Âm thanh: Đang Bật (Nhấn để tắt)' : 'Âm thanh: Đang Tắt (Nhấn để bật)'}">${soundEnabled ? '🔊' : '🔇'}</button>
-   <button type="button" class="mv-icon-btn" data-action="toggleFullscreen" title="Chế độ Toàn màn hình">⛶</button>
-   ${isStudent ? `<button type="button" class="mv-icon-btn" data-action="demoTeacher" title="Chuyển sang Màn hình Giáo viên">👩‍🏫</button>` : ''}
-   ${session ? `<button type="button" class="mv-icon-btn" data-action="home" title="Đổi màn hình / Đăng nhập lại">⌂</button>` : ''}
-   <div class="mv-user-pill" title="Đội chơi / Tài khoản hiện tại">
-    <span class="mv-user-avatar">${meAvatar}</span>
-    <span>${esc(meName)}</span>
-   </div>
+   ${session ? `<span class="mv-top-team" title="Đội chơi · Phòng ${esc(world?.room || '')}"><span>${meAvatar}</span><span>${esc(meName)}</span></span>` : ''}
+   ${isStudent && world?.me ? `<div class="mv-top-resources">
+    <span title="Vàng của đội">🪙 <b id="topGoldBadge">${goldVal}</b></span>
+    <span class="mv-sep">|</span>
+    <span title="Điểm kinh nghiệm & Cấp độ">⭐ <b>${xpVal} XP</b> <small>Lv.${lvVal}</small></span>
+   </div>` : ''}
+   <button type="button" class="mv-icon-btn" data-action="toggleSound" title="${soundEnabled ? 'Âm thanh: Đang Bật' : 'Âm thanh: Đang Tắt'}">${soundEnabled ? '🔊' : '🔇'}</button>
+   <button type="button" class="mv-icon-btn" data-action="toggleFullscreen" title="Toàn màn hình">⛶</button>
+   ${isStudent ? `<button type="button" class="mv-icon-btn" data-action="demoTeacher" title="Màn hình Giáo viên">👩‍🏫</button>` : ''}
+   ${session ? `<button type="button" class="mv-icon-btn" data-action="openSettingsModal" title="Cài đặt & Đổi màn hình">⚙️</button>` : ''}
   </div>
- </nav>${content}<div class="footer">MathVerse Oxyz – Hệ thống Game Tương Tác Nhóm & Mô phỏng 3D Không Gian Oxyz • Trường THPT Số 1 Phan Chu Trinh</div>`;
+ </nav>${content}`;
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -741,13 +747,7 @@ function renderOxyz3D(m, forceOpen=false){
  };
  const hlAxis=m.challenge?.highlightAxis||'all';
  if(!oxyz3D.open && !forceOpen){
-  return `<div class="oxyz-compact-bar">
-   <div style="display:flex;align-items:center;gap:8px">
-    <span class="oxyz-compact-tag">🧊 3D OXYZ</span>
-    <span style="font-size:12.5px;font-weight:900;color:#e0f2fe">${esc(v3.title)} · <b style="color:#fde047">${esc(v3.formula||'')}</b></span>
-   </div>
-   <button type="button" class="oxyz-btn" data-action="toggle3DPanel">👁️ Mở Mô hình 3D Oxyz Tra Cứu</button>
-  </div>`;
+  return '';
  }
  const O=project3DPoint(0,0,0);
  const X=project3DPoint(4.6,0,0);
@@ -1111,39 +1111,33 @@ function startScreen(msg=''){
 }
 
 function mapTrack(stage){
- const curRound = world?.me?.round || 0;
- return `<div class="world-journey-map mv-islands-wrap" style="background:none;border:0;padding:0;margin:0;display:block">
-  <svg class="mv-light-path-svg" viewBox="0 0 1000 60" preserveAspectRatio="none">
-   <path class="mv-energy-line-glow" d="M 60 32 Q 180 8, 300 32 T 520 30 T 740 32 T 940 28" />
-   <path class="mv-energy-line-core" d="M 60 32 Q 180 8, 300 32 T 520 30 T 740 32 T 940 28" />
+ return `<div class="world-journey-map mv-journey-bar">
+  <svg class="mv-light-path-svg" viewBox="0 0 1000 20" preserveAspectRatio="none">
+   <line class="mv-energy-line-glow" x1="50" y1="10" x2="950" y2="10" />
+   <line class="mv-energy-line-core" x1="50" y1="10" x2="950" y2="10" />
   </svg>
   <div class="mv-islands-grid">
    ${missionMeta.map((m, i) => {
     const state = stage === -1 ? 'current' : i < stage ? 'done' : i === stage ? 'current' : 'locked';
-    const totalR = (world?.stages?.[i]?.totalRounds) || 3;
-    const filledStars = Math.max(0, Math.min(3, Math.round((curRound / totalR) * 3)));
-    const starsHtml = (state === 'done' || stage === -1)
-     ? '<span class="mv-island-stars">⭐⭐⭐</span>'
-     : state === 'current'
-       ? `<span class="mv-island-stars">${'⭐'.repeat(Math.max(1, filledStars))}${'☆'.repeat(Math.max(0, 3 - Math.max(1, filledStars)))}</span>`
-       : '<span class="mv-island-lock" title="Chặng đang khóa – Hoàn thành chặng trước hoặc nhấn để khám phá">🔒</span>';
+    const shortName = SHORT_STAGE_NAMES[i] || m.sub;
+    const statusIcon = (state === 'done' || stage === -1) ? '✅' : state === 'current' ? '⭐' : '🔒';
     const clickAttr = session?.role === 'student'
      ? `data-action="demoJumpStage" data-stage="${i}"`
      : `data-action="preview3DStage" data-stage="${i}"`;
-    return `<div class="island-card mv-island-node ${state}" style="background:none;border:0;box-shadow:none;padding:2px" ${clickAttr}>
+    return `<div class="island-card mv-island-node ${state}" ${clickAttr}>
      <div class="mv-island-tooltip">
       <b style="color:#F2B94B">Chặng ${i + 1}: ${esc(m.place)}</b><br/>
-      <span>📐 Chủ đề: ${esc(m.sub)}</span><br/>
-      <span style="color:#67E8F9">🎮 Chế độ: ${esc(m.mode)}</span><br/>
-      <small style="color:${state === 'done' ? '#35C992' : state === 'current' ? '#FDE047' : '#94A3B8'}">${state === 'done' ? '✅ Đã chinh phục' : state === 'current' ? '⚔️ Đang chiến đấu (Nhấn để chơi)' : '🔒 Chưa mở khóa (Nhấn để chuyển nhanh)'}</small>
+      <span style="color:#A5F3FC">📐 ${esc(STAGE_FORMULAS_SHORT[i] || m.sub)}</span><br/>
+      <small style="color:#CBD5E1">🎮 ${esc(m.mode)}</small>
      </div>
-     ${state === 'current' ? '<div class="mv-island-pointer">▼</div>' : '<div style="height:18px"></div>'}
-     <div class="mv-island-art">${ISLAND_SVGS[i] || ISLAND_SVGS[0]}</div>
-     <div class="mv-island-plate">
-      <div class="mv-island-stage-num">${state === 'done' ? '✅ ' : ''}Chặng ${i + 1}</div>
-      <div class="mv-island-name">${esc(m.place)}</div>
-      <div class="mv-island-footer">${starsHtml}</div>
+     <div class="mv-island-left">
+      <div class="mv-island-art">${ISLAND_SVGS[i] || ISLAND_SVGS[0]}</div>
+      <div class="mv-island-info">
+       <span class="mv-island-num">Chặng ${i + 1}</span>
+       <strong class="mv-island-short">${esc(shortName)}</strong>
+      </div>
      </div>
+     <span class="mv-island-status">${statusIcon}</span>
     </div>`;
    }).join('')}
   </div>
@@ -1157,16 +1151,15 @@ function teacherMap(teams){
 function standings(teams,compact=false){
  const list=[...teams].sort((a,b)=>b.score-a.score||(b.stage-a.stage)||(b.round-a.round)||((a.finishedAt||'9999').localeCompare(b.finishedAt||'9999')));
  if(compact){
-  const topRows = list.slice(0, 4).map((t,i)=>{
-   const topCls = i===0 ? 'top-1' : i===1 ? 'top-2' : i===2 ? 'top-3' : '';
-   const medal = i===0 ? '🥇' : i===1 ? '🥈' : i===2 ? '🥉' : '🏅';
-   return `<div class="mini-rank mv-rank-row ${topCls}">
-    <span class="mv-rank-left"><span>${medal}</span><span>${t.avatar}</span><span class="mv-rank-name">${esc(t.name)}</span></span>
-    <strong class="mv-rank-xp">${t.score.toLocaleString('vi-VN')} XP</strong>
-   </div>`;
-  }).join('');
-  return `<div class="mv-rank-list">${topRows}</div>
-   <button type="button" class="mv-rank-more-btn" data-action="openFullLeaderboard">Xem đầy đủ bảng xếp hạng &gt;</button>`;
+  const meId = world?.me?.id;
+  const myIdx = Math.max(0, list.findIndex(t => t.id === meId));
+  const myTeam = list[myIdx] || world?.me || {name:'Đội 1', avatar:'🐉', score:0};
+  const rankNum = myIdx + 1;
+  const medal = rankNum === 1 ? '🥇' : rankNum === 2 ? '🥈' : rankNum === 3 ? '🥉' : '🏅';
+  return `<div class="mini-rank mv-my-rank-card" title="Nhấn 'Bảng đầy đủ' để xem toàn bộ lớp">
+   <span class="mv-my-rank-pos">${medal} Hạng #${rankNum} · ${esc(myTeam.name)}</span>
+   <span class="mv-my-rank-xp">${(myTeam.score || 0).toLocaleString('vi-VN')} XP</span>
+  </div>`;
  }
  return `<table class="result-table"><thead><tr><th>Hạng</th><th>Đội</th><th>Tiến độ Chặng</th><th>Vàng · Cấp · Combo</th><th>Điểm XP</th><th>Trạng thái</th></tr></thead><tbody>${list.map((t,i)=>`<tr><td>${i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1}</td><td>${t.avatar} <strong>${esc(t.name)}</strong></td><td><div class="mini-progress"><span style="width:${(t.stage*3+(t.stage<5?t.round:0))/15*100}%"></span></div><small>Chặng ${t.stage}/5 • ${t.stage<5?`lượt ${t.round+1}/3`:'Hoàn tất 5 chặng'}</small></td><td>🪙 ${t.gold??120} · Lv.${t.heroLevel??1} ${(t.streak||0)>=2?`<span class="pill pink">🔥x${t.streak}</span>`:''}</td><td><strong>${t.score} XP</strong></td><td>${t.completed?'<span class="pill green">🏆 Đã mở kho báu</span>':t.stage===5?'<span class="pill gold">🔐 Đang giải mật mã</span>':'⚔️ Đang chiến đấu'}</td></tr>`).join('')}</tbody></table>`;
 }
@@ -2519,21 +2512,7 @@ function renderHuntGame(m){
  }
 
  return `<div class="hw-wrapper">
-  <div class="hw-hud-top">
-   <div class="hw-hud-keys">
-    ${keySlots}
-    <div class="hw-key-slot ${r>=m.totalRounds?'earned':''}">🎁 Vật phẩm: <b>${esc(m.item||'Mảnh mật mã')}</b></div>
-   </div>
-   <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-    <button type="button" class="hw-btn-hud ${m.cipherReady?'alert':''}" data-action="openCipherNotebook">
-     📜 SỔ MẬT THƯ (${m.cipherReady?'SẴN SÀNG':'XEM MẢNH'})
-    </button>
-    <button type="button" class="hw-btn-hud" data-action="openTeamRoles">
-     🤝 PHÂN VAI NHÓM
-    </button>
-   </div>
-   <div class="hw-quick-nav">${trackerBadges}</div>
-  </div>
+
   <div class="hw-viewport" id="hwViewport">
    <div class="hw-compass">
     <span class="hw-compass-arrow" id="hwCompassArrow" style="transform:rotate(${angleDeg}deg)">➤</span>
@@ -2589,16 +2568,9 @@ function renderHuntGame(m){
      <button type="button" class="hw-sprint-btn ${huntState.isSprinting?'active':''}" data-action="toggleSprint" title="Bật/Tắt chạy nhanh (Shift)">⚡ ${huntState.isSprinting?'ĐANG CHẠY NHANH':'TĂNG TỐC'}</button>
     </div>
     <div class="hw-action-panel">
-     <button type="button" class="hw-attack-station-btn ${nearStation?'pulse-urgent':''}" data-action="openHuntBattle" style="${nearStation?'display:inline-flex':'display:none'}">⚔️ ĐÃ TỚI TRẠM ${r+1}! BẤM MỞ BÀI TOÁN (Space / E)</button>
-     <button type="button" class="hw-interact-btn" data-action="autoRunToStation" style="display:inline-flex;background:linear-gradient(135deg,#059669,#10b981)" title="Tự động chạy tới Đền mục tiêu">🏃 TỰ CHẠY TỚI ĐỀN ${r+1}</button><button type="button" class="hw-interact-btn" data-action="autoRunToStation" style="display:inline-flex;background:linear-gradient(135deg,#059669,#10b981)" title="Tự động chạy tới Đền mục tiêu">🏃 TỰ CHẠY TỚI ĐỀN ${r+1}</button><button type="button" class="hw-interact-btn" data-action="interactNearObject" style="display:inline-flex" title="Nhấn E để tương tác">✋ TƯƠNG TÁC (Phím E)</button>
-     <div class="hw-exploring-pill" style="${nearStation?'display:none':'display:flex'}">
-      <span class="hw-exploring-icon">🧭</span>
-      <div>
-       <div style="font-size:12px;font-weight:900;color:#fde047">Đang tự lái tìm Trạm ${r+1} · <span class="hw-exploring-dist">Còn ${Math.round(dist*1.5)}m</span></div>
-       <div style="font-size:10.5px;color:#bae6fd">Dùng WASD / Mũi tên hoặc chạm bản đồ để chạy đến Trạm!</div>
-      </div>
-     </div>
-     <div class="hw-hint-pill">💡 Lái nhân vật nhặt Vàng 🪙 và Tinh thể Oxyz 💎 trên đường chạy!</div>
+     <button type="button" class="hw-attack-station-btn ${nearStation?'pulse-urgent':''}" data-action="openHuntBattle" style="${nearStation?'display:inline-flex':'display:none'}">⚔️ MỞ CÂU ĐỐ TRẠM ${r+1} (E)</button>
+     <button type="button" class="hw-interact-btn" data-action="autoRunToStation" style="display:inline-flex;background:linear-gradient(135deg,#059669,#10b981)" title="Tự động chạy tới Trạm ${r+1}">▶ TỚI TRẠM ${r+1}</button>
+     <button type="button" class="hw-interact-btn" data-action="interactNearObject" style="display:inline-flex" title="Tương tác với Trạm hoặc Rương (Phím E)">✋ TƯƠNG TÁC (E)</button>
     </div>
    </div>
   </div>
@@ -3030,97 +3002,79 @@ function stageContent(m){
  const streak = world.me?.streak || 0;
  const totalR = m.totalRounds || 3;
  const curR = m.round || 0;
+ const shortTitle = SHORT_STAGE_NAMES[(m.id || 1) - 1] || m.place;
+
  const questTaskLabels = m.id === 1
   ? ['🔑 Thu thập chìa khóa X (dx)', '🔑 Thu thập chìa khóa Y (dy)', '🔑 Thu thập chìa khóa Z (dz)']
   : Array.from({length: totalR}, (_, idx) => {
-     const stName = m.huntMap?.stations?.[idx]?.name || m.allRounds?.[idx]?.label || ('Trạm thử thách ' + (idx + 1));
-     return `⚔️ Vượt ${stName}`;
+     const stName = m.huntMap?.stations?.[idx]?.name || m.allRounds?.[idx]?.label || ('Trạm ' + (idx + 1));
+     return `⚔️ ${stName}`;
     });
 
- const checklistHtml = questTaskLabels.map((lbl, idx) => {
-  const isDone = idx < curR;
-  return `<div class="mv-quest-item ${isDone ? 'done' : ''}">
-   <span class="mv-quest-check">${isDone ? '✓' : ''}</span>
-   <span>${esc(lbl)}</span>
-  </div>`;
- }).join('');
+ const drawerQuestHtml = !mvBriefingCollapsed ? `<div class="mv-drawer-panel">
+  <div class="flex-between">
+   <strong style="color:#FEF08A;font-size:13.5px">${m.icon} ${esc(m.title)} – ${esc(m.place)}</strong>
+   <button type="button" class="mv-chip-btn" data-action="toggleBriefing">✕ Đóng</button>
+  </div>
+  <p style="color:#CBD5E1;margin-top:4px;font-size:12px">${esc(m.story)}</p>
+  <div class="mv-drawer-grid">
+   <div class="mv-drawer-box">
+    <h4>🎯 Danh sách nhiệm vụ (${curR}/${totalR})</h4>
+    ${questTaskLabels.map((lbl, idx) => `<div style="padding:2px 0;color:${idx < curR ? '#35C992' : '#E2E8F0'}">${idx < curR ? '✅' : '▫️'} ${esc(lbl)}</div>`).join('')}
+   </div>
+   <div class="mv-drawer-box">
+    <h4>👥 Phân vai thành viên</h4>
+    ${roles.length ? roles.map((r, idx) => `<div style="padding:2px 0;color:${idx === curR ? '#FDE047' : '#CBD5E1'}"><b>${idx + 1}.</b> ${esc(r)}</div>`).join('') : '<div>Cả đội cùng phối hợp giải toán</div>'}
+   </div>
+   <div class="mv-drawer-box">
+    <h4>🎁 Phần thưởng chặng</h4>
+    <div>🪙 +1.500 Vàng</div>
+    <div>⭐ +500 XP</div>
+    <div>🧰 ${esc(m.item || 'Mảnh mật mã')}</div>
+   </div>
+  </div>
+ </div>` : '';
 
- const briefingHtml = mvBriefingCollapsed
-  ? `<div class="mv-briefing-banner collapsed flex-between">
-      <div style="display:flex;align-items:center;gap:10px">
-       <span class="mv-briefing-leaf" style="width:32px;height:32px;font-size:17px">${m.id === 1 ? '🍃' : m.icon}</span>
-       <div>
-        <strong style="font-size:13.5px;color:#FFF">${esc(m.title)} – ${esc(m.place)}</strong>
-        <small style="display:block;color:#A7F3D0;font-size:11.5px">Tiến độ nhiệm vụ: ${curR}/${totalR} · Phần thưởng: +1.500 Vàng, +500 XP, ${esc(m.item || 'Rương Chặng ' + m.id)}</small>
-       </div>
-      </div>
-      <button type="button" class="mv-nav-pill" data-action="toggleBriefing">📜 Mở Bảng Nhiệm Vụ</button>
-     </div>`
-  : `<div class="mv-briefing-banner">
-      <div class="mv-briefing-grid">
-       <div>
-        <div class="mv-briefing-title-wrap">
-         <div class="mv-briefing-leaf">${m.id === 1 ? '🍃' : m.icon}</div>
-         <div>
-          <div class="mv-briefing-h2">${esc(m.title)}</div>
-          <div class="mv-briefing-sub">${esc(m.place)}</div>
-         </div>
-        </div>
-        <p class="mv-briefing-story">${esc(m.story)}</p>
-       </div>
-       <div class="mv-quest-checklist">
-        <div class="mv-quest-checklist-head">
-         <span>🎯 Nhiệm vụ chặng ${m.id}</span>
-         <span>${curR}/${totalR}</span>
-        </div>
-        ${checklistHtml}
-       </div>
-      </div>
-      <div class="mv-rewards-strip">
-       <div class="mv-rewards-badges">
-        <span style="font-size:12px;font-weight:800;color:#CBD5E1">📣 Phần thưởng chặng:</span>
-        <span class="mv-reward-pill">🪙 +1.500 Vàng</span>
-        <span class="mv-reward-pill" style="border-color:#1AB6B5;color:#A5F3FC">💎 +500 XP</span>
-        <span class="mv-reward-pill">🧰 Rương Chặng ${m.id}: ${esc(m.item || 'Mảnh mật mã')}</span>
-       </div>
-       <button type="button" class="mv-cta-play-btn" data-action="startPlayStage">
-        ▶ ${curR > 0 ? 'TIẾP TỤC CHƠI' : 'BẮT ĐẦU CHƠI'} CHẶNG ${m.id}
-       </button>
-      </div>
-     </div>`;
+ const drawerKnowledgeHtml = oxyz3D.open ? `<div style="margin-bottom:10px">${renderOxyz3D(m, true)}</div>` : '';
 
  let innerGameHtml = '';
  if(m.id === 5 && !m.isBoss && !world.me?.bossReady){
-  innerGameHtml = `<div class="ms-wrapper-outer" id="mvActiveGameCanvas">${renderMinesweeperGame(m)}${renderOxyz3D(m)}</div>`;
+  innerGameHtml = `<div class="ms-wrapper-outer" id="mvActiveGameCanvas">${renderMinesweeperGame(m)}</div>`;
  } else if(m.id === 3){
-  innerGameHtml = `<div class="zd-wrapper-outer" id="mvActiveGameCanvas">${renderZombieDefenseGame(m)}${renderOxyz3D(m)}</div>`;
+  innerGameHtml = `<div class="zd-wrapper-outer" id="mvActiveGameCanvas">${renderZombieDefenseGame(m)}</div>`;
  } else if(m.id === 4){
-  innerGameHtml = `<div class="maze-wrapper-outer" id="mvActiveGameCanvas">${renderGridMazeGame(m)}${renderOxyz3D(m)}</div>`;
+  innerGameHtml = `<div class="maze-wrapper-outer" id="mvActiveGameCanvas">${renderGridMazeGame(m)}</div>`;
  } else {
-  innerGameHtml = `<div class="question-card" id="mvActiveGameCanvas">
-   ${roles.length ? `<div class="role-strip">${roles.map((r,idx)=>`<div class="role-chip ${idx===m.round?'active-role':''}"><span class="role-num">${idx+1}</span> ${esc(r)}</div>`).join('')}</div>` : ''}
-   ${renderStageGame(m)}
-   ${renderOxyz3D(m)}
-  </div>`;
+  innerGameHtml = `<div class="question-card" id="mvActiveGameCanvas">${renderStageGame(m)}</div>`;
  }
 
  return `<div class="mv-game-frame">
-  <div class="mv-game-topbar">
-   <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-    <span class="mv-stage-pill-gold">CHẶNG ${m.id} / 5</span>
-    <span class="mv-mode-pill-cyan">🎮 ${esc(getGameModeBadge(m))}</span>
-    ${streak >= 2 ? `<span class="combo-pill">🔥 COMBO x${streak}</span>` : ''}
-   </div>
-   <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-    <button type="button" class="mv-nav-pill" data-action="toggleBriefing" title="Ẩn/Hiện bảng mô tả nhiệm vụ chặng">
-     📜 ${mvBriefingCollapsed ? 'Hiện Nhiệm Vụ' : 'Thu Gọn Nhiệm Vụ'}
+  <div class="mv-quest-bar">
+   <div class="mv-quest-summary">
+    <span class="mv-quest-stage">CHẶNG ${m.id} – ${esc(shortTitle.toUpperCase())}</span>
+    <span class="mv-quest-div">|</span>
+    <span class="mv-quest-metric" title="Tiến độ chìa khóa / trạm">🔑 ${curR}/${totalR}</span>
+    <span class="mv-quest-div">|</span>
+    <span class="mv-quest-metric gold" title="Phần thưởng: +1.500 Vàng, +500 XP">⭐ +500 XP</span>
+    ${streak >= 2 ? `<span class="combo-pill">🔥x${streak}</span>` : ''}
+    <button type="button" class="mv-btn-start-compact" data-action="startPlayStage">
+     ▶ ${curR > 0 ? 'TIẾP TỤC' : 'BẮT ĐẦU'}
     </button>
-    <button type="button" class="oxyz-toggle-btn" data-action="toggle3DPanel">
-     🧊 ${oxyz3D.open ? '▲ Đóng 3D Oxyz' : '▼ Mở 3D Oxyz & Công thức'}
+   </div>
+   <div class="mv-quest-actions">
+    <button type="button" class="mv-chip-btn ${!mvBriefingCollapsed ? 'active' : ''}" data-action="toggleBriefing" title="Xem chi tiết cốt truyện, danh sách nhiệm vụ, phân vai và phần thưởng">
+     🎯 Nhiệm vụ
+    </button>
+    <button type="button" class="mv-chip-btn ${oxyz3D.open ? 'active' : ''}" data-action="toggle3DPanel" title="Mở Mô hình 3D Oxyz & Công thức kiến thức">
+     📘 Kiến thức
+    </button>
+    <button type="button" class="mv-chip-btn" data-action="toggleSidebar" title="${mvSidebarCollapsed ? 'Mở rộng Sidebar' : 'Thu gọn Sidebar'}">
+     ${mvSidebarCollapsed ? '⇤' : '⇥'}
     </button>
    </div>
   </div>
-  ${briefingHtml}
+  ${drawerQuestHtml}
+  ${drawerKnowledgeHtml}
   ${innerGameHtml}
  </div>`;
 }
@@ -3142,55 +3096,12 @@ function renderStudentProgressMetrics(me, mineRank){
  const maxXp = Math.max(150, lv * 150);
  const pct = Math.max(6, Math.min(100, Math.round((me.score / maxXp) * 100)));
  const doneTasks = Math.min(15, (me.stage || 0) * 3 + ((me.stage || 0) < 5 ? (me.round || 0) : 0));
- return `<div class="mv-progress-bar-row">
-   <span class="mv-lv-pill-sm">Lv.${lv}</span>
-   <div class="mv-xp-bar-col">
-    <div class="mv-xp-bar-labels"><span>Thanh kinh nghiệm</span><span>${me.score.toLocaleString('vi-VN')} / ${maxXp.toLocaleString('vi-VN')} XP</span></div>
-    <div class="mv-xp-track"><div class="mv-xp-fill" style="width:${pct}%"></div></div>
-   </div>
+ return `<div class="mv-xp-track" title="Kinh nghiệm: ${me.score} / ${maxXp} XP (Cấp ${lv})">
+   <div class="mv-xp-fill" style="width:${pct}%"></div>
   </div>
-  <div class="mv-stats-3grid">
-   <div class="mv-stat-card"><b>⭐ ${me.stage}/5</b><small>Chặng</small></div>
-   <div class="mv-stat-card"><b>📘 ${doneTasks}/15</b><small>Nhiệm vụ</small></div>
-   <div class="mv-stat-card"><b>🏆 #${mineRank}</b><small>Hạng tạm thời</small></div>
-  </div>`;
-}
-
-function renderStudentProgressMetrics(me, mineRank){
- const lv = me.heroLevel ?? 1;
- const maxXp = Math.max(150, lv * 150);
- const pct = Math.max(6, Math.min(100, Math.round((me.score / maxXp) * 100)));
- const doneTasks = Math.min(15, (me.stage || 0) * 3 + ((me.stage || 0) < 5 ? (me.round || 0) : 0));
- return `<div class="mv-progress-bar-row">
-   <span class="mv-lv-pill-sm">Lv.${lv}</span>
-   <div class="mv-xp-bar-col">
-    <div class="mv-xp-bar-labels"><span>Thanh kinh nghiệm</span><span>${me.score.toLocaleString('vi-VN')} / ${maxXp.toLocaleString('vi-VN')} XP</span></div>
-    <div class="mv-xp-track"><div class="mv-xp-fill" style="width:${pct}%"></div></div>
-   </div>
-  </div>
-  <div class="mv-stats-3grid">
-   <div class="mv-stat-card"><b>⭐ ${me.stage}/5</b><small>Chặng</small></div>
-   <div class="mv-stat-card"><b>📘 ${doneTasks}/15</b><small>Nhiệm vụ</small></div>
-   <div class="mv-stat-card"><b>🏆 #${mineRank}</b><small>Hạng tạm thời</small></div>
-  </div>`;
-}
-
-function renderStudentProgressMetrics(me, mineRank){
- const lv = me.heroLevel ?? 1;
- const maxXp = Math.max(150, lv * 150);
- const pct = Math.max(6, Math.min(100, Math.round((me.score / maxXp) * 100)));
- const doneTasks = Math.min(15, (me.stage || 0) * 3 + ((me.stage || 0) < 5 ? (me.round || 0) : 0));
- return `<div class="mv-progress-bar-row">
-   <span class="mv-lv-pill-sm">Lv.${lv}</span>
-   <div class="mv-xp-bar-col">
-    <div class="mv-xp-bar-labels"><span>Thanh kinh nghiệm</span><span>${me.score.toLocaleString('vi-VN')} / ${maxXp.toLocaleString('vi-VN')} XP</span></div>
-    <div class="mv-xp-track"><div class="mv-xp-fill" style="width:${pct}%"></div></div>
-   </div>
-  </div>
-  <div class="mv-stats-3grid">
-   <div class="mv-stat-card"><b>⭐ ${me.stage}/5</b><small>Chặng</small></div>
-   <div class="mv-stat-card"><b>📘 ${doneTasks}/15</b><small>Nhiệm vụ</small></div>
-   <div class="mv-stat-card"><b>🏆 #${mineRank}</b><small>Hạng tạm thời</small></div>
+  <div class="mv-stats-2grid">
+   <div class="mv-stat-mini"><span>Chặng</span><b>${me.stage}/5</b></div>
+   <div class="mv-stat-mini"><span>Trạm</span><b>${doneTasks}/15</b></div>
   </div>`;
 }
 
@@ -3199,82 +3110,43 @@ function studentScreen(){
  const activeBroadcast=(world.lastEvent||[]).find(e=>e.text.includes('📢'));
  const broadcastHtml=activeBroadcast?`<div class="teacher-broadcast-bar">${esc(activeBroadcast.text)}</div>`:'';
  const lv = me.heroLevel ?? 1;
- const maxXp = Math.max(150, lv * 150);
- const xpPct = Math.max(8, Math.min(100, Math.round((me.score / maxXp) * 100)));
  const curStageDisplay = Math.min((me.stage ?? 0) + 1, 5);
 
- return `<section class="mv-vista-container">
-  <div class="mv-vista-bg-decor">${HERO_OXYZ_CUBE_SVG}</div>
-  <div class="mv-hero-top">
-   <div class="mv-mascot-col">
-    ${CHAR_GREEN_DRAGON_MASCOT_SVG}
-   </div>
-   <div class="mv-hero-center">
-    <div class="mv-team-eyebrow">👥 BIỆT ĐỘI ${esc(me.name).toUpperCase()}  ·  PHÒNG ${esc(world.room)}</div>
-    <div class="mv-hero-title-row">
-     <span class="mv-laurel">🌿</span>
-     <h1 class="mv-hero-title">${me.completed ? 'KHO BÁU ĐÃ ĐƯỢC MỞ!' : me.stage === 5 ? 'ĐÃ THU ĐỦ 5 MẢNH MẬT MÃ!' : 'HÀNH TRÌNH GIẢI CỨU LỤC ĐỊA OXYZ'}</h1>
-     <span class="mv-laurel">🌿</span>
-    </div>
-    <p class="mv-hero-subtitle">${me.completed ? 'Hãy theo dõi bảng xếp hạng và phần vinh danh của giáo viên.' : me.stage === 5 ? 'Hãy ghép 5 chữ số mật mã để mở Rương Lõi Trí Tuệ!' : 'Quan sát mô hình không gian 3D Oxyz, điều khiển nhân vật trên bản đồ 2D hoặc chỉ huy Thành Trì!'}</p>
-   </div>
-   <div class="mv-hero-right">
-    <div class="mv-gold-lv-pill">
-     <span class="mv-gold-coin">🪙</span>
-     <span class="mv-gold-amount" id="topGoldBadge">${(me.gold ?? 120).toLocaleString('vi-VN')} Vàng</span>
-     <span class="mv-lv-tag">Lv.${lv}</span>
-    </div>
-    <div class="mv-hero-xp-mini">
-     <span>XP</span>
-     <div class="mv-hero-xp-track"><div class="mv-hero-xp-fill" style="width:${xpPct}%"></div></div>
-     <span>${me.score} XP</span>
-    </div>
-   </div>
-  </div>
-  <div class="mv-journey-row">
-   <div class="mv-map-shield">
-    <strong>BẢN ĐỒ<br/>HÀNH TRÌNH<br/>5 CHẶNG</strong>
-    <small>Đã vượt ${me.stage}/5</small>
-   </div>
-   ${mapTrack(me.stage)}
-  </div>
- </section>
+ return `${mapTrack(me.stage)}
  ${broadcastHtml}
- ${world.paused?'<div class="notice error" style="margin:12px 0"><b>⏸ Giáo viên đang tạm dừng trò chơi để hướng dẫn.</b> Cả nhóm hãy lắng nghe nhé!</div>':''}
- <div class="mission-wrapper mv-workspace-grid" style="margin-top:0">
+ ${world.paused?'<div class="notice error" style="margin:6px 0"><b>⏸ Giáo viên đang tạm dừng trò chơi.</b></div>':''}
+ <div class="mission-wrapper mv-workspace-grid ${mvSidebarCollapsed ? 'sidebar-collapsed' : ''}" style="margin-top:0">
   <div>
-   ${me.completed ? `<div class="panel champion arwes-frame gold" style="padding:26px 20px">
+   ${me.completed ? `<div class="panel champion arwes-frame gold" style="padding:22px 18px">
     <div class="arwes-scanner-line"></div>
-    <div class="arwes-corner tl"></div><div class="arwes-corner tr"></div>
-    <div class="arwes-corner bl"></div><div class="arwes-corner br"></div>
     <span class="star">🏆</span>
     <h2 class="arwes-decrypt-auto" data-text="ĐỘI ${esc(me.name).toUpperCase()} ĐÃ CHIẾN THẮNG!">ĐỘI ${esc(me.name).toUpperCase()} ĐÃ CHIẾN THẮNG!</h2>
-    <p class="arwes-decrypt-auto" data-text="“TƯ DUY VÀ HỢP TÁC MỞ KHO BÁU”" style="margin-top:9px;font-size:20px;font-weight:900;color:#facc15;font-family:'Consolas',monospace">“TƯ DUY VÀ HỢP TÁC MỞ KHO BÁU”</p>
+    <p style="margin-top:8px;font-size:18px;font-weight:900;color:#facc15">“TƯ DUY VÀ HỢP TÁC MỞ KHO BÁU”</p>
     <div class="top-numbers" style="justify-content:center">
-     <div class="metric"><b>${me.score} XP</b><small>TỔNG ĐIỂM ĐỘI</small></div>
-     <div class="metric"><b>#${mineRank}</b><small>THỨ HẠNG HIỆN TẠI</small></div>
+     <div class="metric"><b>${me.score} XP</b><small>TỔNG ĐIỂM</small></div>
+     <div class="metric"><b>#${mineRank}</b><small>XẾP HẠNG</small></div>
     </div>
    </div>` : me.stage >= 5 ? finalContent() : stageContent(world.current)}
   </div>
-  <aside class="team-sidebar mv-sidebar">
-   <div class="mv-side-panel">
-    <div class="mv-side-header">
-     <div class="mv-side-title"><span>🎒</span><span>Túi Vật Phẩm (5 ô)</span></div>
-     <small style="color:#A5F3FC;font-weight:800;font-size:11px">${(me.digits||[]).length}/5 mảnh</small>
+  <aside class="team-sidebar mv-sidebar ${mvSidebarCollapsed ? 'hidden-sidebar' : ''}">
+   <div class="mv-side-widget">
+    <div class="mv-widget-head">
+     <span>🎒 Túi đồ</span>
+     <small style="color:#94A3B8;font-weight:700">${(me.digits||[]).length}/5</small>
     </div>
     ${inv(me.digits)}
    </div>
-   <div class="mv-side-panel">
-    <div class="mv-side-header">
-     <div class="mv-side-title"><span>🏆</span><span>Bảng Xếp Hạng Lớp</span></div>
-     <small style="color:#FDE047;font-weight:800;font-size:11px">Trực tiếp</small>
+   <div class="mv-side-widget">
+    <div class="mv-widget-head">
+     <span>🏆 Xếp hạng</span>
+     <button type="button" class="mv-link-btn" data-action="openFullLeaderboard" title="Xem bảng xếp hạng đầy đủ">Bảng đầy đủ &gt;</button>
     </div>
     <div id="studentSidebarRanks">${standings(world.teams,true)}</div>
    </div>
-   <div class="mv-side-panel">
-    <div class="mv-side-header">
-     <div class="mv-side-title"><span>📊</span><span>Tiến Trình Của Đội</span></div>
-     <small style="color:#35C992;font-weight:800;font-size:11px">Đồng bộ</small>
+   <div class="mv-side-widget">
+    <div class="mv-widget-head">
+     <span>📊 Tiến trình</span>
+     <small style="color:#F2B94B;font-weight:800">Lv.${lv}</small>
     </div>
     <div id="studentSidebarMetrics">
      ${renderStudentProgressMetrics(me, mineRank)}
@@ -3282,35 +3154,19 @@ function studentScreen(){
    </div>
   </aside>
  </div>
- <nav class="mv-bottom-nav" aria-label="Thanh công cụ điều hướng trò chơi">
-  <div class="mv-bottom-actions">
-   <button type="button" class="mv-bot-btn primary-purple" data-action="scrollTop" title="Cuộn lên đầu trang chủ hành trình">
-    🏠 Trang chủ
-   </button>
-   <button type="button" class="mv-bot-btn ${oxyz3D.open ? 'active-cyan' : ''}" data-action="toggle3DPanel" title="Mở/Đóng Mô hình Không gian 3D Oxyz">
-    🗺️ Bản đồ Oxyz
-   </button>
-   <button type="button" class="mv-bot-btn" data-action="openCipherNotebook" title="Mở Túi đồ & Sổ mật thư 5 chặng">
-    🎒 Túi đồ
-   </button>
-   <button type="button" class="mv-bot-btn" data-action="openTeamRoles" title="Xem phân công vai trò các thành viên trong đội">
-    👥 Đội / Nhóm
-   </button>
-   <button type="button" class="mv-bot-btn" data-action="quickHint" title="Xem gợi ý công thức Toán 12 Oxyz cho thử thách hiện tại">
-    💡 Gợi ý
-   </button>
-   <button type="button" class="mv-bot-btn ${!mvBriefingCollapsed ? 'active-cyan' : ''}" data-action="toggleBriefing" title="Ẩn/Hiện bảng thông tin nhiệm vụ chặng">
-    📜 Nhiệm vụ
-   </button>
+ <nav class="mv-bottom-nav" aria-label="Thanh công cụ">
+  <div class="mv-bottom-icons">
+   <button type="button" class="mv-tool-icon ${oxyz3D.open ? 'active' : ''}" data-action="toggle3DPanel" data-tooltip="Bản đồ 3D Oxyz" title="Bản đồ 3D Oxyz">🗺️</button>
+   <button type="button" class="mv-tool-icon" data-action="openTeamRoles" data-tooltip="Đội chơi & Phân vai" title="Đội chơi & Phân vai">👥</button>
+   <button type="button" class="mv-tool-icon" data-action="openCipherNotebook" data-tooltip="Túi đồ & Mật thư" title="Túi đồ & Mật thư">🎒</button>
+   <button type="button" class="mv-tool-icon" data-action="quickHint" data-tooltip="Kiến thức & Gợi ý" title="Kiến thức & Gợi ý">📘</button>
+   <button type="button" class="mv-tool-icon ${!mvBriefingCollapsed ? 'active' : ''}" data-action="toggleBriefing" data-tooltip="Nhiệm vụ chặng" title="Nhiệm vụ chặng">🎯</button>
+   <button type="button" class="mv-tool-icon" data-action="openSettingsModal" data-tooltip="Cài đặt" title="Cài đặt">⚙️</button>
   </div>
   <div class="mv-bottom-pager">
-   <button type="button" class="mv-bot-btn" data-action="demoJumpStage" data-stage="${Math.max(0, (me.stage ?? 0) - 1)}" ${(me.stage ?? 0) <= 0 ? 'disabled' : ''} title="Quay lại chặng trước">
-    &lt; Chặng trước
-   </button>
-   <span class="mv-pager-indicator">Chặng ${curStageDisplay} / 5</span>
-   <button type="button" class="mv-bot-btn" data-action="demoJumpStage" data-stage="${Math.min(5, (me.stage ?? 0) + 1)}" title="Chuyển sang chặng tiếp theo">
-    Chặng tiếp &gt;
-   </button>
+   <button type="button" class="mv-tool-icon" data-action="demoJumpStage" data-stage="${Math.max(0, (me.stage ?? 0) - 1)}" ${(me.stage ?? 0) <= 0 ? 'disabled' : ''} data-tooltip="Chặng trước" title="Chặng trước">◀</button>
+   <span class="mv-pager-pill">${curStageDisplay} / 5</span>
+   <button type="button" class="mv-tool-icon" data-action="demoJumpStage" data-stage="${Math.min(5, (me.stage ?? 0) + 1)}" data-tooltip="Chặng tiếp" title="Chặng tiếp">▶</button>
   </div>
  </nav>`;
 }
@@ -3917,11 +3773,46 @@ async function handle(action,el){
   if(action==='toggle3DProj'){oxyz3D.showProj=!oxyz3D.showProj;render();return;}
   if(action==='toggle3DPanel'){oxyz3D.open=!oxyz3D.open;render();return;}
   if(action==='toggleBriefing'){mvBriefingCollapsed=!mvBriefingCollapsed;render();return;}
+  if(action==='toggleSidebar'){
+   mvSidebarCollapsed=!mvSidebarCollapsed;
+   render();
+   return;
+  }
+  if(action==='openSettingsModal'){
+   const old=$('.modal-backdrop');if(old)old.remove();
+   const elModal=document.createElement('div');
+   elModal.className='modal-backdrop';
+   elModal.innerHTML=`<div class="modal" style="max-width:440px;color:#1e293b" role="dialog" aria-modal="true">
+    <div class="flex-between" style="margin-bottom:14px">
+     <h2>⚙️ Cài đặt & Điều khiển</h2>
+     <button type="button" class="button sm gray" data-action="closeModal">✕</button>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:10px">
+     <button type="button" class="button primary block" data-action="toggleSound">${soundEnabled ? '🔊 Âm thanh: Đang Bật (Nhấn để Tắt)' : '🔇 Âm thanh: Đang Tắt (Nhấn để Bật)'}</button>
+     <button type="button" class="button teal block" data-action="toggleFullscreen">⛶ Bật / Tắt Toàn màn hình</button>
+     <button type="button" class="button gold block" data-action="toggleSidebar">${mvSidebarCollapsed ? '⇤ Hiện thanh bên (Sidebar)' : '⇥ Ẩn thanh bên (Sidebar)'}</button>
+     ${session ? `<button type="button" class="button gray block" data-action="home">⌂ Đổi màn hình / Đăng nhập lại</button>` : ''}
+    </div>
+   </div>`;
+   document.body.appendChild(elModal);
+   return;
+  }
   if(action==='startPlayStage'){
    mvBriefingCollapsed=true;
+   const m=world?.current;
+   if(m && m.id===1){
+    const st=m.huntMap?.stations?.[m.round];
+    if(st){
+     const d=Math.hypot(st.x-huntState.x, st.y-huntState.y);
+     if(d<=10.5){
+      huntState.battleOpen=true;huntState.selectedChoice=null;huntState.shortText='';huntState.monsterDefeated=false;huntState.rewardBadge=null;
+     }else{
+      huntState.targetX=st.x;huntState.targetY=st.y;huntState.lastAutoStation=-1;
+      sound('boost');
+     }
+    }
+   }
    render();
-   const canvasEl=$('#mvActiveGameCanvas');
-   if(canvasEl)canvasEl.scrollIntoView({behavior:'smooth',block:'center'});
    return;
   }
   if(action==='scrollTop'){

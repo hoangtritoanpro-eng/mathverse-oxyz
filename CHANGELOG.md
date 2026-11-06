@@ -9,6 +9,29 @@ Tất cả những thay đổi quan trọng của dự án này sẽ được gh
 
 ---
 
+## [3.5.0] - 2026-11-06
+
+### Changed & Optimized (Minimal Fantasy RPG – Game-First UI)
+- **Tối Giản Hóa Giao Diện theo Nguyên Tắc "70% Trải Nghiệm Hình Ảnh – 30% Thông Tin & Điều Khiển":**
+  - **Giảm 65–70% lượng chữ hiển thị mặc định:** Chuyển toàn bộ cốt truyện dài, danh sách nhiệm vụ, phân vai nhóm, phần thưởng và công thức Toán 12 vào các ngăn kéo thu gọn (`🎯 Nhiệm vụ`, `📘 Kiến thức`) và tooltip khi di chuột.
+  - **Thu gọn phần đầu trang (`.mv-topnav`):** Hợp nhất thành một thanh Header gọn (~48px) chỉ hiển thị linh vật **Rồng Xanh**, tên game **MATHVERSE OXYZ**, nút chuyển chế độ (`🗺️ 2D`, `🏰 Thủ thành`, `🧊 3D Oxyz`), tên đội, **Vàng & XP** và các icon cài đặt (`🔊`, `⛶`, `👩‍🏫`, `⚙️`). Lược bỏ banner mô tả dài trong màn hình chơi.
+  - **Thanh Hành Trình 5 Chặng Tối Giản (`.mv-journey-bar`):** Hiển thị hình ảnh đảo nổi đại diện, số chặng, biểu tượng trạng thái (`✅`, `⭐`, `🔒`) và **tên rút gọn**:
+    1. *Hiệu vectơ*
+    2. *Tổng vectơ*
+    3. *Hình bình hành*
+    4. *Trung điểm*
+    5. *Trọng tâm*
+    *(Tên đầy đủ, công thức và mô tả chế độ chơi xuất hiện trong popover tooltip khi hover).*
+  - **Thanh Nhiệm Vụ 1 Dòng (`.mv-quest-bar`):** Hiển thị gọn `CHẶNG 1 – HIỆU VECTƠ | 🔑 0/3 | ⭐ +500 XP | [▶ BẮT ĐẦU]` cùng nút mở ngăn `🎯 Nhiệm vụ`, `📘 Kiến thức` và nút thu gọn Sidebar (`⇥`/`⇤`).
+  - **Ưu Tiên Diện Tích Màn Chơi (Game-First Viewport):** Màn hình game 2D/3D xuất hiện trọn vẹn ngay trong viewport đầu tiên ở cả độ phân giải `1920×1080` và `1366×768` (`height: clamp(470px, 66vh, 660px)`), tích hợp cảnh nền thế giới đảo nổi Fantasy (`/images/fantasy-floating-world.jpg`) và lược bỏ các khung chữ thừa đè lên bản đồ.
+  - **Sidebar 3 Widget Siêu Gọn & Có Thể Thu Gọn (`.mv-sidebar`):**
+    1. **Túi đồ:** 5 biểu tượng vật phẩm kèm tooltip, không có đoạn văn mô tả dài.
+    2. **Xếp hạng:** Chỉ hiển thị thứ hạng hiện tại của đội (`🥇 Hạng #1 · XP`) và nút `Bảng đầy đủ >`.
+    3. **Tiến trình:** 1 thanh XP và 2 chỉ số ngắn gọn (`Chặng 0/5`, `Trạm 0/15`).
+  - **Thanh Công Cụ Icon Có Tooltip (`.mv-bottom-nav`):** Chuyển các nút chức năng phụ thành icon có tooltip tức thì (`🗺️`, `👥`, `🎒`, `📘`, `🎯`, `⚙️`) và nút chuyển chặng `◀` `1/5` `▶`.
+
+---
+
 ## [3.4.0] - 2026-11-06
 
 ### Added & Overhauled (Fantasy Adventure RPG + Holographic MathVerse UI/UX Upgrade)
