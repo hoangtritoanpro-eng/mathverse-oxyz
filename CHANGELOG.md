@@ -9,6 +9,34 @@ Tất cả những thay đổi quan trọng của dự án này sẽ được gh
 
 ---
 
+## [3.4.0] - 2026-11-06
+
+### Added & Overhauled (Fantasy Adventure RPG + Holographic MathVerse UI/UX Upgrade)
+- **Nâng cấp Toàn Diện Giao Diện MATHVERSE OXYZ theo Phong Cách Fantasy Adventure RPG + 3D Holographic:**
+  - **Hệ thống Màu & Typography (`index.html`, `style.css`):**
+    - Tích hợp font chữ `Montserrat` hỗ trợ đầy đủ tiếng Việt cùng hệ màu chủ đạo: Background (`#0B1227`), Deep Navy (`#101B3B`), Royal Purple (`#5846C9`), Electric Cyan (`#1AB6B5`), Emerald Green (`#35C992`), Treasure Gold (`#F2B94B`), Text White (`#F8FAFF`).
+  - **A. Thanh Điều Hướng Tối Giản & Chuyên Nghiệp (`.mv-topnav`):**
+    - Bên trái: Biểu tượng sao kim cương phát sáng + Logo `MATHVERSE OXYZ`.
+    - Chính giữa: 4 nút chức năng `🎓 TOÁN 12 (GDPT 2018)`, `🗺️ SĂN KHO BÁU 2D`, `🏰 THỦ THÀNH`, `🧊 3D OXYZ` kết nối trực tiếp với các chế độ chơi và mô hình 3D.
+    - Bên phải: Nút Âm thanh, Toàn màn hình, Chuyển màn hình Giáo viên, Đổi màn hình và Huy hiệu Đội chơi.
+  - **B. Hero Banner Phiêu Lưu & Linh Vật Rồng Xanh (`.mv-vista-container`):**
+    - Thiết kế đồ họa vector linh vật **Rồng Xanh Oxyz (`CHAR_GREEN_DRAGON_MASCOT_SVG`)** đeo kính bảo hộ công nghệ và giáp ngực OXYZ.
+    - Tiêu đề vòng nguyệt quế vàng kim `HÀNH TRÌNH GIẢI CỨU LỤC ĐỊA OXYZ`, thông tin đội chơi, mã phòng, huy hiệu Vàng + Cấp độ (`Lv.`) và thanh XP đi kèm khối lập phương tọa độ 3D Oxyz Hologram (`HERO_OXYZ_CUBE_SVG`).
+  - **C. Bản Đồ Hành Trình 5 Chặng Đảo Nổi (`mapTrack` & `ISLAND_SVGS`):**
+    - Thay thế các thẻ đơn giản bằng 5 hòn đảo nổi minh họa SVG độc quyền nối với nhau bởi **Con đường ánh sáng năng lượng (`.mv-light-path-svg`)**: *Rừng Vectơ Khởi Nguyên*, *Pháo Đài Góc Vuông*, *Tháp Pha Lê Khoảng Cách*, *Mê Cung Trung Điểm*, *Thành Trì Lõi Trí Tuệ*.
+    - Hiển thị mũi tên vàng định vị chặng đang chơi, đánh giá sao `⭐⭐⭐`, biểu tượng khóa `🔒` cho chặng chưa mở và tooltip chi tiết khi di chuột.
+  - **D. Khu Vực Game Chính & Bảng Nhiệm Vụ Thu Gọn (`.mv-game-frame` & `.mv-briefing-banner`):**
+    - Khung game trung tâm viền Electric Cyan phát sáng, tích hợp bảng Nhiệm vụ chặng có thể thu gọn/mở rộng (`📜 Nhiệm vụ`), hiển thị mô tả cốt truyện, checklist tiến độ (`0/3`), phần thưởng chặng và nút CTA ánh kim `▶ BẮT ĐẦU CHƠI CHẶNG X` không che khuất vùng thao tác của học sinh.
+  - **E. Sidebar Bên Phải 3 Khối Đồng Bộ Thời Gian Thực (`.mv-sidebar`):**
+    - **Khối 1 – Túi Vật Phẩm (5 ô):** Hiển thị 5 ô chìa khóa/cổ vật phát sáng khi sở hữu và trạng thái khóa kèm tooltip giải thích công dụng.
+    - **Khối 2 – Bảng Xếp Hạng Lớp:** Làm nổi bật Top 1, 2, 3 (`🥇`, `🥈`, `🥉`) và nút `Xem đầy đủ bảng xếp hạng >` mở modal chi tiết.
+    - **Khối 3 – Tiến Trình Của Đội:** Hiển thị cấp độ `Lv.`, thanh XP chuyển động mượt và 3 thẻ chỉ số (`Chặng`, `Nhiệm vụ`, `Hạng tạm thời`).
+  - **F. Thanh Điều Hướng Phía Dưới (`.mv-bottom-nav`):**
+    - Tích hợp đầy đủ các nút tương tác thật: `🏠 Trang chủ`, `🗺️ Bản đồ Oxyz`, `🎒 Túi đồ`, `👥 Đội / Nhóm`, `💡 Gợi ý`, `📜 Nhiệm vụ` và bộ chuyển chặng `< Chặng trước` / `Chặng X / 5` / `Chặng tiếp >`.
+  - **Tối Ưu Responsive & Hiệu Năng:** Tương thích màn hình `1920×1080`, `1366×768`, hỗ trợ `prefers-reduced-motion`, đóng gói đồng bộ vào [CHOI_THU_1_MAY.html](file:///c:/Users/ADMIN/Downloads/ggvdg%20duyen/MATHVERSE_OXYZ_MINIGAMES/CHOI_THU_1_MAY.html) (~2.37 MB) và vượt qua 100% bài kiểm thử 5 chặng.
+
+---
+
 ## [3.3.1] - 2026-11-06
 
 ### Fixed (Global Character SVGs Scope Definition)
