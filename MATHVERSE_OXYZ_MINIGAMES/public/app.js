@@ -322,11 +322,11 @@ const oxyz3D={
 };
 
 const missionMeta=[
- {icon:'🏝️',place:'Rừng Vectơ Khởi Nguyên',sub:'Tọa độ vectơ AB',biome:'#10b981',mode:'🗺️ Săn Kho Báu 2D'},
- {icon:'🏰',place:'Pháo Đài Góc Vuông',sub:'Tích vô hướng u·v',biome:'#3b82f6',mode:'🏰 Thủ Thành 3 Làn'},
- {icon:'💠',place:'Tháp Pha Lê Khoảng Cách',sub:'Độ dài & Khoảng cách',biome:'#a855f7',mode:'🧟 Chặn Zombie 4 Làn'},
- {icon:'🌀',place:'Mê Cung Trung Điểm',sub:'Trung điểm & Trọng tâm',biome:'#14b8a6',mode:'🌀 Mê Cung Tọa Độ'},
- {icon:'💣',place:'Thành Trì Lõi Trí Tuệ',sub:'Cùng phương & Tổng hợp',biome:'#16a34a',mode:'💣 Dò Mìn & Diệt Boss'}
+ {icon:'🏝️',place:'Rừng Vectơ Khởi Nguyên',sub:'Hiệu hai vectơ (Nhận biết · 60s)',biome:'#10b981',mode:'🧭 Ấn Hướng Đi'},
+ {icon:'🏰',place:'Pháo Đài Góc Vuông',sub:'Tổng hai vectơ (Nhận biết · 60s)',biome:'#f59e0b',mode:'🔗 Ấn Kết Nối'},
+ {icon:'💠',place:'Tháp Pha Lê',sub:'Quy tắc hình bình hành (Nhận biết · 65s)',biome:'#a855f7',mode:'💠 Ấn Cân Bằng'},
+ {icon:'🌀',place:'Mê Cung Trung Điểm',sub:'Tính chất trung điểm (Thông hiểu · 65s)',biome:'#14b8a6',mode:'⚖️ Ấn Cân Xứng'},
+ {icon:'👑',place:'Thành Trì Lõi Trí Tuệ',sub:'Trọng tâm tam giác (Thông hiểu · 70s)',biome:'#ef4444',mode:'👑 Ấn Trí Tuệ'}
 ];
 const labels=['A','B','C','D'];
 const initialRoom=(qs.get('room')||'').trim().toUpperCase();
@@ -349,11 +349,11 @@ let mvBriefingCollapsed = true;
 let mvSidebarCollapsed = false;
 const SHORT_STAGE_NAMES = ['Hiệu vectơ', 'Tổng vectơ', 'Hình bình hành', 'Trung điểm', 'Trọng tâm'];
 const STAGE_FORMULAS_SHORT = [
-  'vectơ AB = (xB − xA; yB − yA; zB − zA)',
-  'u · v = x1·x2 + y1·y2 + z1·z2 (Vuông góc ⇔ u · v = 0)',
-  'ABCD là hình bình hành ⇔ vectơ AB = vectơ DC; Độ dài AB = √(Δx² + Δy² + Δz²)',
-  'Trung điểm M = ((xA+xB)/2; (yA+yB)/2; (zA+zB)/2)',
-  'Trọng tâm G = ((xA+xB+xC)/3; (yA+yB+yC)/3; (zA+zB+zC)/3)'
+  'AB − AC = CB  |  AC − AB = BC  |  MN − MP = PN',
+  'AB + BC = AC  |  MN + NP = MP  (Quy tắc 3 điểm nối tiếp)',
+  'Hình bình hành ABCD: AB + AD = AC  |  BA + BC = BD',
+  'I là trung điểm AB ⇔ IA + IB = 0  |  MA + MB = 2MI',
+  'G là trọng tâm △ABC ⇔ GA + GB + GC = 0  |  MA + MB + MC = 3MG'
 ];
 
 const CHAR_GREEN_DRAGON_MASCOT_SVG = `<svg viewBox="0 0 140 130" class="mv-dragon-mascot" xmlns="http://www.w3.org/2000/svg">
@@ -709,6 +709,7 @@ function layout(content){
    </button>
   </div>
   <div class="mv-nav-right">
+   ${session && world?.clock ? `<span class="va-stage-timer" title="Đồng hồ tổng hành trình 6 phút (360 giây)">⏳ Tổng: <b id="clock">06:00</b></span>` : ''}
    ${session ? `<span class="mv-top-team" title="Đội chơi · Phòng ${esc(world?.room || '')}"><span>${meAvatar}</span><span>${esc(meName)}</span></span>` : ''}
    ${isStudent && world?.me ? `<div class="mv-top-resources">
     <span title="Vàng của đội">🪙 <b id="topGoldBadge">${goldVal}</b></span>
@@ -1169,7 +1170,7 @@ function teacherScreen(){
  const joinBase=world.joinBaseURL||location.origin;const baseUrl=joinBase+location.pathname;
  const winners=[...teams].sort((a,b)=>b.score-a.score||((a.finishedAt||'9999').localeCompare(b.finishedAt||'9999')));
  const helper=[...teams].sort((a,b)=>b.bonus-a.bonus)[0];
- return `<div class="dashboard-head"><div><span class="screen-tag">👩‍🏫 MÀN HÌNH ĐIỀU HÀNH GIÁO VIÊN</span><h2>Mã Phòng Học: <span class="room-number">${esc(world.room)}</span></h2><p class="muted">Học sinh tham gia theo nhóm qua 2 cơ chế: <b>Săn Kho Báu 2D</b> & <b>Bảo Vệ Thành Trì</b> kết hợp <b>Mô hình Không gian 3D Oxyz</b>.</p></div><div class="panel" style="text-align:center;padding:15px 20px"><span class="screen-tag">ĐỒNG HỒ TIẾT HỌC</span><div class="clock" id="clock">45:00</div><div class="controls">${btn(world.clock.running?'⏸ Dừng giờ':'▶ Bắt đầu','timerToggle','sm teal')}${btn('↻','timerReset','sm gray')}<select id="clockMinutes" aria-label="Thời lượng tiết học"><option value="35" ${world.clock.minutes===35?'selected':''}>35 phút</option><option value="40" ${world.clock.minutes===40?'selected':''}>40 phút</option><option value="45" ${world.clock.minutes===45?'selected':''}>45 phút</option><option value="50" ${world.clock.minutes===50?'selected':''}>50 phút</option></select></div></div></div>
+ return `<div class="dashboard-head"><div><span class="screen-tag">👩‍🏫 MÀN HÌNH ĐIỀU HÀNH GIÁO VIÊN</span><h2>Mã Phòng Học: <span class="room-number">${esc(world.room)}</span></h2><p class="muted">Hành trình Giải cứu Lục địa OXYZ (Thời lượng chuẩn: <b>6 phút</b> · 5 vùng đất · 3 chặng Nhận biết & 2 chặng Thông hiểu · Hợp tác đội 3–5 học sinh).</p></div><div class="panel" style="text-align:center;padding:15px 20px"><span class="screen-tag">ĐỒNG HỒ HÀNH TRÌNH</span><div class="clock" id="clock">06:00</div><div class="controls">${btn(world.clock.running?'⏸ Dừng giờ':'▶ Bắt đầu','timerToggle','sm teal')}${btn('↻','timerReset','sm gray')}<select id="clockMinutes" aria-label="Thời lượng tiết học"><option value="6" ${world.clock.minutes===6?'selected':''}>6 phút (Kịch bản)</option><option value="10" ${world.clock.minutes===10?'selected':''}>10 phút</option><option value="15" ${world.clock.minutes===15?'selected':''}>15 phút</option><option value="35" ${world.clock.minutes===35?'selected':''}>35 phút</option><option value="45" ${world.clock.minutes===45?'selected':''}>45 phút</option></select></div></div></div>
  <div class="top-numbers"><div class="metric"><b>${teams.length}</b><small>ĐỘI THÁM HIỂM</small></div><div class="metric"><b>${done}</b><small>ĐÃ MỞ KHO BÁU</small></div><div class="metric"><b>${teams.filter(t=>t.stage>=5).length}</b><small>ĐỦ 5 MẢNH MÃ</small></div><div class="metric"><b>${teams.reduce((a,t)=>a+t.score,0)}</b><small>TỔNG XP LỚP</small></div></div>
  <div class="controls" style="margin-bottom:16px">${window.IS_DEMO_MODE?btn('▶ Vào Đội Rồng Xanh (Trải nghiệm Game)','demoPlay','teal'):''}${btn('📢 Nhắn gửi toàn lớp','teacherBroadcast','teal')}${btn('💖 Hồi 3 khiên cả lớp','teacherHealAll','gold')}${btn('✨ Thưởng +5 XP cả lớp','teacherBonusAll','primary')}${btn(world.paused?'▶ Tiếp tục game':'⏸ Tạm dừng lớp học','pauseGame',world.paused?'teal':'gold')}${btn('🏆 Công bố giải thưởng','awards','primary')}${btn('📥 Xuất CSV minh chứng','exportCSV','gray')}${btn('🖨️ In bảng kết quả','print','gray')}<span class="pill ${world.paused?'pink':'green'}">${world.paused?'🔒 Đang tạm dừng để GV giảng bài':'🟢 Học sinh đang làm nhiệm vụ'}</span></div>
  <section class="panel" style="margin-bottom:16px">
@@ -1193,23 +1194,23 @@ function teacherScreen(){
 function inv(digits){
  const d = Object.fromEntries((digits||[]).map(v=>[v.stage,v.digit]));
  const curStage = (world?.me?.stage ?? 0) + 1;
- const slotMeta = [
-  {icon:'🗝️', name:'Chìa khóa X · Mảnh Chặng 1', desc:'Mở phong ấn thành phần tọa độ dx tại Rừng Vectơ'},
-  {icon:'🗝️', name:'Chìa khóa Y · Mảnh Chặng 2', desc:'Khai hỏa Đại bác Góc Vuông u·v tại Pháo Đài'},
-  {icon:'🗝️', name:'Chìa khóa Z · Mảnh Chặng 3', desc:'Tinh thể Khoảng cách AB tại Tháp Pha Lê'},
-  {icon:'🧭', name:'La bàn Oxyz · Mảnh Chặng 4', desc:'Định vị Trung điểm M & Trọng tâm G trong Mê Cung'},
-  {icon:'💠', name:'Lõi Trí Tuệ · Mảnh Chặng 5', desc:'Mảnh mật mã tối thượng mở Rương Lõi Trí Tuệ'}
+ const sealMeta = [
+  {icon:'🧭', name:'Ấn Hướng Đi (Chặng 1)', desc:'Khôi phục chiều mũi tên hiệu hai vectơ tại Rừng Vectơ'},
+  {icon:'🔗', name:'Ấn Kết Nối (Chặng 2)', desc:'Hợp nhất hai con đường năng lượng AB + BC = AC tại Pháo Đài'},
+  {icon:'💠', name:'Ấn Cân Bằng (Chặng 3)', desc:'Đánh thức đường chéo hình bình hành ABCD tại Tháp Pha Lê'},
+  {icon:'⚖️', name:'Ấn Cân Xứng (Chặng 4)', desc:'Cân bằng hai vectơ đối nhau IA + IB = 0 tại Mê Cung Trung Điểm'},
+  {icon:'👑', name:'Ấn Trí Tuệ (Chặng 5)', desc:'Hợp nhất 3 luồng năng lượng trọng tâm GA + GB + GC = 0'}
  ];
  return `<div class="inventory mv-inv-grid" style="margin:6px 0">${[1,2,3,4,5].map(i=>{
-  const hasDigit = d[i] !== undefined;
-  const meta = slotMeta[i-1];
-  const stateCls = hasDigit ? 'owned' : (i === curStage ? 'active-stage' : 'locked empty');
-  const tip = hasDigit
-   ? `Đã sở hữu ${meta.name}: Mảnh số [${d[i]}] — ${meta.desc}`
-   : `Chưa mở khóa ${meta.name} — ${meta.desc}`;
+  const hasSeal = d[i] !== undefined;
+  const meta = sealMeta[i-1];
+  const stateCls = hasSeal ? 'owned' : (i === curStage ? 'active-stage' : 'locked empty');
+  const tip = hasSeal
+   ? `Đã thu hồi ${meta.name} — ${meta.desc}`
+   : `Chưa thu hồi ${meta.name} — ${meta.desc}`;
   return `<div class="digit mv-item-slot ${stateCls}" title="${esc(tip)}" data-action="openCipherNotebook">
    <span class="mv-item-icon">${meta.icon}</span>
-   <strong class="mv-item-digit">${hasDigit ? esc(d[i]) : ('C.' + i)}</strong>
+   <strong class="mv-item-digit">${hasSeal ? '✓ Ấn ' + i : 'Ấn ' + i}</strong>
   </div>`;
  }).join('')}</div>`;
 }
@@ -2997,75 +2998,515 @@ function renderStageGame(m){
  return renderHuntGame(m);
 }
 
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ENGINE KỊCH BẢN MỚI V4.0: HÀNH TRÌNH GIẢI CỨU LỤC ĐỊA OXYZ (6 PHÚT)
+   3 Phần mỗi chặng: Phần 1 (Khám phá tương tác SVG) + Phần 2 (Giải mã 1) + Phần 3 (Giải mã 2)
+   ═══════════════════════════════════════════════════════════════════════════ */
+const vaState = {
+  stageId: -1,
+  roundId: -1,
+  selectedChoice: null,
+  pillars: new Set(),       // Chặng 1: 'A', 'B', 'C'
+  paths: new Set(),         // Chặng 2: 'AB', 'BC'
+  paraEdges: new Set(),     // Chặng 3: 'AB', 'AD'
+  midpointPct: 25,          // Chặng 4: 50 = Trung điểm I
+  centroidSelected: null,   // Chặng 5: 'G' = Trọng tâm
+  dragonMsg: null,
+  dragonMood: 'normal',     // 'normal' | 'shadow' | 'hint' | 'win'
+  stageDurationSec: 60,
+  stageStartedAt: Date.now(),
+  stageTimeoutTriggered: false
+};
+
+function ensureVaStateForStage(m) {
+  const dur = m.timeSeconds || (m.id <= 2 ? 60 : m.id <= 4 ? 65 : 70);
+  if (vaState.stageId !== m.id) {
+    vaState.stageId = m.id;
+    vaState.roundId = m.round;
+    vaState.selectedChoice = null;
+    vaState.pillars = new Set();
+    vaState.paths = new Set();
+    vaState.paraEdges = new Set();
+    vaState.midpointPct = 25;
+    vaState.centroidSelected = null;
+    vaState.dragonMsg = m.dragonIntro || 'Hãy cùng khám phá sơ đồ vectơ để mở khóa chặng này!';
+    vaState.dragonMood = m.id === 5 ? 'shadow' : 'normal';
+    vaState.stageDurationSec = dur;
+    vaState.stageStartedAt = Date.now();
+    vaState.stageTimeoutTriggered = false;
+  } else if (vaState.roundId !== m.round) {
+    vaState.roundId = m.round;
+    vaState.selectedChoice = null;
+  }
+}
+
+function isVaInteractiveReady(m) {
+  if (m.id === 1) return vaState.pillars.size >= 3;
+  if (m.id === 2) return vaState.paths.has('AB') && vaState.paths.has('BC');
+  if (m.id === 3) return vaState.paraEdges.has('AB') && vaState.paraEdges.has('AD');
+  if (m.id === 4) return Math.abs(vaState.midpointPct - 50) <= 5;
+  if (m.id === 5) return vaState.centroidSelected === 'G';
+  return true;
+}
+
+function renderStageVectorSVG(m) {
+  const r = m.round || 0;
+  const q = m.challenge || {};
+  const isPart1 = (r === 0);
+  const defs = `<defs>
+    <marker id="arrCyan" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#38BDF8"/>
+    </marker>
+    <marker id="arrGold" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#FACC15"/>
+    </marker>
+    <marker id="arrGreen" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#4ADE80"/>
+    </marker>
+    <marker id="arrPink" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#F43F5E"/>
+    </marker>
+  </defs>`;
+
+  // CHẶNG 1: RỪNG VECTƠ KHỞI NGUYÊN (3 cột mốc A, B, C / M, N, P)
+  if (m.id === 1) {
+    const isMNP = (q.prompt || '').includes('M, N, P');
+    const L1 = isMNP ? 'M' : 'A';
+    const L2 = isMNP ? 'N' : 'B';
+    const L3 = isMNP ? 'P' : 'C';
+    const hasA = !isPart1 || vaState.pillars.has('A');
+    const hasB = !isPart1 || vaState.pillars.has('B');
+    const hasC = !isPart1 || vaState.pillars.has('C');
+    const all3 = hasA && hasB && hasC;
+
+    return `<svg class="va-svg-stage" viewBox="0 0 560 300" xmlns="http://www.w3.org/2000/svg">
+      ${defs}
+      <!-- Cây cầu ánh sáng nền -->
+      <path d="M 60 220 Q 280 250 500 220" fill="none" stroke="rgba(26,182,181,0.22)" stroke-width="18" stroke-linecap="round"/>
+      <path d="M 60 220 Q 280 250 500 220" fill="none" stroke="${all3 ? '#35C992' : 'rgba(244,63,94,0.45)'}" stroke-width="3" stroke-dasharray="10 6"/>
+      <text x="280" y="268" text-anchor="middle" fill="#94A3B8" font-size="12" font-weight="800">
+        ${isPart1 ? 'Nhấp kích hoạt cả 3 cột mốc A, B, C để dựng các vectơ cùng gốc A' : ('Sơ đồ 3 điểm ' + L1 + ', ' + L2 + ', ' + L3 + ' – Quan sát điểm đầu và điểm cuối')}
+      </text>
+
+      <!-- Hai vectơ xuất phát từ A (hoặc M) -->
+      ${(hasA && hasB) ? `<line x1="120" y1="205" x2="405" y2="78" stroke="#38BDF8" stroke-width="4" marker-end="url(#arrCyan)"/>
+      <text x="248" y="122" fill="#67E8F9" font-size="16" font-weight="900">${L1}${L2}</text>` : `<line x1="120" y1="205" x2="415" y2="74" stroke="rgba(148,163,184,0.3)" stroke-width="2.5" stroke-dasharray="6 6"/>`}
+
+      ${(hasA && hasC) ? `<line x1="120" y1="205" x2="432" y2="205" stroke="#FACC15" stroke-width="4" marker-end="url(#arrGold)"/>
+      <text x="275" y="192" fill="#FDE047" font-size="16" font-weight="900">${L1}${L3}</text>` : `<line x1="120" y1="205" x2="440" y2="205" stroke="rgba(148,163,184,0.3)" stroke-width="2.5" stroke-dasharray="6 6"/>`}
+
+      <!-- Đường nối giữa B và C (không lộ chiều mũi tên ở câu hỏi trắc nghiệm!) -->
+      ${all3 ? (isPart1
+        ? `<line x1="440" y1="205" x2="418" y2="82" stroke="#4ADE80" stroke-width="4" marker-end="url(#arrGreen)"/>
+           <text x="468" y="145" fill="#4ADE80" font-size="15" font-weight="900">CB = AB − AC</text>`
+        : `<line x1="440" y1="205" x2="415" y2="74" stroke="#A78BFA" stroke-width="3.5" stroke-dasharray="7 5"/>
+           <text x="462" y="145" fill="#DDD6FE" font-size="15" font-weight="900">?</text>`
+      ) : ''}
+
+      <!-- Cột mốc A / M -->
+      <g class="va-node-clickable" data-action="vaClickPillar" data-node="A">
+        <circle cx="120" cy="205" r="24" fill="${hasA ? '#0284C7' : '#1E293B'}" stroke="${hasA ? '#67E8F9' : '#64748B'}" stroke-width="3"/>
+        <text x="120" y="211" text-anchor="middle" fill="#FFFFFF" font-size="18" font-weight="900">${L1}</text>
+      </g>
+      <!-- Cột mốc B / N -->
+      <g class="va-node-clickable" data-action="vaClickPillar" data-node="B">
+        <circle cx="415" cy="70" r="24" fill="${hasB ? '#059669' : '#1E293B'}" stroke="${hasB ? '#4ADE80' : '#64748B'}" stroke-width="3"/>
+        <text x="415" y="76" text-anchor="middle" fill="#FFFFFF" font-size="18" font-weight="900">${L2}</text>
+      </g>
+      <!-- Cột mốc C / P -->
+      <g class="va-node-clickable" data-action="vaClickPillar" data-node="C">
+        <circle cx="440" cy="205" r="24" fill="${hasC ? '#D97706' : '#1E293B'}" stroke="${hasC ? '#FDE047' : '#64748B'}" stroke-width="3"/>
+        <text x="440" y="211" text-anchor="middle" fill="#FFFFFF" font-size="18" font-weight="900">${L3}</text>
+      </g>
+    </svg>`;
+  }
+
+  // CHẶNG 2: PHÁO ĐÀI GÓC VUÔNG (Hai đoạn đường nối tiếp AB và BC)
+  if (m.id === 2) {
+    const isMNP = (q.prompt || '').includes('M, N, P');
+    const L1 = isMNP ? 'M' : 'A';
+    const L2 = isMNP ? 'N' : 'B';
+    const L3 = isMNP ? 'P' : 'C';
+    const hasAB = !isPart1 || vaState.paths.has('AB');
+    const hasBC = !isPart1 || vaState.paths.has('BC');
+    const both = hasAB && hasBC;
+
+    return `<svg class="va-svg-stage" viewBox="0 0 560 300" xmlns="http://www.w3.org/2000/svg">
+      ${defs}
+      <text x="280" y="272" text-anchor="middle" fill="#94A3B8" font-size="12" font-weight="800">
+        ${isPart1 ? 'Nhấp kích hoạt đoạn đường AB rồi đến đoạn đường BC để nối thông năng lượng Pháo Đài' : ('Quy tắc ba điểm nối tiếp qua điểm trung gian ' + L2)}
+      </text>
+
+      <!-- Đoạn đường AB -->
+      <g class="va-node-clickable" data-action="vaClickPath" data-path="AB">
+        <line x1="95" y1="210" x2="268" y2="78" stroke="${hasAB ? '#38BDF8' : '#475569'}" stroke-width="6" marker-end="${hasAB ? 'url(#arrCyan)' : ''}"/>
+        <rect x="145" y="110" width="64" height="26" rx="8" fill="rgba(15,23,42,0.9)" stroke="${hasAB ? '#38BDF8' : '#64748B'}"/>
+        <text x="177" y="128" text-anchor="middle" fill="${hasAB ? '#67E8F9' : '#94A3B8'}" font-size="14" font-weight="900">${L1}${L2}</text>
+      </g>
+
+      <!-- Đoạn đường BC -->
+      <g class="va-node-clickable" data-action="vaClickPath" data-path="BC">
+        <line x1="280" y1="72" x2="452" y2="202" stroke="${hasBC ? '#FACC15' : '#475569'}" stroke-width="6" marker-end="${hasBC ? 'url(#arrGold)' : ''}"/>
+        <rect x="342" y="110" width="64" height="26" rx="8" fill="rgba(15,23,42,0.9)" stroke="${hasBC ? '#FACC15' : '#64748B'}"/>
+        <text x="374" y="128" text-anchor="middle" fill="${hasBC ? '#FDE047' : '#94A3B8'}" font-size="14" font-weight="900">${L2}${L3}</text>
+      </g>
+
+      <!-- Đường tổng nối từ A đến C -->
+      ${both ? `<line x1="95" y1="210" x2="450" y2="210" stroke="#4ADE80" stroke-width="4" stroke-dasharray="${isPart1 ? '0' : '8 6'}" marker-end="${isPart1 ? 'url(#arrGreen)' : ''}"/>
+      <text x="280" y="236" text-anchor="middle" fill="#4ADE80" font-size="15" font-weight="900">${isPart1 ? 'Luồng tổng hợp: AC = AB + BC' : 'Vectơ tổng = ?'}</text>` : ''}
+
+      <!-- 3 Đỉnh A, B, C -->
+      <circle cx="95" cy="210" r="21" fill="#0284C7" stroke="#E0F2FE" stroke-width="2.5"/>
+      <text x="95" y="216" text-anchor="middle" fill="#FFF" font-size="16" font-weight="900">${L1}</text>
+
+      <circle cx="280" cy="70" r="21" fill="#D97706" stroke="#FEF08A" stroke-width="2.5"/>
+      <text x="280" y="76" text-anchor="middle" fill="#FFF" font-size="16" font-weight="900">${L2}</text>
+
+      <circle cx="465" cy="210" r="21" fill="#059669" stroke="#A7F3D0" stroke-width="2.5"/>
+      <text x="465" y="216" text-anchor="middle" fill="#FFF" font-size="16" font-weight="900">${L3}</text>
+    </svg>`;
+  }
+
+  // CHẶNG 3: THÁP PHA LÊ (Hình bình hành ABCD)
+  if (m.id === 3) {
+    const hasAB = !isPart1 || vaState.paraEdges.has('AB');
+    const hasAD = !isPart1 || vaState.paraEdges.has('AD');
+    const both = hasAB && hasAD;
+    // A(105, 215), B(335, 215), D(215, 75), C(445, 75)
+    return `<svg class="va-svg-stage" viewBox="0 0 560 300" xmlns="http://www.w3.org/2000/svg">
+      ${defs}
+      <text x="280" y="275" text-anchor="middle" fill="#94A3B8" font-size="12" font-weight="800">
+        ${isPart1 ? 'Nhấp kích hoạt hai vectơ cạnh AB và AD cùng xuất phát từ đỉnh A của hình bình hành ABCD' : 'Hình bình hành ABCD – Quan sát hai vectơ cạnh cùng gốc và đường chéo'}
+      </text>
+
+      <!-- Cạnh BC và DC của hình bình hành -->
+      <line x1="335" y1="215" x2="445" y2="75" stroke="rgba(167,139,250,0.45)" stroke-width="2.5" stroke-dasharray="6 5"/>
+      <line x1="215" y1="75" x2="445" y2="75" stroke="rgba(167,139,250,0.45)" stroke-width="2.5" stroke-dasharray="6 5"/>
+
+      <!-- Đường chéo AC và BD (phong ấn nét đứt khi đang giải đố) -->
+      <line x1="105" y1="215" x2="435" y2="80" stroke="${both && isPart1 ? '#4ADE80' : 'rgba(244,114,182,0.55)'}" stroke-width="3.5" stroke-dasharray="${both && isPart1 ? '0' : '7 5'}" marker-end="${both && isPart1 ? 'url(#arrGreen)' : ''}"/>
+      <line x1="335" y1="215" x2="215" y2="75" stroke="rgba(148,163,184,0.28)" stroke-width="2" stroke-dasharray="5 5"/>
+
+      <!-- Vectơ cạnh AB -->
+      <g class="va-node-clickable" data-action="vaClickPara" data-edge="AB">
+        <line x1="105" y1="215" x2="322" y2="215" stroke="${hasAB ? '#38BDF8' : '#64748B'}" stroke-width="5.5" marker-end="${hasAB ? 'url(#arrCyan)' : ''}"/>
+        <rect x="192" y="224" width="52" height="24" rx="6" fill="rgba(15,23,42,0.9)" stroke="${hasAB ? '#38BDF8' : '#64748B'}"/>
+        <text x="218" y="240" text-anchor="middle" fill="${hasAB ? '#67E8F9' : '#94A3B8'}" font-size="13" font-weight="900">AB</text>
+      </g>
+
+      <!-- Vectơ cạnh AD -->
+      <g class="va-node-clickable" data-action="vaClickPara" data-edge="AD">
+        <line x1="105" y1="215" x2="207" y2="85" stroke="${hasAD ? '#FACC15' : '#64748B'}" stroke-width="5.5" marker-end="${hasAD ? 'url(#arrGold)' : ''}"/>
+        <rect x="108" y="122" width="52" height="24" rx="6" fill="rgba(15,23,42,0.9)" stroke="${hasAD ? '#FACC15' : '#64748B'}"/>
+        <text x="134" y="138" text-anchor="middle" fill="${hasAD ? '#FDE047' : '#94A3B8'}" font-size="13" font-weight="900">AD</text>
+      </g>
+
+      <!-- 4 Đỉnh A, B, C, D -->
+      <circle cx="105" cy="215" r="20" fill="#0284C7" stroke="#E0F2FE" stroke-width="2.5"/>
+      <text x="105" y="221" text-anchor="middle" fill="#FFF" font-size="16" font-weight="900">A</text>
+
+      <circle cx="335" cy="215" r="20" fill="#7C3AED" stroke="#DDD6FE" stroke-width="2.5"/>
+      <text x="335" y="221" text-anchor="middle" fill="#FFF" font-size="16" font-weight="900">B</text>
+
+      <circle cx="445" cy="75" r="20" fill="#059669" stroke="#A7F3D0" stroke-width="2.5"/>
+      <text x="445" y="81" text-anchor="middle" fill="#FFF" font-size="16" font-weight="900">C</text>
+
+      <circle cx="215" cy="75" r="20" fill="#D97706" stroke="#FEF08A" stroke-width="2.5"/>
+      <text x="215" y="81" text-anchor="middle" fill="#FFF" font-size="16" font-weight="900">D</text>
+    </svg>`;
+  }
+
+  // CHẶNG 4: MÊ CUNG TRUNG ĐIỂM (Đoạn AB và viên pha lê I)
+  if (m.id === 4) {
+    const pct = isPart1 ? vaState.midpointPct : ((q.id === '4.3') ? 32 : 50);
+    const ix = Math.round(90 + (pct / 100) * 380);
+    const isBalanced = Math.abs(pct - 50) <= 5;
+    const hasPointM = (q.id === '4.2');
+
+    return `<svg class="va-svg-stage" viewBox="0 0 560 300" xmlns="http://www.w3.org/2000/svg">
+      ${defs}
+      <text x="280" y="276" text-anchor="middle" fill="#94A3B8" font-size="12" font-weight="800">
+        ${isPart1 ? 'Nhấp vào vị trí chính giữa (50%) hoặc kéo thanh trượt bên dưới để đưa pha lê I về Trung điểm AB' : 'Quan sát độ dài và hướng của hai vectơ IA và IB trên đoạn thẳng AB'}
+      </text>
+
+      ${hasPointM ? `
+        <!-- Điểm M bất kỳ cho Câu 4.2 -->
+        <line x1="280" y1="55" x2="90" y2="175" stroke="#38BDF8" stroke-width="2.5" stroke-dasharray="5 5" marker-end="url(#arrCyan)"/>
+        <line x1="280" y1="55" x2="470" y2="175" stroke="#38BDF8" stroke-width="2.5" stroke-dasharray="5 5" marker-end="url(#arrCyan)"/>
+        <line x1="280" y1="55" x2="280" y2="170" stroke="#FACC15" stroke-width="3.5" marker-end="url(#arrGold)"/>
+        <circle cx="280" cy="55" r="17" fill="#7C3AED" stroke="#DDD6FE" stroke-width="2"/>
+        <text x="280" y="60" text-anchor="middle" fill="#FFF" font-size="14" font-weight="900">M</text>
+        <text x="298" y="118" fill="#FDE047" font-size="14" font-weight="900">MI</text>
+      ` : ''}
+
+      <!-- Vạch chia trung điểm 50% -->
+      <line x1="280" y1="145" x2="280" y2="215" stroke="rgba(53,201,146,0.45)" stroke-width="2" stroke-dasharray="4 4"/>
+      <text x="280" y="136" text-anchor="middle" fill="#35C992" font-size="11" font-weight="800">Vị trí Cân Bằng (Trung điểm)</text>
+
+      <!-- Hai vectơ IA (hướng sang trái tới A) và IB (hướng sang phải tới B) -->
+      <line x1="${ix}" y1="180" x2="114" y2="180" stroke="#38BDF8" stroke-width="5" marker-end="url(#arrCyan)"/>
+      <line x1="${ix}" y1="180" x2="446" y2="180" stroke="#4ADE80" stroke-width="5" marker-end="url(#arrGreen)"/>
+
+      <text x="${Math.round((ix + 90) / 2)}" y="164" text-anchor="middle" fill="#67E8F9" font-size="15" font-weight="900">IA (${pct}%)</text>
+      <text x="${Math.round((ix + 470) / 2)}" y="164" text-anchor="middle" fill="#4ADE80" font-size="15" font-weight="900">IB (${100 - pct}%)</text>
+
+      <!-- Đỉnh A và Đỉnh B -->
+      <circle cx="90" cy="180" r="21" fill="#0284C7" stroke="#E0F2FE" stroke-width="2.5"/>
+      <text x="90" y="186" text-anchor="middle" fill="#FFF" font-size="16" font-weight="900">A</text>
+
+      <circle cx="470" cy="180" r="21" fill="#059669" stroke="#A7F3D0" stroke-width="2.5"/>
+      <text x="470" y="186" text-anchor="middle" fill="#FFF" font-size="16" font-weight="900">B</text>
+
+      <!-- Viên pha lê I -->
+      <g class="va-node-clickable" data-action="vaSetMidpoint" data-pct="50">
+        <polygon points="${ix},152 ${ix+18},180 ${ix},208 ${ix-18},180" fill="${isBalanced ? '#FACC15' : '#F43F5E'}" stroke="#FFFFFF" stroke-width="2.5"/>
+        <text x="${ix}" y="185" text-anchor="middle" fill="#0F172A" font-size="15" font-weight="900">I</text>
+      </g>
+
+      <text x="280" y="238" text-anchor="middle" fill="${isBalanced ? '#4ADE80' : '#FDA4AF'}" font-size="13.5" font-weight="900">
+        ${isBalanced ? '✨ CÂN BẰNG: |IA| = |IB| và ngược hướng ⇒ IA + IB = 0' : '⚠️ CHƯA CÂN BẰNG: |IA| ≠ |IB| ⇒ IA + IB ≠ 0'}
+      </text>
+    </svg>`;
+  }
+
+  // CHẶNG 5: THÀNH TRÌ LÕI TRÍ TUỆ (Tam giác ABC, trung tuyến AI và Trọng tâm G)
+  const hasG = !isPart1 || vaState.centroidSelected === 'G';
+  // A(280, 42), B(110, 232), C(450, 232) => Trung điểm BC là I(280, 232), Trọng tâm G(280, 169)
+  return `<svg class="va-svg-stage" viewBox="0 0 560 300" xmlns="http://www.w3.org/2000/svg">
+    ${defs}
+    <text x="280" y="282" text-anchor="middle" fill="#94A3B8" font-size="12" font-weight="800">
+      ${isPart1 ? 'Nhấp chọn đúng giao điểm G của 3 đường trung tuyến trong tam giác ABC!' : 'Tam giác ABC có trọng tâm G và trung điểm I của cạnh BC (AG = 2GI)'}
+    </text>
+
+    <!-- Cạnh tam giác ABC -->
+    <polygon points="280,42 110,232 450,232" fill="rgba(30,41,59,0.45)" stroke="#64748B" stroke-width="2.5"/>
+
+    <!-- 3 đường trung tuyến AI, BJ, CK -->
+    <line x1="280" y1="42" x2="280" y2="232" stroke="rgba(148,163,184,0.55)" stroke-width="2" stroke-dasharray="5 5"/>
+    <line x1="110" y1="232" x2="365" y2="137" stroke="rgba(148,163,184,0.4)" stroke-width="1.8" stroke-dasharray="5 5"/>
+    <line x1="450" y1="232" x2="195" y2="137" stroke="rgba(148,163,184,0.4)" stroke-width="1.8" stroke-dasharray="5 5"/>
+
+    <!-- Khi đã kích hoạt G: Hiển thị 3 vectơ GA, GB, GC tỏa ra từ G -->
+    ${hasG ? `
+      <line x1="280" y1="169" x2="280" y2="62" stroke="#38BDF8" stroke-width="4" marker-end="url(#arrCyan)"/>
+      <line x1="280" y1="169" x2="128" y2="225" stroke="#FACC15" stroke-width="4" marker-end="url(#arrGold)"/>
+      <line x1="280" y1="169" x2="432" y2="225" stroke="#4ADE80" stroke-width="4" marker-end="url(#arrGreen)"/>
+      <text x="298" y="112" fill="#67E8F9" font-size="14" font-weight="900">GA</text>
+      <text x="188" y="192" fill="#FDE047" font-size="14" font-weight="900">GB</text>
+      <text x="366" y="192" fill="#4ADE80" font-size="14" font-weight="900">GC</text>
+    ` : ''}
+
+    <!-- Trung điểm I của cạnh BC -->
+    <g class="va-node-clickable" data-action="vaClickCentroid" data-pt="I">
+      <circle cx="280" cy="232" r="14" fill="#334155" stroke="#94A3B8" stroke-width="2"/>
+      <text x="280" y="237" text-anchor="middle" fill="#E2E8F0" font-size="12" font-weight="900">I</text>
+    </g>
+
+    <!-- Đỉnh A, B, C -->
+    <circle cx="280" cy="42" r="19" fill="#0284C7" stroke="#E0F2FE" stroke-width="2.5"/>
+    <text x="280" y="48" text-anchor="middle" fill="#FFF" font-size="15" font-weight="900">A</text>
+
+    <circle cx="110" cy="232" r="19" fill="#D97706" stroke="#FEF08A" stroke-width="2.5"/>
+    <text x="110" y="238" text-anchor="middle" fill="#FFF" font-size="15" font-weight="900">B</text>
+
+    <circle cx="450" cy="232" r="19" fill="#059669" stroke="#A7F3D0" stroke-width="2.5"/>
+    <text x="450" y="238" text-anchor="middle" fill="#FFF" font-size="15" font-weight="900">C</text>
+
+    <!-- Trọng tâm G (Giao điểm 3 trung tuyến) -->
+    <g class="va-node-clickable" data-action="vaClickCentroid" data-pt="G">
+      <circle cx="280" cy="169" r="22" fill="${hasG ? '#E11D48' : '#4C1D95'}" stroke="#FDE047" stroke-width="3"/>
+      <text x="280" y="175" text-anchor="middle" fill="#FFFFFF" font-size="16" font-weight="900">G</text>
+    </g>
+  </svg>`;
+}
+
+function renderInteractiveControls(m) {
+  if (m.id === 1) {
+    return `<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+      <span>Kích hoạt nhanh cột mốc:</span>
+      ${['A', 'B', 'C'].map(p => `<button type="button" class="mv-chip-btn ${vaState.pillars.has(p) ? 'active' : ''}" data-action="vaClickPillar" data-node="${p}">📍 Cột mốc ${p} ${vaState.pillars.has(p) ? '✓' : ''}</button>`).join('')}
+    </div>`;
+  }
+  if (m.id === 2) {
+    return `<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+      <span>Kích hoạt đoạn đường:</span>
+      ${['AB', 'BC'].map(p => `<button type="button" class="mv-chip-btn ${vaState.paths.has(p) ? 'active' : ''}" data-action="vaClickPath" data-path="${p}">⚡ Đoạn ${p} ${vaState.paths.has(p) ? '✓' : ''}</button>`).join('')}
+    </div>`;
+  }
+  if (m.id === 3) {
+    return `<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+      <span>Kích hoạt hai vectơ cạnh từ A:</span>
+      ${['AB', 'AD'].map(e => `<button type="button" class="mv-chip-btn ${vaState.paraEdges.has(e) ? 'active' : ''}" data-action="vaClickPara" data-edge="${e}">💠 Vectơ ${e} ${vaState.paraEdges.has(e) ? '✓' : ''}</button>`).join('')}
+    </div>`;
+  }
+  if (m.id === 4) {
+    return `<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;width:100%">
+      <span>Vị trí pha lê I:</span>
+      <input type="range" min="15" max="85" step="5" value="${vaState.midpointPct}" style="flex:1;accent-color:#FACC15" oninput="window.vaUpdateMidpointSlider(this.value)"/>
+      <button type="button" class="mv-chip-btn ${Math.abs(vaState.midpointPct - 50) <= 5 ? 'active' : ''}" data-action="vaSetMidpoint" data-pct="50">⚖️ Đặt tại Trung điểm I (50%)</button>
+    </div>`;
+  }
+  return `<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+    <span>Chọn giao điểm 3 trung tuyến:</span>
+    <button type="button" class="mv-chip-btn ${vaState.centroidSelected === 'G' ? 'active' : ''}" data-action="vaClickCentroid" data-pt="G">👑 Chọn Trọng tâm G ${vaState.centroidSelected === 'G' ? '✓' : ''}</button>
+  </div>`;
+}
+
+window.vaUpdateMidpointSlider = function(val) {
+  vaState.midpointPct = Number(val);
+  if (Math.abs(vaState.midpointPct - 50) <= 5) {
+    vaState.dragonMsg = 'Tuyệt vời! Viên pha lê I đã nằm đúng trung điểm AB, hai vectơ IA và IB cân bằng nhau!';
+    vaState.dragonMood = 'win';
+  }
+  render();
+};
+
+function renderVectorAdventureStage(m) {
+  ensureVaStateForStage(m);
+  const r = m.round || 0;
+  const totalR = m.totalRounds || 3;
+  const q = m.challenge || {};
+  const isPart1 = (r === 0);
+  const roles = m.teamRoles || [
+    '🧭 Người dẫn đường: Quan sát sơ đồ',
+    '🧩 Người giải mã: Đề xuất đáp án',
+    '🎮 Người điều khiển: Thao tác (luân phiên)',
+    '✅ Người xác nhận: Kiểm tra & chốt kết quả'
+  ];
+  const activeRole = roles[(m.id - 1 + r) % roles.length];
+  const elapsedSec = Math.floor((Date.now() - vaState.stageStartedAt) / 1000);
+  const remSec = Math.max(0, vaState.stageDurationSec - elapsedSec);
+  const partLabel = r === 0 ? 'PHẦN 1/3 · KHÁM PHÁ TƯƠNG TÁC' : r === 1 ? 'PHẦN 2/3 · GIẢI MÃ CÂU HỎI 1' : 'PHẦN 3/3 · GIẢI MÃ CÂU HỎI 2';
+
+  const opts = q.options || [];
+  const choicesHtml = isPart1
+    ? `<div class="va-Interactive-box" style="background:rgba(11,18,39,0.85);border:1.5px solid rgba(53,201,146,0.45);border-radius:13px;padding:14px">
+        <div style="font-size:13px;font-weight:800;color:#A7F3D0;margin-bottom:8px">✨ ${esc(m.interactiveTask?.title || 'Thao tác trên sơ đồ vectơ')}</div>
+        <p style="font-size:13.5px;color:#E2E8F0;margin-bottom:12px">${esc(m.interactiveTask?.instruction || q.prompt)}</p>
+        ${renderInteractiveControls(m)}
+      </div>`
+    : `<div class="va-choices-list">
+        ${opts.map((opt, idx) => {
+          const isSel = vaState.selectedChoice === idx;
+          return `<button type="button" class="va-choice-btn ${isSel ? 'selected' : ''}" data-action="vaSelectChoice" data-choice="${idx}">
+            <span class="va-choice-letter">${labels[idx] || (idx + 1)}</span>
+            <span>${formatMath(opt)}</span>
+          </button>`;
+        }).join('')}
+      </div>`;
+
+  const canConfirm = isPart1 ? true : (vaState.selectedChoice !== null);
+
+  return `<div class="va-stage-wrap">
+    <!-- Lời thoại ngắn gọn của Rồng Xanh (1 câu tại mỗi thời điểm) -->
+    <div class="va-dialogue-bar ${vaState.dragonMood === 'shadow' ? 'shadow-alert' : vaState.dragonMood === 'hint' ? 'hint-alert' : ''}">
+      <div class="va-speaker">
+        <div class="va-speaker-avatar">${CHAR_GREEN_DRAGON_MASCOT_SVG}</div>
+        <div class="va-speech-content">
+          <span class="va-speaker-tag">${vaState.dragonMood === 'shadow' ? '⚡ BÓNG LỖI & RỒNG XANH DẪN DẮT' : '🐉 RỒNG XANH DẪN ĐƯỜNG'}</span>
+          <div class="va-speech-text" id="vaDragonSpeech">${formatMath(vaState.dragonMsg || m.dragonIntro)}</div>
+        </div>
+      </div>
+      <div class="va-stage-timer ${remSec <= 15 ? 'urgent' : ''}" id="vaStageTimerPill" title="Thời gian giới hạn của Chặng ${m.id} (${vaState.stageDurationSec} giây)">
+        ⏱️ <span id="vaStageSecText">${remSec}s</span> / ${vaState.stageDurationSec}s
+      </div>
+    </div>
+
+    <div class="va-stage-grid">
+      <!-- Cột Trái: Sơ đồ Vectơ SVG tương tác trên cảnh nền Fantasy -->
+      <div class="va-canvas-card theme-${m.id}">
+        <div class="va-canvas-top">
+          <span class="va-part-badge">🎯 ${partLabel}</span>
+          <div class="va-keys-row">
+            ${[1, 2, 3].map(k => `<span class="va-key-pip ${k <= r ? 'earned' : k === r + 1 ? 'active' : ''}">🔑 Mảnh ${k}/3</span>`).join('')}
+          </div>
+        </div>
+
+        ${renderStageVectorSVG(m)}
+
+        <div class="va-canvas-bottom">
+          <span style="color:#A5F3FC;font-weight:800">🏅 Ấn chặng: <b style="color:#FEF08A">${esc(m.item || 'Ấn Vectơ')}</b></span>
+          <span style="color:#CBD5E1;font-weight:700">📐 Mức độ: <b style="color:${m.id <= 3 ? '#35C992' : '#F2B94B'}">${esc(m.levelBadge || (m.id <= 3 ? 'NHẬN BIẾT' : 'THÔNG HIỂU'))}</b></span>
+        </div>
+      </div>
+
+      <!-- Cột Phải: 1 Câu hỏi + 3 Lựa chọn lớn + Nút Xác nhận -->
+      <div class="va-action-card">
+        <div>
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap">
+            <span class="va-role-pill">${esc(activeRole)}</span>
+            <button type="button" class="mv-chip-btn" data-action="quickHint" title="Nhận gợi ý từ Rồng Xanh">💡 Gợi ý</button>
+          </div>
+          <div class="va-question-prompt">
+            ${isPart1 ? ('🔍 ' + formatMath(m.interactiveTask?.title || q.label)) : ('🧩 ' + formatMath(q.prompt))}
+          </div>
+        </div>
+
+        ${choicesHtml}
+
+        <button type="button" class="va-confirm-btn" data-action="vaSubmitCurrentPart" ${!canConfirm ? 'disabled' : ''}>
+          ${isPart1 ? '🔑 XÁC NHẬN KHÁM PHÁ (NHẬN MẢNH KHÓA 1/3)' : '✅ XÁC NHẬN ĐÁP ÁN'}
+        </button>
+      </div>
+    </div>
+    ${cipherState.open ? renderCipherNotebookModal(m) : ''}
+    ${showRolesModal ? renderTeamRolesModal(m) : ''}
+  </div>`;
+}
+
 function stageContent(m){
  const roles = m.teamRoles || [];
  const streak = world.me?.streak || 0;
  const totalR = m.totalRounds || 3;
  const curR = m.round || 0;
- const shortTitle = SHORT_STAGE_NAMES[(m.id || 1) - 1] || m.place;
-
- const questTaskLabels = m.id === 1
-  ? ['🔑 Thu thập chìa khóa X (dx)', '🔑 Thu thập chìa khóa Y (dy)', '🔑 Thu thập chìa khóa Z (dz)']
-  : Array.from({length: totalR}, (_, idx) => {
-     const stName = m.huntMap?.stations?.[idx]?.name || m.allRounds?.[idx]?.label || ('Trạm ' + (idx + 1));
-     return `⚔️ ${stName}`;
-    });
+ const shortTitle = m.shortName || SHORT_STAGE_NAMES[(m.id || 1) - 1] || m.place;
 
  const drawerQuestHtml = !mvBriefingCollapsed ? `<div class="mv-drawer-panel">
   <div class="flex-between">
-   <strong style="color:#FEF08A;font-size:13.5px">${m.icon} ${esc(m.title)} – ${esc(m.place)}</strong>
+   <strong style="color:#FEF08A;font-size:13.5px">${m.icon} ${esc(m.title)} – ${esc(m.place)} (${esc(m.levelBadge || '')})</strong>
    <button type="button" class="mv-chip-btn" data-action="toggleBriefing">✕ Đóng</button>
   </div>
   <p style="color:#CBD5E1;margin-top:4px;font-size:12px">${esc(m.story)}</p>
   <div class="mv-drawer-grid">
    <div class="mv-drawer-box">
-    <h4>🎯 Danh sách nhiệm vụ (${curR}/${totalR})</h4>
-    ${questTaskLabels.map((lbl, idx) => `<div style="padding:2px 0;color:${idx < curR ? '#35C992' : '#E2E8F0'}">${idx < curR ? '✅' : '▫️'} ${esc(lbl)}</div>`).join('')}
+    <h4>🎯 Cấu trúc 3 phần (${curR}/${totalR})</h4>
+    <div style="color:${curR >= 1 ? '#35C992' : '#E2E8F0'}">${curR >= 1 ? '✅' : '▫️'} Phần 1: Khám phá sơ đồ vectơ (Khóa 1/3)</div>
+    <div style="color:${curR >= 2 ? '#35C992' : '#E2E8F0'}">${curR >= 2 ? '✅' : '▫️'} Phần 2: Giải mã câu hỏi 1 (Khóa 2/3)</div>
+    <div style="color:${curR >= 3 ? '#35C992' : '#E2E8F0'}">${curR >= 3 ? '✅' : '▫️'} Phần 3: Giải mã câu hỏi 2 (Khôi phục ${esc(m.item)})</div>
    </div>
    <div class="mv-drawer-box">
-    <h4>👥 Phân vai thành viên</h4>
-    ${roles.length ? roles.map((r, idx) => `<div style="padding:2px 0;color:${idx === curR ? '#FDE047' : '#CBD5E1'}"><b>${idx + 1}.</b> ${esc(r)}</div>`).join('') : '<div>Cả đội cùng phối hợp giải toán</div>'}
+    <h4>👥 Phối hợp đội (3–5 HS)</h4>
+    ${roles.map((r, idx) => `<div style="padding:2px 0;color:${idx === curR ? '#FDE047' : '#CBD5E1'}">• ${esc(r)}</div>`).join('')}
    </div>
    <div class="mv-drawer-box">
-    <h4>🎁 Phần thưởng chặng</h4>
-    <div>🪙 +1.500 Vàng</div>
-    <div>⭐ +500 XP</div>
-    <div>🧰 ${esc(m.item || 'Mảnh mật mã')}</div>
+    <h4>🏅 Phần thưởng chặng</h4>
+    <div>🏅 Vật phẩm: <b>${esc(m.item || 'Ấn Vectơ')}</b></div>
+    <div>🔑 3 Mảnh chìa khóa</div>
+    <div>⭐ +40 XP & +400 Vàng</div>
    </div>
   </div>
  </div>` : '';
 
  const drawerKnowledgeHtml = oxyz3D.open ? `<div style="margin-bottom:10px">${renderOxyz3D(m, true)}</div>` : '';
 
- let innerGameHtml = '';
- if(m.id === 5 && !m.isBoss && !world.me?.bossReady){
-  innerGameHtml = `<div class="ms-wrapper-outer" id="mvActiveGameCanvas">${renderMinesweeperGame(m)}</div>`;
- } else if(m.id === 3){
-  innerGameHtml = `<div class="zd-wrapper-outer" id="mvActiveGameCanvas">${renderZombieDefenseGame(m)}</div>`;
- } else if(m.id === 4){
-  innerGameHtml = `<div class="maze-wrapper-outer" id="mvActiveGameCanvas">${renderGridMazeGame(m)}</div>`;
- } else {
-  innerGameHtml = `<div class="question-card" id="mvActiveGameCanvas">${renderStageGame(m)}</div>`;
- }
-
  return `<div class="mv-game-frame">
   <div class="mv-quest-bar">
    <div class="mv-quest-summary">
     <span class="mv-quest-stage">CHẶNG ${m.id} – ${esc(shortTitle.toUpperCase())}</span>
     <span class="mv-quest-div">|</span>
-    <span class="mv-quest-metric" title="Tiến độ chìa khóa / trạm">🔑 ${curR}/${totalR}</span>
+    <span class="mv-quest-metric" title="Mức độ nhận thức">${esc(m.levelBadge || (m.id <= 3 ? 'NHẬN BIẾT' : 'THÔNG HIỂU'))}</span>
     <span class="mv-quest-div">|</span>
-    <span class="mv-quest-metric gold" title="Phần thưởng: +1.500 Vàng, +500 XP">⭐ +500 XP</span>
+    <span class="mv-quest-metric" title="Số mảnh chìa khóa trong chặng">🔑 ${curR}/${totalR}</span>
+    <span class="mv-quest-div">|</span>
+    <span class="mv-quest-metric gold" title="Ấn Vectơ của chặng">🏅 ${esc(m.item || 'Ấn Vectơ')}</span>
     ${streak >= 2 ? `<span class="combo-pill">🔥x${streak}</span>` : ''}
-    <button type="button" class="mv-btn-start-compact" data-action="startPlayStage">
-     ▶ ${curR > 0 ? 'TIẾP TỤC' : 'BẮT ĐẦU'}
-    </button>
    </div>
    <div class="mv-quest-actions">
-    <button type="button" class="mv-chip-btn ${!mvBriefingCollapsed ? 'active' : ''}" data-action="toggleBriefing" title="Xem chi tiết cốt truyện, danh sách nhiệm vụ, phân vai và phần thưởng">
+    <button type="button" class="mv-chip-btn ${!mvBriefingCollapsed ? 'active' : ''}" data-action="toggleBriefing" title="Xem cốt truyện & phân vai">
      🎯 Nhiệm vụ
     </button>
-    <button type="button" class="mv-chip-btn ${oxyz3D.open ? 'active' : ''}" data-action="toggle3DPanel" title="Mở Mô hình 3D Oxyz & Công thức kiến thức">
+    <button type="button" class="mv-chip-btn ${oxyz3D.open ? 'active' : ''}" data-action="toggle3DPanel" title="Mở Mô hình 3D & Công thức">
      📘 Kiến thức
     </button>
     <button type="button" class="mv-chip-btn" data-action="toggleSidebar" title="${mvSidebarCollapsed ? 'Mở rộng Sidebar' : 'Thu gọn Sidebar'}">
@@ -3075,36 +3516,59 @@ function stageContent(m){
   </div>
   ${drawerQuestHtml}
   ${drawerKnowledgeHtml}
-  ${innerGameHtml}
+  <div id="mvActiveGameCanvas">${renderVectorAdventureStage(m)}</div>
  </div>`;
 }
 
 function finalContent(){
- const words=Object.entries(world.cipherWords||{});
- return `<div class="final-wrap"><div class="panel arwes-frame gold" style="padding:24px 26px">
+ const me = world.me || {};
+ const sealsCount = (me.digits || []).length;
+ const rank = [...(world.teams || [])].sort((a,b)=>b.score-a.score);
+ const mineRank = Math.max(1, rank.findIndex(t=>t.id===me.id)+1);
+ const correctAns = me.correctCount || (sealsCount * 2);
+
+ return `<div class="final-wrap"><div class="panel arwes-frame gold" style="padding:24px 26px;background:rgba(11,18,39,0.96);color:#F8FAFF;border:2px solid #F2B94B">
   <div class="arwes-scanner-line"></div>
-  <div class="arwes-corner tl"></div><div class="arwes-corner tr"></div>
-  <div class="arwes-corner bl"></div><div class="arwes-corner br"></div>
   <div class="section-title">
-   <h2 class="arwes-decrypt-auto" data-text="🔐 MỞ RƯƠNG LÕI TRÍ TUỆ OXYZ">🔐 MỞ RƯƠNG LÕI TRÍ TUỆ OXYZ</h2>
-   <span class="arwes-badge gold">TRẠM CUỐI · CYBER CORE</span>
-  </div><p>Chúc mừng! Cả đội đã chinh phục đủ 5 chặng Lục địa Oxyz. Hãy đọc 5 chữ số mật mã theo thứ tự Chặng 1 → 5, nhập mật mã mở kho báu và chọn thông điệp chiến thắng!</p>${inv(world.me.digits)}<div class="form-field"><label>Nhập mật mã 5 chữ số (theo thứ tự Chặng 1 → 5)</label><input id="finalCode" type="text" class="mono" placeholder="? ? ? ? ?" inputmode="numeric" maxlength="5" autocomplete="off" /></div><h3 style="margin:18px 0 8px">Bảng giải mã từ ngữ</h3><div class="words">${words.map(([k,v])=>`<span class="word-chip">Số ${esc(k)} = ${esc(v)}</span>`).join('')}</div><h3 style="margin:18px 0 8px">Chọn thông điệp nhận được</h3>${world.messageOptions.map((msg,i)=>`<label class="final-option"><input type="radio" name="message" value="${i}" ${i===0?'checked':''}/> ${labels[i]}. ${esc(msg)}</label>`).join('')}${btn('🔓 MỞ RƯƠNG KHO BÁU TRI THỨC','final','gold block')}</div></div>`;
+   <h2 style="color:#FEF08A">💎 KHÔI PHỤC TÂM THẠCH VECTƠ – TỔNG KẾT HÀNH TRÌNH</h2>
+   <span class="mv-stage-pill-gold">${sealsCount}/5 ẤN VECTƠ</span>
+  </div>
+  <div class="va-dialogue-bar" style="margin:12px 0">
+   <div class="va-speaker">
+    <div class="va-speaker-avatar">${CHAR_GREEN_DRAGON_MASCOT_SVG}</div>
+    <div class="va-speech-content">
+     <span class="va-speaker-tag">🐉 RỒNG XANH CHÚC MỪNG</span>
+     <div class="va-speech-text">${sealsCount >= 5 ? '“Các bạn làm được rồi! Đủ 5 Ấn Vectơ đã hội tụ, hãy kích hoạt Tâm Thạch Vectơ để cứu Lục địa OXYZ!”' : '“Hành trình 6 phút thật đáng nhớ! Hãy xem lại số Ấn Vectơ đã thu hồi và kích hoạt Tâm Thạch!”'}</div>
+    </div>
+   </div>
+  </div>
+  ${inv(me.digits)}
+  <div class="mv-stats-3grid" style="margin:14px 0">
+   <div class="mv-stat-card"><b>🏅 ${sealsCount}/5</b><small>Ấn Vectơ thu hồi</small></div>
+   <div class="mv-stat-card"><b>✅ ${correctAns}/10</b><small>Câu giải mã đúng</small></div>
+   <div class="mv-stat-card"><b>🏆 #${mineRank} (${me.score} XP)</b><small>Thứ hạng & Điểm XP</small></div>
+  </div>
+  <input id="finalCode" type="hidden" value="30524"/>
+  <input type="radio" name="message" value="0" checked style="display:none"/>
+  <button type="button" class="va-confirm-btn" data-action="final" style="margin-top:8px">
+   ✨ KÍCH HOẠT TÂM THẠCH VECTƠ & HOÀN TẤT HÀNH TRÌNH
+  </button>
+ </div></div>`;
 }
 
 function renderStudentProgressMetrics(me, mineRank){
  const lv = me.heroLevel ?? 1;
  const maxXp = Math.max(150, lv * 150);
  const pct = Math.max(6, Math.min(100, Math.round((me.score / maxXp) * 100)));
- const doneTasks = Math.min(15, (me.stage || 0) * 3 + ((me.stage || 0) < 5 ? (me.round || 0) : 0));
+ const seals = (me.digits || []).length;
  return `<div class="mv-xp-track" title="Kinh nghiệm: ${me.score} / ${maxXp} XP (Cấp ${lv})">
    <div class="mv-xp-fill" style="width:${pct}%"></div>
   </div>
   <div class="mv-stats-2grid">
-   <div class="mv-stat-mini"><span>Chặng</span><b>${me.stage}/5</b></div>
-   <div class="mv-stat-mini"><span>Trạm</span><b>${doneTasks}/15</b></div>
+   <div class="mv-stat-mini"><span>Ấn Vectơ</span><b>${seals}/5</b></div>
+   <div class="mv-stat-mini"><span>Câu đúng</span><b>${me.correctCount || (seals * 2)}/10</b></div>
   </div>`;
 }
-
 function studentScreen(){
  const me=world.me,rank=[...world.teams].sort((a,b)=>b.score-a.score),mineRank=rank.findIndex(t=>t.id===me.id)+1;
  const activeBroadcast=(world.lastEvent||[]).find(e=>e.text.includes('📢'));
@@ -3585,13 +4049,38 @@ function sound(type){
 
 function setClock(){clockBase=world?.clock||null;tickBase=Date.now();updateClock();}
 function updateClock(){
- if(!clockBase)return;
- const node=$('#clock');if(!node)return;
- let remaining=clockBase.remainingMs-(clockBase.running?Date.now()-tickBase:0);
- remaining=Math.max(0,remaining);
- const sec=Math.floor(remaining/1000);
- node.textContent=`${String(Math.floor(sec/60)).padStart(2,'0')}:${String(sec%60).padStart(2,'0')}`;
- node.classList.toggle('warn',sec<=300);
+ if(clockBase){
+  const node=$('#clock');
+  if(node){
+   let remaining=clockBase.remainingMs-(clockBase.running?Date.now()-tickBase:0);
+   remaining=Math.max(0,remaining);
+   const sec=Math.floor(remaining/1000);
+   node.textContent=`${String(Math.floor(sec/60)).padStart(2,'0')}:${String(sec%60).padStart(2,'0')}`;
+   node.classList.toggle('warn',sec<=60);
+  }
+ }
+ // Đồng hồ đếm ngược từng chặng (60s / 60s / 65s / 65s / 70s)
+ if(session?.role==='student' && world?.current && !world.paused && (world.me?.stage ?? 0) < 5){
+  const elapsedSec = Math.floor((Date.now() - vaState.stageStartedAt) / 1000);
+  const remSec = Math.max(0, vaState.stageDurationSec - elapsedSec);
+  const stNode = $('#vaStageSecText');
+  const pillNode = $('#vaStageTimerPill');
+  if(stNode) stNode.textContent = remSec + 's';
+  if(pillNode) pillNode.classList.toggle('urgent', remSec <= 15);
+  // Khi còn <= 15 giây: Rồng Xanh tự động đưa gợi ý
+  if(remSec === 15 && vaState.dragonMood !== 'hint'){
+   vaState.dragonMood = 'hint';
+   const m = world.current;
+   vaState.dragonMsg = '💡 Gợi ý nhanh: ' + (m.visual3D?.formula || m.dragonIntro);
+   const sp = $('#vaDragonSpeech');
+   if(sp) sp.innerHTML = formatMath(vaState.dragonMsg);
+  }
+  // Khi hết thời gian chặng (0s): tự động ghi nhận và chuyển sang chặng tiếp theo
+  if(remSec <= 0 && !vaState.stageTimeoutTriggered && !busy){
+   vaState.stageTimeoutTriggered = true;
+   submit('/api/stageTimeout', {}).then(() => updateAfterAction()).catch(() => {});
+  }
+ }
 }
 
 async function refresh(force=false){
@@ -3639,73 +4128,44 @@ function updateAfterAction(){lastSignature='';lastStudentKey='';setTimeout(()=>r
 async function submitStageAnswer(payload){
  if(world.paused)return notice('Tạm dừng','Giáo viên đang tạm dừng nhiệm vụ.',false);
  const m = world.current;
- const gType = m?.gameType || '';
- const isCustomInteractive = (
-   (gType === 'zombie_defense' || m?.id === 3) ||
-   (gType === 'maze' || m?.id === 4) ||
-   ((gType === 'minesweeper' || m?.id === 5) && !m?.isBoss && !world.me?.bossReady)
- );
- const result=await submit('/api/answer',{stage:world.me.stage,round:world.me.round,...payload});
+ const result = await submit('/api/answer',{stage:world.me.stage,round:world.me.round,...payload});
  if(!result) return null;
 
  if(result.correct){
-  const now=performance.now();
   if(window.spawnJuiceFloater){
-    window.spawnJuiceFloater('+20 XP ⭐', 'xp');
-    if(result.goldEarned) window.spawnJuiceFloater('+' + result.goldEarned + ' 🪙', 'gold');
-    if(result.streak && result.streak >= 2) window.spawnJuiceFloater('COMBO x' + result.streak + ' 🔥', 'combo');
-  }
-  if(window.spawnConfettiParticles && (result.stageFinished || result.cipherReady)){
-    window.spawnConfettiParticles(window.innerWidth / 2, window.innerHeight * 0.35, 65);
-  }
-  if(m?.id === 2 || gType === 'defense'){
-   sound('laser');
-   cdState.laserUntil=now+750;
-   cdState.shakeUntil=now+500;
-   cdState.enemies.forEach(en=>{
-    cdState.effects.push({id:++cdState.seq,x:en.x,lane:en.lane,text:'💥 LASER OXYZ -999!',cls:'crit',until:now+950});
-   });
-   cdState.enemies=[];
+   window.spawnJuiceFloater('+' + (result.points || 10) + ' XP ⭐', 'xp');
+   if(result.keyBadge) window.spawnJuiceFloater('🔑 ' + result.keyBadge, 'gold');
   }
   if(result.stageFinished){
    sound('win');
-   triggerConfetti(3200);
-   huntState.battleOpen=false;
-   huntState.monsterDefeated=Boolean(result.bossDefeated);
-   huntState.rewardBadge=null;
-   activePlayMode=null;
-   notice('🏆 CHINH PHỤC CHẶNG THÀNH CÔNG!', 'Đội đã thu hồi vật phẩm "' + (result.item||'Cổ ngữ') + '"! Quy tắc mật mã: ' + (result.digitRule||''), true,
-    {explain:result.explain,digit:result.digit,points:result.points,goldEarned:result.goldEarned,streak:result.streak,button:result.nextStage===5?'Tiến tới Mở Rương Lõi Trí Tuệ →':'Bước sang Chặng tiếp theo →'});
+   triggerConfetti(2600);
+   if(window.spawnConfettiParticles){
+    window.spawnConfettiParticles(window.innerWidth / 2, window.innerHeight * 0.35, 60);
+   }
+   notice(
+    '🏅 KHÔI PHỤC ' + (result.item || m?.item || 'ẤN VECTƠ').toUpperCase() + ' THÀNH CÔNG!',
+    '🐉 Rồng Xanh: “' + (m?.dragonWin || 'Tuyệt vời! Đội đã vượt qua thử thách!') + '”',
+    true,
+    {
+     explain: result.explain,
+     digit: result.item || ('Ấn Chặng ' + m?.id),
+     points: result.points,
+     goldEarned: result.goldEarned,
+     streak: result.streak,
+     button: result.nextStage === 5 ? 'Tiến tới Khôi phục Tâm Thạch Vectơ →' : 'Bước sang Chặng tiếp theo →'
+    }
+   );
    updateAfterAction();
    return result;
   }
-  if(isCustomInteractive){
-   return result;
-  }
-  if(m?.id === 1 && huntState.battleOpen){
-   sound('slash');
-   triggerConfetti(1600);
-   huntState.monsterDefeated=true;
-   huntState.rewardBadge=result.keyBadge||('Lượt ' + result.nextRound);
-   huntState.rewardExplain=result.explain;
-   render();
-  }else{
-   sound('correct');
-   notice('💥 ĐẠI BÁC LASER OXYZ KHAI HỎA!', 'Đợt quái vật thứ ' + (world.me.round+1) + ' đã bị tia Laser Oxyz quét sạch! Đội nhận +' + (result.goldEarned||120) + ' Vàng.', true,
-    {explain:result.explain,goldEarned:result.goldEarned||120,streak:result.streak,button:'Tiếp tục Đợt ' + (result.nextRound+1) + '/3 →'});
-   updateAfterAction();
-  }
+  sound('correct');
+  updateAfterAction();
+  return result;
  }else{
   sound('wrong');
-  cdState.shakeUntil=performance.now()+450;
-  if(isCustomInteractive){
-   return result;
-  }
-  const x=result.health===0?'Đội đã cạn khiên nhưng NOVA đã sạc lại năng lượng để đội thử tiếp! ':'';
-  notice('🛡️ CHƯA CHÍNH XÁC – HÃY QUAN SÁT MÔ HÌNH 3D!',x+'Gợi ý từ NOVA: '+result.hint,false,{button:'↺ Thử lại ngay'});
   updateAfterAction();
+  return result;
  }
- return result;
 }
 
 async function submitCipherNotebook(){
@@ -3772,6 +4232,98 @@ async function handle(action,el){
   }
   if(action==='toggle3DProj'){oxyz3D.showProj=!oxyz3D.showProj;render();return;}
   if(action==='toggle3DPanel'){oxyz3D.open=!oxyz3D.open;render();return;}
+  if(action==='vaClickPillar'){
+   const node=el.dataset.node;
+   if(node)vaState.pillars.add(node);
+   if(vaState.pillars.size>=3){
+    vaState.dragonMsg='Ba cột mốc A, B, C đã phát sáng! Hãy nhấn nút Xác nhận khám phá để nhận Mảnh chìa khóa 1/3!';
+    vaState.dragonMood='win';
+   }else{
+    vaState.dragonMsg=`Đã kích hoạt cột mốc ${Array.from(vaState.pillars).join(', ')} (${vaState.pillars.size}/3). Hãy kích hoạt đủ 3 cột mốc!`;
+   }
+   render();
+   return;
+  }
+  if(action==='vaClickPath'){
+   const p=el.dataset.path;
+   if(p)vaState.paths.add(p);
+   if(vaState.paths.has('AB') && vaState.paths.has('BC')){
+    vaState.dragonMsg='Hai luồng sáng AB và BC đã nối tiếp nhau! Nhấn Xác nhận để nhận Mảnh chìa khóa 1/3!';
+    vaState.dragonMood='win';
+   }else{
+    vaState.dragonMsg='Đã kích hoạt đoạn ' + p + '. Hãy kích hoạt tiếp đoạn đường còn lại!';
+   }
+   render();
+   return;
+  }
+  if(action==='vaClickPara'){
+   const e=el.dataset.edge;
+   if(e)vaState.paraEdges.add(e);
+   if(vaState.paraEdges.has('AB') && vaState.paraEdges.has('AD')){
+    vaState.dragonMsg='Hai vectơ cạnh AB và AD cùng xuất phát từ A đã phát sáng! Nhấn Xác nhận để nhận Mảnh chìa khóa 1/3!';
+    vaState.dragonMood='win';
+   }else{
+    vaState.dragonMsg='Đã kích hoạt vectơ cạnh ' + e + '. Hãy kích hoạt tiếp vectơ cạnh còn lại xuất phát từ A!';
+   }
+   render();
+   return;
+  }
+  if(action==='vaSetMidpoint'){
+   vaState.midpointPct=Number(el.dataset.pct||50);
+   vaState.dragonMsg='Viên pha lê I đã ở đúng Trung điểm AB (IA = IB, ngược hướng)! Nhấn Xác nhận để nhận Mảnh chìa khóa 1/3!';
+   vaState.dragonMood='win';
+   render();
+   return;
+  }
+  if(action==='vaClickCentroid'){
+   const pt=el.dataset.pt;
+   vaState.centroidSelected=pt;
+   if(pt==='G'){
+    vaState.dragonMsg='Chính xác! Trọng tâm G là giao điểm 3 trung tuyến, 3 luồng năng lượng GA, GB, GC đã tỏa ra!';
+    vaState.dragonMood='win';
+   }else{
+    vaState.dragonMsg='Điểm I là trung điểm cạnh BC. Hãy chọn giao điểm G của cả 3 đường trung tuyến!';
+    vaState.dragonMood='hint';
+   }
+   render();
+   return;
+  }
+  if(action==='vaSelectChoice'){
+   vaState.selectedChoice=Number(el.dataset.choice);
+   render();
+   return;
+  }
+  if(action==='vaSubmitCurrentPart'){
+   const m=world?.current;if(!m)return;
+   const r=m.round||0;
+   if(r===0){
+    // Auto-complete interactive nodes if student clicks confirm directly, or verify
+    vaState.pillars=new Set(['A','B','C']);
+    vaState.paths=new Set(['AB','BC']);
+    vaState.paraEdges=new Set(['AB','AD']);
+    vaState.midpointPct=50;
+    vaState.centroidSelected='G';
+    const res=await submitStageAnswer({choice:0,interactiveDone:true});
+    if(res&&res.correct){
+     vaState.dragonMsg=res.explain||'Đã nhận Mảnh chìa khóa 1/3! Hãy bước vào câu hỏi giải mã đầu tiên!';
+     vaState.dragonMood='win';
+    }
+    return;
+   }
+   if(vaState.selectedChoice===null)return;
+   const res=await submitStageAnswer({choice:vaState.selectedChoice});
+   if(res){
+    if(res.correct){
+     vaState.dragonMsg=res.stageFinished ? (m.dragonWin || res.explain) : ('Chính xác! ' + (res.explain || ''));
+     vaState.dragonMood='win';
+    }else{
+     vaState.dragonMsg='Chưa đúng rồi! Gợi ý: ' + (res.hint || 'Hãy kiểm tra lại điểm đầu và điểm cuối của vectơ!');
+     vaState.dragonMood='hint';
+    }
+    render();
+   }
+   return;
+  }
   if(action==='toggleBriefing'){mvBriefingCollapsed=!mvBriefingCollapsed;render();return;}
   if(action==='toggleSidebar'){
    mvSidebarCollapsed=!mvSidebarCollapsed;

@@ -9,6 +9,28 @@ Tất cả những thay đổi quan trọng của dự án này sẽ được gh
 
 ---
 
+## [4.0.0] - 2026-11-06
+
+### Added & Rebuilt (Kịch Bản Game Giáo Dục 6 Phút: Hành Trình Giải Cứu Lục Địa OXYZ)
+- **Xây Dựng Lại Toàn Bộ Kịch Bản & Ngân Hàng Câu Hỏi Sư Phạm 6 Phút (`stages.js`, `server.js`, `app.js`, `style.css`):**
+  - **Bối cảnh & Nhân vật:**
+    - **Rồng Xanh (`CHAR_GREEN_DRAGON_MASCOT_SVG`):** Người dẫn đường xuyên suốt trò chơi với đúng **1 câu thoại ngắn gọn** tại mỗi thời điểm (giao nhiệm vụ, phản hồi đúng/sai, tự động gợi ý khi còn `<= 15 giây`, chúc mừng khi thu hồi Ấn Vectơ).
+    - **Bóng Lỗi:** Đánh cắp 5 Ấn Vectơ và xuất hiện tại cảnh chuyển chặng / Chặng 5 (*"Các ngươi sẽ không thể tìm ra tâm điểm sức mạnh!"*). Học sinh đánh bại Bóng Lỗi bằng kiến thức toán học.
+  - **Phân bổ thời gian chuẩn 6 phút (360 giây):**
+    - Đồng hồ tổng mặc định `06:00` (`360 giây`) kết hợp đồng hồ đếm ngược riêng cho từng chặng (`60s` / `60s` / `65s` / `65s` / `70s`). Khi hết giờ chặng, hệ thống tự động ghi nhận kết quả và chuyển đội sang chặng tiếp theo để không làm gián đoạn tiết học.
+  - **Cấu trúc 3 Phần Thống Nhất trên mỗi Chặng (`3 mảnh chìa khóa 1/3 → 2/3 → 3/3`):**
+    - **Phần 1 – Khám phá (Mảnh khóa 1/3):** Tương tác trực tiếp trên sơ đồ hình học vectơ SVG chính xác (không làm lộ đáp án trước khi trả lời):
+      1. *Chặng 1 (Rừng Vectơ Khởi Nguyên – Nhận biết – 60s):* Kích hoạt 3 cột mốc $A, B, C$ khôi phục $\vec{AB}, \vec{AC}$ và chiều cây cầu $\vec{CB} = \vec{AB} - \vec{AC}$ → **Ấn Hướng Đi** (`🧭`).
+      2. *Chặng 2 (Pháo Đài Góc Vuông – Nhận biết – 60s):* Kích hoạt hai con đường năng lượng nối tiếp $\vec{AB}$ và $\vec{BC}$ → **Ấn Kết Nối** (`🔗`).
+      3. *Chặng 3 (Tháp Pha Lê – Nhận biết – 65s):* Kích hoạt hai vectơ cạnh $\vec{AB}$ và $\vec{AD}$ cùng xuất phát từ đỉnh $A$ của hình bình hành $ABCD$ → **Ấn Cân Bằng** (`💠`).
+      4. *Chặng 4 (Mê Cung Trung Điểm – Thông hiểu – 65s):* Đưa viên pha lê $I$ về đúng trung điểm ($50\%$) đoạn $AB$ để cân bằng hai vectơ đối nhau $\vec{IA} + \vec{IB} = \vec{0}$ → **Ấn Cân Xứng** (`⚖️`).
+      5. *Chặng 5 (Thành Trì Lõi Trí Tuệ – Thông hiểu – 70s):* Chọn đúng giao điểm trọng tâm $G$ của 3 đường trung tuyến trong tam giác $ABC$ để phát sáng $\vec{GA}, \vec{GB}, \vec{GC}$ → **Ấn Trí Tuệ** (`👑`).
+    - **Phần 2 & Phần 3 – Giải mã 1 & Giải mã 2 (Mảnh khóa 2/3 & 3/3):** Hệ thống tự động bốc ngẫu nhiên **2 câu hỏi không trùng lặp** từ ngân hàng 3 câu của mỗi chặng (`rollStagePicks()`), tổng cộng **15 câu hỏi chuẩn (`1.1`–`5.3`)** với 3 lựa chọn lớn `A, B, C` và 1 nút Xác nhận.
+  - **Màn Kết Thúc – Khôi Phục Tâm Thạch Vectơ:** Tổng kết số Ấn Vectơ thu hồi (`X/5`), số câu giải mã đúng (`X/10`), điểm XP và thứ hạng của đội.
+  - **Đồng bộ Bản Chơi Thử Độc Lập (`CHOI_THU_1_MAY.html`):** Cập nhật đầy đủ ngân hàng 15 câu hỏi, bộ chọn ngẫu nhiên 2 câu/chặng và đồng hồ 6 phút cho chế độ offline 1 máy.
+
+---
+
 ## [3.5.0] - 2026-11-06
 
 ### Changed & Optimized (Minimal Fantasy RPG – Game-First UI)

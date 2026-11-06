@@ -2597,3 +2597,341 @@ body {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* ═══ VECTOR ADVENTURE SCENARIO V4.0 STYLES ═══ */
+/* Rồng Xanh & Bóng Lỗi Single-Line Dialogue Strip */
+.va-dialogue-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 14px;
+  margin-bottom: 10px;
+  border-radius: 14px;
+  background: linear-gradient(90deg, rgba(16, 42, 68, 0.95), rgba(16, 27, 59, 0.95));
+  border: 1.5px solid rgba(53, 201, 146, 0.55);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
+}
+.va-dialogue-bar.shadow-alert {
+  background: linear-gradient(90deg, rgba(58, 16, 42, 0.95), rgba(28, 18, 59, 0.95));
+  border-color: rgba(244, 63, 94, 0.65);
+}
+.va-dialogue-bar.hint-alert {
+  border-color: #F2B94B;
+  box-shadow: 0 0 16px rgba(242, 185, 75, 0.35);
+}
+
+.va-speaker {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  flex: 1;
+}
+.va-speaker-avatar {
+  width: 44px;
+  height: 42px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.va-speaker-avatar svg {
+  width: 100%;
+  height: 100%;
+}
+.va-speech-content {
+  min-width: 0;
+  flex: 1;
+}
+.va-speaker-tag {
+  font-size: 10.5px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #35C992;
+  display: block;
+}
+.va-dialogue-bar.shadow-alert .va-speaker-tag {
+  color: #FB7185;
+}
+.va-speech-text {
+  font-size: 13.5px;
+  font-weight: 800;
+  color: #F8FAFF;
+  line-height: 1.35;
+}
+
+/* Stage Countdown Pill */
+.va-stage-timer {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 99px;
+  background: rgba(11, 18, 39, 0.92);
+  border: 1.5px solid #1AB6B5;
+  color: #A5F3FC;
+  font-size: 12.5px;
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.va-stage-timer.urgent {
+  border-color: #F43F5E;
+  color: #FDA4AF;
+  background: rgba(136, 19, 55, 0.55);
+  animation: pulse 1s infinite;
+}
+
+/* Main 2-Column Adventure & Vector Stage Grid */
+.va-stage-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(320px, 1fr);
+  gap: 14px;
+  align-items: stretch;
+  min-height: 430px;
+}
+
+/* Left Column: Fantasy Backdrop + Interactive Vector SVG Canvas */
+.va-canvas-card {
+  position: relative;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1.5px solid rgba(26, 182, 181, 0.45);
+  background:
+    radial-gradient(circle at 50% 25%, rgba(26, 182, 181, 0.22), transparent 65%),
+    linear-gradient(180deg, #0D1B3E 0%, #091229 100%);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 14px;
+  box-shadow: inset 0 0 32px rgba(0, 0, 0, 0.65);
+}
+.va-canvas-card.theme-1 {
+  background-image:
+    linear-gradient(180deg, rgba(8, 22, 38, 0.72) 0%, rgba(9, 28, 36, 0.84) 100%),
+    url('/images/fantasy-floating-world.jpg');
+  background-size: cover;
+  background-position: center;
+}
+.va-canvas-card.theme-2 {
+  background: radial-gradient(circle at 50% 20%, rgba(245, 158, 11, 0.22), transparent 60%), linear-gradient(180deg, #1E1B4B 0%, #0F172A 100%);
+}
+.va-canvas-card.theme-3 {
+  background: radial-gradient(circle at 50% 20%, rgba(168, 85, 247, 0.26), transparent 60%), linear-gradient(180deg, #2E1065 0%, #0F172A 100%);
+}
+.va-canvas-card.theme-4 {
+  background: radial-gradient(circle at 50% 20%, rgba(20, 184, 166, 0.24), transparent 60%), linear-gradient(180deg, #0F2942 0%, #091326 100%);
+}
+.va-canvas-card.theme-5 {
+  background: radial-gradient(circle at 50% 20%, rgba(244, 63, 94, 0.25), transparent 60%), linear-gradient(180deg, #31102F 0%, #0B1120 100%);
+}
+
+.va-canvas-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  z-index: 2;
+}
+.va-part-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 99px;
+  background: rgba(11, 18, 39, 0.85);
+  border: 1px solid rgba(242, 185, 75, 0.55);
+  color: #FEF08A;
+  font-size: 11.5px;
+  font-weight: 800;
+}
+.va-keys-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.va-key-pip {
+  padding: 3px 9px;
+  border-radius: 99px;
+  background: rgba(15, 23, 42, 0.85);
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  font-size: 11px;
+  font-weight: 800;
+  color: #64748B;
+}
+.va-key-pip.earned {
+  background: rgba(53, 201, 146, 0.22);
+  border-color: #35C992;
+  color: #A7F3D0;
+  box-shadow: 0 0 10px rgba(53, 201, 146, 0.35);
+}
+.va-key-pip.active {
+  border-color: #F2B94B;
+  color: #FEF08A;
+}
+
+.va-svg-stage {
+  width: 100%;
+  height: 310px;
+  display: block;
+  margin: auto 0;
+  user-select: none;
+}
+
+.va-node-clickable {
+  cursor: pointer;
+  transition: transform 0.18s ease, filter 0.18s ease;
+}
+.va-node-clickable:hover {
+  filter: drop-shadow(0 0 12px #FEF08A);
+}
+
+.va-canvas-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 8px 12px;
+  border-radius: 12px;
+  background: rgba(11, 18, 39, 0.82);
+  border: 1px solid rgba(99, 125, 195, 0.3);
+  font-size: 12px;
+  z-index: 2;
+}
+
+/* Right Column: Question / Interactive Controls Box */
+.va-action-card {
+  border-radius: 16px;
+  background: linear-gradient(180deg, rgba(16, 27, 59, 0.96) 0%, rgba(11, 18, 39, 0.98) 100%);
+  border: 1.5px solid rgba(99, 125, 195, 0.4);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.va-role-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 11px;
+  border-radius: 9px;
+  background: rgba(88, 70, 201, 0.25);
+  border: 1px solid rgba(167, 139, 250, 0.45);
+  color: #DDD6FE;
+  font-size: 11.5px;
+  font-weight: 800;
+}
+
+.va-question-prompt {
+  font-size: 16px;
+  font-weight: 800;
+  color: #F8FAFF;
+  line-height: 1.48;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: rgba(11, 18, 39, 0.85);
+  border-left: 4px solid #1AB6B5;
+}
+
+/* 3 Large Choice Buttons */
+.va-choices-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.va-choice-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 13px 16px;
+  border-radius: 13px;
+  background: rgba(20, 33, 68, 0.9);
+  border: 2px solid rgba(99, 125, 195, 0.4);
+  color: #F8FAFF;
+  font-size: 15px;
+  font-weight: 800;
+  text-align: left;
+  transition: all 0.16s ease;
+}
+.va-choice-btn:hover {
+  border-color: #1AB6B5;
+  background: rgba(26, 182, 181, 0.16);
+  transform: translateY(-1px);
+}
+.va-choice-btn.selected {
+  background: linear-gradient(90deg, rgba(26, 182, 181, 0.28), rgba(88, 70, 201, 0.28));
+  border-color: #F2B94B;
+  box-shadow: 0 0 18px rgba(242, 185, 75, 0.4);
+}
+.va-choice-letter {
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
+  background: rgba(11, 18, 39, 0.9);
+  border: 1.5px solid #1AB6B5;
+  color: #A5F3FC;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 900;
+  flex-shrink: 0;
+}
+.va-choice-btn.selected .va-choice-letter {
+  background: #F2B94B;
+  border-color: #FFFBEB;
+  color: #451A03;
+}
+
+.va-confirm-btn {
+  width: 100%;
+  padding: 13px 18px;
+  border-radius: 13px;
+  background: linear-gradient(180deg, #FDE047 0%, #F59E0B 55%, #D97706 100%);
+  border: 2px solid #FFFBEB;
+  color: #451A03;
+  font-size: 14.5px;
+  font-weight: 900;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  box-shadow: 0 0 20px rgba(242, 185, 75, 0.5);
+  transition: all 0.18s ease;
+}
+.va-confirm-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 0 28px rgba(253, 224, 71, 0.85);
+}
+
+/* Mathematical Overline Vector Notation */
+.vec-arrow {
+  position: relative;
+  display: inline-block;
+  font-weight: 900;
+  color: #67E8F9;
+  padding-top: 2px;
+  margin: 0 1px;
+}
+.vec-arrow::before {
+  content: '→';
+  position: absolute;
+  top: -0.62em;
+  left: 50%;
+  transform: translateX(-50%) scaleX(1.15);
+  font-size: 0.78em;
+  line-height: 1;
+  color: #FDE047;
+  font-weight: 900;
+}
+
+@media (max-width: 1120px) {
+  .va-stage-grid {
+    grid-template-columns: 1fr;
+  }
+}
