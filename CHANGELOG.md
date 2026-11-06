@@ -9,6 +9,25 @@ Tất cả những thay đổi quan trọng của dự án này sẽ được gh
 
 ---
 
+## [4.1.0] - 2026-11-06
+
+### Added & Integrated (Tích Hợp Toàn Bộ Bộ Ảnh Nhân Vật Rồng Xanh, Giao Diện Mở Đầu & Cảnh Nền 5 Chặng)
+- **Tích hợp đầy đủ bộ tài nguyên hình ảnh gốc vào trò chơi (`public/images/scenario/`, `app.js`, `style.css`, `CHOI_THU_1_MAY.html`):**
+  - **Giao diện Game Ban Đầu (`Hành Trình Giải Cứu Lục Địa OXYZ.png` → `/images/scenario/intro-hub.jpg`):**
+    - Hiển thị tại màn hình khởi đầu và nút **`🏞️ Sảnh Hành Trình`** trên thanh điều hướng.
+    - Gắn các điểm tương tác trực tiếp (hotspots) lên đúng 5 đảo nổi Chặng 1–5, nút **`▶ BẮT ĐẦU HÀNH TRÌNH`**, 4 nút **`Đội chơi` / `Túi đồ` / `Kiến thức` / `Xếp hạng`** và bảng **`🎯 Mục tiêu`** tự động tích xanh theo tiến độ thật.
+  - **Nhân vật Rồng Xanh (`Ảnh ChatGPT ...-1.png` → `/images/scenario/dragon-mascot.png`):**
+    - Tách nền trắng trong suốt (RGBA) sắc nét, hiển thị làm linh vật dẫn đường trên thanh Header, thanh hội thoại Rồng Xanh, nhân vật đồng hành đứng trực tiếp trong từng khung cảnh chặng chơi và màn tổng kết Tâm Thạch Vectơ.
+  - **Bộ 5 Cảnh Nền Chặng 1–5 (`Ảnh ChatGPT ...-2..6.png` → `stage-1.jpg` .. `stage-5.jpg`) & 5 Thẻ Kiến Thức (`card-1.jpg` .. `card-5.jpg`):**
+    - *Chặng 1 – Rừng Vectơ Khởi Nguyên:* `stage-1.jpg` (Rừng cổ thụ, cầu đá & vòng tròn bệ đá tinh thể).
+    - *Chặng 2 – Pháo Đài Góc Vuông:* `stage-2.jpg` (Pháo đài đá với cờ hiệu góc vuông vàng `∟`).
+    - *Chặng 3 – Tháp Pha Lê:* `stage-3.jpg` (Quần đảo nổi trên mây & Tháp Pha Lê tím-lam).
+    - *Chặng 4 – Mê Cung Trung Điểm:* `stage-4.jpg` (Mê cung cây xanh đối xứng & cổng xoáy không gian tím).
+    - *Chặng 5 – Thành Trì Lõi Trí Tuệ:* `stage-5.jpg` (Thành trì dung nham & Tâm Thạch Vectơ trên đỉnh tháp).
+    - Tích hợp 5 Thẻ Kiến Thức (`01_Hieu_hai_vecto.png` .. `05_Tinh_chat_trong_tam.png`) vào ngăn **`📘 Kiến thức`** song song với mô hình 3D Oxyz.
+
+---
+
 ## [4.0.0] - 2026-11-06
 
 ### Added & Rebuilt (Kịch Bản Game Giáo Dục 6 Phút: Hành Trình Giải Cứu Lục Địa OXYZ)

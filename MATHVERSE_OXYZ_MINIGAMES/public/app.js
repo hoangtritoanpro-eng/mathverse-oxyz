@@ -356,65 +356,7 @@ const STAGE_FORMULAS_SHORT = [
   'G là trọng tâm △ABC ⇔ GA + GB + GC = 0  |  MA + MB + MC = 3MG'
 ];
 
-const CHAR_GREEN_DRAGON_MASCOT_SVG = `<svg viewBox="0 0 140 130" class="mv-dragon-mascot" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <linearGradient id="drgBody" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#4ADE80"/>
-      <stop offset="60%" stop-color="#22C55E"/>
-      <stop offset="100%" stop-color="#15803D"/>
-    </linearGradient>
-    <linearGradient id="drgBelly" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#FEF08A"/>
-      <stop offset="100%" stop-color="#F59E0B"/>
-    </linearGradient>
-    <linearGradient id="drgWing" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#FACC15"/>
-      <stop offset="100%" stop-color="#10B981"/>
-    </linearGradient>
-    <linearGradient id="drgGoggle" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#38BDF8"/>
-      <stop offset="50%" stop-color="#E0F2FE"/>
-      <stop offset="100%" stop-color="#0284C7"/>
-    </linearGradient>
-  </defs>
-  <!-- Glowing Aura -->
-  <circle cx="72" cy="70" r="52" fill="rgba(53,201,146,0.16)"/>
-  <!-- Wings -->
-  <path d="M36 74 L8 50 Q18 72 14 86 Q26 82 38 88 Z" fill="url(#drgWing)" stroke="#166534" stroke-width="2"/>
-  <path d="M104 72 L132 48 Q122 70 126 84 Q114 80 102 86 Z" fill="url(#drgWing)" stroke="#166534" stroke-width="2"/>
-  <!-- Tail -->
-  <path d="M42 102 Q18 108 14 94 Q22 92 34 94" fill="url(#drgBody)" stroke="#14532D" stroke-width="2"/>
-  <!-- Body & Belly -->
-  <ellipse cx="72" cy="88" rx="30" ry="27" fill="url(#drgBody)" stroke="#14532D" stroke-width="2.2"/>
-  <ellipse cx="72" cy="91" rx="20" ry="19" fill="url(#drgBelly)"/>
-  <!-- OXYZ Cyber Armor Chest Plate -->
-  <path d="M51 79 L93 79 L87 101 L72 107 L57 101 Z" fill="#1E1B4B" stroke="#38BDF8" stroke-width="2"/>
-  <text x="72" y="95" text-anchor="middle" fill="#67E8F9" font-size="11" font-weight="900" font-family="Montserrat,sans-serif">OXYZ</text>
-  <!-- Head -->
-  <ellipse cx="72" cy="49" rx="31" ry="26" fill="url(#drgBody)" stroke="#14532D" stroke-width="2.2"/>
-  <!-- Golden Horns & Head Crest -->
-  <path d="M50 30 Q36 14 43 8 Q54 14 58 26 Z" fill="#FBBF24" stroke="#92400E" stroke-width="1.8"/>
-  <path d="M94 30 Q108 14 101 8 Q90 14 86 26 Z" fill="#FBBF24" stroke="#92400E" stroke-width="1.8"/>
-  <path d="M72 23 L67 11 L72 15 L77 11 Z" fill="#F59E0B"/>
-  <!-- Cyber Goggles on Forehead -->
-  <rect x="43" y="22" width="58" height="15" rx="7.5" fill="#1E293B" stroke="#94A3B8" stroke-width="2"/>
-  <ellipse cx="59" cy="29.5" rx="11" ry="5.5" fill="url(#drgGoggle)" stroke="#0369A1" stroke-width="1.5"/>
-  <ellipse cx="85" cy="29.5" rx="11" ry="5.5" fill="url(#drgGoggle)" stroke="#0369A1" stroke-width="1.5"/>
-  <!-- Cute Big Eyes -->
-  <ellipse cx="58" cy="49" rx="7.5" ry="8.5" fill="#1E293B"/>
-  <ellipse cx="86" cy="49" rx="7.5" ry="8.5" fill="#1E293B"/>
-  <circle cx="56" cy="46" r="3" fill="#FFFFFF"/>
-  <circle cx="84" cy="46" r="3" fill="#FFFFFF"/>
-  <circle cx="60" cy="52" r="1.4" fill="#4ADE80"/>
-  <circle cx="88" cy="52" r="1.4" fill="#4ADE80"/>
-  <!-- Happy Smile & Cute Fang -->
-  <path d="M62 60 Q72 68 82 60 Z" fill="#991B1B" stroke="#14532D" stroke-width="1.5"/>
-  <path d="M66 62 Q72 67 78 62" fill="#FB7185"/>
-  <polygon points="65,60 67,64 69,60" fill="#FFFFFF"/>
-  <!-- Arms waving -->
-  <ellipse cx="40" cy="82" rx="9" ry="6" transform="rotate(-25 40 82)" fill="url(#drgBody)" stroke="#14532D" stroke-width="1.8"/>
-  <ellipse cx="104" cy="79" rx="9" ry="6" transform="rotate(28 104 79)" fill="url(#drgBody)" stroke="#14532D" stroke-width="1.8"/>
-</svg>`;
+const CHAR_GREEN_DRAGON_MASCOT_SVG = `<img src="/images/scenario/dragon-mascot.png" alt="Rồng Xanh OXYZ" class="mv-dragon-mascot-img" draggable="false"/>`;
 
 const HERO_OXYZ_CUBE_SVG = `<svg viewBox="0 0 220 150" class="mv-vista-cube" xmlns="http://www.w3.org/2000/svg">
   <!-- Glowing Grid Base -->
@@ -444,74 +386,12 @@ const HERO_OXYZ_CUBE_SVG = `<svg viewBox="0 0 220 150" class="mv-vista-cube" xml
 </svg>`;
 
 const ISLAND_SVGS = [
-  // Chặng 1: Rừng Vectơ Khởi Nguyên
-  `<svg viewBox="0 0 150 95" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
-    <ellipse cx="75" cy="76" rx="52" ry="12" fill="rgba(53,201,146,0.28)"/>
-    <polygon points="26,56 124,56 108,76 75,88 42,76" fill="#57534E" stroke="#A8A29E" stroke-width="1.2"/>
-    <polygon points="42,76 75,88 75,56 26,56" fill="#44403C"/>
-    <ellipse cx="75" cy="55" rx="51" ry="11" fill="#22C55E" stroke="#86EFAC" stroke-width="1.5"/>
-    <!-- Stone Portal in Center -->
-    <path d="M63 54 L63 32 Q75 22 87 32 L87 54 Z" fill="#0F172A" stroke="#FBBF24" stroke-width="2.2"/>
-    <path d="M67 52 L67 34 Q75 27 83 34 L83 52 Z" fill="#1AB6B5" opacity="0.65"/>
-    <!-- Lush Ancient Trees -->
-    <rect x="40" y="38" width="6" height="16" fill="#78350F"/>
-    <circle cx="43" cy="32" r="14" fill="#16A34A"/>
-    <circle cx="38" cy="28" r="10" fill="#4ADE80"/>
-    <rect x="104" y="38" width="6" height="16" fill="#78350F"/>
-    <circle cx="107" cy="32" r="14" fill="#15803D"/>
-    <circle cx="111" cy="28" r="10" fill="#4ADE80"/>
-  </svg>`,
-  // Chặng 2: Pháo Đài Góc Vuông
-  `<svg viewBox="0 0 150 95" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
-    <ellipse cx="75" cy="76" rx="50" ry="11" fill="rgba(242,185,75,0.22)"/>
-    <polygon points="28,58 122,58 104,78 75,88 46,78" fill="#64748B" stroke="#CBD5E1" stroke-width="1.2"/>
-    <ellipse cx="75" cy="57" rx="48" ry="10" fill="#F59E0B" stroke="#FDE68A" stroke-width="1.4"/>
-    <!-- Golden White Citadel -->
-    <rect x="52" y="30" width="46" height="27" fill="#FEF3C7" stroke="#D97706" stroke-width="1.6"/>
-    <rect x="42" y="24" width="14" height="33" fill="#FDE68A" stroke="#B45309" stroke-width="1.4"/>
-    <rect x="94" y="24" width="14" height="33" fill="#FDE68A" stroke="#B45309" stroke-width="1.4"/>
-    <polygon points="40,24 49,11 58,24" fill="#F59E0B"/>
-    <polygon points="92,24 101,11 110,24" fill="#F59E0B"/>
-    <polygon points="62,30 75,10 88,30" fill="#EA580C"/>
-    <path d="M69 57 L69 42 Q75 37 81 42 L81 57 Z" fill="#38BDF8"/>
-  </svg>`,
-  // Chặng 3: Tháp Pha Lê Khoảng Cách
-  `<svg viewBox="0 0 150 95" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
-    <ellipse cx="75" cy="76" rx="50" ry="11" fill="rgba(168,85,247,0.28)"/>
-    <polygon points="28,58 122,58 106,77 75,88 44,77" fill="#4C1D95" stroke="#A78BFA" stroke-width="1.2"/>
-    <ellipse cx="75" cy="57" rx="48" ry="10" fill="#7C3AED" stroke="#DDD6FE" stroke-width="1.4"/>
-    <!-- Crystal Spires -->
-    <polygon points="75,8 63,56 87,56" fill="#38BDF8" stroke="#E0F2FE" stroke-width="1.5"/>
-    <polygon points="54,22 44,56 64,56" fill="#C084FC" stroke="#F3E8FF" stroke-width="1.3"/>
-    <polygon points="96,20 86,56 106,56" fill="#EC4899" stroke="#FCE7F3" stroke-width="1.3"/>
-    <circle cx="75" cy="36" r="5" fill="#FEF08A"/>
-  </svg>`,
-  // Chặng 4: Mê Cung Trung Điểm
-  `<svg viewBox="0 0 150 95" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
-    <ellipse cx="75" cy="76" rx="52" ry="11" fill="rgba(192,132,252,0.25)"/>
-    <polygon points="25,56 125,56 108,77 75,88 42,77" fill="#312E81" stroke="#818CF8" stroke-width="1.2"/>
-    <ellipse cx="75" cy="48" rx="48" ry="16" fill="#4C1D95" stroke="#C084FC" stroke-width="2"/>
-    <!-- Glowing Concentric Labyrinth Rings -->
-    <ellipse cx="75" cy="46" rx="36" ry="11" fill="none" stroke="#E879F9" stroke-width="2.4" stroke-dasharray="18 5"/>
-    <ellipse cx="75" cy="45" rx="22" ry="7" fill="none" stroke="#67E8F9" stroke-width="2.2" stroke-dasharray="12 4"/>
-    <circle cx="75" cy="44" r="5" fill="#FDE047"/>
-  </svg>`,
-  // Chặng 5: Thành Trì Lõi Trí Tuệ
-  `<svg viewBox="0 0 150 95" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
-    <ellipse cx="75" cy="76" rx="52" ry="12" fill="rgba(239,68,68,0.28)"/>
-    <polygon points="26,58 124,58 106,78 75,89 44,78" fill="#1E1B4B" stroke="#F43F5E" stroke-width="1.4"/>
-    <ellipse cx="75" cy="57" rx="49" ry="10" fill="#881337" stroke="#FB7185" stroke-width="1.5"/>
-    <!-- Obsidian Fortress Towers -->
-    <rect x="48" y="26" width="54" height="31" fill="#1F2937" stroke="#F43F5E" stroke-width="1.5"/>
-    <polygon points="45,26 55,10 65,26" fill="#991B1B"/>
-    <polygon points="65,26 75,6 85,26" fill="#E11D48"/>
-    <polygon points="85,26 95,10 105,26" fill="#991B1B"/>
-    <circle cx="75" cy="39" r="6" fill="#FACC15"/>
-    <path d="M69 57 L69 47 Q75 43 81 47 L81 57 Z" fill="#F97316"/>
-  </svg>`
+  '<img src="/images/scenario/stage-1.jpg" alt="Chặng 1" class="mv-island-photo" draggable="false"/>',
+  '<img src="/images/scenario/stage-2.jpg" alt="Chặng 2" class="mv-island-photo" draggable="false"/>',
+  '<img src="/images/scenario/stage-3.jpg" alt="Chặng 3" class="mv-island-photo" draggable="false"/>',
+  '<img src="/images/scenario/stage-4.jpg" alt="Chặng 4" class="mv-island-photo" draggable="false"/>',
+  '<img src="/images/scenario/stage-5.jpg" alt="Chặng 5" class="mv-island-photo" draggable="false"/>'
 ];
-
-
 
 /* ─── TRẠNG THÁI ENGINE 4: MÊ CUNG TỌA ĐỘ Ô VUÔNG (GRID MAZE) ─── */
 const mazeState = {
@@ -698,6 +578,9 @@ function layout(content){
    <span>MATHVERSE <span class="mv-brand-oxyz">OXYZ</span></span>
   </div>
   <div class="mv-nav-center">
+   <button type="button" class="mv-nav-pill ${mvShowIntroHub ? 'gold-active' : ''}" data-action="toggleIntroHub" title="Xem Giao diện Mở đầu Hành Trình Giải Cứu Lục Địa OXYZ">
+    🏞️ Sảnh Hành Trình
+   </button>
    <button type="button" class="mv-nav-pill ${isStudent && stg === 0 ? 'gold-active' : ''}" ${isStudent ? 'data-action="demoJumpStage" data-stage="0"' : 'data-action="scrollTop"'} title="Chế độ Săn Kho Báu 2D">
     🗺️ 2D
    </button>
@@ -977,7 +860,8 @@ function getTerrainSVG(theme,pathPts){
     <stop offset="70%" stop-color="#92400e"/>
     <stop offset="100%" stop-color="#451a03"/>
    </linearGradient>
-  </defs>`;
+  </defs>
+  <rect class="va-svg-glass-plate" x="42" y="20" width="476" height="242" rx="18" fill="rgba(11, 18, 39, 0.56)" stroke="rgba(103, 232, 249, 0.38)" stroke-width="1.5"/>`;
 
  if(theme==='forest'){
   bgShapes=`
@@ -1099,18 +983,74 @@ function getTerrainSVG(theme,pathPts){
  </svg>`;
 }
 
-function startScreen(msg=''){
- const fRoom=esc(initialRoom),fTeam=esc(initialTeam);
- const demoBar=`<div class="demo-banner"><strong>🎮 CHẾ ĐỘ CHƠI THỬ & TRÌNH CHIẾU NHANH:</strong> ${btn('▶ VÀO ĐỘI RỒNG XANH (CHƠI NGAY)','demoPlay','teal')} ${btn('👩‍🏫 XEM MÀN HÌNH GIÁO VIÊN','demoTeacher','gold')}<small>Phòng mẫu 123456 · Mã PIN Đội 1: 1111 · Đội 2: 2222 · Đội 3: 3333 · Đội 4: 4444</small></div>`;
- app.innerHTML=layout(`<header class="hero"><div class="eyebrow">HÀNH TRÌNH GIẢI MẬT THƯ • TOÁN LỚP 12 (CT GDPT 2018)</div><h1>MATHVERSE OXYZ<br/>SĂN KHO BÁU & BẢO VỆ THÀNH TRÌ</h1><p class="subtitle">Hệ thống 5 Chặng Game Tương Tác Nhóm kết hợp <b>Mô hình Không gian 3D Oxyz trực quan</b>: Điều khiển nhân vật Săn Kho Báu trên bản đồ 2D & Chỉ huy 3 Anh Hùng Bảo Vệ Thành Trì thời gian thực!</p><div class="hero-character" style="right:4%;top:18px;width:135px;height:125px">${CHAR_GREEN_DRAGON_MASCOT_SVG}</div></header>
- ${demoBar}
- <div class="tabs"><button class="active" data-action="switch-tab" data-tab="teacher">👩‍🏫 Tạo phòng – Giáo viên</button><button data-action="switch-tab" data-tab="student">🧑‍🚀 Vào đội – Học sinh</button></div>
- ${msg?`<div class="notice error">${esc(msg)}</div>`:''}
- <section class="setup grid grid-2" id="entry"><div class="panel" data-tabbox="teacher"><div class="section-title"><h2>🎓 Phòng điều khiển Giáo viên</h2></div><p>Giáo viên tạo mã phòng, phát mã PIN cho 4–8 nhóm học sinh, chiếu Bản đồ Lục địa 5 Chặng Oxyz và theo dõi điểm XP, Vàng, Combo, Khiên theo thời gian thực.</p><div class="form-field"><label>Số đội tham gia</label><select id="teamCount"><option value="4">4 đội</option><option value="5">5 đội</option><option value="6" selected>6 đội</option><option value="7">7 đội</option><option value="8">8 đội</option></select></div>${btn('✨ TẠO PHÒNG MATHVERSE','create','primary block')}<p class="muted" style="margin-top:13px;font-size:12px">Khuyến nghị 4–6 học sinh/đội (phân vai tính trục Ox, Oy, Oz và Đội trưởng điều khiển).</p></div>
- <div class="panel" data-tabbox="student"><div class="section-title"><h2>🚀 Đăng nhập Đội Thám Hiểm</h2></div><p>Nhận mã phòng và mã PIN đội từ giáo viên. Cả nhóm cùng thảo luận công thức trên Mô hình 3D Oxyz để điều khiển nhân vật và bảo vệ thành trì!</p><div class="form-field"><label>Mã phòng 6 chữ số</label><input id="roomInput" type="text" inputmode="numeric" maxlength="6" class="mono" value="${fRoom}" placeholder="VD: 123456" /></div><div class="form-field"><label>Đội thám hiểm</label><select id="teamSelect">${Array.from({length:8},(_,i)=>`<option value="doi-${i+1}" ${fTeam===`doi-${i+1}`?'selected':''}>Đội ${i+1}</option>`).join('')}</select></div><div class="form-field"><label>Mã đội 4 chữ số</label><input id="teamCode" type="password" inputmode="numeric" maxlength="4" placeholder="Mã PIN của đội" /></div>${btn('🗝️ VÀO HÀNH TRÌNH NGAY','join','teal block')}</div></section>
- <div class="mv-vista-container" style="margin-top:20px"><h3 style="color:#FEF08A;margin-bottom:8px;text-align:center">📜 BẢN ĐỒ 5 CHẶNG HÀNH TRÌNH LỤC ĐỊA OXYZ</h3>${mapTrack(0)}</div>`);
+
+let mvShowIntroHub = false;
+
+function renderIntroHubBanner(isStudentLogged = false) {
+  const me = world?.me || {};
+  const curStage = me.stage ?? 0;
+  const sealsCount = (me.digits || []).length;
+  const completedAll5 = curStage >= 5 || Boolean(me.completed);
+  const hasAllSeals = sealsCount >= 5;
+  const isCoreRestored = Boolean(me.completed);
+
+  // 5 island hotspot left positions (%) matching "Hành Trình Giải Cứu Lục Địa OXYZ.png"
+  const islandLefts = [27.5, 42.3, 56.9, 71.3, 85.0];
+  const islandHotspots = [0, 1, 2, 3, 4].map(i => {
+    const isDone = isStudentLogged && i < curStage;
+    const isCur = isStudentLogged ? (i === curStage) : (i === 0);
+    const badge = isDone ? '✅ Đã qua' : isCur ? '⭐ Đang mở' : '🔒 Chặng ' + (i + 1);
+    const actionAttr = isStudentLogged
+      ? `data-action="hubEnterStage" data-stage="${i}"`
+      : `data-action="demoPlay" data-stage="${i}"`;
+    return `<div class="mv-hub-hotspot-island ${isCur ? 'active-stage' : ''}" style="left:${islandLefts[i]}%" ${actionAttr} title="Nhấn để vào Chặng ${i + 1}: ${esc(missionMeta[i]?.place || '')}">
+      <span class="mv-hub-badge-pip">${badge}</span>
+    </div>`;
+  }).join('');
+
+  const startAction = isStudentLogged
+    ? `data-action="hubStartCurrentStage"`
+    : `data-action="demoPlay"`;
+
+  // 4 bottom buttons on the artwork: Đội chơi (31.2%), Túi đồ (43.8%), Kiến thức (55.8%), Xếp hạng (67.2%)
+  const bottomBtns = isStudentLogged ? `
+    <button type="button" class="mv-hub-bottom-btn" style="left:31.2%" data-action="openTeamRoles" title="Đội chơi & Phân vai"></button>
+    <button type="button" class="mv-hub-bottom-btn" style="left:43.8%" data-action="openCipherNotebook" title="Túi đồ & 5 Ấn Vectơ"></button>
+    <button type="button" class="mv-hub-bottom-btn" style="left:55.8%" data-action="hubOpenKnowledge" title="Kiến thức & Công thức"></button>
+    <button type="button" class="mv-hub-bottom-btn" style="left:67.2%" data-action="openFullLeaderboard" title="Bảng xếp hạng"></button>
+  ` : `
+    <button type="button" class="mv-hub-bottom-btn" style="left:31.2%" data-action="demoPlay" title="Vào Đội chơi ngay"></button>
+    <button type="button" class="mv-hub-bottom-btn" style="left:43.8%" data-action="demoPlay" title="Mở Túi đồ"></button>
+    <button type="button" class="mv-hub-bottom-btn" style="left:55.8%" data-action="demoPlay" title="Xem Kiến thức"></button>
+    <button type="button" class="mv-hub-bottom-btn" style="left:67.2%" data-action="demoTeacher" title="Xem Bảng xếp hạng GV"></button>
+  `;
+
+  return `<div class="mv-intro-hub-showcase" role="region" aria-label="Giao diện Hành Trình Giải Cứu Lục Địa OXYZ">
+    ${islandHotspots}
+    <button type="button" class="mv-hub-start-btn" ${startAction} title="Bắt đầu Hành Trình Giải Cứu Lục Địa OXYZ!"></button>
+    ${bottomBtns}
+    ${isStudentLogged ? `
+      <div class="mv-hub-live-goals">
+        <div style="font-weight:900;color:#92400E;margin-bottom:2px">🎯 Mục tiêu (${sealsCount}/5 Ấn)</div>
+        <div>${completedAll5 ? '☑️' : '⬜'} Hoàn thành 5 chặng (${Math.min(curStage, 5)}/5)</div>
+        <div>${hasAllSeals ? '☑️' : '⬜'} Thu hồi 5 Ấn Vectơ (${sealsCount}/5)</div>
+        <div>${isCoreRestored ? '☑️' : '⬜'} Khôi phục Tâm Thạch</div>
+      </div>
+    ` : ''}
+  </div>`;
 }
 
+function startScreen(msg=''){
+ const fRoom=esc(initialRoom),fTeam=esc(initialTeam);
+ const demoBar=`<div class="demo-banner"><strong>🎮 CHẾ ĐỘ CHƠI THỬ & TRÌNH CHIẾU NHANH:</strong> ${btn('▶ BẮT ĐẦU HÀNH TRÌNH (ĐỘI RỒNG XANH)','demoPlay','teal')} ${btn('👩‍🏫 MÀN HÌNH GIÁO VIÊN','demoTeacher','gold')}<small>Nhấp trực tiếp vào nút "BẮT ĐẦU HÀNH TRÌNH" hoặc 5 Chặng trên giao diện bên dưới để vào game ngay!</small></div>`;
+ app.innerHTML=layout(`
+ ${demoBar}
+ ${renderIntroHubBanner(false)}
+ <div class="tabs"><button class="active" data-action="switch-tab" data-tab="teacher">👩‍🏫 Tạo phòng – Giáo viên</button><button data-action="switch-tab" data-tab="student">🧑‍🚀 Vào đội – Học sinh</button></div>
+ ${msg?`<div class="notice error">${esc(msg)}</div>`:''}
+ <section class="setup grid grid-2" id="entry"><div class="panel" data-tabbox="teacher"><div class="section-title"><h2>🎓 Phòng điều khiển Giáo viên</h2></div><p>Giáo viên tạo mã phòng, phát mã PIN cho 4–8 nhóm học sinh (3–5 HS/đội), chiếu Hành trình Giải cứu Lục địa OXYZ (6 phút) và theo dõi tiến độ thu hồi 5 Ấn Vectơ thời gian thực.</p><div class="form-field"><label>Số đội tham gia</label><select id="teamCount"><option value="4">4 đội</option><option value="5">5 đội</option><option value="6" selected>6 đội</option><option value="7">7 đội</option><option value="8">8 đội</option></select></div>${btn('✨ TẠO PHÒNG MATHVERSE (6 PHÚT)','create','primary block')}</div>
+ <div class="panel" data-tabbox="student"><div class="section-title"><h2>🚀 Đăng nhập Đội Thám Hiểm</h2></div><p>Nhận mã phòng và mã PIN đội từ giáo viên để cùng Rồng Xanh vượt qua 5 vùng đất và khôi phục Tâm Thạch Vectơ!</p><div class="form-field"><label>Mã phòng 6 chữ số</label><input id="roomInput" type="text" inputmode="numeric" maxlength="6" class="mono" value="${fRoom}" placeholder="VD: 123456" /></div><div class="form-field"><label>Đội thám hiểm</label><select id="teamSelect">${Array.from({length:8},(_,i)=>`<option value="doi-${i+1}" ${fTeam===`doi-${i+1}`?'selected':''}>Đội ${i+1}</option>`).join('')}</select></div><div class="form-field"><label>Mã đội 4 chữ số</label><input id="teamCode" type="password" inputmode="numeric" maxlength="4" placeholder="Mã PIN của đội" /></div>${btn('🗝️ VÀO HÀNH TRÌNH NGAY','join','teal block')}</div></section>`);
+}
 function mapTrack(stage){
  return `<div class="world-journey-map mv-journey-bar">
   <svg class="mv-light-path-svg" viewBox="0 0 1000 20" preserveAspectRatio="none">
@@ -3423,6 +3363,7 @@ function renderVectorAdventureStage(m) {
           </div>
         </div>
 
+        <img src="/images/scenario/dragon-mascot.png" alt="Rồng Xanh" class="va-stage-dragon-companion" draggable="false"/>
         ${renderStageVectorSVG(m)}
 
         <div class="va-canvas-bottom">
@@ -3488,7 +3429,16 @@ function stageContent(m){
   </div>
  </div>` : '';
 
- const drawerKnowledgeHtml = oxyz3D.open ? `<div style="margin-bottom:10px">${renderOxyz3D(m, true)}</div>` : '';
+ const drawerKnowledgeHtml = oxyz3D.open ? `<div class="mv-knowledge-split">
+  <div class="mv-knowledge-card-box">
+   <div class="flex-between">
+    <strong style="color:#FEF08A;font-size:12.5px">📘 Thẻ Kiến Thức Chặng ${m.id}: ${esc(shortTitle)}</strong>
+    <button type="button" class="mv-chip-btn" data-action="toggle3DPanel">✕ Đóng</button>
+   </div>
+   <img src="${['/images/scenario/card-1.jpg','/images/scenario/card-2.jpg','/images/scenario/card-3.jpg','/images/scenario/card-4.jpg','/images/scenario/card-5.jpg'][(m.id||1)-1]||'/images/scenario/card-1.jpg'}" alt="Thẻ kiến thức Chặng ${m.id}" class="mv-knowledge-card-img" draggable="false"/>
+  </div>
+  <div>${renderOxyz3D(m, true)}</div>
+ </div>` : '';
 
  return `<div class="mv-game-frame">
   <div class="mv-quest-bar">
@@ -3516,7 +3466,7 @@ function stageContent(m){
   </div>
   ${drawerQuestHtml}
   ${drawerKnowledgeHtml}
-  <div id="mvActiveGameCanvas">${renderVectorAdventureStage(m)}</div>
+  <div id="mvActiveGameCanvas">${mvShowIntroHub ? renderIntroHubBanner(true) : renderVectorAdventureStage(m)}</div>
  </div>`;
 }
 
@@ -4324,6 +4274,16 @@ async function handle(action,el){
    }
    return;
   }
+  if(action==='toggleIntroHub'){mvShowIntroHub=!mvShowIntroHub;render();return;}
+  if(action==='hubStartCurrentStage'){mvShowIntroHub=false;render();return;}
+  if(action==='hubOpenKnowledge'){mvShowIntroHub=false;oxyz3D.open=true;render();return;}
+  if(action==='hubEnterStage'){
+   const stg=Number(el.dataset.stage||0);
+   mvShowIntroHub=false;
+   await submit('/api/demoJump',{stage:stg});
+   await refresh(true);
+   return;
+  }
   if(action==='toggleBriefing'){mvBriefingCollapsed=!mvBriefingCollapsed;render();return;}
   if(action==='toggleSidebar'){
    mvSidebarCollapsed=!mvSidebarCollapsed;
@@ -4396,6 +4356,7 @@ async function handle(action,el){
   if(action==='demoPlay'){saveSession({role:'student',room:'123456',teamId:'doi-1',token:'DEMO_DOI_1'});activePlayMode=null;await refresh(true);return;}
   if(action==='demoTeacher'){saveSession({role:'teacher',room:'123456',token:'DEMO_GV'});await refresh(true);return;}
   if(action==='demoJumpStage'){
+   mvShowIntroHub=false;
    const stg=Number(el.dataset.stage);
    await submit('/api/demoJump',{stage:stg});
    activePlayMode=null;

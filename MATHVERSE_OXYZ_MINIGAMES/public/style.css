@@ -2935,3 +2935,237 @@ body {
     grid-template-columns: 1fr;
   }
 }
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   SCENARIO ARTWORK INTEGRATION v4.1 (IMAGES 1-6 + INTRO HUB + KNOWLEDGE CARDS)
+   ═══════════════════════════════════════════════════════════════════════════ */
+.mv-dragon-mascot-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.55));
+  transition: transform 0.25s ease;
+}
+.mv-dragon-mascot-img:hover {
+  transform: scale(1.06) rotate(-2deg);
+}
+
+/* Stage 1-5 Custom Artwork Backgrounds */
+.va-canvas-card.theme-1 {
+  background-image:
+    linear-gradient(180deg, rgba(8, 20, 36, 0.25) 0%, rgba(8, 20, 36, 0.12) 48%, rgba(8, 20, 36, 0.58) 100%),
+    url('/images/scenario/stage-1.jpg') !important;
+  background-size: cover !important;
+  background-position: center !important;
+}
+.va-canvas-card.theme-2 {
+  background-image:
+    linear-gradient(180deg, rgba(12, 22, 46, 0.25) 0%, rgba(12, 22, 46, 0.12) 48%, rgba(12, 22, 46, 0.58) 100%),
+    url('/images/scenario/stage-2.jpg') !important;
+  background-size: cover !important;
+  background-position: center !important;
+}
+.va-canvas-card.theme-3 {
+  background-image:
+    linear-gradient(180deg, rgba(24, 12, 52, 0.24) 0%, rgba(24, 12, 52, 0.12) 48%, rgba(24, 12, 52, 0.58) 100%),
+    url('/images/scenario/stage-3.jpg') !important;
+  background-size: cover !important;
+  background-position: center !important;
+}
+.va-canvas-card.theme-4 {
+  background-image:
+    linear-gradient(180deg, rgba(8, 28, 36, 0.25) 0%, rgba(8, 28, 36, 0.12) 48%, rgba(8, 28, 36, 0.58) 100%),
+    url('/images/scenario/stage-4.jpg') !important;
+  background-size: cover !important;
+  background-position: center !important;
+}
+.va-canvas-card.theme-5 {
+  background-image:
+    linear-gradient(180deg, rgba(32, 10, 24, 0.25) 0%, rgba(32, 10, 24, 0.12) 48%, rgba(32, 10, 24, 0.60) 100%),
+    url('/images/scenario/stage-5.jpg') !important;
+  background-size: cover !important;
+  background-position: center !important;
+}
+
+/* Rồng Xanh standing inside the stage scene */
+.va-stage-dragon-companion {
+  position: absolute;
+  left: 12px;
+  bottom: 48px;
+  width: 96px;
+  height: 118px;
+  object-fit: contain;
+  pointer-events: none;
+  z-index: 3;
+  filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.75));
+  animation: floatDragonCompanion 3.2s ease-in-out infinite;
+}
+@keyframes floatDragonCompanion {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+/* Island Thumbnail Photo in 5-Stage Strip */
+.mv-island-photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 7px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+}
+
+/* Interactive Initial Game Screen (Hành Trình Giải Cứu Lục Địa OXYZ) */
+.mv-intro-hub-showcase {
+  position: relative;
+  width: 100%;
+  max-width: 1280px;
+  margin: 8px auto 14px;
+  aspect-ratio: 16 / 9;
+  border-radius: 20px;
+  overflow: hidden;
+  border: 2px solid rgba(242, 185, 75, 0.75);
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.75), 0 0 28px rgba(26, 182, 181, 0.28);
+  background: #0B1227 url('/images/scenario/intro-hub.jpg') center / cover no-repeat;
+  user-select: none;
+}
+
+/* Interactive Hotspots overlaid on the Intro Hub Artwork */
+.mv-hub-hotspot-island {
+  position: absolute;
+  top: 38%;
+  width: 13.2%;
+  height: 25%;
+  border-radius: 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 2px solid transparent;
+  background: rgba(255, 255, 255, 0.01);
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+  padding: 6px;
+}
+.mv-hub-hotspot-island:hover {
+  border-color: #FEF08A;
+  background: rgba(254, 240, 138, 0.14);
+  box-shadow: 0 0 24px rgba(250, 204, 21, 0.65);
+  transform: translateY(-4px) scale(1.03);
+}
+.mv-hub-hotspot-island.active-stage {
+  border-color: #35C992;
+  box-shadow: 0 0 22px rgba(53, 201, 146, 0.65);
+}
+.mv-hub-badge-pip {
+  padding: 2px 7px;
+  border-radius: 99px;
+  background: rgba(11, 18, 39, 0.88);
+  border: 1px solid #F2B94B;
+  color: #FEF08A;
+  font-size: 11px;
+  font-weight: 900;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.6);
+}
+
+/* Big Center Start Button Hotspot */
+.mv-hub-start-btn {
+  position: absolute;
+  left: 39%;
+  top: 64.5%;
+  width: 26.5%;
+  height: 12.5%;
+  border-radius: 18px;
+  border: 2px solid rgba(255, 251, 235, 0.65);
+  background: rgba(250, 204, 21, 0.08);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 0 25px rgba(245, 158, 11, 0.45);
+}
+.mv-hub-start-btn:hover {
+  background: rgba(254, 240, 138, 0.22);
+  border-color: #FFFFFF;
+  box-shadow: 0 0 36px rgba(254, 240, 138, 0.95);
+  transform: scale(1.04);
+}
+
+/* Bottom 4 Action Buttons on Hub Artwork (Đội chơi, Túi đồ, Kiến thức, Xếp hạng) */
+.mv-hub-bottom-btn {
+  position: absolute;
+  top: 80.5%;
+  width: 10.6%;
+  height: 14.5%;
+  border-radius: 16px;
+  border: 2px solid transparent;
+  background: rgba(26, 182, 181, 0.04);
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+.mv-hub-bottom-btn:hover {
+  border-color: #67E8F9;
+  background: rgba(26, 182, 181, 0.18);
+  box-shadow: 0 0 20px rgba(103, 232, 249, 0.65);
+  transform: translateY(-3px);
+}
+
+/* Live Timer & Live Goals Overlays on Intro Hub */
+.mv-hub-live-timer {
+  position: absolute;
+  left: 7.5%;
+  bottom: 5.2%;
+  padding: 2px 10px;
+  border-radius: 8px;
+  background: rgba(254, 243, 199, 0.92);
+  color: #3B0764;
+  font-size: clamp(16px, 2.2vw, 28px);
+  font-weight: 900;
+  letter-spacing: 0.04em;
+}
+.mv-hub-live-goals {
+  position: absolute;
+  right: 1.4%;
+  bottom: 3.5%;
+  width: 20.5%;
+  height: 22%;
+  padding: 10px 14px;
+  border-radius: 16px;
+  background: rgba(254, 243, 199, 0.94);
+  border: 2px solid #D97706;
+  color: #451A03;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  font-size: clamp(10.5px, 1.05vw, 13.5px);
+  font-weight: 800;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.45);
+}
+
+/* Knowledge Card + 3D Split Drawer */
+.mv-knowledge-split {
+  display: grid;
+  grid-template-columns: minmax(280px, 440px) 1fr;
+  gap: 14px;
+  align-items: stretch;
+  margin-bottom: 10px;
+}
+.mv-knowledge-card-box {
+  background: rgba(11, 18, 39, 0.92);
+  border: 1.5px solid rgba(242, 185, 75, 0.55);
+  border-radius: 14px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.mv-knowledge-card-img {
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+  object-fit: contain;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+@media (max-width: 980px) {
+  .mv-knowledge-split {
+    grid-template-columns: 1fr;
+  }
+}
