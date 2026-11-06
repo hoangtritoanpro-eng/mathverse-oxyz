@@ -28,6 +28,8 @@ Tất cả những thay đổi quan trọng của dự án này sẽ được gh
 - **Đồng bộ thời gian thực với Màn Hình Giáo Viên & Màn Hình Trình Chiếu (`server.js`, `public/app.js`):**
   - Hiển thị trực tiếp trên bảng xếp hạng Giáo viên và Modal Chi Tiết Đội: `📜 Mật thư: X/3`, `🧩 Ghép mật thư: Đã ghép / Chưa`, `🌉 Cầu ánh sáng: Đã mở cầu / Chưa mở`.
 - **Cập nhật Bản Chơi Thử 1 Máy (`CHOI_THU_1_MAY.html`):** Đồng bộ đầy đủ 4 bước gameplay Chặng 1 vào bản đóng gói độc lập.
+- **Cập nhật Báo Cáo Biện Pháp (`Bien phap gop phan nang cao chat luong DH.docx` & `scratch/build_bien_phap_docx.py`):**
+  - Đồng bộ toàn bộ nội dung văn bản Báo cáo Biện pháp 3 trang theo đúng **Quy trình thiết kế & xây dựng game giáo dục Mathverse Oxyz – “Hành Trình Giải Cứu Lục Địa OXYZ”** (ma trận 6 phút / 3 chặng Nhận biết + 2 chặng Thông hiểu, Chặng 1 “Bí Mật Cây Cầu Đảo Chiều” với 4 bước tìm mật thư – ghép biểu thức – kéo mũi tên $\vec{CB}$ – khôi phục cầu, giao diện Minimal Fantasy RPG Game-First UI chống lộ đáp án, phân vai nhóm 3–5 học sinh và Trung tâm chỉ huy Giáo viên thời gian thực).
 
 ---
 

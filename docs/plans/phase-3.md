@@ -39,10 +39,15 @@ Tài liệu này quản lý chi tiết việc thực hiện và nghiệm thu **P
    - Rèn luyện năng lực hợp tác phân vai chuyên trách 3 trục $Ox, Oy, Oz$.
    - Mô hình hóa trực quan 3D xoay chiều.
    - Vận hành mạng LAN lớp học không phụ thuộc Internet.
-3. **Các giải pháp triển khai cụ thể:**
-   - *Giải pháp 1:* Chuỗi 5 chặng game Mathverse Oxyz (Săn kho báu tọa độ $\vec{AB}$, Thủ thành pháo kích $\vec{u}\cdot\vec{v}=0$, Zombie defense độ dài $|\vec{u}|$, Mê cung trung điểm & trọng tâm, Dò mìn diệt Boss cuối $\vec{u}=k\vec{v}$ và giải mã cổ ngữ `30524`).
-   - *Giải pháp 2:* Cơ chế phân vai chuyên trách $Ox, Oy, Oz$ & Đội trưởng kiểm tra chéo, đảm bảo 100% học sinh đều tham gia tư duy.
-   - *Giải pháp 3:* Trực quan hóa 3D Oxyz và giải pháp công nghệ mạng LAN Node.js Zero-dependency (chạy không cần Internet, học sinh kết nối qua điện thoại cá nhân).
+3. **Các giải pháp triển khai cụ thể (Cập nhật theo Quy trình thiết kế & xây dựng game Mathverse Oxyz v4.3):**
+   - *Giải pháp 1:* Quy trình 5 bước kiến tạo kịch bản *“Hành Trình Giải Cứu Lục Địa OXYZ”* (6 phút / 360 giây, phân tầng 3 chặng Nhận biết + 2 chặng Thông hiểu, nhân vật Rồng Xanh dẫn dắt và gợi ý tự động ở 15 giây cuối) cùng 5 chặng giải mã tương tác:
+     + **Chặng 1 – Rừng Vectơ Khởi Nguyên (“Bí Mật Cây Cầu Đảo Chiều” – Nhận biết, 60s):** Thay thế hoàn toàn trắc nghiệm A/B/C bằng 4 bước: Tìm mật thư tại 3 cột đá cổ $A, B, C$ (`0/3 → 3/3`), Kéo thả ghép mật thư $\vec{AB} - \vec{AC} = \text{?}$, Nhấn điểm đầu $C$ và kéo mũi tên đến điểm cuối $B$ xác định hướng vectơ $\vec{CB}$, Khôi phục Cầu Ánh Sáng và nhận *Ấn Hướng Đi*.
+     + **Chặng 2 – Pháo Đài Góc (Nhận biết, 60s):** Kích hoạt hai đoạn đường nối tiếp $\vec{AB}, \vec{BC}$, vận dụng quy tắc 3 điểm $\vec{AB} + \vec{BC} = \vec{AC}$, nhận *Ấn Kết Nối*.
+     + **Chặng 3 – Tháp Pha Lê (Nhận biết, 65s):** Kích hoạt hai vectơ cạnh $\vec{AB}, \vec{AD}$ xuất phát từ $A$, giải mã đường chéo hình bình hành $\vec{AB} + \vec{AD} = \vec{AC}$, nhận *Ấn Cân Bằng*.
+     + **Chặng 4 – Mê Cung Trung Điểm (Thông hiểu, 65s):** Đưa pha lê năng lượng về trung điểm $I$ của $AB$ cân bằng hai vectơ đối nhau $\vec{IA} + \vec{IB} = \vec{0}$ (và $\vec{MA} + \vec{MB} = 2\vec{MI}$), nhận *Ấn Cân Xứng*.
+     + **Chặng 5 – Thành Trì Trí Tuệ (Thông hiểu, 70s):** Xác định trọng tâm $G$ hợp nhất 3 luồng năng lượng $\vec{GA} + \vec{GB} + \vec{GC} = \vec{0}$, thu hồi *Ấn Trí Tuệ* và khôi phục **Tâm Thạch Vectơ**.
+   - *Giải pháp 2:* Thiết kế giao diện *Minimal Fantasy RPG (Game-First UI)* giảm 60–70% chữ tĩnh, chống lộ đáp án (*Zero Answer Leak*) kết hợp phân vai hợp tác nhóm 3–5 học sinh (Thám hiểm – Giải mật thư – Điều khiển kéo mũi tên – Xác nhận).
+   - *Giải pháp 3:* Trung tâm chỉ huy Giáo viên thời gian thực, Chế độ trình chiếu công khai không lộ đáp án và Mạng LAN Node.js Zero-dependency (kèm bản độc lập `CHOI_THU_1_MAY.html`).
 
 ### II. Hiệu quả mang lại của biện pháp
 - Học sinh hào hứng, tích cực, xóa bỏ tâm lý ngại hình không gian, ghi nhớ bền vững công thức.
