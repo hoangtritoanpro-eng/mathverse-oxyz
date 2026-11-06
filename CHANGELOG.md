@@ -9,6 +9,28 @@ Tất cả những thay đổi quan trọng của dự án này sẽ được gh
 
 ---
 
+## [4.3.0] - 2026-11-06
+
+### Added & Upgraded (Nâng Cấp Chặng 1 – Game Truy Tìm Mật Thư: "BÍ MẬT CÂY CẦU ĐẢO CHIỀU")
+- **Tích hợp 4 bối cảnh hình ảnh chuyên biệt cho Chặng 1 (`public/assets/`):**
+  - `Stage1_Pillars_Forest.jpg`: Rừng Vectơ Khởi Nguyên với 3 cột đá cổ khắc rune phát sáng.
+  - `Stage1_Cipher_Scroll.jpg`: Cuộn mật thư cổ đại dùng cho Bảng giải mã.
+  - `Stage1_Vector_Triangle_Beams.jpg`: Sơ đồ tam giác tia sáng năng lượng để xác định hướng vectơ bí mật.
+  - `Stage1_Restored_Bridge.jpg`: Cảnh Cầu Ánh Sáng khôi phục hoàn chỉnh nối qua vực Rừng Vectơ.
+- **Thay thế hoàn toàn câu hỏi trắc nghiệm A/B/C ở Chặng 1 bằng 4 Bước Gameplay Phiêu Lưu Giải Mã (`stages.js`, `server.js`, `public/app.js`, `public/style.css`):**
+  1. **Bước 1 – Tìm mật thư (`0/3 → 1/3 → 2/3 → 3/3`):** Đặt 3 cột đá cổ `A`, `B`, `C` phát sáng trên bối cảnh Rừng Vectơ. Mỗi lần nhấn mở phong ấn một cột đá sẽ phát hiệu ứng âm thanh pha lê, thu thập 1 mảnh mật thư ($\vec{AB}$, $-$, $\vec{AC}$) và gửi `/api/stage1Progress` cập nhật thời gian thực về màn hình Giáo viên.
+  2. **Bước 2 – Ghép mật thư (`\vec{AB} − \vec{AC} = ?`):** Mở Bảng giải mã mật thư cổ đại. Học sinh kéo thả (`Drag & Drop`) hoặc nhấn chọn các mảnh để sắp xếp thành biểu thức $\vec{AB} - \vec{AC} = \text{?}$ (tuyệt đối không để lộ đáp án `CB`). Nếu xếp sai thứ tự (ví dụ `AC - AB`), hệ thống phản hồi ngắn gọn và cho phép thử lại ngay.
+  3. **Bước 3 – Tìm hướng vectơ bí mật (Kéo mũi tên từ `C` đến `B`):** Hiển thị sơ đồ tam giác `A, B, C` tương tác trực tiếp. Học sinh nhấn giữ điểm bắt đầu và kéo mũi tên đến điểm kết thúc (hoặc chạm lần lượt Điểm đầu → Điểm cuối). Hệ thống kiểm tra bằng định danh điểm (`vectorFrom === 'C' && vectorTo === 'B'`). Nếu kéo ngược hướng (`B → C`), hiển thị gợi ý quy tắc hiệu hai vectơ chung gốc $A$ và cho phép kéo lại ngay, không dùng câu hỏi trắc nghiệm A/B/C.
+  4. **Bước 4 – Khôi phục cây cầu (`s1BridgeRestoredOverlay`):** Khi giải mã đúng $\vec{CB}$, cả 3 cột đá `A, B, C` và mũi tên $\vec{CB}$ phát sáng rực rỡ, Cầu Năng Lượng xuất hiện nối từ $C$ sang $B$, Rồng Xanh chúc mừng, đội nhận thưởng XP, Vàng cùng **Ấn Hướng Đi (`🧭`)** và tự động chuyển sang Chặng 2.
+- **Phối hợp nhóm 3–5 học sinh & Chống lộ đáp án tuyệt đối:**
+  - Hiển thị thanh phân vai trực quan theo từng bước (Thành viên 1 tìm cột đá, Thành viên 2 ghép mật thư, Thành viên 3 kéo mũi tên, Thành viên 4 xác nhận) nhưng không khóa cứng tiến trình nếu đội chỉ có 3 người hoặc mất kết nối.
+  - Ẩn hoàn toàn đáp án `CB` trên bản đồ 5 chặng, thẻ kiến thức, lời giới thiệu và gợi ý tự động trước khi học sinh hoàn thành Chặng 1.
+- **Đồng bộ thời gian thực với Màn Hình Giáo Viên & Màn Hình Trình Chiếu (`server.js`, `public/app.js`):**
+  - Hiển thị trực tiếp trên bảng xếp hạng Giáo viên và Modal Chi Tiết Đội: `📜 Mật thư: X/3`, `🧩 Ghép mật thư: Đã ghép / Chưa`, `🌉 Cầu ánh sáng: Đã mở cầu / Chưa mở`.
+- **Cập nhật Bản Chơi Thử 1 Máy (`CHOI_THU_1_MAY.html`):** Đồng bộ đầy đủ 4 bước gameplay Chặng 1 vào bản đóng gói độc lập.
+
+---
+
 ## [4.2.0] - 2026-11-06
 
 ### Added & Upgraded (Màn Hình Học Sinh Minimal Fantasy RPG & Màn Hình Giáo Viên Trung Tâm Chỉ Huy + Trình Chiếu)

@@ -4393,6 +4393,501 @@ body {
   }
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   CHẶNG 1 NÂNG CẤP: "BÍ MẬT CÂY CẦU ĐẢO CHIỀU" (FOREST GREEN + CYAN + GOLD)
+   ═══════════════════════════════════════════════════════════════════════════ */
+.gv-s1-inline-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 3px;
+}
+.gv-s1-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 1px 6px;
+  border-radius: 99px;
+  font-size: 10.5px;
+  font-weight: 800;
+  background: rgba(15, 23, 42, 0.78);
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  color: #94A3B8;
+}
+.gv-s1-pill.done {
+  background: rgba(16, 185, 129, 0.18);
+  border-color: #10B981;
+  color: #6EE7B7;
+}
+
+.s1-quest-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-family: 'Montserrat', sans-serif;
+}
+.s1-step-ribbon {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 10px;
+  background: rgba(10, 22, 42, 0.85);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+}
+.s1-step-pill {
+  padding: 4px 10px;
+  border-radius: 99px;
+  font-size: 11.5px;
+  font-weight: 800;
+  color: #94A3B8;
+  background: rgba(15, 23, 42, 0.75);
+  border: 1px solid rgba(100, 116, 139, 0.35);
+}
+.s1-step-pill.active {
+  color: #061526;
+  background: linear-gradient(90deg, #10B981, #36DEF4);
+  border-color: #67E8F9;
+  box-shadow: 0 0 12px rgba(54, 222, 244, 0.45);
+}
+.s1-step-pill.done {
+  color: #6EE7B7;
+  background: rgba(16, 185, 129, 0.18);
+  border-color: #10B981;
+}
+.s1-role-chip {
+  margin-left: auto;
+  padding: 4px 10px;
+  border-radius: 99px;
+  font-size: 11px;
+  font-weight: 800;
+  color: #FDE68A;
+  background: rgba(245, 158, 11, 0.16);
+  border: 1px solid rgba(255, 201, 83, 0.45);
+}
+
+.s1-forest-scene,
+.s1-cipher-board,
+.s1-vector-arena,
+.s1-restored-showcase {
+  position: relative;
+  min-height: 365px;
+  border-radius: 14px;
+  padding: 14px 16px;
+  background-size: cover;
+  background-position: center;
+  border: 1.5px solid rgba(54, 222, 244, 0.42);
+  box-shadow: inset 0 0 40px rgba(6, 20, 34, 0.65), 0 8px 24px rgba(0, 0, 0, 0.45);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: hidden;
+}
+
+.s1-scene-top-hud {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  z-index: 2;
+}
+.s1-objective-badge {
+  flex: 1;
+  min-width: 240px;
+  padding: 8px 13px;
+  border-radius: 10px;
+  background: rgba(8, 22, 42, 0.88);
+  border: 1px solid rgba(54, 222, 244, 0.4);
+  color: #F8FAFF;
+  font-size: 12.8px;
+  line-height: 1.4;
+}
+.s1-clue-counter,
+.s1-decoded-expr-pill {
+  padding: 8px 14px;
+  border-radius: 10px;
+  background: rgba(16, 27, 59, 0.92);
+  border: 1.5px solid #FFC953;
+  color: #FEF08A;
+  font-size: 13.5px;
+  font-weight: 900;
+  box-shadow: 0 0 14px rgba(255, 201, 83, 0.28);
+}
+.s1-clue-counter.complete {
+  border-color: #10B981;
+  color: #6EE7B7;
+  background: rgba(6, 78, 59, 0.88);
+}
+
+/* Bước 1: 3 Cột đá A, B, C trong Rừng Vectơ */
+.s1-pillars-stage {
+  position: relative;
+  height: 220px;
+  width: 100%;
+  my: 6px;
+}
+.s1-pillar-node {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  width: 112px;
+  height: 136px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.22s ease, filter 0.22s ease;
+  z-index: 3;
+}
+.s1-pillar-node:hover {
+  transform: translate(-50%, -54%) scale(1.06);
+}
+.s1-pillar-aura {
+  position: absolute;
+  inset: -8px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(54, 222, 244, 0.42) 0%, rgba(16, 185, 129, 0.12) 60%, transparent 75%);
+  animation: s1PulseAura 2.2s ease-in-out infinite;
+  pointer-events: none;
+}
+.s1-pillar-node.opened .s1-pillar-aura {
+  background: radial-gradient(circle, rgba(255, 201, 83, 0.55) 0%, rgba(16, 185, 129, 0.28) 62%, transparent 78%);
+}
+@keyframes s1PulseAura {
+  0%, 100% { transform: scale(0.95); opacity: 0.78; }
+  50% { transform: scale(1.1); opacity: 1; }
+}
+.s1-pillar-stone {
+  position: relative;
+  width: 88px;
+  height: 112px;
+  border-radius: 18px 18px 10px 10px;
+  background: linear-gradient(180deg, rgba(30, 58, 95, 0.94) 0%, rgba(15, 23, 42, 0.96) 100%);
+  border: 2px solid #36DEF4;
+  box-shadow: 0 0 18px rgba(54, 222, 244, 0.55), inset 0 0 14px rgba(54, 222, 244, 0.25);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: 6px;
+}
+.s1-pillar-node.opened .s1-pillar-stone {
+  border-color: #FFC953;
+  background: linear-gradient(180deg, rgba(6, 78, 59, 0.95) 0%, rgba(15, 23, 42, 0.96) 100%);
+  box-shadow: 0 0 24px rgba(255, 201, 83, 0.75), inset 0 0 16px rgba(16, 185, 129, 0.45);
+}
+.s1-pillar-rune {
+  font-size: 16px;
+  color: #67E8F9;
+  text-shadow: 0 0 8px #36DEF4;
+}
+.s1-pillar-letter {
+  font-size: 28px;
+  font-weight: 900;
+  color: #FFFFFF;
+  line-height: 1.05;
+}
+.s1-pillar-status {
+  font-size: 10px;
+  font-weight: 800;
+  color: #A7F3D0;
+}
+.s1-pillar-shard {
+  margin-top: 5px;
+  padding: 3px 9px;
+  border-radius: 99px;
+  background: rgba(11, 18, 39, 0.94);
+  border: 1.5px solid #FFC953;
+  color: #FEF08A;
+  font-size: 12px;
+  font-weight: 900;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+}
+
+.s1-forest-bottom-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: rgba(8, 18, 36, 0.9);
+  border: 1px solid rgba(54, 222, 244, 0.35);
+  z-index: 2;
+}
+.s1-collected-tray {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-size: 12.5px;
+  font-weight: 800;
+  color: #CBD5E1;
+}
+.s1-mini-fragment {
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: 12.5px;
+  font-weight: 900;
+}
+.s1-mini-fragment.earned {
+  background: rgba(16, 185, 129, 0.22);
+  border: 1px solid #10B981;
+  color: #FEF08A;
+}
+.s1-mini-fragment.locked {
+  background: rgba(30, 41, 59, 0.75);
+  border: 1px dashed rgba(148, 163, 184, 0.45);
+  color: #64748B;
+}
+
+/* Bước 2: Bảng Ghép Mật Thư */
+.s1-cipher-equation-box {
+  margin: 12px auto;
+  padding: 18px 22px;
+  border-radius: 14px;
+  background: rgba(8, 18, 38, 0.88);
+  border: 2px solid rgba(255, 201, 83, 0.55);
+  box-shadow: 0 0 28px rgba(255, 201, 83, 0.2);
+}
+.s1-cipher-slots-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.s1-cipher-slot {
+  min-width: 126px;
+  height: 82px;
+  border-radius: 12px;
+  padding: 6px 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.18s ease;
+}
+.s1-cipher-slot.empty {
+  background: rgba(15, 23, 42, 0.8);
+  border: 2px dashed rgba(54, 222, 244, 0.55);
+}
+.s1-cipher-slot.filled {
+  background: linear-gradient(180deg, rgba(16, 185, 129, 0.25), rgba(15, 23, 42, 0.92));
+  border: 2px solid #FFC953;
+  cursor: pointer;
+  box-shadow: 0 0 16px rgba(255, 201, 83, 0.35);
+}
+.s1-slot-index {
+  font-size: 10px;
+  font-weight: 800;
+  color: #94A3B8;
+  text-transform: uppercase;
+}
+.s1-slot-content {
+  font-size: 22px;
+  font-weight: 900;
+  color: #F8FAFF;
+  margin-top: 2px;
+}
+.s1-slot-placeholder {
+  font-size: 11px;
+  font-weight: 700;
+  color: #64748B;
+}
+.s1-cipher-equals {
+  font-size: 28px;
+  font-weight: 900;
+  color: #36DEF4;
+}
+.s1-cipher-mystery-box {
+  width: 68px;
+  height: 68px;
+  border-radius: 12px;
+  background: rgba(88, 70, 201, 0.28);
+  border: 2px solid #36DEF4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  font-weight: 900;
+  color: #FFC953;
+}
+.s1-cipher-pool-area {
+  text-align: center;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: rgba(11, 18, 39, 0.86);
+  border: 1px solid rgba(54, 222, 244, 0.3);
+}
+.s1-pool-label {
+  font-size: 12px;
+  font-weight: 800;
+  color: #94A3B8;
+  margin-bottom: 8px;
+}
+.s1-cipher-tokens-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+.s1-cipher-token-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: 12px;
+  background: linear-gradient(180deg, #162B54 0%, #0F1D3A 100%);
+  border: 2px solid #36DEF4;
+  color: #FFFFFF;
+  font-size: 20px;
+  font-weight: 900;
+  cursor: grab;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.45);
+  transition: transform 0.16s ease, border-color 0.16s ease;
+}
+.s1-cipher-token-chip:hover {
+  transform: translateY(-3px) scale(1.04);
+  border-color: #FFC953;
+}
+.s1-chip-grip {
+  color: #64748B;
+  font-size: 14px;
+}
+.s1-all-placed-note {
+  font-size: 13px;
+  font-weight: 800;
+  color: #35C992;
+}
+.s1-cipher-actions,
+.s1-vector-controls-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: rgba(8, 18, 36, 0.9);
+  border: 1px solid rgba(54, 222, 244, 0.35);
+}
+
+/* Bước 3: Sơ đồ Tam giác ABC Kéo Mũi Tên */
+.s1-svg-canvas-box {
+  width: 100%;
+  max-width: 620px;
+  margin: 4px auto;
+  border-radius: 12px;
+  background: rgba(8, 16, 34, 0.82);
+  border: 1.5px solid rgba(54, 222, 244, 0.38);
+  padding: 4px;
+}
+.s1-interactive-svg {
+  width: 100%;
+  height: 235px;
+  display: block;
+  touch-action: none;
+  user-select: none;
+}
+.s1-vertex-node {
+  cursor: pointer;
+}
+.s1-vertex-node:hover circle {
+  filter: drop-shadow(0 0 10px #FFC953);
+}
+.s1-arrow-status-text {
+  font-size: 12.5px;
+  color: #E2E8F0;
+  flex: 1;
+  min-width: 220px;
+}
+
+.s1-inline-feedback {
+  padding: 8px 14px;
+  border-radius: 10px;
+  font-size: 12.5px;
+  font-weight: 800;
+  text-align: center;
+}
+.s1-inline-feedback.warn {
+  background: rgba(244, 63, 94, 0.2);
+  border: 1px solid #F43F5E;
+  color: #FECDD3;
+}
+.s1-inline-feedback.good {
+  background: rgba(16, 185, 129, 0.2);
+  border: 1px solid #10B981;
+  color: #A7F3D0;
+}
+
+/* Bước 4: Khôi phục Cây Cầu Ánh Sáng */
+.s1-restored-svg {
+  width: 100%;
+  max-width: 580px;
+  height: 205px;
+  margin: 0 auto;
+  display: block;
+}
+.s1-bridge-beam-glow {
+  filter: drop-shadow(0 0 16px #36DEF4);
+  animation: s1PulseAura 1.6s ease-in-out infinite;
+}
+.s1-cb-arrow-glow {
+  filter: drop-shadow(0 0 12px #FFC953);
+}
+.s1-pillar-svg-glow {
+  filter: drop-shadow(0 0 12px #10B981);
+}
+.s1-restored-banner {
+  background: rgba(8, 20, 38, 0.92);
+  border: 2px solid #FFC953;
+  border-radius: 14px;
+  padding: 12px 16px;
+  text-align: center;
+  box-shadow: 0 0 28px rgba(255, 201, 83, 0.35);
+}
+.s1-restored-formula {
+  font-size: 22px;
+  font-weight: 900;
+  color: #FFC953;
+  margin-bottom: 4px;
+}
+.s1-restored-msg {
+  font-size: 13px;
+  color: #E2E8F0;
+  margin: 4px 0 10px;
+}
+.s1-restored-rewards {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.s1-reward-pill {
+  padding: 6px 14px;
+  border-radius: 99px;
+  font-size: 12.5px;
+  font-weight: 900;
+}
+.s1-reward-pill.gold {
+  background: rgba(255, 201, 83, 0.2);
+  border: 1.5px solid #FFC953;
+  color: #FEF08A;
+}
+.s1-reward-pill.cyan {
+  background: rgba(54, 222, 244, 0.18);
+  border: 1.5px solid #36DEF4;
+  color: #A5F3FC;
+}
+
 
 .demo-banner{background:rgba(16,28,58,0.92);border:1.5px solid #36DEF4;border-radius:14px;padding:12px 16px;margin:12px 18px;display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;color:#F8FAFF}
 .demo-banner small{flex:1 0 100%;text-align:center;color:#CBD5E1}
@@ -4404,7 +4899,7 @@ body {
 <main class="wrap" id="app"></main>
 <script>
 window.IS_DEMO_MODE = true;
-const offStages = [{"id":1,"gameType":"vector_adventure","defaultMode":"hunt","title":"CHẶNG 1. RỪNG VECTƠ KHỞI NGUYÊN","subtitle":"Quy tắc hiệu hai vectơ","shortName":"Hiệu vectơ","place":"Rừng Vectơ Khởi Nguyên","icon":"🏝️","biomeColor":"#10b981","levelBadge":"NHẬN BIẾT","timeSeconds":60,"time":"60 giây","tag":"Nhận biết · Hiệu hai vectơ (60 giây)","item":"Ấn Hướng Đi","sealIcon":"🧭","digit":"3","digitRule":"Khôi phục Ấn Hướng Đi (Chặng 1 = 3).","story":"Cây cầu ánh sáng xuyên qua Rừng Vectơ bị Bóng Lỗi đảo chiều. Rồng Xanh cần đội thám hiểm nhận biết các vectơ để khôi phục đường đi.","dragonIntro":"Cây cầu bị đảo chiều rồi! Hãy nhận ra những mũi tên đúng để mở đường!","dragonWin":"Chính xác! Những mũi tên đã trở về đúng hướng!","shadowIntro":"Bóng Lỗi đã đảo chiều Cây cầu ánh sáng và đánh cắp Ấn Hướng Đi!","groupTask":"Cả đội quan sát sơ đồ 3 cột mốc A, B, C, kích hoạt các cột mốc và giải mã hiệu hai vectơ cùng gốc.","teamRoles":["🧭 Người dẫn đường: Quan sát mục tiêu & sơ đồ vectơ","🧩 Người giải mã: Đề xuất đáp án & giải thích quy tắc","🎮 Người điều khiển: Thực hiện thao tác (luân phiên mỗi chặng)","✅ Người xác nhận: Kiểm tra lý do và chốt kết quả"],"visual3D":{"title":"Quy tắc hiệu hai vectơ cùng điểm đầu","type":"vectorDiff","points":[{"label":"A","coords":[0,0,0],"x":0,"y":0,"z":0,"color":"#38bdf8"},{"label":"B","coords":[4,2,2],"x":4,"y":2,"z":2,"color":"#facc15"},{"label":"C","coords":[2,4,0],"x":2,"y":4,"z":0,"color":"#4ade80"}],"vectors":[{"from":[0,0,0],"to":[4,2,2],"label":"AB","color":"#38bdf8"},{"from":[0,0,0],"to":[2,4,0],"label":"AC","color":"#facc15"},{"from":[2,4,0],"to":[4,2,2],"label":"CB = AB − AC","color":"#4ade80"}],"formula":"AB − AC = CB   (hay AC − AB = BC)"},"interactiveTask":{"type":"pillars_abc","title":"Phần 1 – Khám phá: Kích hoạt 3 cột mốc A, B, C","instruction":"Chạm vào 3 cột mốc A, B, C trên sơ đồ để dựng hai vectơ xuất phát từ A và khôi phục chiều mũi tên trên Cây cầu ánh sáng!","targets":["A","B","C"],"rewardText":"Đã kích hoạt đủ 3 cột mốc A, B, C! Nhận Mảnh chìa khóa 1/3!"},"interactiveChallenge":{"id":"1.0","isInteractive":true,"level":"NHẬN BIẾT","label":"Phần 1 · Khám phá 3 cột mốc A, B, C","prompt":"NHIỆM VỤ TƯƠNG TÁC: Hãy kích hoạt cả 3 cột mốc A, B, C trên sơ đồ Cây cầu ánh sáng để nhận mảnh chìa khóa đầu tiên (1/3)!","options":["Đã kích hoạt 3 cột mốc A, B, C và quan sát chiều mũi tên","Chỉ kích hoạt 1 cột mốc A","Bỏ qua sơ đồ"],"correct":0,"shortAnswer":"A","hints":["Hãy nhấp chuột vào từng cột mốc A, B, C trên hình vẽ bên trái rồi bấm Xác nhận.","Khi hai vectơ AB và AC cùng xuất phát từ A, hiệu AB − AC nối từ C tới B."],"explain":"Tuyệt vời! Ba cột mốc A, B, C đã phát sáng. Đội nhận Mảnh chìa khóa 1/3!","keyBadge":"Khóa 1/3"},"questionBank":[{"id":"1.1","level":"NHẬN BIẾT","label":"Câu 1.1 · Hiệu hai vectơ AB và AC","prompt":"Cho ba điểm A, B, C. Vectơ nào bằng hiệu của vectơ AB và vectơ AC?","options":["Vectơ CB.","Vectơ BC.","Vectơ BA."],"correct":0,"shortAnswer":"CB","hints":["Quy tắc hiệu hai vectơ cùng gốc A: AB − AC có điểm đầu là C, điểm cuối là B.","AB − AC = CB."],"explain":"AB − AC = CB (các đại lượng đều là vectơ).","keyBadge":"Khóa 2/3"},{"id":"1.2","level":"NHẬN BIẾT","label":"Câu 1.2 · Hiệu hai vectơ AC và AB","prompt":"Cho ba điểm A, B, C. Vectơ nào bằng AC − AB?","options":["Vectơ CB.","Vectơ BC.","Vectơ CA."],"correct":1,"shortAnswer":"BC","hints":["Hai vectơ AC và AB cùng điểm đầu A: hiệu AC − AB hướng từ điểm B sang điểm C.","AC − AB = BC."],"explain":"AC − AB = BC.","keyBadge":"Khóa 2/3"},{"id":"1.3","level":"NHẬN BIẾT","label":"Câu 1.3 · Hiệu hai vectơ MN và MP","prompt":"Cho ba điểm M, N, P. Vectơ nào bằng MN − MP?","options":["Vectơ NP.","Vectơ NM.","Vectơ PN."],"correct":2,"shortAnswer":"PN","hints":["Hai vectơ MN và MP cùng gốc M: hiệu MN − MP hướng từ điểm cuối P của vectơ trừ tới điểm cuối N.","MN − MP = PN."],"explain":"MN − MP = PN.","keyBadge":"Khóa 3/3"}],"challenges":[{"id":"1.0","isInteractive":true,"level":"NHẬN BIẾT","label":"Phần 1 · Khám phá 3 cột mốc A, B, C","prompt":"NHIỆM VỤ TƯƠNG TÁC: Hãy kích hoạt cả 3 cột mốc A, B, C trên sơ đồ Cây cầu ánh sáng để nhận mảnh chìa khóa đầu tiên (1/3)!","options":["Đã kích hoạt 3 cột mốc A, B, C và quan sát chiều mũi tên","Chỉ kích hoạt 1 cột mốc A","Bỏ qua sơ đồ"],"correct":0,"shortAnswer":"A","hints":["Hãy nhấp chuột vào từng cột mốc A, B, C trên hình vẽ bên trái rồi bấm Xác nhận.","Khi hai vectơ AB và AC cùng xuất phát từ A, hiệu AB − AC nối từ C tới B."],"explain":"Tuyệt vời! Ba cột mốc A, B, C đã phát sáng. Đội nhận Mảnh chìa khóa 1/3!","keyBadge":"Khóa 1/3"},{"id":"1.1","level":"NHẬN BIẾT","label":"Câu 1.1 · Hiệu hai vectơ AB và AC","prompt":"Cho ba điểm A, B, C. Vectơ nào bằng hiệu của vectơ AB và vectơ AC?","options":["Vectơ CB.","Vectơ BC.","Vectơ BA."],"correct":0,"shortAnswer":"CB","hints":["Quy tắc hiệu hai vectơ cùng gốc A: AB − AC có điểm đầu là C, điểm cuối là B.","AB − AC = CB."],"explain":"AB − AC = CB (các đại lượng đều là vectơ).","keyBadge":"Khóa 2/3"},{"id":"1.2","level":"NHẬN BIẾT","label":"Câu 1.2 · Hiệu hai vectơ AC và AB","prompt":"Cho ba điểm A, B, C. Vectơ nào bằng AC − AB?","options":["Vectơ CB.","Vectơ BC.","Vectơ CA."],"correct":1,"shortAnswer":"BC","hints":["Hai vectơ AC và AB cùng điểm đầu A: hiệu AC − AB hướng từ điểm B sang điểm C.","AC − AB = BC."],"explain":"AC − AB = BC.","keyBadge":"Khóa 3/3"}]},{"id":2,"gameType":"vector_adventure","defaultMode":"defense","title":"CHẶNG 2. PHÁO ĐÀI GÓC VUÔNG","subtitle":"Quy tắc cộng hai vectơ nối tiếp","shortName":"Tổng vectơ","place":"Pháo Đài Góc Vuông","icon":"🏰","biomeColor":"#f59e0b","levelBadge":"NHẬN BIẾT","timeSeconds":60,"time":"60 giây","tag":"Nhận biết · Tổng hai vectơ (60 giây)","item":"Ấn Kết Nối","sealIcon":"🔗","digit":"0","digitRule":"Khôi phục Ấn Kết Nối (Chặng 2 = 0).","story":"Pháo đài bị phong ấn bởi hai con đường năng lượng AB và BC. Muốn mở cổng thành, đội phải nhận biết quy tắc cộng hai vectơ.","dragonIntro":"Hai con đường đã bị tách rời! Hãy tìm vectơ tổng để nối chúng!","dragonWin":"Tuyệt vời! Các con đường đã hợp nhất!","shadowIntro":"Cổng Pháo Đài đã bị chia cắt thành hai đoạn rời rạc!","groupTask":"Kích hoạt lần lượt hai đoạn đường AB và BC trên bản đồ và giải mã quy tắc 3 điểm để mở cổng thành.","teamRoles":["🧭 Người dẫn đường: Quan sát mục tiêu & sơ đồ vectơ","🧩 Người giải mã: Đề xuất đáp án & giải thích quy tắc","🎮 Người điều khiển: Thực hiện thao tác (luân phiên mỗi chặng)","✅ Người xác nhận: Kiểm tra lý do và chốt kết quả"],"visual3D":{"title":"Quy tắc ba điểm (Cộng hai vectơ nối tiếp)","type":"vectorSum","points":[{"label":"A","coords":[-2,-2,0],"x":-2,"y":-2,"z":0,"color":"#38bdf8"},{"label":"B","coords":[1,3,2],"x":1,"y":3,"z":2,"color":"#facc15"},{"label":"C","coords":[4,0,1],"x":4,"y":0,"z":1,"color":"#4ade80"}],"vectors":[{"from":[-2,-2,0],"to":[1,3,2],"label":"AB","color":"#38bdf8"},{"from":[1,3,2],"to":[4,0,1],"label":"BC","color":"#facc15"},{"from":[-2,-2,0],"to":[4,0,1],"label":"AC = AB + BC","color":"#4ade80"}],"formula":"AB + BC = AC   (Quy tắc ba điểm)"},"interactiveTask":{"type":"paths_ab_bc","title":"Phần 1 – Khám phá: Kích hoạt 2 đoạn đường AB và BC","instruction":"Nhấp kích hoạt lần lượt đoạn đường năng lượng AB rồi đến đoạn đường BC để dẫn luồng sáng tới cổng Pháo Đài!","targets":["AB","BC"],"rewardText":"Hai luồng sáng AB và BC đã kích hoạt! Nhận Mảnh chìa khóa 1/3!"},"interactiveChallenge":{"id":"2.0","isInteractive":true,"level":"NHẬN BIẾT","label":"Phần 1 · Kích hoạt hai đoạn đường AB và BC","prompt":"NHIỆM VỤ TƯƠNG TÁC: Hãy kích hoạt lần lượt hai đoạn đường năng lượng AB và BC trên sơ đồ Pháo Đài để nhận mảnh chìa khóa đầu tiên (1/3)!","options":["Đã kích hoạt hai đoạn đường AB và BC nối tiếp nhau","Chỉ kích hoạt một đoạn đường","Bỏ qua sơ đồ"],"correct":0,"shortAnswer":"A","hints":["Nhấp vào đoạn đường AB trước, sau đó nhấp vào đoạn đường BC trên sơ đồ bên trái.","Điểm cuối của vectơ AB nối tiếp với điểm đầu của vectơ BC tại B."],"explain":"Hai luồng năng lượng AB và BC đã rực sáng! Đội nhận Mảnh chìa khóa 1/3!","keyBadge":"Khóa 1/3"},"questionBank":[{"id":"2.1","level":"NHẬN BIẾT","label":"Câu 2.1 · Tổng của vectơ AB và vectơ BC","prompt":"Cho ba điểm A, B, C. Tổng của vectơ AB và vectơ BC bằng vectơ nào?","options":["Vectơ CA.","Vectơ AC.","Vectơ CB."],"correct":1,"shortAnswer":"AC","hints":["Áp dụng quy tắc ba điểm: điểm cuối B của vectơ thứ nhất trùng với điểm đầu B của vectơ thứ hai.","AB + BC = AC."],"explain":"AB + BC = AC.","keyBadge":"Khóa 2/3"},{"id":"2.2","level":"NHẬN BIẾT","label":"Câu 2.2 · Tổng của vectơ MN và vectơ NP","prompt":"Cho ba điểm M, N, P. Tổng của vectơ MN và vectơ NP bằng vectơ nào?","options":["Vectơ PM.","Vectơ PN.","Vectơ MP."],"correct":2,"shortAnswer":"MP","hints":["Điểm đầu là M, nối qua trung gian N tới điểm cuối P.","MN + NP = MP."],"explain":"MN + NP = MP.","keyBadge":"Khóa 2/3"},{"id":"2.3","level":"NHẬN BIẾT","label":"Câu 2.3 · Cặp vectơ có tổng bằng AC","prompt":"Cặp vectơ nào sau đây có tổng bằng vectơ AC?","options":["Vectơ AB và vectơ BC.","Vectơ AB và vectơ CB.","Vectơ BA và vectơ AC."],"correct":0,"shortAnswer":"A","hints":["Để tổng bằng AC theo quy tắc 3 điểm, vectơ đầu phải xuất phát từ A và vectơ sau kết thúc tại C.","AB + BC = AC."],"explain":"Quy tắc ba điểm cho AB + BC = AC.","keyBadge":"Khóa 3/3"}],"challenges":[{"id":"2.0","isInteractive":true,"level":"NHẬN BIẾT","label":"Phần 1 · Kích hoạt hai đoạn đường AB và BC","prompt":"NHIỆM VỤ TƯƠNG TÁC: Hãy kích hoạt lần lượt hai đoạn đường năng lượng AB và BC trên sơ đồ Pháo Đài để nhận mảnh chìa khóa đầu tiên (1/3)!","options":["Đã kích hoạt hai đoạn đường AB và BC nối tiếp nhau","Chỉ kích hoạt một đoạn đường","Bỏ qua sơ đồ"],"correct":0,"shortAnswer":"A","hints":["Nhấp vào đoạn đường AB trước, sau đó nhấp vào đoạn đường BC trên sơ đồ bên trái.","Điểm cuối của vectơ AB nối tiếp với điểm đầu của vectơ BC tại B."],"explain":"Hai luồng năng lượng AB và BC đã rực sáng! Đội nhận Mảnh chìa khóa 1/3!","keyBadge":"Khóa 1/3"},{"id":"2.1","level":"NHẬN BIẾT","label":"Câu 2.1 · Tổng của vectơ AB và vectơ BC","prompt":"Cho ba điểm A, B, C. Tổng của vectơ AB và vectơ BC bằng vectơ nào?","options":["Vectơ CA.","Vectơ AC.","Vectơ CB."],"correct":1,"shortAnswer":"AC","hints":["Áp dụng quy tắc ba điểm: điểm cuối B của vectơ thứ nhất trùng với điểm đầu B của vectơ thứ hai.","AB + BC = AC."],"explain":"AB + BC = AC.","keyBadge":"Khóa 2/3"},{"id":"2.2","level":"NHẬN BIẾT","label":"Câu 2.2 · Tổng của vectơ MN và vectơ NP","prompt":"Cho ba điểm M, N, P. Tổng của vectơ MN và vectơ NP bằng vectơ nào?","options":["Vectơ PM.","Vectơ PN.","Vectơ MP."],"correct":2,"shortAnswer":"MP","hints":["Điểm đầu là M, nối qua trung gian N tới điểm cuối P.","MN + NP = MP."],"explain":"MN + NP = MP.","keyBadge":"Khóa 3/3"}]},{"id":3,"gameType":"vector_adventure","defaultMode":"zombie","title":"CHẶNG 3. THÁP PHA LÊ","subtitle":"Quy tắc hình bình hành","shortName":"Hình bình hành","place":"Tháp Pha Lê Khoảng Cách","icon":"💠","biomeColor":"#8b5cf6","levelBadge":"NHẬN BIẾT","timeSeconds":65,"time":"65 giây","tag":"Nhận biết · Quy tắc hình bình hành (65 giây)","item":"Ấn Cân Bằng","sealIcon":"💠","digit":"5","digitRule":"Khôi phục Ấn Cân Bằng (Chặng 3 = 5).","story":"Tháp Pha Lê chỉ hoạt động khi các mạch năng lượng tuân theo quy tắc hình bình hành. Một sơ đồ ABCD phát sáng xuất hiện trước cửa tháp.","dragonIntro":"Một đường chéo đang bị phong ấn! Hãy nhận ra quy tắc để đánh thức tháp!","dragonWin":"Xuất sắc! Tháp Pha Lê đã được đánh thức!","shadowIntro":"Đường chéo năng lượng của Tháp Pha Lê đã bị phong ấn!","groupTask":"Kích hoạt hai vectơ cạnh cùng xuất phát từ đỉnh A là AB và AD trên hình bình hành ABCD để giải mã đường chéo.","teamRoles":["🧭 Người dẫn đường: Quan sát mục tiêu & sơ đồ vectơ","🧩 Người giải mã: Đề xuất đáp án & giải thích quy tắc","🎮 Người điều khiển: Thực hiện thao tác (luân phiên mỗi chặng)","✅ Người xác nhận: Kiểm tra lý do và chốt kết quả"],"visual3D":{"title":"Quy tắc hình bình hành ABCD","type":"parallelogram","points":[{"label":"A","coords":[0,0,0],"x":0,"y":0,"z":0,"color":"#38bdf8"},{"label":"B","coords":[3,1,0],"x":3,"y":1,"z":0,"color":"#facc15"},{"label":"D","coords":[1,3,2],"x":1,"y":3,"z":2,"color":"#c084fc"},{"label":"C","coords":[4,4,2],"x":4,"y":4,"z":2,"color":"#4ade80"}],"vectors":[{"from":[0,0,0],"to":[3,1,0],"label":"AB","color":"#38bdf8"},{"from":[0,0,0],"to":[1,3,2],"label":"AD","color":"#c084fc"},{"from":[0,0,0],"to":[4,4,2],"label":"AC = AB + AD","color":"#4ade80"}],"formula":"AB + AD = AC   (ABCD là hình bình hành)"},"interactiveTask":{"type":"parallelogram_ab_ad","title":"Phần 1 – Khám phá: Kích hoạt hai vectơ cạnh AB và AD","instruction":"Nhấp kích hoạt hai vectơ cạnh xuất phát từ cùng đỉnh A là AB và AD trên hình bình hành ABCD!","targets":["AB","AD"],"rewardText":"Hai mạch năng lượng cạnh AB và AD đã nạp đầy! Nhận Mảnh chìa khóa 1/3!"},"interactiveChallenge":{"id":"3.0","isInteractive":true,"level":"NHẬN BIẾT","label":"Phần 1 · Kích hoạt hai vectơ cạnh AB và AD","prompt":"NHIỆM VỤ TƯƠNG TÁC: Trên hình bình hành ABCD trước Tháp Pha Lê, hãy kích hoạt hai vectơ xuất phát từ A là AB và AD để nhận mảnh chìa khóa đầu tiên (1/3)!","options":["Đã kích hoạt hai vectơ cạnh AB và AD cùng xuất phát từ đỉnh A","Chỉ kích hoạt một cạnh","Bỏ qua sơ đồ"],"correct":0,"shortAnswer":"A","hints":["Nhấp vào cạnh vectơ AB và cạnh vectơ AD trên sơ đồ hình bình hành bên trái.","Trong hình bình hành ABCD, tổng hai vectơ cạnh xuất phát từ A tạo thành vectơ đường chéo xuất phát từ A."],"explain":"Hai mạch cạnh AB và AD đã phát sáng! Đội nhận Mảnh chìa khóa 1/3!","keyBadge":"Khóa 1/3"},"questionBank":[{"id":"3.1","level":"NHẬN BIẾT","label":"Câu 3.1 · Quy tắc hình bình hành tại đỉnh A","prompt":"Cho hình bình hành ABCD. Vectơ AB + vectơ AD bằng vectơ nào?","options":["Vectơ BD.","Vectơ CA.","Vectơ AC."],"correct":2,"shortAnswer":"AC","hints":["Hai vectơ AB và AD là hai cạnh cùng xuất phát từ đỉnh A của hình bình hành ABCD.","Tổng của chúng bằng vectơ đường chéo xuất phát từ A là AC."],"explain":"Theo quy tắc hình bình hành, AB + AD = AC.","keyBadge":"Khóa 2/3"},{"id":"3.2","level":"NHẬN BIẾT","label":"Câu 3.2 · Quy tắc hình bình hành tại đỉnh B","prompt":"Cho hình bình hành ABCD. Vectơ BA + vectơ BC bằng vectơ nào?","options":["Vectơ BD.","Vectơ DB.","Vectơ AC."],"correct":0,"shortAnswer":"BD","hints":["Hai vectơ BA và BC là hai cạnh cùng xuất phát từ đỉnh B.","Đường chéo xuất phát từ đỉnh B của hình bình hành ABCD là vectơ BD."],"explain":"Hai vectơ BA và BC cùng điểm đầu B nên có tổng bằng BD.","keyBadge":"Khóa 2/3"},{"id":"3.3","level":"NHẬN BIẾT","label":"Câu 3.3 · Nhận diện cặp vectơ cạnh","prompt":"Cho hình bình hành ABCD. Cặp vectơ nào sau đây được cộng theo quy tắc hình bình hành để được vectơ AC?","options":["Vectơ AB và vectơ BC.","Vectơ AB và vectơ AD.","Vectơ BA và vectơ BC."],"correct":1,"shortAnswer":"B","hints":["Quy tắc hình bình hành cộng hai vectơ cạnh cùng xuất phát từ một đỉnh.","Để được đường chéo AC xuất phát từ A, cần cộng hai vectơ cạnh cùng gốc A là AB và AD."],"explain":"AB và AD là hai vectơ cạnh cùng xuất phát từ A.","keyBadge":"Khóa 3/3"}],"challenges":[{"id":"3.0","isInteractive":true,"level":"NHẬN BIẾT","label":"Phần 1 · Kích hoạt hai vectơ cạnh AB và AD","prompt":"NHIỆM VỤ TƯƠNG TÁC: Trên hình bình hành ABCD trước Tháp Pha Lê, hãy kích hoạt hai vectơ xuất phát từ A là AB và AD để nhận mảnh chìa khóa đầu tiên (1/3)!","options":["Đã kích hoạt hai vectơ cạnh AB và AD cùng xuất phát từ đỉnh A","Chỉ kích hoạt một cạnh","Bỏ qua sơ đồ"],"correct":0,"shortAnswer":"A","hints":["Nhấp vào cạnh vectơ AB và cạnh vectơ AD trên sơ đồ hình bình hành bên trái.","Trong hình bình hành ABCD, tổng hai vectơ cạnh xuất phát từ A tạo thành vectơ đường chéo xuất phát từ A."],"explain":"Hai mạch cạnh AB và AD đã phát sáng! Đội nhận Mảnh chìa khóa 1/3!","keyBadge":"Khóa 1/3"},{"id":"3.1","level":"NHẬN BIẾT","label":"Câu 3.1 · Quy tắc hình bình hành tại đỉnh A","prompt":"Cho hình bình hành ABCD. Vectơ AB + vectơ AD bằng vectơ nào?","options":["Vectơ BD.","Vectơ CA.","Vectơ AC."],"correct":2,"shortAnswer":"AC","hints":["Hai vectơ AB và AD là hai cạnh cùng xuất phát từ đỉnh A của hình bình hành ABCD.","Tổng của chúng bằng vectơ đường chéo xuất phát từ A là AC."],"explain":"Theo quy tắc hình bình hành, AB + AD = AC.","keyBadge":"Khóa 2/3"},{"id":"3.2","level":"NHẬN BIẾT","label":"Câu 3.2 · Quy tắc hình bình hành tại đỉnh B","prompt":"Cho hình bình hành ABCD. Vectơ BA + vectơ BC bằng vectơ nào?","options":["Vectơ BD.","Vectơ DB.","Vectơ AC."],"correct":0,"shortAnswer":"BD","hints":["Hai vectơ BA và BC là hai cạnh cùng xuất phát từ đỉnh B.","Đường chéo xuất phát từ đỉnh B của hình bình hành ABCD là vectơ BD."],"explain":"Hai vectơ BA và BC cùng điểm đầu B nên có tổng bằng BD.","keyBadge":"Khóa 3/3"}]},{"id":4,"gameType":"vector_adventure","defaultMode":"maze","title":"CHẶNG 4. MÊ CUNG TRUNG ĐIỂM","subtitle":"Tính chất vectơ của trung điểm đoạn thẳng","shortName":"Trung điểm","place":"Mê Cung Trung Điểm","icon":"🌀","biomeColor":"#14b8a6","levelBadge":"THÔNG HIỂU","timeSeconds":65,"time":"65 giây","tag":"Thông hiểu · Trung điểm đoạn thẳng (65 giây)","item":"Ấn Cân Xứng","sealIcon":"⚖️","digit":"2","digitRule":"Khôi phục Ấn Cân Xứng (Chặng 4 = 2).","story":"Trong mê cung, hai nguồn năng lượng tại A và B đang kéo ngược nhau. Cánh cổng chỉ xuất hiện khi đội tìm được điểm cân bằng và hiểu vì sao các vectơ tại đó triệt tiêu.","dragonIntro":"Đừng chỉ tìm điểm ở giữa! Hãy giải thích vì sao nơi đó tạo ra sự cân bằng!","dragonWin":"Các bạn đã hiểu bí mật của điểm cân bằng!","shadowIntro":"Hai nguồn lực tại A và B đang xung đột dữ dội trong mê cung!","groupTask":"Kéo viên pha lê I vào vị trí trung điểm của đoạn AB, quan sát hai vectơ IA, IB và thảo luận giải thích tính chất triệt tiêu.","teamRoles":["🧭 Người dẫn đường: Quan sát mục tiêu & sơ đồ vectơ","🧩 Người giải mã: Đề xuất đáp án & giải thích quy tắc","🎮 Người điều khiển: Thực hiện thao tác (luân phiên mỗi chặng)","✅ Người xác nhận: Kiểm tra lý do và chốt kết quả"],"visual3D":{"title":"Tính chất trung điểm I của đoạn thẳng AB","type":"midpoint","points":[{"label":"A","coords":[-3,0,1],"x":-3,"y":0,"z":1,"color":"#38bdf8"},{"label":"I (Trung điểm)","coords":[0,0,1],"x":0,"y":0,"z":1,"color":"#facc15"},{"label":"B","coords":[3,0,1],"x":3,"y":0,"z":1,"color":"#4ade80"}],"vectors":[{"from":[0,0,1],"to":[-3,0,1],"label":"IA","color":"#38bdf8"},{"from":[0,0,1],"to":[3,0,1],"label":"IB","color":"#4ade80"}],"formula":"IA + IB = 0   và   MA + MB = 2MI"},"interactiveTask":{"type":"midpoint_slider","title":"Phần 1 – Khám phá: Đưa viên pha lê I về đúng Trung điểm AB","instruction":"Di chuyển viên pha lê I vào đúng vị trí chính giữa (trung điểm) của đoạn thẳng AB để cân bằng hai vectơ IA và IB!","targets":["MIDPOINT_I"],"rewardText":"Viên pha lê I đã nằm đúng trung điểm AB (IA = IB, ngược hướng)! Nhận Mảnh chìa khóa 1/3!"},"interactiveChallenge":{"id":"4.0","isInteractive":true,"level":"THÔNG HIỂU","label":"Phần 1 · Đặt viên pha lê I tại trung điểm AB","prompt":"NHIỆM VỤ TƯƠNG TÁC: Hãy đưa viên pha lê I vào đúng vị trí trung điểm của đoạn AB để hai vectơ IA và IB cân bằng nhau và nhận mảnh chìa khóa đầu tiên (1/3)!","options":["Đã đặt viên pha lê I tại trung điểm AB (IA = IB và ngược hướng)","Đặt I lệch về phía A","Đặt I lệch về phía B"],"correct":0,"shortAnswer":"A","hints":["Kéo thanh trượt hoặc nhấn nút \"Đặt tại Trung điểm I (50%)\" trên sơ đồ bên trái.","Tại trung điểm I, hai vectơ IA và IB có cùng độ dài và ngược hướng."],"explain":"Chính xác! Tại trung điểm I, hai vectơ IA và IB đối nhau nên cân bằng tuyệt đối. Đội nhận Mảnh chìa khóa 1/3!","keyBadge":"Khóa 1/3"},"questionBank":[{"id":"4.1","level":"THÔNG HIỂU","label":"Câu 4.1 · Giải thích tính chất IA + IB = 0","prompt":"Cho I là trung điểm của đoạn AB. Vì sao vectơ IA + vectơ IB bằng vectơ không?","options":["Vì hai vectơ cùng hướng.","Vì hai vectơ có cùng độ dài và ngược hướng.","Vì hai vectơ luôn vuông góc."],"correct":1,"shortAnswer":"B","hints":["Quan sát hướng và độ dài của hai mũi tên IA và IB xuất phát từ trung điểm I.","Hai vectơ có cùng độ dài và ngược hướng là hai vectơ đối nhau."],"explain":"Hai vectơ IA và IB là hai vectơ đối nhau nên tổng bằng vectơ không.","keyBadge":"Khóa 2/3"},{"id":"4.2","level":"THÔNG HIỂU","label":"Câu 4.2 · Giải thích hệ thức MA + MB = 2MI","prompt":"Cho I là trung điểm AB và M là điểm bất kỳ. Vì sao vectơ MA + vectơ MB = 2 vectơ MI?","options":["Vì MA và MB luôn bằng nhau.","Vì MI luôn là vectơ không.","Vì khi phân tích MA và MB qua I, hai vectơ IA và IB triệt tiêu nhau."],"correct":2,"shortAnswer":"C","hints":["Hãy chèn điểm trung điểm I vào hai vectơ MA và MB theo quy tắc ba điểm.","MA + MB = (MI + IA) + (MI + IB) = 2MI + (IA + IB) = 2MI + 0 = 2MI."],"explain":"MA = MI + IA, MB = MI + IB. Vì IA + IB = 0 nên MA + MB = 2MI.","keyBadge":"Khóa 2/3"},{"id":"4.3","level":"THÔNG HIỂU","label":"Câu 4.3 · Khi I không phải là trung điểm AB","prompt":"Điểm I nằm trên đoạn AB nhưng IA không bằng IB về độ dài. Nhận định nào đúng?","options":["Vectơ IA + vectơ IB khác vectơ không.","Vectơ IA + vectơ IB bằng vectơ không.","Vectơ IA và vectơ IB là hai vectơ đối nhau."],"correct":0,"shortAnswer":"A","hints":["Hai vectơ đối nhau bắt buộc phải vừa ngược hướng vừa có cùng độ dài.","Vì độ dài IA ≠ IB nên hai vectơ không thể triệt tiêu hoàn toàn."],"explain":"Hai vectơ IA, IB ngược hướng nhưng khác độ dài nên tổng của chúng không bằng vectơ không.","keyBadge":"Khóa 3/3"}],"challenges":[{"id":"4.0","isInteractive":true,"level":"THÔNG HIỂU","label":"Phần 1 · Đặt viên pha lê I tại trung điểm AB","prompt":"NHIỆM VỤ TƯƠNG TÁC: Hãy đưa viên pha lê I vào đúng vị trí trung điểm của đoạn AB để hai vectơ IA và IB cân bằng nhau và nhận mảnh chìa khóa đầu tiên (1/3)!","options":["Đã đặt viên pha lê I tại trung điểm AB (IA = IB và ngược hướng)","Đặt I lệch về phía A","Đặt I lệch về phía B"],"correct":0,"shortAnswer":"A","hints":["Kéo thanh trượt hoặc nhấn nút \"Đặt tại Trung điểm I (50%)\" trên sơ đồ bên trái.","Tại trung điểm I, hai vectơ IA và IB có cùng độ dài và ngược hướng."],"explain":"Chính xác! Tại trung điểm I, hai vectơ IA và IB đối nhau nên cân bằng tuyệt đối. Đội nhận Mảnh chìa khóa 1/3!","keyBadge":"Khóa 1/3"},{"id":"4.1","level":"THÔNG HIỂU","label":"Câu 4.1 · Giải thích tính chất IA + IB = 0","prompt":"Cho I là trung điểm của đoạn AB. Vì sao vectơ IA + vectơ IB bằng vectơ không?","options":["Vì hai vectơ cùng hướng.","Vì hai vectơ có cùng độ dài và ngược hướng.","Vì hai vectơ luôn vuông góc."],"correct":1,"shortAnswer":"B","hints":["Quan sát hướng và độ dài của hai mũi tên IA và IB xuất phát từ trung điểm I.","Hai vectơ có cùng độ dài và ngược hướng là hai vectơ đối nhau."],"explain":"Hai vectơ IA và IB là hai vectơ đối nhau nên tổng bằng vectơ không.","keyBadge":"Khóa 2/3"},{"id":"4.2","level":"THÔNG HIỂU","label":"Câu 4.2 · Giải thích hệ thức MA + MB = 2MI","prompt":"Cho I là trung điểm AB và M là điểm bất kỳ. Vì sao vectơ MA + vectơ MB = 2 vectơ MI?","options":["Vì MA và MB luôn bằng nhau.","Vì MI luôn là vectơ không.","Vì khi phân tích MA và MB qua I, hai vectơ IA và IB triệt tiêu nhau."],"correct":2,"shortAnswer":"C","hints":["Hãy chèn điểm trung điểm I vào hai vectơ MA và MB theo quy tắc ba điểm.","MA + MB = (MI + IA) + (MI + IB) = 2MI + (IA + IB) = 2MI + 0 = 2MI."],"explain":"MA = MI + IA, MB = MI + IB. Vì IA + IB = 0 nên MA + MB = 2MI.","keyBadge":"Khóa 3/3"}]},{"id":5,"gameType":"vector_adventure","defaultMode":"minesweeper","title":"CHẶNG 5. THÀNH TRÌ LÕI TRÍ TUỆ","subtitle":"Tính chất vectơ của trọng tâm tam giác","shortName":"Trọng tâm","place":"Thành Trì Lõi Trí Tuệ","icon":"🏰","biomeColor":"#ef4444","levelBadge":"THÔNG HIỂU","timeSeconds":70,"time":"70 giây","tag":"Thông hiểu · Trọng tâm tam giác (70 giây)","item":"Ấn Trí Tuệ","sealIcon":"👑","digit":"4","digitRule":"Khôi phục Ấn Trí Tuệ & Tâm Thạch Vectơ (Chặng 5 = 4).","story":"Bóng Lỗi đã chiếm giữ Tâm Thạch Vectơ. Ba luồng năng lượng từ các đỉnh A, B, C đang mất cân bằng. Muốn chiến thắng, đội phải xác định trọng tâm và hiểu mối quan hệ giữa các vectơ tại trọng tâm.","dragonIntro":"Cả đội hãy cùng giải mã! Điểm cân bằng của tam giác sẽ cứu chúng ta!","dragonWin":"Các bạn làm được rồi! Sức mạnh của tri thức đã cứu Lục địa OXYZ!","shadowIntro":"Bóng Lỗi: \"Các ngươi sẽ không thể tìm ra tâm điểm sức mạnh!\"","groupTask":"Chọn giao điểm G của ba đường trung tuyến trong tam giác ABC, kích hoạt 3 luồng năng lượng GA, GB, GC và giải thích hệ thức trọng tâm.","teamRoles":["🧭 Người dẫn đường: Quan sát mục tiêu & sơ đồ vectơ","🧩 Người giải mã: Đề xuất đáp án & giải thích quy tắc","🎮 Người điều khiển: Thực hiện thao tác (luân phiên mỗi chặng)","✅ Người xác nhận: Kiểm tra lý do và chốt kết quả"],"visual3D":{"title":"Tính chất trọng tâm G của tam giác ABC","type":"centroid","points":[{"label":"A","coords":[0,3,2],"x":0,"y":3,"z":2,"color":"#38bdf8"},{"label":"B","coords":[-3,-2,0],"x":-3,"y":-2,"z":0,"color":"#facc15"},{"label":"C","coords":[3,-1,1],"x":3,"y":-1,"z":1,"color":"#4ade80"},{"label":"G (Trọng tâm)","coords":[0,0,1],"x":0,"y":0,"z":1,"color":"#f43f5e"}],"vectors":[{"from":[0,0,1],"to":[0,3,2],"label":"GA","color":"#38bdf8"},{"from":[0,0,1],"to":[-3,-2,0],"label":"GB","color":"#facc15"},{"from":[0,0,1],"to":[3,-1,1],"label":"GC","color":"#4ade80"}],"formula":"GA + GB + GC = 0   và   MA + MB + MC = 3MG"},"interactiveTask":{"type":"centroid_select","title":"Phần 1 – Khám phá: Chọn trọng tâm G (giao điểm 3 trung tuyến)","instruction":"Trên sơ đồ tam giác ABC với 3 đường trung tuyến, hãy nhấp chọn đúng giao điểm G để khơi thông 3 luồng năng lượng GA, GB, GC!","targets":["CENTROID_G"],"rewardText":"Đã xác định đúng Trọng tâm G! Ba luồng năng lượng GA, GB, GC đã xuất hiện! Nhận Mảnh chìa khóa 1/3!"},"interactiveChallenge":{"id":"5.0","isInteractive":true,"level":"THÔNG HIỂU","label":"Phần 1 · Xác định Trọng tâm G của tam giác ABC","prompt":"NHIỆM VỤ TƯƠNG TÁC: Hãy chọn đúng giao điểm G của ba đường trung tuyến trong tam giác ABC để kích hoạt ba luồng năng lượng hướng tới A, B, C và nhận mảnh chìa khóa đầu tiên (1/3)!","options":["Đã chọn đúng giao điểm G của ba đường trung tuyến","Chọn trung điểm I của cạnh BC","Chọn đỉnh A của tam giác"],"correct":0,"shortAnswer":"A","hints":["Nhấp chuột trực tiếp vào điểm G (nơi 3 đường trung tuyến cắt nhau) trên tam giác ABC bên trái.","Trọng tâm G là giao điểm của ba đường trung tuyến trong tam giác ABC."],"explain":"Chính xác! Từ trọng tâm G, ba luồng năng lượng GA, GB, GC đã tỏa ra cân bằng. Đội nhận Mảnh chìa khóa 1/3!","keyBadge":"Khóa 1/3"},"questionBank":[{"id":"5.1","level":"THÔNG HIỂU","label":"Câu 5.1 · Giải thích vì sao GA + GB + GC = 0","prompt":"Cho G là trọng tâm tam giác ABC và I là trung điểm BC. Cặp hệ thức nào giải thích vì sao tổng ba vectơ GA, GB, GC bằng vectơ không?","options":["GB + GC = GI và GA = −GI.","GB + GC = 2GI và GA = −2GI.","GB + GC = 2GI và GA = 2GI."],"correct":1,"shortAnswer":"B","hints":["Vì I là trung điểm BC nên với điểm G ta có GB + GC = 2GI.","Tính chất trọng tâm: AG = 2GI và GA ngược hướng với GI nên GA = −2GI."],"explain":"Vì I là trung điểm BC nên GB + GC = 2GI. Trọng tâm G chia trung tuyến AI theo tỉ số AG:GI = 2:1 nên GA = −2GI. Do đó tổng ba vectơ bằng không.","keyBadge":"Khóa 2/3"},{"id":"5.2","level":"THÔNG HIỂU","label":"Câu 5.2 · Ý nghĩa của hệ thức MA + MB + MC = 3MG","prompt":"Cho G là trọng tâm tam giác ABC. Với điểm M khác G, đẳng thức vectơ MA + MB + MC = 3MG cho biết điều gì?","options":["Tổng ba vectơ luôn bằng vectơ không.","M luôn là trọng tâm tam giác.","Tổng ba vectơ cùng hướng với MG và có độ dài gấp 3 lần MG."],"correct":2,"shortAnswer":"C","hints":["Nhân một vectơ MG với số dương k = 3 > 0 thì vectơ tích có hướng và độ dài thế nào?","Vectơ 3MG cùng hướng với MG và có độ dài bằng 3 lần độ dài MG."],"explain":"Tổng ba vectơ bằng ba lần vectơ MG.","keyBadge":"Khóa 2/3"},{"id":"5.3","level":"THÔNG HIỂU","label":"Câu 5.3 · Xác định vị trí điểm M khi MA + MB + MC = 0","prompt":"Với tam giác ABC có trọng tâm G, nếu một điểm M thỏa mãn vectơ MA + vectơ MB + vectơ MC = vectơ không thì M ở đâu?","options":["M trùng với G.","M nằm tại một đỉnh bất kỳ.","M là trung điểm của một cạnh bất kỳ."],"correct":0,"shortAnswer":"A","hints":["Áp dụng hệ thức MA + MB + MC = 3MG.","Khi 3MG = 0 thì vectơ MG bằng vectơ không, tức là điểm M trùng với G."],"explain":"MA + MB + MC = 3MG. Tổng bằng vectơ không nên MG bằng vectơ không, suy ra M trùng G.","keyBadge":"Khóa 3/3"}],"challenges":[{"id":"5.0","isInteractive":true,"level":"THÔNG HIỂU","label":"Phần 1 · Xác định Trọng tâm G của tam giác ABC","prompt":"NHIỆM VỤ TƯƠNG TÁC: Hãy chọn đúng giao điểm G của ba đường trung tuyến trong tam giác ABC để kích hoạt ba luồng năng lượng hướng tới A, B, C và nhận mảnh chìa khóa đầu tiên (1/3)!","options":["Đã chọn đúng giao điểm G của ba đường trung tuyến","Chọn trung điểm I của cạnh BC","Chọn đỉnh A của tam giác"],"correct":0,"shortAnswer":"A","hints":["Nhấp chuột trực tiếp vào điểm G (nơi 3 đường trung tuyến cắt nhau) trên tam giác ABC bên trái.","Trọng tâm G là giao điểm của ba đường trung tuyến trong tam giác ABC."],"explain":"Chính xác! Từ trọng tâm G, ba luồng năng lượng GA, GB, GC đã tỏa ra cân bằng. Đội nhận Mảnh chìa khóa 1/3!","keyBadge":"Khóa 1/3"},{"id":"5.1","level":"THÔNG HIỂU","label":"Câu 5.1 · Giải thích vì sao GA + GB + GC = 0","prompt":"Cho G là trọng tâm tam giác ABC và I là trung điểm BC. Cặp hệ thức nào giải thích vì sao tổng ba vectơ GA, GB, GC bằng vectơ không?","options":["GB + GC = GI và GA = −GI.","GB + GC = 2GI và GA = −2GI.","GB + GC = 2GI và GA = 2GI."],"correct":1,"shortAnswer":"B","hints":["Vì I là trung điểm BC nên với điểm G ta có GB + GC = 2GI.","Tính chất trọng tâm: AG = 2GI và GA ngược hướng với GI nên GA = −2GI."],"explain":"Vì I là trung điểm BC nên GB + GC = 2GI. Trọng tâm G chia trung tuyến AI theo tỉ số AG:GI = 2:1 nên GA = −2GI. Do đó tổng ba vectơ bằng không.","keyBadge":"Khóa 2/3"},{"id":"5.2","level":"THÔNG HIỂU","label":"Câu 5.2 · Ý nghĩa của hệ thức MA + MB + MC = 3MG","prompt":"Cho G là trọng tâm tam giác ABC. Với điểm M khác G, đẳng thức vectơ MA + MB + MC = 3MG cho biết điều gì?","options":["Tổng ba vectơ luôn bằng vectơ không.","M luôn là trọng tâm tam giác.","Tổng ba vectơ cùng hướng với MG và có độ dài gấp 3 lần MG."],"correct":2,"shortAnswer":"C","hints":["Nhân một vectơ MG với số dương k = 3 > 0 thì vectơ tích có hướng và độ dài thế nào?","Vectơ 3MG cùng hướng với MG và có độ dài bằng 3 lần độ dài MG."],"explain":"Tổng ba vectơ bằng ba lần vectơ MG.","keyBadge":"Khóa 3/3"}]}];
+const offStages = [{"id":1,"isCipherBridgeQuest":true,"gameType":"vector_adventure","defaultMode":"hunt","title":"BÍ MẬT CÂY CẦU ĐẢO CHIỀU","subtitle":"Rừng Vectơ Khởi Nguyên • Hiệu hai vectơ","shortName":"Hiệu vectơ","place":"Bí Mật Cây Cầu Đảo Chiều","icon":"🏝️","biomeColor":"#10b981","levelBadge":"NHẬN BIẾT","timeSeconds":60,"time":"60 giây","tag":"Nhận biết · Hiệu hai vectơ (60 giây)","item":"Ấn Hướng Đi","sealIcon":"🧭","digit":"3","digitRule":"Khôi phục Cây Cầu Ánh Sáng & nhận Ấn Hướng Đi (Chặng 1 = 3).","story":"Bóng Lỗi đã phá hủy cây cầu xuyên qua Rừng Vectơ. Rồng Xanh yêu cầu đội học sinh tìm ba mảnh mật thư tại các cột mốc A, B, C. Khi giải mã đúng, cây cầu ánh sáng được khôi phục và đội nhận Ấn Hướng Đi.","dragonIntro":"Cây cầu xuyên qua Rừng Vectơ đã bị phá hủy! Hãy tìm 3 mảnh mật thư tại các cột mốc A, B, C!","dragonWin":"Chính xác! Vectơ AB − vectơ AC = vectơ CB! Cây cầu ánh sáng đã được khôi phục, đội nhận Ấn Hướng Đi!","shadowIntro":"Bóng Lỗi đã phá hủy Cây cầu ánh sáng và giấu mật thư tại 3 cột mốc A, B, C!","groupTask":"Tìm 3 mảnh mật thư tại cột mốc A, B, C → Kéo thả ghép mật thư → Kéo mũi tên xác định hướng vectơ bí mật để khôi phục cây cầu.","teamRoles":["🧭 Thành viên 1 (Thám hiểm): Khám phá và mở phong ấn tại 3 cột mốc đá A, B, C","📜 Thành viên 2 (Giải mã): Đọc và kéo thả ghép 3 mảnh mật thư thành biểu thức đúng","🏹 Thành viên 3 (Điều khiển): Nhấn điểm đầu và kéo mũi tên xác định hướng vectơ bí mật","✅ Thành viên 4 (Kiểm chứng): Kiểm tra chiều mũi tên và xác nhận khôi phục cây cầu"],"visual3D":{"title":"Sơ đồ 3 cột mốc A, B, C trong Rừng Vectơ","type":"vectorDiff","points":[{"label":"A","coords":[0,0,0],"x":0,"y":0,"z":0,"color":"#38bdf8"},{"label":"B","coords":[4,2,2],"x":4,"y":2,"z":2,"color":"#facc15"},{"label":"C","coords":[2,4,0],"x":2,"y":4,"z":0,"color":"#4ade80"}],"vectors":[{"from":[0,0,0],"to":[4,2,2],"label":"AB","color":"#38bdf8"},{"from":[0,0,0],"to":[2,4,0],"label":"AC","color":"#facc15"},{"from":[2,4,0],"to":[4,2,2],"label":"?","color":"#4ade80"}],"formula":"Quy tắc hiệu hai vectơ chung gốc A: vectơ AB − vectơ AC = ?"},"interactiveTask":{"type":"cipher_bridge_quest","title":"Bước 1 – Tìm mật thư tại 3 cột đá A, B, C","instruction":"Nhấn vào 3 cột đá cổ A, B, C đang phát sáng trong Rừng Vectơ để mở phong ấn và thu thập đủ 3 mảnh mật thư (0/3 → 3/3)!","targets":["A","B","C"],"rewardText":"Đã tìm đủ 3/3 mảnh mật thư tại các cột đá A, B, C!"},"interactiveChallenge":{"id":"1.0","stepType":"find_pillars","isInteractive":true,"level":"NHẬN BIẾT","label":"Bước 1 · Tìm mật thư tại 3 cột đá A, B, C","prompt":"BƯỚC 1 – TÌM MẬT THƯ: Hãy nhấn vào 3 cột đá cổ A, B, C trong Rừng Vectơ để mở phong ấn và thu thập đủ 3 mảnh mật thư (0/3 → 3/3)!","options":["Đã thu thập đủ 3/3 mảnh mật thư tại các cột đá A, B, C","Chỉ mới tìm thấy 1 mảnh mật thư","Chưa mở phong ấn cột đá"],"correct":0,"shortAnswer":"ABC","hints":["Hãy quan sát 3 cột đá cổ A, B, C đang phát sáng trên màn hình và nhấp vào từng cột đá để thu thập mảnh mật thư.","Mỗi cột đá A, B, C chứa 1 mảnh của biểu thức mật thư cổ."],"explain":"Tuyệt vời! Đội đã thu thập đủ 3/3 mảnh mật thư từ ba cột đá A, B, C!","keyBadge":"Mật thư 3/3"},"fixedChallenges":[{"id":"1.0","stepType":"find_pillars","isInteractive":true,"level":"NHẬN BIẾT","label":"Bước 1 · Tìm mật thư tại 3 cột đá A, B, C","prompt":"BƯỚC 1 – TÌM MẬT THƯ: Hãy nhấn vào 3 cột đá cổ A, B, C trong Rừng Vectơ để mở phong ấn và thu thập đủ 3 mảnh mật thư (0/3 → 3/3)!","options":["Đã thu thập đủ 3/3 mảnh mật thư tại cột đá A, B, C"],"correct":0,"shortAnswer":"ABC","hints":["Nhấp vào từng cột đá cổ A, B, C đang phát sáng trong Rừng Vectơ để mở phong ấn.","Khi thu thập đủ 3/3 mảnh mật thư, bảng giải mã sẽ tự động mở ra."],"explain":"Đã thu thập đủ 3/3 mảnh mật thư cổ từ các cột mốc A, B, C!","keyBadge":"Mật thư 3/3"},{"id":"1.1","stepType":"assemble_cipher","isInteractive":false,"level":"NHẬN BIẾT","label":"Bước 2 · Ghép mật thư cổ","prompt":"BƯỚC 2 – GHÉP MẬT THƯ: Kéo thả và sắp xếp 3 mảnh mật thư vừa tìm được để tạo thành biểu thức hiệu của vectơ AB và vectơ AC!","options":["vectơ AB − vectơ AC = ?","vectơ AC − vectơ AB = ?","− vectơ AB vectơ AC = ?"],"correct":0,"shortAnswer":"AB-AC","hints":["Đặt mảnh [vectơ AB] vào ô thứ nhất, mảnh dấu [−] vào ô thứ hai, và mảnh [vectơ AC] vào ô thứ ba.","Biểu thức mật thư đúng là: vectơ AB − vectơ AC = ?"],"explain":"Đã ghép đúng mật thư: vectơ AB − vectơ AC = ? Hãy bước sang Bước 3 để tìm hướng vectơ bí mật!","keyBadge":"Giải mã mật thư"},{"id":"1.2","stepType":"draw_vector_cb","isInteractive":false,"level":"NHẬN BIẾT","label":"Bước 3 · Tìm hướng vectơ bí mật","prompt":"BƯỚC 3 – TÌM HƯỚNG VECTƠ BÍ MẬT: Trên sơ đồ tam giác A, B, C, hãy nhấn điểm bắt đầu và kéo mũi tên năng lượng đến điểm kết thúc để tạo vectơ bằng hiệu của vectơ AB và vectơ AC!","options":["Vectơ CB (Từ điểm C đến điểm B)","Vectơ BC (Từ điểm B đến điểm C)","Vectơ BA (Từ điểm B đến điểm A)"],"correct":0,"shortAnswer":"CB","hints":["Theo quy tắc hiệu hai vectơ chung điểm đầu A: vectơ AB − vectơ AC nối giữa hai điểm cuối B và C.","Hãy nhấn giữ tại điểm C (điểm bắt đầu) và kéo mũi tên năng lượng tới điểm B (điểm kết thúc)!"],"explain":"vectơ AB − vectơ AC = vectơ CB (xuất phát tại C và kết thúc tại B). Cây cầu ánh sáng đã được khôi phục!","keyBadge":"Mở Cầu Ánh Sáng"}],"questionBank":[{"id":"1.1","stepType":"assemble_cipher","level":"NHẬN BIẾT","label":"Bước 2 · Ghép mật thư cổ (AB − AC = ?)","prompt":"Ghép 3 mảnh mật thư tại cột đá A, B, C thành biểu thức hiệu hai vectơ xuất phát từ A.","options":["vectơ AB − vectơ AC = ?","vectơ AC − vectơ AB = ?","− vectơ AB vectơ AC = ?"],"correct":0,"shortAnswer":"AB-AC","hints":["Đặt mảnh [vectơ AB] ở đầu, dấu [−] ở giữa, và mảnh [vectơ AC] ở cuối.","Biểu thức mật thư đúng là: vectơ AB − vectơ AC = ?"],"explain":"Ghép đúng mật thư: vectơ AB − vectơ AC = ?","keyBadge":"Giải mã mật thư"},{"id":"1.2","stepType":"draw_vector_cb","level":"NHẬN BIẾT","label":"Bước 3 · Kéo hướng vectơ bí mật (C → B)","prompt":"Trên sơ đồ tam giác A, B, C: Nhấn điểm bắt đầu và kéo mũi tên đến điểm kết thúc để tạo vectơ bằng vectơ AB − vectơ AC.","options":["Vectơ CB (Từ C đến B)","Vectơ BC (Từ B đến C)","Vectơ BA (Từ B đến A)"],"correct":0,"shortAnswer":"CB","hints":["Hai vectơ AB và AC cùng gốc A: hiệu AB − AC xuất phát từ điểm cuối C của AC và kết thúc tại điểm cuối B của AB.","Nhấn giữ tại C và kéo mũi tên tới B để tạo vectơ CB."],"explain":"vectơ AB − vectơ AC = vectơ CB.","keyBadge":"Mở Cầu Ánh Sáng"}],"challenges":[{"id":"1.0","stepType":"find_pillars","isInteractive":true,"level":"NHẬN BIẾT","label":"Bước 1 · Tìm mật thư tại 3 cột đá A, B, C","prompt":"BƯỚC 1 – TÌM MẬT THƯ: Hãy nhấn vào 3 cột đá cổ A, B, C trong Rừng Vectơ để mở phong ấn và thu thập đủ 3 mảnh mật thư (0/3 → 3/3)!","options":["Đã thu thập đủ 3/3 mảnh mật thư tại cột đá A, B, C"],"correct":0,"shortAnswer":"ABC","hints":["Nhấp vào từng cột đá cổ A, B, C đang phát sáng trong Rừng Vectơ để mở phong ấn.","Khi thu thập đủ 3/3 mảnh mật thư, bảng giải mã sẽ tự động mở ra."],"explain":"Đã thu thập đủ 3/3 mảnh mật thư cổ từ các cột mốc A, B, C!","keyBadge":"Mật thư 3/3"},{"id":"1.1","stepType":"assemble_cipher","isInteractive":false,"level":"NHẬN BIẾT","label":"Bước 2 · Ghép mật thư cổ","prompt":"BƯỚC 2 – GHÉP MẬT THƯ: Kéo thả và sắp xếp 3 mảnh mật thư vừa tìm được để tạo thành biểu thức hiệu của vectơ AB và vectơ AC!","options":["vectơ AB − vectơ AC = ?","vectơ AC − vectơ AB = ?","− vectơ AB vectơ AC = ?"],"correct":0,"shortAnswer":"AB-AC","hints":["Đặt mảnh [vectơ AB] vào ô thứ nhất, mảnh dấu [−] vào ô thứ hai, và mảnh [vectơ AC] vào ô thứ ba.","Biểu thức mật thư đúng là: vectơ AB − vectơ AC = ?"],"explain":"Đã ghép đúng mật thư: vectơ AB − vectơ AC = ? Hãy bước sang Bước 3 để tìm hướng vectơ bí mật!","keyBadge":"Giải mã mật thư"},{"id":"1.2","stepType":"draw_vector_cb","isInteractive":false,"level":"NHẬN BIẾT","label":"Bước 3 · Tìm hướng vectơ bí mật","prompt":"BƯỚC 3 – TÌM HƯỚNG VECTƠ BÍ MẬT: Trên sơ đồ tam giác A, B, C, hãy nhấn điểm bắt đầu và kéo mũi tên năng lượng đến điểm kết thúc để tạo vectơ bằng hiệu của vectơ AB và vectơ AC!","options":["Vectơ CB (Từ điểm C đến điểm B)","Vectơ BC (Từ điểm B đến điểm C)","Vectơ BA (Từ điểm B đến điểm A)"],"correct":0,"shortAnswer":"CB","hints":["Theo quy tắc hiệu hai vectơ chung điểm đầu A: vectơ AB − vectơ AC nối giữa hai điểm cuối B và C.","Hãy nhấn giữ tại điểm C (điểm bắt đầu) và kéo mũi tên năng lượng tới điểm B (điểm kết thúc)!"],"explain":"vectơ AB − vectơ AC = vectơ CB (xuất phát tại C và kết thúc tại B). Cây cầu ánh sáng đã được khôi phục!","keyBadge":"Mở Cầu Ánh Sáng"}]},{"id":2,"gameType":"vector_adventure","defaultMode":"defense","title":"CHẶNG 2. PHÁO ĐÀI GÓC VUÔNG","subtitle":"Quy tắc cộng hai vectơ nối tiếp","shortName":"Tổng vectơ","place":"Pháo Đài Góc Vuông","icon":"🏰","biomeColor":"#f59e0b","levelBadge":"NHẬN BIẾT","timeSeconds":60,"time":"60 giây","tag":"Nhận biết · Tổng hai vectơ (60 giây)","item":"Ấn Kết Nối","sealIcon":"🔗","digit":"0","digitRule":"Khôi phục Ấn Kết Nối (Chặng 2 = 0).","story":"Pháo đài bị phong ấn bởi hai con đường năng lượng AB và BC. Muốn mở cổng thành, đội phải nhận biết quy tắc cộng hai vectơ.","dragonIntro":"Hai con đường đã bị tách rời! Hãy tìm vectơ tổng để nối chúng!","dragonWin":"Tuyệt vời! Các con đường đã hợp nhất!","shadowIntro":"Cổng Pháo Đài đã bị chia cắt thành hai đoạn rời rạc!","groupTask":"Kích hoạt lần lượt hai đoạn đường AB và BC trên bản đồ và giải mã quy tắc 3 điểm để mở cổng thành.","teamRoles":["🧭 Người dẫn đường: Quan sát mục tiêu & sơ đồ vectơ","🧩 Người giải mã: Đề xuất đáp án & giải thích quy tắc","🎮 Người điều khiển: Thực hiện thao tác (luân phiên mỗi chặng)","✅ Người xác nhận: Kiểm tra lý do và chốt kết quả"],"visual3D":{"title":"Quy tắc ba điểm (Cộng hai vectơ nối tiếp)","type":"vectorSum","points":[{"label":"A","coords":[-2,-2,0],"x":-2,"y":-2,"z":0,"color":"#38bdf8"},{"label":"B","coords":[1,3,2],"x":1,"y":3,"z":2,"color":"#facc15"},{"label":"C","coords":[4,0,1],"x":4,"y":0,"z":1,"color":"#4ade80"}],"vectors":[{"from":[-2,-2,0],"to":[1,3,2],"label":"AB","color":"#38bdf8"},{"from":[1,3,2],"to":[4,0,1],"label":"BC","color":"#facc15"},{"from":[-2,-2,0],"to":[4,0,1],"label":"AC = AB + BC","color":"#4ade80"}],"formula":"AB + BC = AC   (Quy tắc ba điểm)"},"interactiveTask":{"type":"paths_ab_bc","title":"Phần 1 – Khám phá: Kích hoạt 2 đoạn đường AB và BC","instruction":"Nhấp kích hoạt lần lượt đoạn đường năng lượng AB rồi đến đoạn đường BC để dẫn luồng sáng tới cổng Pháo Đài!","targets":["AB","BC"],"rewardText":"Hai luồng sáng AB và BC đã kích hoạt! Nhận Mảnh chìa khóa 1/3!"},"interactiveChallenge":{"id":"2.0","isInteractive":true,"level":"NHẬN BIẾT","label":"Phần 1 · Kích hoạt hai đoạn đường AB và BC","prompt":"NHIỆM VỤ TƯƠNG TÁC: Hãy kích hoạt lần lượt hai đoạn đường năng lượng AB và BC trên sơ đồ Pháo Đài để nhận mảnh chìa khóa đầu tiên (1/3)!","options":["Đã kích hoạt hai đoạn đường AB và BC nối tiếp nhau","Chỉ kích hoạt một đoạn đường","Bỏ qua sơ đồ"],"correct":0,"shortAnswer":"A","hints":["Nhấp vào đoạn đường AB trước, sau đó nhấp vào đoạn đường BC trên sơ đồ bên trái.","Điểm cuối của vectơ AB nối tiếp với điểm đầu của vectơ BC tại B."],"explain":"Hai luồng năng lượng AB và BC đã rực sáng! Đội nhận Mảnh chìa khóa 1/3!","keyBadge":"Khóa 1/3"},"questionBank":[{"id":"2.1","level":"NHẬN BIẾT","label":"Câu 2.1 · Tổng của vectơ AB và vectơ BC","prompt":"Cho ba điểm A, B, C. Tổng của vectơ AB và vectơ BC bằng vectơ nào?","options":["Vectơ CA.","Vectơ AC.","Vectơ CB."],"correct":1,"shortAnswer":"AC","hints":["Áp dụng quy tắc ba điểm: điểm cuối B của vectơ thứ nhất trùng với điểm đầu B của vectơ thứ hai.","AB + BC = AC."],"explain":"AB + BC = AC.","keyBadge":"Khóa 2/3"},{"id":"2.2","level":"NHẬN BIẾT","label":"Câu 2.2 · Tổng của vectơ MN và vectơ NP","prompt":"Cho ba điểm M, N, P. Tổng của vectơ MN và vectơ NP bằng vectơ nào?","options":["Vectơ PM.","Vectơ PN.","Vectơ MP."],"correct":2,"shortAnswer":"MP","hints":["Điểm đầu là M, nối qua trung gian N tới điểm cuối P.","MN + NP = MP."],"explain":"MN + NP = MP.","keyBadge":"Khóa 2/3"},{"id":"2.3","level":"NHẬN BIẾT","label":"Câu 2.3 · Cặp vectơ có tổng bằng AC","prompt":"Cặp vectơ nào sau đây có tổng bằng vectơ AC?","options":["Vectơ AB và vectơ BC.","Vectơ AB và vectơ CB.","Vectơ BA và vectơ AC."],"correct":0,"shortAnswer":"A","hints":["Để tổng bằng AC theo quy tắc 3 điểm, vectơ đầu phải xuất phát từ A và vectơ sau kết thúc tại C.","AB + BC = AC."],"explain":"Quy tắc ba điểm cho AB + BC = AC.","keyBadge":"Khóa 3/3"}],"challenges":[{"id":"2.0","isInteractive":true,"level":"NHẬN BIẾT","label":"Phần 1 · Kích hoạt hai đoạn đường AB và BC","prompt":"NHIỆM VỤ TƯƠNG TÁC: Hãy kích hoạt lần lượt hai đoạn đường năng lượng AB và BC trên sơ đồ Pháo Đài để nhận mảnh chìa khóa đầu tiên (1/3)!","options":["Đã kích hoạt hai đoạn đường AB và BC nối tiếp nhau","Chỉ kích hoạt một đoạn đường","Bỏ qua sơ đồ"],"correct":0,"shortAnswer":"A","hints":["Nhấp vào đoạn đường AB trước, sau đó nhấp vào đoạn đường BC trên sơ đồ bên trái.","Điểm cuối của vectơ AB nối tiếp với điểm đầu của vectơ BC tại B."],"explain":"Hai luồng năng lượng AB và BC đã rực sáng! Đội nhận Mảnh chìa khóa 1/3!","keyBadge":"Khóa 1/3"},{"id":"2.1","level":"NHẬN BIẾT","label":"Câu 2.1 · Tổng của vectơ AB và vectơ BC","prompt":"Cho ba điểm A, B, C. Tổng của vectơ AB và vectơ BC bằng vectơ nào?","options":["Vectơ CA.","Vectơ AC.","Vectơ CB."],"correct":1,"shortAnswer":"AC","hints":["Áp dụng quy tắc ba điểm: điểm cuối B của vectơ thứ nhất trùng với điểm đầu B của vectơ thứ hai.","AB + BC = AC."],"explain":"AB + BC = AC.","keyBadge":"Khóa 2/3"},{"id":"2.2","level":"NHẬN BIẾT","label":"Câu 2.2 · Tổng của vectơ MN và vectơ NP","prompt":"Cho ba điểm M, N, P. Tổng của vectơ MN và vectơ NP bằng vectơ nào?","options":["Vectơ PM.","Vectơ PN.","Vectơ MP."],"correct":2,"shortAnswer":"MP","hints":["Điểm đầu là M, nối qua trung gian N tới điểm cuối P.","MN + NP = MP."],"explain":"MN + NP = MP.","keyBadge":"Khóa 3/3"}]},{"id":3,"gameType":"vector_adventure","defaultMode":"zombie","title":"CHẶNG 3. THÁP PHA LÊ","subtitle":"Quy tắc hình bình hành","shortName":"Hình bình hành","place":"Tháp Pha Lê Khoảng Cách","icon":"💠","biomeColor":"#8b5cf6","levelBadge":"NHẬN BIẾT","timeSeconds":65,"time":"65 giây","tag":"Nhận biết · Quy tắc hình bình hành (65 giây)","item":"Ấn Cân Bằng","sealIcon":"💠","digit":"5","digitRule":"Khôi phục Ấn Cân Bằng (Chặng 3 = 5).","story":"Tháp Pha Lê chỉ hoạt động khi các mạch năng lượng tuân theo quy tắc hình bình hành. Một sơ đồ ABCD phát sáng xuất hiện trước cửa tháp.","dragonIntro":"Một đường chéo đang bị phong ấn! Hãy nhận ra quy tắc để đánh thức tháp!","dragonWin":"Xuất sắc! Tháp Pha Lê đã được đánh thức!","shadowIntro":"Đường chéo năng lượng của Tháp Pha Lê đã bị phong ấn!","groupTask":"Kích hoạt hai vectơ cạnh cùng xuất phát từ đỉnh A là AB và AD trên hình bình hành ABCD để giải mã đường chéo.","teamRoles":["🧭 Người dẫn đường: Quan sát mục tiêu & sơ đồ vectơ","🧩 Người giải mã: Đề xuất đáp án & giải thích quy tắc","🎮 Người điều khiển: Thực hiện thao tác (luân phiên mỗi chặng)","✅ Người xác nhận: Kiểm tra lý do và chốt kết quả"],"visual3D":{"title":"Quy tắc hình bình hành ABCD","type":"parallelogram","points":[{"label":"A","coords":[0,0,0],"x":0,"y":0,"z":0,"color":"#38bdf8"},{"label":"B","coords":[3,1,0],"x":3,"y":1,"z":0,"color":"#facc15"},{"label":"D","coords":[1,3,2],"x":1,"y":3,"z":2,"color":"#c084fc"},{"label":"C","coords":[4,4,2],"x":4,"y":4,"z":2,"color":"#4ade80"}],"vectors":[{"from":[0,0,0],"to":[3,1,0],"label":"AB","color":"#38bdf8"},{"from":[0,0,0],"to":[1,3,2],"label":"AD","color":"#c084fc"},{"from":[0,0,0],"to":[4,4,2],"label":"AC = AB + AD","color":"#4ade80"}],"formula":"AB + AD = AC   (ABCD là hình bình hành)"},"interactiveTask":{"type":"parallelogram_ab_ad","title":"Phần 1 – Khám phá: Kích hoạt hai vectơ cạnh AB và AD","instruction":"Nhấp kích hoạt hai vectơ cạnh xuất phát từ cùng đỉnh A là AB và AD trên hình bình hành ABCD!","targets":["AB","AD"],"rewardText":"Hai mạch năng lượng cạnh AB và AD đã nạp đầy! Nhận Mảnh chìa khóa 1/3!"},"interactiveChallenge":{"id":"3.0","isInteractive":true,"level":"NHẬN BIẾT","label":"Phần 1 · Kích hoạt hai vectơ cạnh AB và AD","prompt":"NHIỆM VỤ TƯƠNG TÁC: Trên hình bình hành ABCD trước Tháp Pha Lê, hãy kích hoạt hai vectơ xuất phát từ A là AB và AD để nhận mảnh chìa khóa đầu tiên (1/3)!","options":["Đã kích hoạt hai vectơ cạnh AB và AD cùng xuất phát từ đỉnh A","Chỉ kích hoạt một cạnh","Bỏ qua sơ đồ"],"correct":0,"shortAnswer":"A","hints":["Nhấp vào cạnh vectơ AB và cạnh vectơ AD trên sơ đồ hình bình hành bên trái.","Trong hình bình hành ABCD, tổng hai vectơ cạnh xuất phát từ A tạo thành vectơ đường chéo xuất phát từ A."],"explain":"Hai mạch cạnh AB và AD đã phát sáng! Đội nhận Mảnh chìa khóa 1/3!","keyBadge":"Khóa 1/3"},"questionBank":[{"id":"3.1","level":"NHẬN BIẾT","label":"Câu 3.1 · Quy tắc hình bình hành tại đỉnh A","prompt":"Cho hình bình hành ABCD. Vectơ AB + vectơ AD bằng vectơ nào?","options":["Vectơ BD.","Vectơ CA.","Vectơ AC."],"correct":2,"shortAnswer":"AC","hints":["Hai vectơ AB và AD là hai cạnh cùng xuất phát từ đỉnh A của hình bình hành ABCD.","Tổng của chúng bằng vectơ đường chéo xuất phát từ A là AC."],"explain":"Theo quy tắc hình bình hành, AB + AD = AC.","keyBadge":"Khóa 2/3"},{"id":"3.2","level":"NHẬN BIẾT","label":"Câu 3.2 · Quy tắc hình bình hành tại đỉnh B","prompt":"Cho hình bình hành ABCD. Vectơ BA + vectơ BC bằng vectơ nào?","options":["Vectơ BD.","Vectơ DB.","Vectơ AC."],"correct":0,"shortAnswer":"BD","hints":["Hai vectơ BA và BC là hai cạnh cùng xuất phát từ đỉnh B.","Đường chéo xuất phát từ đỉnh B của hình bình hành ABCD là vectơ BD."],"explain":"Hai vectơ BA và BC cùng điểm đầu B nên có tổng bằng BD.","keyBadge":"Khóa 2/3"},{"id":"3.3","level":"NHẬN BIẾT","label":"Câu 3.3 · Nhận diện cặp vectơ cạnh","prompt":"Cho hình bình hành ABCD. Cặp vectơ nào sau đây được cộng theo quy tắc hình bình hành để được vectơ AC?","options":["Vectơ AB và vectơ BC.","Vectơ AB và vectơ AD.","Vectơ BA và vectơ BC."],"correct":1,"shortAnswer":"B","hints":["Quy tắc hình bình hành cộng hai vectơ cạnh cùng xuất phát từ một đỉnh.","Để được đường chéo AC xuất phát từ A, cần cộng hai vectơ cạnh cùng gốc A là AB và AD."],"explain":"AB và AD là hai vectơ cạnh cùng xuất phát từ A.","keyBadge":"Khóa 3/3"}],"challenges":[{"id":"3.0","isInteractive":true,"level":"NHẬN BIẾT","label":"Phần 1 · Kích hoạt hai vectơ cạnh AB và AD","prompt":"NHIỆM VỤ TƯƠNG TÁC: Trên hình bình hành ABCD trước Tháp Pha Lê, hãy kích hoạt hai vectơ xuất phát từ A là AB và AD để nhận mảnh chìa khóa đầu tiên (1/3)!","options":["Đã kích hoạt hai vectơ cạnh AB và AD cùng xuất phát từ đỉnh A","Chỉ kích hoạt một cạnh","Bỏ qua sơ đồ"],"correct":0,"shortAnswer":"A","hints":["Nhấp vào cạnh vectơ AB và cạnh vectơ AD trên sơ đồ hình bình hành bên trái.","Trong hình bình hành ABCD, tổng hai vectơ cạnh xuất phát từ A tạo thành vectơ đường chéo xuất phát từ A."],"explain":"Hai mạch cạnh AB và AD đã phát sáng! Đội nhận Mảnh chìa khóa 1/3!","keyBadge":"Khóa 1/3"},{"id":"3.1","level":"NHẬN BIẾT","label":"Câu 3.1 · Quy tắc hình bình hành tại đỉnh A","prompt":"Cho hình bình hành ABCD. Vectơ AB + vectơ AD bằng vectơ nào?","options":["Vectơ BD.","Vectơ CA.","Vectơ AC."],"correct":2,"shortAnswer":"AC","hints":["Hai vectơ AB và AD là hai cạnh cùng xuất phát từ đỉnh A của hình bình hành ABCD.","Tổng của chúng bằng vectơ đường chéo xuất phát từ A là AC."],"explain":"Theo quy tắc hình bình hành, AB + AD = AC.","keyBadge":"Khóa 2/3"},{"id":"3.2","level":"NHẬN BIẾT","label":"Câu 3.2 · Quy tắc hình bình hành tại đỉnh B","prompt":"Cho hình bình hành ABCD. Vectơ BA + vectơ BC bằng vectơ nào?","options":["Vectơ BD.","Vectơ DB.","Vectơ AC."],"correct":0,"shortAnswer":"BD","hints":["Hai vectơ BA và BC là hai cạnh cùng xuất phát từ đỉnh B.","Đường chéo xuất phát từ đỉnh B của hình bình hành ABCD là vectơ BD."],"explain":"Hai vectơ BA và BC cùng điểm đầu B nên có tổng bằng BD.","keyBadge":"Khóa 3/3"}]},{"id":4,"gameType":"vector_adventure","defaultMode":"maze","title":"CHẶNG 4. MÊ CUNG TRUNG ĐIỂM","subtitle":"Tính chất vectơ của trung điểm đoạn thẳng","shortName":"Trung điểm","place":"Mê Cung Trung Điểm","icon":"🌀","biomeColor":"#14b8a6","levelBadge":"THÔNG HIỂU","timeSeconds":65,"time":"65 giây","tag":"Thông hiểu · Trung điểm đoạn thẳng (65 giây)","item":"Ấn Cân Xứng","sealIcon":"⚖️","digit":"2","digitRule":"Khôi phục Ấn Cân Xứng (Chặng 4 = 2).","story":"Trong mê cung, hai nguồn năng lượng tại A và B đang kéo ngược nhau. Cánh cổng chỉ xuất hiện khi đội tìm được điểm cân bằng và hiểu vì sao các vectơ tại đó triệt tiêu.","dragonIntro":"Đừng chỉ tìm điểm ở giữa! Hãy giải thích vì sao nơi đó tạo ra sự cân bằng!","dragonWin":"Các bạn đã hiểu bí mật của điểm cân bằng!","shadowIntro":"Hai nguồn lực tại A và B đang xung đột dữ dội trong mê cung!","groupTask":"Kéo viên pha lê I vào vị trí trung điểm của đoạn AB, quan sát hai vectơ IA, IB và thảo luận giải thích tính chất triệt tiêu.","teamRoles":["🧭 Người dẫn đường: Quan sát mục tiêu & sơ đồ vectơ","🧩 Người giải mã: Đề xuất đáp án & giải thích quy tắc","🎮 Người điều khiển: Thực hiện thao tác (luân phiên mỗi chặng)","✅ Người xác nhận: Kiểm tra lý do và chốt kết quả"],"visual3D":{"title":"Tính chất trung điểm I của đoạn thẳng AB","type":"midpoint","points":[{"label":"A","coords":[-3,0,1],"x":-3,"y":0,"z":1,"color":"#38bdf8"},{"label":"I (Trung điểm)","coords":[0,0,1],"x":0,"y":0,"z":1,"color":"#facc15"},{"label":"B","coords":[3,0,1],"x":3,"y":0,"z":1,"color":"#4ade80"}],"vectors":[{"from":[0,0,1],"to":[-3,0,1],"label":"IA","color":"#38bdf8"},{"from":[0,0,1],"to":[3,0,1],"label":"IB","color":"#4ade80"}],"formula":"IA + IB = 0   và   MA + MB = 2MI"},"interactiveTask":{"type":"midpoint_slider","title":"Phần 1 – Khám phá: Đưa viên pha lê I về đúng Trung điểm AB","instruction":"Di chuyển viên pha lê I vào đúng vị trí chính giữa (trung điểm) của đoạn thẳng AB để cân bằng hai vectơ IA và IB!","targets":["MIDPOINT_I"],"rewardText":"Viên pha lê I đã nằm đúng trung điểm AB (IA = IB, ngược hướng)! Nhận Mảnh chìa khóa 1/3!"},"interactiveChallenge":{"id":"4.0","isInteractive":true,"level":"THÔNG HIỂU","label":"Phần 1 · Đặt viên pha lê I tại trung điểm AB","prompt":"NHIỆM VỤ TƯƠNG TÁC: Hãy đưa viên pha lê I vào đúng vị trí trung điểm của đoạn AB để hai vectơ IA và IB cân bằng nhau và nhận mảnh chìa khóa đầu tiên (1/3)!","options":["Đã đặt viên pha lê I tại trung điểm AB (IA = IB và ngược hướng)","Đặt I lệch về phía A","Đặt I lệch về phía B"],"correct":0,"shortAnswer":"A","hints":["Kéo thanh trượt hoặc nhấn nút \"Đặt tại Trung điểm I (50%)\" trên sơ đồ bên trái.","Tại trung điểm I, hai vectơ IA và IB có cùng độ dài và ngược hướng."],"explain":"Chính xác! Tại trung điểm I, hai vectơ IA và IB đối nhau nên cân bằng tuyệt đối. Đội nhận Mảnh chìa khóa 1/3!","keyBadge":"Khóa 1/3"},"questionBank":[{"id":"4.1","level":"THÔNG HIỂU","label":"Câu 4.1 · Giải thích tính chất IA + IB = 0","prompt":"Cho I là trung điểm của đoạn AB. Vì sao vectơ IA + vectơ IB bằng vectơ không?","options":["Vì hai vectơ cùng hướng.","Vì hai vectơ có cùng độ dài và ngược hướng.","Vì hai vectơ luôn vuông góc."],"correct":1,"shortAnswer":"B","hints":["Quan sát hướng và độ dài của hai mũi tên IA và IB xuất phát từ trung điểm I.","Hai vectơ có cùng độ dài và ngược hướng là hai vectơ đối nhau."],"explain":"Hai vectơ IA và IB là hai vectơ đối nhau nên tổng bằng vectơ không.","keyBadge":"Khóa 2/3"},{"id":"4.2","level":"THÔNG HIỂU","label":"Câu 4.2 · Giải thích hệ thức MA + MB = 2MI","prompt":"Cho I là trung điểm AB và M là điểm bất kỳ. Vì sao vectơ MA + vectơ MB = 2 vectơ MI?","options":["Vì MA và MB luôn bằng nhau.","Vì MI luôn là vectơ không.","Vì khi phân tích MA và MB qua I, hai vectơ IA và IB triệt tiêu nhau."],"correct":2,"shortAnswer":"C","hints":["Hãy chèn điểm trung điểm I vào hai vectơ MA và MB theo quy tắc ba điểm.","MA + MB = (MI + IA) + (MI + IB) = 2MI + (IA + IB) = 2MI + 0 = 2MI."],"explain":"MA = MI + IA, MB = MI + IB. Vì IA + IB = 0 nên MA + MB = 2MI.","keyBadge":"Khóa 2/3"},{"id":"4.3","level":"THÔNG HIỂU","label":"Câu 4.3 · Khi I không phải là trung điểm AB","prompt":"Điểm I nằm trên đoạn AB nhưng IA không bằng IB về độ dài. Nhận định nào đúng?","options":["Vectơ IA + vectơ IB khác vectơ không.","Vectơ IA + vectơ IB bằng vectơ không.","Vectơ IA và vectơ IB là hai vectơ đối nhau."],"correct":0,"shortAnswer":"A","hints":["Hai vectơ đối nhau bắt buộc phải vừa ngược hướng vừa có cùng độ dài.","Vì độ dài IA ≠ IB nên hai vectơ không thể triệt tiêu hoàn toàn."],"explain":"Hai vectơ IA, IB ngược hướng nhưng khác độ dài nên tổng của chúng không bằng vectơ không.","keyBadge":"Khóa 3/3"}],"challenges":[{"id":"4.0","isInteractive":true,"level":"THÔNG HIỂU","label":"Phần 1 · Đặt viên pha lê I tại trung điểm AB","prompt":"NHIỆM VỤ TƯƠNG TÁC: Hãy đưa viên pha lê I vào đúng vị trí trung điểm của đoạn AB để hai vectơ IA và IB cân bằng nhau và nhận mảnh chìa khóa đầu tiên (1/3)!","options":["Đã đặt viên pha lê I tại trung điểm AB (IA = IB và ngược hướng)","Đặt I lệch về phía A","Đặt I lệch về phía B"],"correct":0,"shortAnswer":"A","hints":["Kéo thanh trượt hoặc nhấn nút \"Đặt tại Trung điểm I (50%)\" trên sơ đồ bên trái.","Tại trung điểm I, hai vectơ IA và IB có cùng độ dài và ngược hướng."],"explain":"Chính xác! Tại trung điểm I, hai vectơ IA và IB đối nhau nên cân bằng tuyệt đối. Đội nhận Mảnh chìa khóa 1/3!","keyBadge":"Khóa 1/3"},{"id":"4.1","level":"THÔNG HIỂU","label":"Câu 4.1 · Giải thích tính chất IA + IB = 0","prompt":"Cho I là trung điểm của đoạn AB. Vì sao vectơ IA + vectơ IB bằng vectơ không?","options":["Vì hai vectơ cùng hướng.","Vì hai vectơ có cùng độ dài và ngược hướng.","Vì hai vectơ luôn vuông góc."],"correct":1,"shortAnswer":"B","hints":["Quan sát hướng và độ dài của hai mũi tên IA và IB xuất phát từ trung điểm I.","Hai vectơ có cùng độ dài và ngược hướng là hai vectơ đối nhau."],"explain":"Hai vectơ IA và IB là hai vectơ đối nhau nên tổng bằng vectơ không.","keyBadge":"Khóa 2/3"},{"id":"4.2","level":"THÔNG HIỂU","label":"Câu 4.2 · Giải thích hệ thức MA + MB = 2MI","prompt":"Cho I là trung điểm AB và M là điểm bất kỳ. Vì sao vectơ MA + vectơ MB = 2 vectơ MI?","options":["Vì MA và MB luôn bằng nhau.","Vì MI luôn là vectơ không.","Vì khi phân tích MA và MB qua I, hai vectơ IA và IB triệt tiêu nhau."],"correct":2,"shortAnswer":"C","hints":["Hãy chèn điểm trung điểm I vào hai vectơ MA và MB theo quy tắc ba điểm.","MA + MB = (MI + IA) + (MI + IB) = 2MI + (IA + IB) = 2MI + 0 = 2MI."],"explain":"MA = MI + IA, MB = MI + IB. Vì IA + IB = 0 nên MA + MB = 2MI.","keyBadge":"Khóa 3/3"}]},{"id":5,"gameType":"vector_adventure","defaultMode":"minesweeper","title":"CHẶNG 5. THÀNH TRÌ LÕI TRÍ TUỆ","subtitle":"Tính chất vectơ của trọng tâm tam giác","shortName":"Trọng tâm","place":"Thành Trì Lõi Trí Tuệ","icon":"🏰","biomeColor":"#ef4444","levelBadge":"THÔNG HIỂU","timeSeconds":70,"time":"70 giây","tag":"Thông hiểu · Trọng tâm tam giác (70 giây)","item":"Ấn Trí Tuệ","sealIcon":"👑","digit":"4","digitRule":"Khôi phục Ấn Trí Tuệ & Tâm Thạch Vectơ (Chặng 5 = 4).","story":"Bóng Lỗi đã chiếm giữ Tâm Thạch Vectơ. Ba luồng năng lượng từ các đỉnh A, B, C đang mất cân bằng. Muốn chiến thắng, đội phải xác định trọng tâm và hiểu mối quan hệ giữa các vectơ tại trọng tâm.","dragonIntro":"Cả đội hãy cùng giải mã! Điểm cân bằng của tam giác sẽ cứu chúng ta!","dragonWin":"Các bạn làm được rồi! Sức mạnh của tri thức đã cứu Lục địa OXYZ!","shadowIntro":"Bóng Lỗi: \"Các ngươi sẽ không thể tìm ra tâm điểm sức mạnh!\"","groupTask":"Chọn giao điểm G của ba đường trung tuyến trong tam giác ABC, kích hoạt 3 luồng năng lượng GA, GB, GC và giải thích hệ thức trọng tâm.","teamRoles":["🧭 Người dẫn đường: Quan sát mục tiêu & sơ đồ vectơ","🧩 Người giải mã: Đề xuất đáp án & giải thích quy tắc","🎮 Người điều khiển: Thực hiện thao tác (luân phiên mỗi chặng)","✅ Người xác nhận: Kiểm tra lý do và chốt kết quả"],"visual3D":{"title":"Tính chất trọng tâm G của tam giác ABC","type":"centroid","points":[{"label":"A","coords":[0,3,2],"x":0,"y":3,"z":2,"color":"#38bdf8"},{"label":"B","coords":[-3,-2,0],"x":-3,"y":-2,"z":0,"color":"#facc15"},{"label":"C","coords":[3,-1,1],"x":3,"y":-1,"z":1,"color":"#4ade80"},{"label":"G (Trọng tâm)","coords":[0,0,1],"x":0,"y":0,"z":1,"color":"#f43f5e"}],"vectors":[{"from":[0,0,1],"to":[0,3,2],"label":"GA","color":"#38bdf8"},{"from":[0,0,1],"to":[-3,-2,0],"label":"GB","color":"#facc15"},{"from":[0,0,1],"to":[3,-1,1],"label":"GC","color":"#4ade80"}],"formula":"GA + GB + GC = 0   và   MA + MB + MC = 3MG"},"interactiveTask":{"type":"centroid_select","title":"Phần 1 – Khám phá: Chọn trọng tâm G (giao điểm 3 trung tuyến)","instruction":"Trên sơ đồ tam giác ABC với 3 đường trung tuyến, hãy nhấp chọn đúng giao điểm G để khơi thông 3 luồng năng lượng GA, GB, GC!","targets":["CENTROID_G"],"rewardText":"Đã xác định đúng Trọng tâm G! Ba luồng năng lượng GA, GB, GC đã xuất hiện! Nhận Mảnh chìa khóa 1/3!"},"interactiveChallenge":{"id":"5.0","isInteractive":true,"level":"THÔNG HIỂU","label":"Phần 1 · Xác định Trọng tâm G của tam giác ABC","prompt":"NHIỆM VỤ TƯƠNG TÁC: Hãy chọn đúng giao điểm G của ba đường trung tuyến trong tam giác ABC để kích hoạt ba luồng năng lượng hướng tới A, B, C và nhận mảnh chìa khóa đầu tiên (1/3)!","options":["Đã chọn đúng giao điểm G của ba đường trung tuyến","Chọn trung điểm I của cạnh BC","Chọn đỉnh A của tam giác"],"correct":0,"shortAnswer":"A","hints":["Nhấp chuột trực tiếp vào điểm G (nơi 3 đường trung tuyến cắt nhau) trên tam giác ABC bên trái.","Trọng tâm G là giao điểm của ba đường trung tuyến trong tam giác ABC."],"explain":"Chính xác! Từ trọng tâm G, ba luồng năng lượng GA, GB, GC đã tỏa ra cân bằng. Đội nhận Mảnh chìa khóa 1/3!","keyBadge":"Khóa 1/3"},"questionBank":[{"id":"5.1","level":"THÔNG HIỂU","label":"Câu 5.1 · Giải thích vì sao GA + GB + GC = 0","prompt":"Cho G là trọng tâm tam giác ABC và I là trung điểm BC. Cặp hệ thức nào giải thích vì sao tổng ba vectơ GA, GB, GC bằng vectơ không?","options":["GB + GC = GI và GA = −GI.","GB + GC = 2GI và GA = −2GI.","GB + GC = 2GI và GA = 2GI."],"correct":1,"shortAnswer":"B","hints":["Vì I là trung điểm BC nên với điểm G ta có GB + GC = 2GI.","Tính chất trọng tâm: AG = 2GI và GA ngược hướng với GI nên GA = −2GI."],"explain":"Vì I là trung điểm BC nên GB + GC = 2GI. Trọng tâm G chia trung tuyến AI theo tỉ số AG:GI = 2:1 nên GA = −2GI. Do đó tổng ba vectơ bằng không.","keyBadge":"Khóa 2/3"},{"id":"5.2","level":"THÔNG HIỂU","label":"Câu 5.2 · Ý nghĩa của hệ thức MA + MB + MC = 3MG","prompt":"Cho G là trọng tâm tam giác ABC. Với điểm M khác G, đẳng thức vectơ MA + MB + MC = 3MG cho biết điều gì?","options":["Tổng ba vectơ luôn bằng vectơ không.","M luôn là trọng tâm tam giác.","Tổng ba vectơ cùng hướng với MG và có độ dài gấp 3 lần MG."],"correct":2,"shortAnswer":"C","hints":["Nhân một vectơ MG với số dương k = 3 > 0 thì vectơ tích có hướng và độ dài thế nào?","Vectơ 3MG cùng hướng với MG và có độ dài bằng 3 lần độ dài MG."],"explain":"Tổng ba vectơ bằng ba lần vectơ MG.","keyBadge":"Khóa 2/3"},{"id":"5.3","level":"THÔNG HIỂU","label":"Câu 5.3 · Xác định vị trí điểm M khi MA + MB + MC = 0","prompt":"Với tam giác ABC có trọng tâm G, nếu một điểm M thỏa mãn vectơ MA + vectơ MB + vectơ MC = vectơ không thì M ở đâu?","options":["M trùng với G.","M nằm tại một đỉnh bất kỳ.","M là trung điểm của một cạnh bất kỳ."],"correct":0,"shortAnswer":"A","hints":["Áp dụng hệ thức MA + MB + MC = 3MG.","Khi 3MG = 0 thì vectơ MG bằng vectơ không, tức là điểm M trùng với G."],"explain":"MA + MB + MC = 3MG. Tổng bằng vectơ không nên MG bằng vectơ không, suy ra M trùng G.","keyBadge":"Khóa 3/3"}],"challenges":[{"id":"5.0","isInteractive":true,"level":"THÔNG HIỂU","label":"Phần 1 · Xác định Trọng tâm G của tam giác ABC","prompt":"NHIỆM VỤ TƯƠNG TÁC: Hãy chọn đúng giao điểm G của ba đường trung tuyến trong tam giác ABC để kích hoạt ba luồng năng lượng hướng tới A, B, C và nhận mảnh chìa khóa đầu tiên (1/3)!","options":["Đã chọn đúng giao điểm G của ba đường trung tuyến","Chọn trung điểm I của cạnh BC","Chọn đỉnh A của tam giác"],"correct":0,"shortAnswer":"A","hints":["Nhấp chuột trực tiếp vào điểm G (nơi 3 đường trung tuyến cắt nhau) trên tam giác ABC bên trái.","Trọng tâm G là giao điểm của ba đường trung tuyến trong tam giác ABC."],"explain":"Chính xác! Từ trọng tâm G, ba luồng năng lượng GA, GB, GC đã tỏa ra cân bằng. Đội nhận Mảnh chìa khóa 1/3!","keyBadge":"Khóa 1/3"},{"id":"5.1","level":"THÔNG HIỂU","label":"Câu 5.1 · Giải thích vì sao GA + GB + GC = 0","prompt":"Cho G là trọng tâm tam giác ABC và I là trung điểm BC. Cặp hệ thức nào giải thích vì sao tổng ba vectơ GA, GB, GC bằng vectơ không?","options":["GB + GC = GI và GA = −GI.","GB + GC = 2GI và GA = −2GI.","GB + GC = 2GI và GA = 2GI."],"correct":1,"shortAnswer":"B","hints":["Vì I là trung điểm BC nên với điểm G ta có GB + GC = 2GI.","Tính chất trọng tâm: AG = 2GI và GA ngược hướng với GI nên GA = −2GI."],"explain":"Vì I là trung điểm BC nên GB + GC = 2GI. Trọng tâm G chia trung tuyến AI theo tỉ số AG:GI = 2:1 nên GA = −2GI. Do đó tổng ba vectơ bằng không.","keyBadge":"Khóa 2/3"},{"id":"5.2","level":"THÔNG HIỂU","label":"Câu 5.2 · Ý nghĩa của hệ thức MA + MB + MC = 3MG","prompt":"Cho G là trọng tâm tam giác ABC. Với điểm M khác G, đẳng thức vectơ MA + MB + MC = 3MG cho biết điều gì?","options":["Tổng ba vectơ luôn bằng vectơ không.","M luôn là trọng tâm tam giác.","Tổng ba vectơ cùng hướng với MG và có độ dài gấp 3 lần MG."],"correct":2,"shortAnswer":"C","hints":["Nhân một vectơ MG với số dương k = 3 > 0 thì vectơ tích có hướng và độ dài thế nào?","Vectơ 3MG cùng hướng với MG và có độ dài bằng 3 lần độ dài MG."],"explain":"Tổng ba vectơ bằng ba lần vectơ MG.","keyBadge":"Khóa 3/3"}]}];
 const offWords = {"0":"VÀ","2":"MỞ","3":"TƯ DUY","4":"KHO BÁU","5":"HỢP TÁC"};
 const offOptions = ["TƯ DUY VÀ HỢP TÁC MỞ KHO BÁU","TỐC ĐỘ LUÔN QUAN TRỌNG NHẤT","CHỈ MỘT NGƯỜI GIỎI MỚI CHIẾN THẮNG"];
 
@@ -4444,6 +4939,7 @@ function initDemo(){
    answerLog:[],
    lastActiveAt:Date.now(),
    stageEnteredAt:Date.now(),
+   stage1:{pillars:i===1||i===2?['A','B','C']:[],cluesFound:i===1||i===2?3:0,cipherSolved:i===1||i===2,bridgeOpened:i===1||i===2},
    digits:offStages.slice(0, i===1?2:i===2?1:0).map((s,idx)=>({stage:idx+1,digit:s.digit,rule:s.digitRule,item:s.item}))
   }))
  };
@@ -4505,6 +5001,7 @@ function offState(d){
   wrong:x.wrong,hints:x.hints||0,score:x.score,correctCount:x.correctCount||0,bonus:x.bonus,
   gold:x.gold,heroLevel:x.heroLevel,streak:x.streak||0,upgrades:x.upgrades,completed:x.completed,
   finishedAt:x.finishedAt,digits:x.digits||[],lastActiveAt:x.lastActiveAt,stageEnteredAt:x.stageEnteredAt,
+  stage1:x.stage1||{pillars:[],cluesFound:x.stage>0?3:0,cipherSolved:x.stage>0,bridgeOpened:x.stage>0},
   ...(gv?{answerLog:x.answerLog||[]}:{})
  }));
  let clk={...r.clock};
@@ -4551,9 +5048,22 @@ async function demoApi(route,d){
   return {ok:true};
  }
  if(!t)offErr('Đội chưa đăng nhập');
+ if(route==='/api/stage1Progress'){
+  t.stage1=t.stage1||{pillars:[],cluesFound:0,cipherSolved:false,bridgeOpened:false};
+  if(d.pillar && ['A','B','C'].includes(d.pillar) && !t.stage1.pillars.includes(d.pillar)){
+   t.stage1.pillars.push(d.pillar);
+  }
+  t.stage1.cluesFound=t.stage1.pillars.length;
+  return {ok:true,stage1:t.stage1};
+ }
+ if(route==='/api/stageTimeout'){
+  if(t.stage<5){t.stage++;t.round=0;t.health=3;t.stageEnteredAt=Date.now();}
+  return {ok:true,nextStage:t.stage};
+ }
  if(route==='/api/demoJump'){
   const stg=Math.max(0,Math.min(5,Number(d.stage)||0));
   t.stage=stg;t.round=0;t.health=3;t.completed=false;
+  if(stg===0)t.stage1={pillars:[],cluesFound:0,cipherSolved:false,bridgeOpened:false};
   t.digits=offStages.slice(0,stg).map((s,idx)=>({stage:idx+1,digit:s.digit,rule:s.digitRule,item:s.item}));
   return {ok:true};
  }
@@ -4561,7 +5071,24 @@ async function demoApi(route,d){
  if(route==='/api/answer'){
   if(t.stage!==Number(d.stage)||t.round!==Number(d.round))offErr('Nhiệm vụ thay đổi, hãy tải lại');
   let s=offStages[t.stage],q=s.challenges[t.round];
-  let isCorrect=Boolean(d.interactiveDone && t.round===0) || (Number(d.choice)===q.correct);
+  t.stage1=t.stage1||{pillars:[],cluesFound:0,cipherSolved:false,bridgeOpened:false};
+  let isCorrect=false;
+  if(t.stage===0){
+   if(t.round===0){
+    isCorrect=Boolean(d.interactiveDone)||Number(d.choice)===q.correct;
+    if(isCorrect){t.stage1.pillars=['A','B','C'];t.stage1.cluesFound=3;}
+   }else if(t.round===1){
+    const ord=Array.isArray(d.cipherOrder)?d.cipherOrder.join(''):String(d.cipherOrder||'').replace(/\s+/g,'').toUpperCase();
+    isCorrect=(ord==='AB-AC'||ord==='AB−AC'||Number(d.choice)===q.correct);
+    if(isCorrect){t.stage1.cluesFound=3;t.stage1.cipherSolved=true;}
+   }else if(t.round===2){
+    const vf=String(d.vectorFrom||'').trim().toUpperCase(), vt=String(d.vectorTo||'').trim().toUpperCase();
+    isCorrect=((vf==='C'&&vt==='B')||(!vf&&!vt&&Number(d.choice)===q.correct));
+    if(isCorrect){t.stage1.cluesFound=3;t.stage1.cipherSolved=true;t.stage1.bridgeOpened=true;}
+   }
+  }else{
+   isCorrect=Boolean(d.interactiveDone && t.round===0) || (Number(d.choice)===q.correct);
+  }
   t.answerLog=t.answerLog||[];
   t.answerLog.push({
    stage:s.id,round:t.round+1,isQuiz:t.round>0,questionId:q.id||('S'+s.id+'_R'+(t.round+1)),
@@ -5691,6 +6218,16 @@ function startScreen(msg=''){
  <section class="setup grid grid-2" id="entry"><div class="panel" data-tabbox="teacher"><div class="section-title"><h2>🎓 Phòng điều khiển Giáo viên</h2></div><p>Giáo viên tạo mã phòng, phát mã PIN cho 4–8 nhóm học sinh (3–5 HS/đội), chiếu Hành trình Giải cứu Lục địa OXYZ (6 phút) và theo dõi tiến độ thu hồi 5 Ấn Vectơ thời gian thực.</p><div class="form-field"><label>Số đội tham gia</label><select id="teamCount"><option value="4">4 đội</option><option value="5">5 đội</option><option value="6" selected>6 đội</option><option value="7">7 đội</option><option value="8">8 đội</option></select></div>${btn('✨ TẠO PHÒNG MATHVERSE (6 PHÚT)','create','primary block')}</div>
  <div class="panel" data-tabbox="student"><div class="section-title"><h2>🚀 Đăng nhập Đội Thám Hiểm</h2></div><p>Nhận mã phòng và mã PIN đội từ giáo viên để cùng Rồng Xanh vượt qua 5 vùng đất và khôi phục Tâm Thạch Vectơ!</p><div class="form-field"><label>Mã phòng 6 chữ số</label><input id="roomInput" type="text" inputmode="numeric" maxlength="6" class="mono" value="${fRoom}" placeholder="VD: 123456" /></div><div class="form-field"><label>Đội thám hiểm</label><select id="teamSelect">${Array.from({length:8},(_,i)=>`<option value="doi-${i+1}" ${fTeam===`doi-${i+1}`?'selected':''}>Đội ${i+1}</option>`).join('')}</select></div><div class="form-field"><label>Mã đội 4 chữ số</label><input id="teamCode" type="password" inputmode="numeric" maxlength="4" placeholder="Mã PIN của đội" /></div>${btn('🗝️ VÀO HÀNH TRÌNH NGAY','join','teal block')}</div></section>`);
 }
+function getStageFormulaSafe(stageIdx, currentTeamStage) {
+ if (stageIdx === 0) {
+  const unlocked = (session?.role === 'teacher') || (Number(currentTeamStage) >= 1) || Boolean(vaState?.s1BridgeRestoredOverlay);
+  return unlocked
+   ? '\\vec{AB} − \\vec{AC} = \\vec{CB}'
+   : 'Bí mật Cây Cầu Đảo Chiều: \\vec{AB} − \\vec{AC} = ?';
+ }
+ return STAGE_FORMULAS_SHORT[stageIdx] || '';
+}
+
 function mapTrack(stage){
  return `<div class="hs-stage-map-bar">
   <div class="hs-stage-cards-grid">
@@ -5705,10 +6242,11 @@ function mapTrack(stage){
     const clickAttr = session?.role === 'student'
      ? `data-action="demoJumpStage" data-stage="${i}"`
      : `data-action="preview3DStage" data-stage="${i}"`;
+    const safeFormula = getStageFormulaSafe(i, stage);
     return `<div class="hs-stage-card ${state}" ${clickAttr}>
      <div class="mv-island-tooltip">
       <b style="color:#FFC953">Chặng ${i + 1}: ${esc(m.place)}</b><br/>
-      <span style="color:#A5F3FC">📐 ${formatMath(STAGE_FORMULAS_SHORT[i] || m.sub)}</span><br/>
+      <span style="color:#A5F3FC">📐 ${formatMath(safeFormula || m.sub)}</span><br/>
       <small style="color:#CBD5E1">🏅 Vật phẩm: ${esc(m.mode)}</small>
      </div>
      <div class="hs-stage-card-top">
@@ -5784,10 +6322,17 @@ function renderTeacherTeamModal() {
    </div>
 
    <div class="gv-inspector-kpis">
-    <div class="gv-mini-kpi"><span>Chặng hiện tại</span><b>${t.completed ? 'Hoàn thành 5/5' : ('Chặng ' + Math.min(5, t.stage + 1) + '/5 (Phần ' + (t.round + 1) + '/3)')}</b></div>
-    <div class="gv-mini-kpi"><span>Số câu đúng</span><b style="color:#35C992">${t.correctCount || 0} / 10 câu</b></div>
+    <div class="gv-mini-kpi"><span>Chặng hiện tại</span><b>${t.completed ? 'Hoàn thành 5/5' : ('Chặng ' + Math.min(5, t.stage + 1) + '/5 (Bước ' + (t.round + 1) + '/3)')}</b></div>
+    <div class="gv-mini-kpi"><span>Số bước giải mã đúng</span><b style="color:#35C992">${t.correctCount || 0} / 10</b></div>
     <div class="gv-mini-kpi"><span>Số lần thử sai / Gợi ý</span><b style="color:#FDA4AF">${t.wrong || 0} sai · ${t.hints || 0} gợi ý</b></div>
     <div class="gv-mini-kpi"><span>Điểm XP & Thưởng</span><b style="color:#FFC953">${t.score} XP (Hợp tác +${t.bonus || 0})</b></div>
+   </div>
+
+   <div class="gv-s1-live-box" style="margin:10px 0;padding:10px 14px;background:rgba(16,185,129,0.12);border:1px solid rgba(54,222,244,0.35);border-radius:10px;display:flex;flex-wrap:wrap;gap:14px;align-items:center;justify-content:space-between">
+    <strong style="color:#36DEF4;font-size:12.5px">🌲 CHẶNG 1 – BÍ MẬT CÂY CẦU ĐẢO CHIỀU:</strong>
+    <span style="font-size:12.5px;color:#F8FAFF">📜 Mật thư: <b style="color:#FFC953">${t.stage > 0 ? 3 : (t.stage1?.cluesFound ?? (t.round >= 1 ? 3 : 0))}/3</b></span>
+    <span style="font-size:12.5px;color:#F8FAFF">🧩 Ghép mật thư: <b style="color:${(t.stage > 0 || t.stage1?.cipherSolved || t.round >= 2) ? '#35C992' : '#94A3B8'}">${(t.stage > 0 || t.stage1?.cipherSolved || t.round >= 2) ? '✓ Đã hoàn thành' : 'Chưa xong'}</b></span>
+    <span style="font-size:12.5px;color:#F8FAFF">🌉 Cầu ánh sáng: <b style="color:${(t.stage > 0 || t.stage1?.bridgeOpened) ? '#35C992' : '#94A3B8'}">${(t.stage > 0 || t.stage1?.bridgeOpened) ? '✓ Đã mở cầu (Ấn Hướng Đi)' : 'Chưa mở'}</b></span>
    </div>
 
    <h3 style="color:#36DEF4;font-size:13.5px;margin:12px 0 8px">📋 Lịch sử câu trả lời & thời gian từng chặng (${logs.length} lượt):</h3>
@@ -5974,12 +6519,20 @@ function teacherScreen(){
       const rankNum = idx + 1;
       const rankCls = rankNum === 1 ? 'rank-1' : rankNum === 2 ? 'rank-2' : rankNum === 3 ? 'rank-3' : 'rank-n';
       const stgDisplay = t.completed ? '5/5' : `${Math.min(5, (t.stage || 0) + (t.round > 0 ? 1 : 1))}/5`;
-      const pct = t.completed ? 100 : Math.max(8, Math.round((((t.stage || 0) * 3 + (t.round || 0)) / 15) * 100));
+      const s1Clues = t.stage > 0 ? 3 : (t.stage1?.cluesFound ?? (t.round >= 1 ? 3 : 0));
+      const s1Cipher = Boolean(t.stage > 0 || t.stage1?.cipherSolved || t.round >= 2);
+      const s1Bridge = Boolean(t.stage > 0 || t.stage1?.bridgeOpened);
+      const pct = t.completed ? 100 : Math.max(8, Math.round((((t.stage || 0) * 3 + (t.round || 0) + (t.stage === 0 && t.round === 0 ? (s1Clues / 3) : 0)) / 15) * 100));
       const barColor = barColors[idx % barColors.length];
       const correctVal = t.correctCount ?? ((t.digits || []).length * 2);
-      return `<div class="gv-rank-row ${rankCls}" data-action="inspectTeamRow" data-team="${t.id}" title="Nhấn để xem chi tiết từng câu trả lời của ${esc(t.name)}">
+      const s1LiveBadge = `<div class="gv-s1-inline-badges">
+       <span class="gv-s1-pill ${s1Clues >= 3 ? 'done' : ''}" title="Số mảnh mật thư Chặng 1 đã tìm thấy">📜 ${s1Clues}/3</span>
+       <span class="gv-s1-pill ${s1Cipher ? 'done' : ''}" title="Trạng thái ghép mật thư Chặng 1">🧩 ${s1Cipher ? 'Đã ghép' : 'Chưa'}</span>
+       <span class="gv-s1-pill ${s1Bridge ? 'done' : ''}" title="Trạng thái mở Cầu ánh sáng Chặng 1">🌉 ${s1Bridge ? 'Đã mở cầu' : 'Chưa mở'}</span>
+      </div>`;
+      return `<div class="gv-rank-row ${rankCls}" data-action="inspectTeamRow" data-team="${t.id}" title="Nhấn để xem chi tiết từng bước của ${esc(t.name)}">
        <span class="gv-col-rank">#${rankNum}</span>
-       <span class="gv-col-team"><strong>${esc(t.name)}</strong></span>
+       <span class="gv-col-team"><strong>${esc(t.name)}</strong>${s1LiveBadge}</span>
        <span class="gv-col-stage">${stgDisplay}</span>
        <div class="gv-col-progress">
         <div class="gv-prog-track"><div class="gv-prog-fill" style="width:${pct}%;background:${barColor}"></div></div>
@@ -6128,12 +6681,15 @@ function displayScreen(){
     ${sortedTeams.map((t, idx) => {
      const rankNum = idx + 1;
      const rankCls = rankNum === 1 ? 'rank-1' : rankNum === 2 ? 'rank-2' : rankNum === 3 ? 'rank-3' : 'rank-n';
-     const pct = t.completed ? 100 : Math.max(8, Math.round((((t.stage || 0) * 3 + (t.round || 0)) / 15) * 100));
+     const s1Clues = t.stage > 0 ? 3 : (t.stage1?.cluesFound ?? (t.round >= 1 ? 3 : 0));
+     const s1Cipher = Boolean(t.stage > 0 || t.stage1?.cipherSolved || t.round >= 2);
+     const s1Bridge = Boolean(t.stage > 0 || t.stage1?.bridgeOpened);
+     const pct = t.completed ? 100 : Math.max(8, Math.round((((t.stage || 0) * 3 + (t.round || 0) + (t.stage === 0 && t.round === 0 ? (s1Clues / 3) : 0)) / 15) * 100));
      const barColor = barColors[idx % barColors.length];
      const seals = (t.digits || []).length;
      return `<div class="gv-rank-row ${rankCls}">
       <span class="gv-col-rank">#${rankNum}</span>
-      <span class="gv-col-team"><strong>${t.avatar} ${esc(t.name)}</strong></span>
+      <span class="gv-col-team"><strong>${t.avatar} ${esc(t.name)}</strong><div class="gv-s1-inline-badges"><span class="gv-s1-pill ${s1Clues >= 3 ? 'done' : ''}">📜 ${s1Clues}/3</span><span class="gv-s1-pill ${s1Cipher ? 'done' : ''}">🧩 ${s1Cipher ? 'Đã ghép' : 'Chưa'}</span><span class="gv-s1-pill ${s1Bridge ? 'done' : ''}">🌉 ${s1Bridge ? 'Đã mở cầu' : 'Chưa'}</span></div></span>
       <span class="gv-col-stage">${t.completed ? 'Đích 🏆' : `${Math.min(5, (t.stage||0)+1)}/5`}</span>
       <div class="gv-col-progress">
        <div class="gv-prog-track"><div class="gv-prog-fill" style="width:${pct}%;background:${barColor}"></div></div>
@@ -7962,6 +8518,12 @@ const vaState = {
   roundId: -1,
   selectedChoice: null,
   pillars: new Set(),       // Chặng 1: 'A', 'B', 'C'
+  s1CipherSlots: [null, null, null], // Chặng 1 Bước 2: ['AB', '-', 'AC']
+  s1ArrowFrom: null,        // Chặng 1 Bước 3: điểm bắt đầu ('A' | 'B' | 'C')
+  s1ArrowTo: null,          // Chặng 1 Bước 3: điểm kết thúc ('A' | 'B' | 'C')
+  s1Feedback: null,         // Phản hồi ngắn tại chỗ cho Chặng 1
+  s1BridgeRestoredOverlay: false, // Bước 4: Hiệu ứng khôi phục cây cầu ánh sáng
+  s1BridgeTimer: null,
   paths: new Set(),         // Chặng 2: 'AB', 'BC'
   paraEdges: new Set(),     // Chặng 3: 'AB', 'AD'
   midpointPct: 25,          // Chặng 4: 50 = Trung điểm I
@@ -7974,12 +8536,22 @@ const vaState = {
 };
 
 function ensureVaStateForStage(m) {
+  if (!m || !m.id) return;
   const dur = m.timeSeconds || (m.id <= 2 ? 60 : m.id <= 4 ? 65 : 70);
+  // Đồng bộ các cột đá A, B, C từ server nếu có
+  const srvPillars = world?.me?.stage1?.pillars;
+  if (m.id === 1 && Array.isArray(srvPillars)) {
+    srvPillars.forEach(p => vaState.pillars.add(p));
+  }
   if (vaState.stageId !== m.id) {
     vaState.stageId = m.id;
     vaState.roundId = m.round;
     vaState.selectedChoice = null;
-    vaState.pillars = new Set();
+    vaState.pillars = new Set(m.id === 1 && Array.isArray(srvPillars) ? srvPillars : []);
+    vaState.s1CipherSlots = [null, null, null];
+    vaState.s1ArrowFrom = null;
+    vaState.s1ArrowTo = null;
+    vaState.s1Feedback = null;
     vaState.paths = new Set();
     vaState.paraEdges = new Set();
     vaState.midpointPct = 25;
@@ -7992,6 +8564,12 @@ function ensureVaStateForStage(m) {
   } else if (vaState.roundId !== m.round) {
     vaState.roundId = m.round;
     vaState.selectedChoice = null;
+    vaState.s1Feedback = null;
+    if (m.id === 1 && m.round === 1) {
+      vaState.dragonMsg = 'Đã thu thập đủ 3 mảnh mật thư! Hãy kéo hoặc nhấn các mảnh để ghép biểu thức hiệu hai vectơ!';
+    } else if (m.id === 1 && m.round === 2) {
+      vaState.dragonMsg = 'Mật thư đã hiện ra: vectơ AB − vectơ AC = ? Hãy nhấn điểm bắt đầu và kéo mũi tên đến điểm kết thúc trên tam giác ABC!';
+    }
   }
 }
 
@@ -8296,8 +8874,445 @@ function formatMMSS(totalSeconds) {
   return mm + ':' + ss;
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   CHẶNG 1 NÂNG CẤP: GAME TRUY TÌM MẬT THƯ – "BÍ MẬT CÂY CẦU ĐẢO CHIỀU"
+   4 Bước tương tác: Tìm 3 cột đá A,B,C -> Ghép mật thư -> Kéo mũi tên CB -> Khôi phục cầu
+   ═══════════════════════════════════════════════════════════════════════════ */
+const S1_PILLAR_META = {
+  A: { id: 'A', label: 'Cột đá A', token: 'AB', tokenDisplay: '\\vec{AB}', left: 20, top: 52, rune: 'ᚠ' },
+  B: { id: 'B', label: 'Cột đá B', token: '-',  tokenDisplay: '−',         left: 52, top: 44, rune: 'ᛟ' },
+  C: { id: 'C', label: 'Cột đá C', token: 'AC', tokenDisplay: '\\vec{AC}', left: 81, top: 50, rune: 'ᛞ' }
+};
+
+const S1_VERTEX_COORDS = {
+  A: { x: 280, y: 56,  labelX: 280, labelY: 26 },
+  B: { x: 120, y: 224, labelX: 88,  labelY: 230 },
+  C: { x: 440, y: 224, labelX: 472, labelY: 230 }
+};
+
+function renderS1TokenLabel(token) {
+  if (token === 'AB') return formatMath('\\vec{AB}');
+  if (token === 'AC') return formatMath('\\vec{AC}');
+  if (token === '-')  return '<span style="font-size:24px;font-weight:900;color:#FFC953">−</span>';
+  return esc(token || '');
+}
+
+window.s1DragStart = function(ev, token, fromSlotIdx = null) {
+  try {
+    ev.dataTransfer.setData('text/plain', JSON.stringify({ token, fromSlotIdx }));
+  } catch (e) {}
+};
+
+window.s1DragOver = function(ev) {
+  ev.preventDefault();
+};
+
+window.s1DropSlot = function(ev, targetSlotIdx) {
+  ev.preventDefault();
+  try {
+    const raw = ev.dataTransfer.getData('text/plain');
+    if (!raw) return;
+    const data = JSON.parse(raw);
+    const token = data.token;
+    if (!token) return;
+    const prevInTarget = vaState.s1CipherSlots[targetSlotIdx];
+    if (data.fromSlotIdx !== null && data.fromSlotIdx !== undefined) {
+      vaState.s1CipherSlots[data.fromSlotIdx] = prevInTarget || null;
+    } else {
+      const existingIdx = vaState.s1CipherSlots.indexOf(token);
+      if (existingIdx !== -1) vaState.s1CipherSlots[existingIdx] = prevInTarget || null;
+    }
+    vaState.s1CipherSlots[targetSlotIdx] = token;
+    vaState.s1Feedback = null;
+    sound('step');
+    render();
+  } catch (e) {}
+};
+
+let s1DragVertexFrom = null;
+window.s1StartVertexDrag = function(ev, pt) {
+  s1DragVertexFrom = pt;
+  vaState.s1ArrowFrom = pt;
+  vaState.s1ArrowTo = null;
+  vaState.s1Feedback = null;
+  const svg = document.getElementById('s1VectorSvg');
+  const dragLine = document.getElementById('s1LiveDragLine');
+  const startCoord = S1_VERTEX_COORDS[pt];
+  if (!svg || !dragLine || !startCoord) return;
+
+  dragLine.setAttribute('x1', startCoord.x);
+  dragLine.setAttribute('y1', startCoord.y);
+  dragLine.setAttribute('x2', startCoord.x);
+  dragLine.setAttribute('y2', startCoord.y);
+  dragLine.style.display = 'block';
+
+  function onMove(moveEv) {
+    const rect = svg.getBoundingClientRect();
+    if (!rect.width || !rect.height) return;
+    const cx = ((moveEv.clientX - rect.left) / rect.width) * 560;
+    const cy = ((moveEv.clientY - rect.top) / rect.height) * 280;
+    dragLine.setAttribute('x2', Math.max(20, Math.min(540, cx)));
+    dragLine.setAttribute('y2', Math.max(20, Math.min(265, cy)));
+  }
+
+  function onUp(upEv) {
+    window.removeEventListener('pointermove', onMove);
+    window.removeEventListener('pointerup', onUp);
+    dragLine.style.display = 'none';
+    const rect = svg.getBoundingClientRect();
+    if (rect.width && rect.height) {
+      const ux = ((upEv.clientX - rect.left) / rect.width) * 560;
+      const uy = ((upEv.clientY - rect.top) / rect.height) * 280;
+      let nearestPt = null;
+      let minDist = 68; // ngưỡng bắt điểm đỉnh A, B, C
+      Object.entries(S1_VERTEX_COORDS).forEach(([k, v]) => {
+        const d = Math.hypot(ux - v.x, uy - v.y);
+        if (d < minDist) {
+          minDist = d;
+          nearestPt = k;
+        }
+      });
+      if (nearestPt && nearestPt !== s1DragVertexFrom) {
+        vaState.s1ArrowFrom = s1DragVertexFrom;
+        vaState.s1ArrowTo = nearestPt;
+        sound('target');
+        render();
+        return;
+      }
+    }
+    render();
+  }
+
+  window.addEventListener('pointermove', onMove);
+  window.addEventListener('pointerup', onUp);
+};
+
+function renderStage1RestoredBridgeStep() {
+  return `<div class="s1-quest-wrap s1-bridge-restored">
+    <div class="s1-step-ribbon">
+      <span class="s1-step-pill done">✓ Bước 1: 3/3 Mật thư</span>
+      <span class="s1-step-pill done">✓ Bước 2: Ghép mật thư</span>
+      <span class="s1-step-pill done">✓ Bước 3: Vectơ CB</span>
+      <span class="s1-step-pill active">✨ Bước 4: Khôi phục Cây Cầu Ánh Sáng</span>
+    </div>
+
+    <div class="s1-restored-showcase" style="background-image: linear-gradient(180deg, rgba(6,22,38,0.45), rgba(6,22,38,0.82)), url('public/assets/Stage1_Restored_Bridge.jpg')">
+      <svg class="s1-restored-svg" viewBox="0 0 560 250" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="s1BridgeEnergyGrad" x1="100%" y1="0%" x2="0%" y2="0%">
+            <stop offset="0%" stop-color="#FFC953"/>
+            <stop offset="50%" stop-color="#36DEF4"/>
+            <stop offset="100%" stop-color="#10B981"/>
+          </linearGradient>
+          <marker id="s1ArrRestoredCB" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+            <path d="M 0 1 L 10 5 L 0 9 z" fill="#FFC953"/>
+          </marker>
+          <marker id="s1ArrCyanSub" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M 0 1 L 10 5 L 0 9 z" fill="#36DEF4"/>
+          </marker>
+        </defs>
+
+        <!-- Hai tia vectơ AB và AC -->
+        <line x1="280" y1="48" x2="128" y2="196" stroke="#36DEF4" stroke-width="4" stroke-opacity="0.85" marker-end="url(#s1ArrCyanSub)"/>
+        <line x1="280" y1="48" x2="432" y2="196" stroke="#36DEF4" stroke-width="4" stroke-opacity="0.85" marker-end="url(#s1ArrCyanSub)"/>
+        ${svgVecLabel(178, 118, 'AB', '#36DEF4', 16)}
+        ${svgVecLabel(382, 118, 'AC', '#36DEF4', 16)}
+
+        <!-- CẦU NĂNG LƯỢNG ÁNH SÁNG NỐI TỪ C SANG B -->
+        <rect x="120" y="192" width="320" height="24" rx="12" fill="url(#s1BridgeEnergyGrad)" opacity="0.38" class="s1-bridge-beam-glow"/>
+        <line x1="422" y1="204" x2="142" y2="204" stroke="#FFC953" stroke-width="6.5" marker-end="url(#s1ArrRestoredCB)" class="s1-cb-arrow-glow"/>
+        ${svgVecLabel(280, 184, 'CB', '#FFC953', 20)}
+
+        <!-- 3 CỘT ĐÁ A, B, C PHÁT SÁNG RỰC RỠ -->
+        <g class="s1-pillar-svg-glow">
+          <circle cx="280" cy="48" r="16" fill="#10B981" stroke="#FFC953" stroke-width="4"/>
+          <text x="280" y="54" text-anchor="middle" fill="#FFFFFF" font-size="15" font-weight="900">A</text>
+        </g>
+        <g class="s1-pillar-svg-glow">
+          <circle cx="120" cy="204" r="16" fill="#10B981" stroke="#FFC953" stroke-width="4"/>
+          <text x="120" y="210" text-anchor="middle" fill="#FFFFFF" font-size="15" font-weight="900">B</text>
+        </g>
+        <g class="s1-pillar-svg-glow">
+          <circle cx="440" cy="204" r="16" fill="#10B981" stroke="#FFC953" stroke-width="4"/>
+          <text x="440" y="210" text-anchor="middle" fill="#FFFFFF" font-size="15" font-weight="900">C</text>
+        </g>
+      </svg>
+
+      <div class="s1-restored-banner">
+        <div class="s1-restored-formula">${formatMath('\\vec{AB} − \\vec{AC} = \\vec{CB}')}</div>
+        <p class="s1-restored-msg">🐉 <b>Rồng Xanh:</b> “Tuyệt vời! Ba cột đá A, B, C và mũi tên <span class="math-vec"><span class="vec-arr">→</span><span>CB</span></span> đã phát sáng! Cây cầu năng lượng qua Rừng Vectơ đã khôi phục, đội nhận <b>Ấn Hướng Đi 🧭</b>!”</p>
+        <div class="s1-restored-rewards">
+          <span class="s1-reward-pill gold">🧭 Nhận Ấn Hướng Đi</span>
+          <span class="s1-reward-pill cyan">⭐ +Điểm XP & Vàng</span>
+          <button type="button" class="hs-confirm-btn" data-action="s1ProceedToStage2">
+            🌉 BƯỚC QUA CẦU SANG CHẶNG 2 →
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderStage1CipherBridgeGame(m) {
+  ensureVaStateForStage(m);
+  if (vaState.s1BridgeRestoredOverlay) {
+    return renderStage1RestoredBridgeStep();
+  }
+
+  const r = m.round || 0;
+  const cluesCount = r >= 1 ? 3 : vaState.pillars.size;
+  const roles = m.teamRoles || [
+    'Thành viên 1 (Thám hiểm): Tìm 3 cột đá A, B, C',
+    'Thành viên 2 (Giải mật thư): Ghép biểu thức vectơ',
+    'Thành viên 3 (Điều khiển): Kéo mũi tên chọn hướng',
+    'Thành viên 4 (Xác nhận): Mở khóa Cầu Ánh Sáng'
+  ];
+  const activeRoleText = r === 0 ? roles[0] : r === 1 ? roles[1] : (roles[2] + ' · ' + (roles[3] || ''));
+
+  const stepRibbonHtml = `<div class="s1-step-ribbon">
+    <span class="s1-step-pill ${r === 0 ? 'active' : 'done'}">${r > 0 ? '✓' : '1.'} Tìm mật thư (${cluesCount}/3)</span>
+    <span class="s1-step-pill ${r === 1 ? 'active' : r > 1 ? 'done' : ''}">${r > 1 ? '✓' : '2.'} Ghép mật thư</span>
+    <span class="s1-step-pill ${r === 2 ? 'active' : ''}">3. Tìm hướng vectơ</span>
+    <span class="s1-role-chip" title="Phân vai phối hợp nhóm 3–5 học sinh">👥 ${esc(activeRoleText)}</span>
+  </div>`;
+
+  // ─── BƯỚC 1: TÌM MẬT THƯ TẠI 3 CỘT ĐÁ A, B, C ───
+  if (r === 0) {
+    const allFound = cluesCount >= 3;
+    return `<div class="s1-quest-wrap">
+      ${stepRibbonHtml}
+      <div class="s1-forest-scene" style="background-image: linear-gradient(180deg, rgba(6,20,34,0.32), rgba(6,20,34,0.78)), url('public/assets/Stage1_Pillars_Forest.jpg'), url('public/assets/Stage_01_Rung_Vecto.png')">
+        <div class="s1-scene-top-hud">
+          <div class="s1-objective-badge">
+            🔍 <b>BƯỚC 1 – TÌM MẬT THƯ:</b> Nhấn vào 3 cột đá cổ <b>A, B, C</b> đang phát sáng trong Rừng Vectơ để thu thập 3 mảnh mật thư!
+          </div>
+          <div class="s1-clue-counter ${allFound ? 'complete' : ''}">
+            📜 Mật thư: <b>${cluesCount}/3</b>
+          </div>
+        </div>
+
+        <!-- 3 CỘT ĐÁ CỔ A, B, C TRÊN BỐI CẢNH RỪNG VECTƠ -->
+        <div class="s1-pillars-stage">
+          ${['A', 'B', 'C'].map(pid => {
+            const meta = S1_PILLAR_META[pid];
+            const isOpened = vaState.pillars.has(pid);
+            return `<button type="button" class="s1-pillar-node ${isOpened ? 'opened' : 'sealed'}" style="left:${meta.left}%;top:${meta.top}%" data-action="s1ClickPillar" data-pillar="${pid}" title="Nhấn để mở phong ấn ${meta.label}">
+              <span class="s1-pillar-aura"></span>
+              <span class="s1-pillar-stone">
+                <span class="s1-pillar-rune">${meta.rune}</span>
+                <strong class="s1-pillar-letter">${pid}</strong>
+                <small class="s1-pillar-status">${isOpened ? '✓ Đã thu thập' : 'Nhấn mở ấn'}</small>
+              </span>
+              ${isOpened ? `<span class="s1-pillar-shard">📜 ${renderS1TokenLabel(meta.token)}</span>` : ''}
+            </button>`;
+          }).join('')}
+        </div>
+
+        <!-- KHAY 3 MẢNH MẬT THƯ & NÚT CHUYỂN SANG BƯỚC 2 -->
+        <div class="s1-forest-bottom-bar">
+          <div class="s1-collected-tray">
+            <span>Mảnh mật thư thu được:</span>
+            ${['A', 'B', 'C'].map(pid => {
+              const meta = S1_PILLAR_META[pid];
+              const has = vaState.pillars.has(pid);
+              return `<span class="s1-mini-fragment ${has ? 'earned' : 'locked'}">
+                ${has ? `Cột ${pid}: ${renderS1TokenLabel(meta.token)}` : `Cột ${pid}: ?`}
+              </span>`;
+            }).join('')}
+          </div>
+          <button type="button" class="hs-confirm-btn ${allFound ? 'pulse-ready' : ''}" data-action="s1FinishStep1" ${!allFound ? 'disabled' : ''}>
+            ${allFound ? '📜 MỞ BẢNG GIẢI MÃ MẬT THƯ (3/3) →' : `Hãy tìm đủ 3 cột đá (${cluesCount}/3)`}
+          </button>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  // ─── BƯỚC 2: GHÉP MẬT THƯ (KÉO THẢ HOẶC NHẤN ĐỂ XẾP: vectơ AB − vectơ AC = ?) ───
+  if (r === 1) {
+    const allTokens = ['AC', 'AB', '-'];
+    const usedTokens = vaState.s1CipherSlots.filter(Boolean);
+    const availableTokens = allTokens.filter(t => !usedTokens.includes(t));
+    const isFull = usedTokens.length === 3;
+
+    return `<div class="s1-quest-wrap">
+      ${stepRibbonHtml}
+      <div class="s1-cipher-board" style="background-image: linear-gradient(180deg, rgba(8,15,32,0.72), rgba(8,15,32,0.88)), url('public/assets/Stage1_Cipher_Scroll.jpg')">
+        <div class="s1-scene-top-hud">
+          <div class="s1-objective-badge">
+            🧩 <b>BƯỚC 2 – GHÉP MẬT THƯ:</b> Kéo thả (hoặc chạm) 3 mảnh mật thư từ 3 cột đá để ghép thành biểu thức <b>Hiệu hai vectơ xuất phát từ điểm A</b>!
+          </div>
+          <div class="s1-clue-counter complete">📜 Đủ 3/3 mảnh</div>
+        </div>
+
+        <!-- KHU VỰC 3 Ô GHÉP BIỂU THỨC: [ Ô 1 ] [ Ô 2 ] [ Ô 3 ] = ? (KHÔNG LỘ ĐÁP ÁN CB) -->
+        <div class="s1-cipher-equation-box">
+          <div class="s1-cipher-slots-row">
+            ${[0, 1, 2].map(slotIdx => {
+              const tok = vaState.s1CipherSlots[slotIdx];
+              const slotHints = ['Vectơ thứ nhất (từ A)', 'Phép toán', 'Vectơ thứ hai (từ A)'];
+              return `<div class="s1-cipher-slot ${tok ? 'filled' : 'empty'}"
+                ondragover="window.s1DragOver(event)"
+                ondrop="window.s1DropSlot(event, ${slotIdx})"
+                ${tok ? `draggable="true" ondragstart="window.s1DragStart(event, '${tok}', ${slotIdx})" data-action="s1RemoveCipherSlot" data-slot="${slotIdx}"` : ''}
+                title="${tok ? 'Nhấn để gỡ mảnh này ra' : slotHints[slotIdx]}">
+                <small class="s1-slot-index">Mảnh ${slotIdx + 1}</small>
+                <div class="s1-slot-content">
+                  ${tok ? renderS1TokenLabel(tok) : `<span class="s1-slot-placeholder">${esc(slotHints[slotIdx])}</span>`}
+                </div>
+              </div>`;
+            }).join('')}
+            <span class="s1-cipher-equals">=</span>
+            <div class="s1-cipher-mystery-box" title="Vectơ bí mật sẽ được giải mã ở Bước 3">?</div>
+          </div>
+        </div>
+
+        <!-- KHAY CÁC MẢNH MẬT THƯ ĐỂ KÉO THẢ HOẶC NHẤN CHỌN -->
+        <div class="s1-cipher-pool-area">
+          <div class="s1-pool-label">Kéo mảnh mật thư vào ô trống phía trên (hoặc nhấn trực tiếp vào mảnh):</div>
+          <div class="s1-cipher-tokens-row">
+            ${availableTokens.length > 0 ? availableTokens.map(tok => `
+              <button type="button" class="s1-cipher-token-chip"
+                draggable="true"
+                ondragstart="window.s1DragStart(event, '${tok}', null)"
+                data-action="s1PlaceCipherToken"
+                data-token="${tok}"
+                title="Kéo thả hoặc nhấn để đặt mảnh này vào ô trống">
+                <span class="s1-chip-grip">⋮⋮</span>
+                <span class="s1-chip-math">${renderS1TokenLabel(tok)}</span>
+              </button>
+            `).join('') : `<span class="s1-all-placed-note">✓ Đã đặt đủ 3 mảnh vào bảng giải mã. Nhấn "Giải mã mật thư" để kiểm tra!</span>`}
+          </div>
+        </div>
+
+        ${vaState.s1Feedback ? `<div class="s1-inline-feedback ${vaState.s1Feedback.good ? 'good' : 'warn'}">${esc(vaState.s1Feedback.text)}</div>` : ''}
+
+        <div class="s1-cipher-actions">
+          <button type="button" class="mv-chip-btn" data-action="s1ResetCipher">↺ Xếp lại các mảnh</button>
+          <button type="button" class="hs-confirm-btn" data-action="s1SubmitCipher" ${!isFull ? 'disabled' : ''}>
+            🔓 GIẢI MÃ MẬT THƯ
+          </button>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  // ─── BƯỚC 3: TÌM HƯỚNG VECTƠ BÍ MẬT (NHẤN ĐIỂM ĐẦU & KÉO MŨI TÊN ĐẾN ĐIỂM CUỐI TRÊN TAM GIÁC ABC) ───
+  const fromPt = vaState.s1ArrowFrom;
+  const toPt = vaState.s1ArrowTo;
+  const hasFullArrow = Boolean(fromPt && toPt && fromPt !== toPt);
+  const fCoord = fromPt ? S1_VERTEX_COORDS[fromPt] : null;
+  const tCoord = toPt ? S1_VERTEX_COORDS[toPt] : null;
+
+  // Rút ngắn nhẹ đầu mũi tên để không đè lên tâm đỉnh
+  let arrowLineHtml = '';
+  if (hasFullArrow && fCoord && tCoord) {
+    const dx = tCoord.x - fCoord.x;
+    const dy = tCoord.y - fCoord.y;
+    const len = Math.hypot(dx, dy) || 1;
+    const x1 = Math.round(fCoord.x + (dx / len) * 18);
+    const y1 = Math.round(fCoord.y + (dy / len) * 18);
+    const x2 = Math.round(tCoord.x - (dx / len) * 22);
+    const y2 = Math.round(tCoord.y - (dy / len) * 22);
+    const midX = Math.round((fCoord.x + tCoord.x) / 2);
+    const midY = Math.round((fCoord.y + tCoord.y) / 2 - 14);
+    arrowLineHtml = `
+      <line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#10B981" stroke-width="6" marker-end="url(#s1ArrPlayer)" class="s1-player-drawn-arrow"/>
+      ${svgVecLabel(midX, midY, fromPt + toPt, '#10B981', 20)}
+    `;
+  }
+
+  return `<div class="s1-quest-wrap">
+    ${stepRibbonHtml}
+    <div class="s1-vector-arena" style="background-image: linear-gradient(180deg, rgba(6,18,34,0.68), rgba(6,18,34,0.86)), url('public/assets/Stage1_Vector_Triangle_Beams.jpg')">
+      <div class="s1-scene-top-hud">
+        <div class="s1-objective-badge">
+          🏹 <b>BƯỚC 3 – TÌM HƯỚNG VECTƠ BÍ MẬT:</b> Nhấn vào <b>điểm bắt đầu</b> và kéo mũi tên đến <b>điểm kết thúc</b> trên sơ đồ tam giác ABC để giải mã:
+        </div>
+        <div class="s1-decoded-expr-pill">
+          ${formatMath('\\vec{AB} − \\vec{AC} =')} <b style="color:#FFC953">${hasFullArrow ? formatMath('\\vec{' + fromPt + toPt + '}') : '?'}</b>
+        </div>
+      </div>
+
+      <div class="s1-svg-canvas-box">
+        <svg id="s1VectorSvg" class="va-svg-stage s1-interactive-svg" viewBox="0 0 560 280" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <marker id="s1ArrCyan" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto">
+              <path d="M 0 1 L 10 5 L 0 9 z" fill="#36DEF4"/>
+            </marker>
+            <marker id="s1ArrGold" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto">
+              <path d="M 0 1 L 10 5 L 0 9 z" fill="#FFC953"/>
+            </marker>
+            <marker id="s1ArrPlayer" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+              <path d="M 0 1 L 10 5 L 0 9 z" fill="#10B981"/>
+            </marker>
+          </defs>
+
+          <!-- Hai vectơ đã biết: AB (từ A xuống B) và AC (từ A xuống C) -->
+          <line x1="280" y1="56" x2="132" y2="210" stroke="#36DEF4" stroke-width="4.5" marker-end="url(#s1ArrCyan)"/>
+          ${svgVecLabel(172, 134, 'AB', '#36DEF4', 18)}
+
+          <line x1="280" y1="56" x2="428" y2="210" stroke="#FFC953" stroke-width="4.5" marker-end="url(#s1ArrGold)"/>
+          ${svgVecLabel(388, 134, 'AC', '#FFC953', 18)}
+
+          <!-- Khe vực cây cầu bị đứt giữa B và C (nét đứt, không lộ hướng) -->
+          <line x1="142" y1="224" x2="418" y2="224" stroke="rgba(244,114,182,0.55)" stroke-width="4" stroke-dasharray="10 8"/>
+          ${!hasFullArrow ? `<text x="280" y="214" text-anchor="middle" fill="#F472B6" font-size="22" font-weight="900">?</text>` : ''}
+
+          <!-- Mũi tên đang kéo trực tiếp bằng chuột/cảm ứng -->
+          <line id="s1LiveDragLine" x1="0" y1="0" x2="0" y2="0" stroke="#10B981" stroke-width="5" stroke-dasharray="6 4" marker-end="url(#s1ArrPlayer)" style="display:none;pointer-events:none"/>
+
+          <!-- Mũi tên do học sinh đã tạo -->
+          ${arrowLineHtml}
+
+          <!-- Ba đỉnh tương tác A, B, C (Hỗ trợ cả Kéo-Thả và Nhấn Điểm Đầu -> Nhấn Điểm Cuối) -->
+          ${['A', 'B', 'C'].map(pt => {
+            const c = S1_VERTEX_COORDS[pt];
+            const isStart = (fromPt === pt);
+            const isEnd = (toPt === pt);
+            const ringColor = isStart ? '#FFC953' : isEnd ? '#10B981' : '#36DEF4';
+            const fillBg = isStart ? '#F59E0B' : isEnd ? '#10B981' : '#0F172A';
+            return `<g class="s1-vertex-node ${isStart ? 'is-start' : ''} ${isEnd ? 'is-end' : ''}"
+              onpointerdown="window.s1StartVertexDrag(event, '${pt}')"
+              data-action="s1ClickVertex"
+              data-pt="${pt}">
+              <circle cx="${c.x}" cy="${c.y}" r="24" fill="rgba(54,222,244,0.12)" stroke="${ringColor}" stroke-width="2" stroke-dasharray="4 3"/>
+              <circle cx="${c.x}" cy="${c.y}" r="16" fill="${fillBg}" stroke="#FFFFFF" stroke-width="3.5"/>
+              <text x="${c.x}" y="${c.y + 6}" text-anchor="middle" fill="#FFFFFF" font-size="16" font-weight="900" style="pointer-events:none">${pt}</text>
+              <text x="${c.labelX}" y="${c.labelY}" text-anchor="middle" fill="${ringColor}" font-size="13" font-weight="900" style="pointer-events:none">
+                ${isStart ? 'Điểm đầu' : isEnd ? 'Điểm cuối' : ('Điểm ' + pt)}
+              </text>
+            </g>`;
+          }).join('')}
+        </svg>
+      </div>
+
+      ${vaState.s1Feedback ? `<div class="s1-inline-feedback ${vaState.s1Feedback.good ? 'good' : 'warn'}">${esc(vaState.s1Feedback.text)}</div>` : ''}
+
+      <div class="s1-vector-controls-bar">
+        <div class="s1-arrow-status-text">
+          ${!fromPt
+            ? '👆 Hãy <b>nhấn giữ Điểm bắt đầu rồi kéo tới Điểm kết thúc</b> (hoặc chạm lần lượt Điểm đầu → Điểm cuối)!'
+            : !toPt
+              ? `📍 Đã chọn điểm bắt đầu <b>${fromPt}</b>. Hãy kéo hoặc nhấn vào <b>Điểm kết thúc</b>!`
+              : `🏹 Đã tạo mũi tên từ <b>${fromPt} → ${toPt}</b> (${formatMath('\\vec{' + fromPt + toPt + '}')}). Nhấn xác nhận để khôi phục cầu!`}
+        </div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <button type="button" class="mv-chip-btn" data-action="s1ResetArrow">↺ Kéo lại mũi tên</button>
+          <button type="button" class="hs-confirm-btn" data-action="s1SubmitVectorArrow" ${!hasFullArrow ? 'disabled' : ''}>
+            ⚡ KÍCH HOẠT VECTƠ & MỞ CẦU
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
 function renderVectorAdventureStage(m) {
   ensureVaStateForStage(m);
+  if (m.id === 1 || vaState.s1BridgeRestoredOverlay) {
+    return renderStage1CipherBridgeGame(m);
+  }
   const r = m.round || 0;
   const q = m.challenge || {};
   const isPart1 = (r === 0);
@@ -8384,22 +9399,23 @@ function stageContent(m){
  const shortTitle = m.shortName || SHORT_STAGE_NAMES[(m.id || 1) - 1] || m.place;
 
  const stageFullTitles = [
-  'CHẶNG 1 · HIỆU HAI VECTƠ',
+  'CHẶNG 1 · BÍ MẬT CÂY CẦU ĐẢO CHIỀU',
   'CHẶNG 2 · TỔNG HAI VECTƠ',
   'CHẶNG 3 · QUY TẮC HÌNH BÌNH HÀNH',
   'CHẶNG 4 · TÍNH CHẤT TRUNG ĐIỂM',
   'CHẶNG 5 · TÍNH CHẤT TRỌNG TÂM'
  ];
  const stageSubtitles = [
-  'Rừng Vectơ Khởi Nguyên • Giải mã cây cầu bị đảo chiều',
+  'Rừng Vectơ Khởi Nguyên • Truy tìm 3 mảnh mật thư & giải mã hướng vectơ khôi phục cầu',
   'Pháo Đài Góc • Nối thông hai luồng năng lượng liên tiếp',
   'Tháp Pha Lê • Khôi phục đường chéo hình bình hành ABCD',
   'Mê Cung Trung Điểm • Cân bằng hai vectơ đối nhau tại điểm I',
   'Thành Trì Trí Tuệ • Hợp nhất 3 luồng năng lượng tại trọng tâm G'
  ];
 
- const headerTitle = stageFullTitles[(m.id || 1) - 1] || ('CHẶNG ' + m.id + ' · ' + m.title);
- const headerSub = stageSubtitles[(m.id || 1) - 1] || (m.place + ' • ' + m.story);
+ const isS1 = (m.id === 1 || vaState.s1BridgeRestoredOverlay);
+ const headerTitle = isS1 ? stageFullTitles[0] : (stageFullTitles[(m.id || 1) - 1] || ('CHẶNG ' + m.id + ' · ' + m.title));
+ const headerSub = isS1 ? stageSubtitles[0] : (stageSubtitles[(m.id || 1) - 1] || (m.place + ' • ' + m.story));
 
  const elapsedSec = Math.floor((Date.now() - vaState.stageStartedAt) / 1000);
  const remSec = Math.max(0, vaState.stageDurationSec - elapsedSec);
@@ -8407,6 +9423,7 @@ function stageContent(m){
 
  const meDigits = world.me?.digits || [];
  const ownedSet = new Set(meDigits.map(d => d.stage));
+ const s1ClueCount = isS1 ? (vaState.s1BridgeRestoredOverlay || curR >= 1 ? 3 : vaState.pillars.size) : 0;
 
  const drawerQuestHtml = !mvBriefingCollapsed ? `<div class="mv-drawer-panel" style="margin-bottom:10px">
   <div class="flex-between">
@@ -8417,28 +9434,38 @@ function stageContent(m){
   <div class="mv-drawer-grid">
    <div class="mv-drawer-box">
     <h4>🎯 Tiến độ trong chặng (${curR}/${totalR})</h4>
-    <div style="color:${curR >= 1 ? '#35C992' : '#E2E8F0'}">${curR >= 1 ? '✓' : '•'} Phần 1: Nhiệm vụ tương tác sơ đồ (Khóa 1/3)</div>
-    <div style="color:${curR >= 2 ? '#35C992' : '#E2E8F0'}">${curR >= 2 ? '✓' : '•'} Phần 2: Câu hỏi giải mã 1/2 (Khóa 2/3)</div>
-    <div style="color:${curR >= 3 ? '#35C992' : '#E2E8F0'}">${curR >= 3 ? '✓' : '•'} Phần 3: Câu hỏi giải mã 2/2 (Nhận ${esc(m.item)})</div>
+    ${isS1 ? `
+     <div style="color:${curR >= 1 ? '#35C992' : '#E2E8F0'}">${curR >= 1 ? '✓' : '•'} Bước 1: Tìm 3 mảnh mật thư tại cột đá A, B, C (${s1ClueCount}/3)</div>
+     <div style="color:${curR >= 2 ? '#35C992' : '#E2E8F0'}">${curR >= 2 ? '✓' : '•'} Bước 2: Ghép mật thư hiệu hai vectơ</div>
+     <div style="color:${vaState.s1BridgeRestoredOverlay ? '#35C992' : '#E2E8F0'}">${vaState.s1BridgeRestoredOverlay ? '✓' : '•'} Bước 3 & 4: Kéo mũi tên hướng vectơ & Mở cầu ánh sáng</div>
+    ` : `
+     <div style="color:${curR >= 1 ? '#35C992' : '#E2E8F0'}">${curR >= 1 ? '✓' : '•'} Phần 1: Nhiệm vụ tương tác sơ đồ (Khóa 1/3)</div>
+     <div style="color:${curR >= 2 ? '#35C992' : '#E2E8F0'}">${curR >= 2 ? '✓' : '•'} Phần 2: Câu hỏi giải mã 1/2 (Khóa 2/3)</div>
+     <div style="color:${curR >= 3 ? '#35C992' : '#E2E8F0'}">${curR >= 3 ? '✓' : '•'} Phần 3: Câu hỏi giải mã 2/2 (Nhận ${esc(m.item)})</div>
+    `}
    </div>
    <div class="mv-drawer-box">
     <h4>👥 Phân vai đội (3–5 học sinh)</h4>
     ${roles.map((r, idx) => `<div style="padding:2px 0;color:${idx === curR ? '#FFC953' : '#CBD5E1'}">• ${esc(r)}</div>`).join('')}
    </div>
    <div class="mv-drawer-box">
-    <h4>📐 Công thức trọng tâm</h4>
-    <div style="color:#A5F3FC;font-weight:800">${formatMath(STAGE_FORMULAS_SHORT[(m.id||1)-1] || '')}</div>
+    <h4>📐 Gợi ý quy tắc</h4>
+    <div style="color:#A5F3FC;font-weight:800">${formatMath(getStageFormulaSafe((m.id||1)-1, world.me?.stage ?? 0))}</div>
    </div>
   </div>
  </div>` : '';
 
+ const s1CardImg = ((m.id === 1) && ((world.me?.stage ?? 0) < 1) && !vaState.s1BridgeRestoredOverlay)
+  ? 'public/assets/Stage1_Cipher_Scroll.jpg'
+  : (['public/images/scenario/card-1.jpg','public/images/scenario/card-2.jpg','public/images/scenario/card-3.jpg','public/images/scenario/card-4.jpg','public/images/scenario/card-5.jpg'][(m.id||1)-1]||'public/images/scenario/card-1.jpg');
+
  const drawerKnowledgeHtml = oxyz3D.open ? `<div class="mv-knowledge-split" style="margin-bottom:10px">
   <div class="mv-knowledge-card-box">
    <div class="flex-between">
-    <strong style="color:#FFC953;font-size:12.5px">📘 Thẻ Kiến Thức Chặng ${m.id}: ${esc(shortTitle)}</strong>
+    <strong style="color:#FFC953;font-size:12.5px">📘 Thẻ Gợi Ý Chặng ${m.id}: ${esc(shortTitle)}</strong>
     <button type="button" class="mv-chip-btn" data-action="toggle3DPanel">✕ Đóng</button>
    </div>
-   <img src="${['public/images/scenario/card-1.jpg','public/images/scenario/card-2.jpg','public/images/scenario/card-3.jpg','public/images/scenario/card-4.jpg','public/images/scenario/card-5.jpg'][(m.id||1)-1]||'public/images/scenario/card-1.jpg'}" alt="Thẻ kiến thức Chặng ${m.id}" class="mv-knowledge-card-img" draggable="false"/>
+   <img src="${s1CardImg}" alt="Thẻ kiến thức Chặng ${m.id}" class="mv-knowledge-card-img" draggable="false"/>
   </div>
   <div>${renderOxyz3D(m, true)}</div>
  </div>` : '';
@@ -8461,7 +9488,7 @@ function stageContent(m){
   ${drawerQuestHtml}
   ${drawerKnowledgeHtml}
 
-  <!-- KHU VỰC TƯƠNG TÁC CHÍNH 2 CỘT -->
+  <!-- KHU VỰC TƯƠNG TÁC CHÍNH -->
   <div id="mvActiveGameCanvas">
    ${mvShowIntroHub ? renderIntroHubBanner(true) : renderVectorAdventureStage(m)}
   </div>
@@ -8472,7 +9499,6 @@ function stageContent(m){
     <span class="hs-bottom-label">ẤN VECTƠ</span>
     <div class="hs-mini-seals-list">
      ${[1,2,3,4,5].map(idx => {
-      const has = ownedSet.has(idx) || (idx === 1 && curR > 0 && ownedSet.size === 0 && idx === m.id);
       return ownedSet.has(idx)
        ? `<span class="hs-mini-seal earned" title="Đã thu hồi Ấn Chặng ${idx}">${SMALL_DIAMOND_SVG}</span>`
        : `<span class="hs-mini-seal empty" title="Ấn Chặng ${idx}"></span>`;
@@ -8481,7 +9507,8 @@ function stageContent(m){
    </div>
 
    <div class="hs-bottom-keys">
-    Chìa khóa: <b>${curR}/${totalR}</b>
+    ${isS1 ? `Mật thư: <b>${s1ClueCount}/3</b> · Bước: <b>${vaState.s1BridgeRestoredOverlay ? '4/4' : ((curR + 1) + '/4')}</b>` : `Chìa khóa: <b>${curR}/${totalR}</b>`}
+   </div>
    </div>
 
    <div class="hs-bottom-team-status">
@@ -9044,16 +10071,24 @@ function updateClock(){
   const pillNode = $('#vaStageTimerPill');
   if(stNode) stNode.textContent = formatMMSS(remSec);
   if(pillNode) pillNode.classList.toggle('urgent', remSec <= 15);
-  // Khi còn <= 15 giây: Rồng Xanh tự động đưa gợi ý
-  if(remSec === 15 && vaState.dragonMood !== 'hint'){
+  // Khi còn <= 15 giây: Rồng Xanh tự động đưa gợi ý (không lộ đáp án CB ở Chặng 1)
+  if(remSec === 15 && vaState.dragonMood !== 'hint' && !vaState.s1BridgeRestoredOverlay){
    vaState.dragonMood = 'hint';
    const m = world.current;
-   vaState.dragonMsg = '💡 Gợi ý nhanh: ' + (m.visual3D?.formula || m.dragonIntro);
+   if (m.id === 1) {
+    vaState.dragonMsg = m.round === 0
+     ? '💡 Gợi ý nhanh: Hãy nhấn vào đủ 3 cột đá cổ A, B, C đang phát sáng trong Rừng Vectơ!'
+     : m.round === 1
+       ? '💡 Gợi ý nhanh: Hãy ghép biểu thức hiệu hai vectơ chung gốc A: vectơ AB trừ vectơ AC!'
+       : '💡 Gợi ý nhanh: Quy tắc hiệu hai vectơ chung gốc A: Mũi tên bắt đầu từ điểm cuối của vectơ AC và kết thúc tại điểm cuối của vectơ AB!';
+   } else {
+    vaState.dragonMsg = '💡 Gợi ý nhanh: ' + (m.visual3D?.formula || m.dragonIntro);
+   }
    const sp = $('#vaDragonSpeech');
    if(sp) sp.innerHTML = formatMath(vaState.dragonMsg);
   }
   // Khi hết thời gian chặng (0s): tự động ghi nhận và chuyển sang chặng tiếp theo
-  if(remSec <= 0 && !vaState.stageTimeoutTriggered && !busy){
+  if(remSec <= 0 && !vaState.stageTimeoutTriggered && !vaState.s1BridgeRestoredOverlay && !busy){
    vaState.stageTimeoutTriggered = true;
    submit('/api/stageTimeout', {}).then(() => updateAfterAction()).catch(() => {});
   }
@@ -9061,7 +10096,7 @@ function updateClock(){
 }
 
 async function refresh(force=false){
- if(!session||busy)return;
+ if(!session||busy||vaState.s1BridgeRestoredOverlay)return;
  try{
   const d=await api('/api/state',{room:session.room,token:session.token});
   world=d;setClock();
@@ -9209,6 +10244,174 @@ async function handle(action,el){
   }
   if(action==='toggle3DProj'){oxyz3D.showProj=!oxyz3D.showProj;render();return;}
   if(action==='toggle3DPanel'){oxyz3D.open=!oxyz3D.open;render();return;}
+  /* ─── ACTIONS CHO CHẶNG 1: BÍ MẬT CÂY CẦU ĐẢO CHIỀU ─── */
+  if(action==='s1ClickPillar'){
+   const pid=el.dataset.pillar;
+   if(pid && ['A','B','C'].includes(pid)){
+    const wasNew=!vaState.pillars.has(pid);
+    vaState.pillars.add(pid);
+    sound('crystal');
+    if(wasNew && window.spawnJuiceFloater){
+     window.spawnJuiceFloater(`📜 Mảnh mật thư ${vaState.pillars.size}/3`, 'gold');
+    }
+    if(session?.room && session?.token){
+     api('/api/stage1Progress',{room:session.room,token:session.token,pillar:pid}).catch(()=>{});
+    }
+    if(vaState.pillars.size>=3){
+     vaState.dragonMsg='Tuyệt vời! Đội đã thu thập đủ 3/3 mảnh mật thư từ cột đá A, B, C! Hãy nhấn "Mở bảng giải mã mật thư"!';
+     vaState.dragonMood='win';
+    }else{
+     vaState.dragonMsg=`Đã mở phong ấn Cột đá ${pid} (${vaState.pillars.size}/3 mảnh mật thư). Hãy tìm tiếp cột đá còn lại!`;
+    }
+    render();
+   }
+   return;
+  }
+  if(action==='s1FinishStep1'){
+   if(vaState.pillars.size<3){
+    vaState.dragonMsg='Hãy nhấn mở đủ 3 cột đá A, B, C để thu thập đủ 3/3 mảnh mật thư trước nhé!';
+    render();
+    return;
+   }
+   sound('powerup');
+   const res=await submit('/api/answer',{stage:0,round:0,choice:0,interactiveDone:true});
+   if(res && res.correct){
+    if(window.spawnJuiceFloater) window.spawnJuiceFloater('+' + (res.points || 10) + ' XP ⭐', 'xp');
+    vaState.dragonMsg='Đã mở Bảng giải mã mật thư! Hãy kéo hoặc nhấn các mảnh để ghép biểu thức hiệu hai vectơ!';
+    vaState.dragonMood='win';
+    updateAfterAction();
+   }
+   return;
+  }
+  if(action==='s1PlaceCipherToken'){
+   const tok=el.dataset.token;
+   const emptyIdx=vaState.s1CipherSlots.indexOf(null);
+   if(tok && emptyIdx!==-1 && !vaState.s1CipherSlots.includes(tok)){
+    vaState.s1CipherSlots[emptyIdx]=tok;
+    vaState.s1Feedback=null;
+    sound('step');
+    render();
+   }
+   return;
+  }
+  if(action==='s1RemoveCipherSlot'){
+   const idx=Number(el.dataset.slot);
+   if(!isNaN(idx) && idx>=0 && idx<3){
+    vaState.s1CipherSlots[idx]=null;
+    vaState.s1Feedback=null;
+    sound('step');
+    render();
+   }
+   return;
+  }
+  if(action==='s1ResetCipher'){
+   vaState.s1CipherSlots=[null,null,null];
+   vaState.s1Feedback=null;
+   sound('step');
+   render();
+   return;
+  }
+  if(action==='s1SubmitCipher'){
+   const filled=vaState.s1CipherSlots.filter(Boolean);
+   if(filled.length<3){
+    vaState.s1Feedback={text:'Hãy đặt đủ 3 mảnh mật thư vào 3 ô trống trước khi giải mã!',good:false};
+    render();
+    return;
+   }
+   const expr=filled.join('');
+   const res=await submit('/api/answer',{stage:0,round:1,cipherOrder:expr,choice:expr==='AB-AC'?0:1});
+   if(res && res.correct){
+    sound('assemble');
+    if(window.spawnJuiceFloater){
+     window.spawnJuiceFloater('+' + (res.points || 10) + ' XP ⭐', 'xp');
+     window.spawnJuiceFloater('📜 Đã ghép mật thư!', 'gold');
+    }
+    vaState.s1Feedback=null;
+    vaState.dragonMsg='Chính xác! Biểu thức bí mật là vectơ AB − vectơ AC = ? Bây giờ hãy kéo mũi tên trên tam giác ABC để xác định hướng vectơ!';
+    vaState.dragonMood='win';
+    updateAfterAction();
+   }else{
+    sound('wrong');
+    const hintMsg=res?.hint||'Thứ tự chưa đúng! Hãy ghép thành biểu thức hiệu hai vectơ xuất phát từ điểm A: vectơ AB trừ vectơ AC.';
+    vaState.s1Feedback={text:hintMsg,good:false};
+    vaState.dragonMsg='Chưa khớp mật thư! ' + hintMsg;
+    vaState.dragonMood='hint';
+    render();
+   }
+   return;
+  }
+  if(action==='s1ClickVertex'){
+   const pt=el.dataset.pt;
+   if(!pt || !['A','B','C'].includes(pt))return;
+   if(!vaState.s1ArrowFrom || (vaState.s1ArrowFrom && vaState.s1ArrowTo)){
+    vaState.s1ArrowFrom=pt;
+    vaState.s1ArrowTo=null;
+    vaState.s1Feedback=null;
+    sound('step');
+    vaState.dragonMsg=`Đã chọn điểm bắt đầu ${pt}. Hãy nhấn hoặc kéo tới điểm kết thúc của vectơ!`;
+    render();
+   }else if(vaState.s1ArrowFrom !== pt){
+    vaState.s1ArrowTo=pt;
+    vaState.s1Feedback=null;
+    sound('target');
+    vaState.dragonMsg=`Đã tạo mũi tên từ ${vaState.s1ArrowFrom} đến ${pt}. Nhấn "Kích hoạt vectơ & Mở cầu" để giải mã!`;
+    render();
+   }
+   return;
+  }
+  if(action==='s1ResetArrow'){
+   vaState.s1ArrowFrom=null;
+   vaState.s1ArrowTo=null;
+   vaState.s1Feedback=null;
+   sound('step');
+   render();
+   return;
+  }
+  if(action==='s1SubmitVectorArrow'){
+   const from=vaState.s1ArrowFrom;
+   const to=vaState.s1ArrowTo;
+   if(!from || !to || from===to)return;
+   const res=await submit('/api/answer',{stage:0,round:2,vectorFrom:from,vectorTo:to});
+   if(res && res.correct){
+    sound('win');
+    triggerConfetti(2800);
+    if(window.spawnConfettiParticles){
+     window.spawnConfettiParticles(window.innerWidth / 2, window.innerHeight * 0.35, 65);
+    }
+    if(window.spawnJuiceFloater){
+     window.spawnJuiceFloater('+' + (res.points || 10) + ' XP ⭐', 'xp');
+     window.spawnJuiceFloater('🧭 Nhận Ấn Hướng Đi!', 'gold');
+    }
+    vaState.s1Feedback=null;
+    vaState.s1BridgeRestoredOverlay=true;
+    vaState.dragonMsg='Tuyệt vời! Ba cột đá A, B, C và mũi tên CB đã phát sáng! Cây cầu năng lượng qua Rừng Vectơ đã khôi phục, đội nhận Ấn Hướng Đi!';
+    vaState.dragonMood='win';
+    render();
+    if(vaState.s1BridgeTimer) clearTimeout(vaState.s1BridgeTimer);
+    vaState.s1BridgeTimer=setTimeout(()=>{
+     if(vaState.s1BridgeRestoredOverlay){
+      vaState.s1BridgeRestoredOverlay=false;
+      updateAfterAction();
+     }
+    }, 4200);
+   }else{
+    sound('wrong');
+    const errText=res?.hint||'Hướng vectơ chưa đúng! Quy tắc hiệu hai vectơ chung gốc A: mũi tên phải đi từ điểm cuối của vectơ thứ hai đến điểm cuối của vectơ thứ nhất. Hãy thử lại!';
+    vaState.s1Feedback={text:errText,good:false};
+    vaState.dragonMsg=errText;
+    vaState.dragonMood='hint';
+    vaState.s1ArrowFrom=null;
+    vaState.s1ArrowTo=null;
+    render();
+   }
+   return;
+  }
+  if(action==='s1ProceedToStage2'){
+   if(vaState.s1BridgeTimer) clearTimeout(vaState.s1BridgeTimer);
+   vaState.s1BridgeRestoredOverlay=false;
+   updateAfterAction();
+   return;
+  }
   if(action==='vaClickPillar'){
    const node=el.dataset.node;
    if(node)vaState.pillars.add(node);
@@ -9307,6 +10510,9 @@ async function handle(action,el){
   if(action==='hubEnterStage'){
    const stg=Number(el.dataset.stage||0);
    mvShowIntroHub=false;
+   if(vaState.s1BridgeTimer) clearTimeout(vaState.s1BridgeTimer);
+   vaState.s1BridgeRestoredOverlay=false;
+   vaState.stageId=-1;
    await submit('/api/demoJump',{stage:stg});
    await refresh(true);
    return;
@@ -9384,6 +10590,9 @@ async function handle(action,el){
   if(action==='demoTeacher'){saveSession({role:'teacher',room:'123456',token:'DEMO_GV'});await refresh(true);return;}
   if(action==='demoJumpStage'){
    mvShowIntroHub=false;
+   if(vaState.s1BridgeTimer) clearTimeout(vaState.s1BridgeTimer);
+   vaState.s1BridgeRestoredOverlay=false;
+   vaState.stageId=-1;
    const stg=Number(el.dataset.stage);
    await submit('/api/demoJump',{stage:stg});
    activePlayMode=null;

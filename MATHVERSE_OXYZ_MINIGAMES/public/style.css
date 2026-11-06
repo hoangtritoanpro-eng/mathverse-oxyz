@@ -4385,3 +4385,498 @@ body {
     grid-template-columns: repeat(3, 1fr);
   }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   CHẶNG 1 NÂNG CẤP: "BÍ MẬT CÂY CẦU ĐẢO CHIỀU" (FOREST GREEN + CYAN + GOLD)
+   ═══════════════════════════════════════════════════════════════════════════ */
+.gv-s1-inline-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 3px;
+}
+.gv-s1-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 1px 6px;
+  border-radius: 99px;
+  font-size: 10.5px;
+  font-weight: 800;
+  background: rgba(15, 23, 42, 0.78);
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  color: #94A3B8;
+}
+.gv-s1-pill.done {
+  background: rgba(16, 185, 129, 0.18);
+  border-color: #10B981;
+  color: #6EE7B7;
+}
+
+.s1-quest-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-family: 'Montserrat', sans-serif;
+}
+.s1-step-ribbon {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 10px;
+  background: rgba(10, 22, 42, 0.85);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+}
+.s1-step-pill {
+  padding: 4px 10px;
+  border-radius: 99px;
+  font-size: 11.5px;
+  font-weight: 800;
+  color: #94A3B8;
+  background: rgba(15, 23, 42, 0.75);
+  border: 1px solid rgba(100, 116, 139, 0.35);
+}
+.s1-step-pill.active {
+  color: #061526;
+  background: linear-gradient(90deg, #10B981, #36DEF4);
+  border-color: #67E8F9;
+  box-shadow: 0 0 12px rgba(54, 222, 244, 0.45);
+}
+.s1-step-pill.done {
+  color: #6EE7B7;
+  background: rgba(16, 185, 129, 0.18);
+  border-color: #10B981;
+}
+.s1-role-chip {
+  margin-left: auto;
+  padding: 4px 10px;
+  border-radius: 99px;
+  font-size: 11px;
+  font-weight: 800;
+  color: #FDE68A;
+  background: rgba(245, 158, 11, 0.16);
+  border: 1px solid rgba(255, 201, 83, 0.45);
+}
+
+.s1-forest-scene,
+.s1-cipher-board,
+.s1-vector-arena,
+.s1-restored-showcase {
+  position: relative;
+  min-height: 365px;
+  border-radius: 14px;
+  padding: 14px 16px;
+  background-size: cover;
+  background-position: center;
+  border: 1.5px solid rgba(54, 222, 244, 0.42);
+  box-shadow: inset 0 0 40px rgba(6, 20, 34, 0.65), 0 8px 24px rgba(0, 0, 0, 0.45);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: hidden;
+}
+
+.s1-scene-top-hud {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  z-index: 2;
+}
+.s1-objective-badge {
+  flex: 1;
+  min-width: 240px;
+  padding: 8px 13px;
+  border-radius: 10px;
+  background: rgba(8, 22, 42, 0.88);
+  border: 1px solid rgba(54, 222, 244, 0.4);
+  color: #F8FAFF;
+  font-size: 12.8px;
+  line-height: 1.4;
+}
+.s1-clue-counter,
+.s1-decoded-expr-pill {
+  padding: 8px 14px;
+  border-radius: 10px;
+  background: rgba(16, 27, 59, 0.92);
+  border: 1.5px solid #FFC953;
+  color: #FEF08A;
+  font-size: 13.5px;
+  font-weight: 900;
+  box-shadow: 0 0 14px rgba(255, 201, 83, 0.28);
+}
+.s1-clue-counter.complete {
+  border-color: #10B981;
+  color: #6EE7B7;
+  background: rgba(6, 78, 59, 0.88);
+}
+
+/* Bước 1: 3 Cột đá A, B, C trong Rừng Vectơ */
+.s1-pillars-stage {
+  position: relative;
+  height: 220px;
+  width: 100%;
+  my: 6px;
+}
+.s1-pillar-node {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  width: 112px;
+  height: 136px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.22s ease, filter 0.22s ease;
+  z-index: 3;
+}
+.s1-pillar-node:hover {
+  transform: translate(-50%, -54%) scale(1.06);
+}
+.s1-pillar-aura {
+  position: absolute;
+  inset: -8px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(54, 222, 244, 0.42) 0%, rgba(16, 185, 129, 0.12) 60%, transparent 75%);
+  animation: s1PulseAura 2.2s ease-in-out infinite;
+  pointer-events: none;
+}
+.s1-pillar-node.opened .s1-pillar-aura {
+  background: radial-gradient(circle, rgba(255, 201, 83, 0.55) 0%, rgba(16, 185, 129, 0.28) 62%, transparent 78%);
+}
+@keyframes s1PulseAura {
+  0%, 100% { transform: scale(0.95); opacity: 0.78; }
+  50% { transform: scale(1.1); opacity: 1; }
+}
+.s1-pillar-stone {
+  position: relative;
+  width: 88px;
+  height: 112px;
+  border-radius: 18px 18px 10px 10px;
+  background: linear-gradient(180deg, rgba(30, 58, 95, 0.94) 0%, rgba(15, 23, 42, 0.96) 100%);
+  border: 2px solid #36DEF4;
+  box-shadow: 0 0 18px rgba(54, 222, 244, 0.55), inset 0 0 14px rgba(54, 222, 244, 0.25);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: 6px;
+}
+.s1-pillar-node.opened .s1-pillar-stone {
+  border-color: #FFC953;
+  background: linear-gradient(180deg, rgba(6, 78, 59, 0.95) 0%, rgba(15, 23, 42, 0.96) 100%);
+  box-shadow: 0 0 24px rgba(255, 201, 83, 0.75), inset 0 0 16px rgba(16, 185, 129, 0.45);
+}
+.s1-pillar-rune {
+  font-size: 16px;
+  color: #67E8F9;
+  text-shadow: 0 0 8px #36DEF4;
+}
+.s1-pillar-letter {
+  font-size: 28px;
+  font-weight: 900;
+  color: #FFFFFF;
+  line-height: 1.05;
+}
+.s1-pillar-status {
+  font-size: 10px;
+  font-weight: 800;
+  color: #A7F3D0;
+}
+.s1-pillar-shard {
+  margin-top: 5px;
+  padding: 3px 9px;
+  border-radius: 99px;
+  background: rgba(11, 18, 39, 0.94);
+  border: 1.5px solid #FFC953;
+  color: #FEF08A;
+  font-size: 12px;
+  font-weight: 900;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+}
+
+.s1-forest-bottom-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: rgba(8, 18, 36, 0.9);
+  border: 1px solid rgba(54, 222, 244, 0.35);
+  z-index: 2;
+}
+.s1-collected-tray {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-size: 12.5px;
+  font-weight: 800;
+  color: #CBD5E1;
+}
+.s1-mini-fragment {
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: 12.5px;
+  font-weight: 900;
+}
+.s1-mini-fragment.earned {
+  background: rgba(16, 185, 129, 0.22);
+  border: 1px solid #10B981;
+  color: #FEF08A;
+}
+.s1-mini-fragment.locked {
+  background: rgba(30, 41, 59, 0.75);
+  border: 1px dashed rgba(148, 163, 184, 0.45);
+  color: #64748B;
+}
+
+/* Bước 2: Bảng Ghép Mật Thư */
+.s1-cipher-equation-box {
+  margin: 12px auto;
+  padding: 18px 22px;
+  border-radius: 14px;
+  background: rgba(8, 18, 38, 0.88);
+  border: 2px solid rgba(255, 201, 83, 0.55);
+  box-shadow: 0 0 28px rgba(255, 201, 83, 0.2);
+}
+.s1-cipher-slots-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.s1-cipher-slot {
+  min-width: 126px;
+  height: 82px;
+  border-radius: 12px;
+  padding: 6px 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.18s ease;
+}
+.s1-cipher-slot.empty {
+  background: rgba(15, 23, 42, 0.8);
+  border: 2px dashed rgba(54, 222, 244, 0.55);
+}
+.s1-cipher-slot.filled {
+  background: linear-gradient(180deg, rgba(16, 185, 129, 0.25), rgba(15, 23, 42, 0.92));
+  border: 2px solid #FFC953;
+  cursor: pointer;
+  box-shadow: 0 0 16px rgba(255, 201, 83, 0.35);
+}
+.s1-slot-index {
+  font-size: 10px;
+  font-weight: 800;
+  color: #94A3B8;
+  text-transform: uppercase;
+}
+.s1-slot-content {
+  font-size: 22px;
+  font-weight: 900;
+  color: #F8FAFF;
+  margin-top: 2px;
+}
+.s1-slot-placeholder {
+  font-size: 11px;
+  font-weight: 700;
+  color: #64748B;
+}
+.s1-cipher-equals {
+  font-size: 28px;
+  font-weight: 900;
+  color: #36DEF4;
+}
+.s1-cipher-mystery-box {
+  width: 68px;
+  height: 68px;
+  border-radius: 12px;
+  background: rgba(88, 70, 201, 0.28);
+  border: 2px solid #36DEF4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  font-weight: 900;
+  color: #FFC953;
+}
+.s1-cipher-pool-area {
+  text-align: center;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: rgba(11, 18, 39, 0.86);
+  border: 1px solid rgba(54, 222, 244, 0.3);
+}
+.s1-pool-label {
+  font-size: 12px;
+  font-weight: 800;
+  color: #94A3B8;
+  margin-bottom: 8px;
+}
+.s1-cipher-tokens-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+.s1-cipher-token-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: 12px;
+  background: linear-gradient(180deg, #162B54 0%, #0F1D3A 100%);
+  border: 2px solid #36DEF4;
+  color: #FFFFFF;
+  font-size: 20px;
+  font-weight: 900;
+  cursor: grab;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.45);
+  transition: transform 0.16s ease, border-color 0.16s ease;
+}
+.s1-cipher-token-chip:hover {
+  transform: translateY(-3px) scale(1.04);
+  border-color: #FFC953;
+}
+.s1-chip-grip {
+  color: #64748B;
+  font-size: 14px;
+}
+.s1-all-placed-note {
+  font-size: 13px;
+  font-weight: 800;
+  color: #35C992;
+}
+.s1-cipher-actions,
+.s1-vector-controls-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: rgba(8, 18, 36, 0.9);
+  border: 1px solid rgba(54, 222, 244, 0.35);
+}
+
+/* Bước 3: Sơ đồ Tam giác ABC Kéo Mũi Tên */
+.s1-svg-canvas-box {
+  width: 100%;
+  max-width: 620px;
+  margin: 4px auto;
+  border-radius: 12px;
+  background: rgba(8, 16, 34, 0.82);
+  border: 1.5px solid rgba(54, 222, 244, 0.38);
+  padding: 4px;
+}
+.s1-interactive-svg {
+  width: 100%;
+  height: 235px;
+  display: block;
+  touch-action: none;
+  user-select: none;
+}
+.s1-vertex-node {
+  cursor: pointer;
+}
+.s1-vertex-node:hover circle {
+  filter: drop-shadow(0 0 10px #FFC953);
+}
+.s1-arrow-status-text {
+  font-size: 12.5px;
+  color: #E2E8F0;
+  flex: 1;
+  min-width: 220px;
+}
+
+.s1-inline-feedback {
+  padding: 8px 14px;
+  border-radius: 10px;
+  font-size: 12.5px;
+  font-weight: 800;
+  text-align: center;
+}
+.s1-inline-feedback.warn {
+  background: rgba(244, 63, 94, 0.2);
+  border: 1px solid #F43F5E;
+  color: #FECDD3;
+}
+.s1-inline-feedback.good {
+  background: rgba(16, 185, 129, 0.2);
+  border: 1px solid #10B981;
+  color: #A7F3D0;
+}
+
+/* Bước 4: Khôi phục Cây Cầu Ánh Sáng */
+.s1-restored-svg {
+  width: 100%;
+  max-width: 580px;
+  height: 205px;
+  margin: 0 auto;
+  display: block;
+}
+.s1-bridge-beam-glow {
+  filter: drop-shadow(0 0 16px #36DEF4);
+  animation: s1PulseAura 1.6s ease-in-out infinite;
+}
+.s1-cb-arrow-glow {
+  filter: drop-shadow(0 0 12px #FFC953);
+}
+.s1-pillar-svg-glow {
+  filter: drop-shadow(0 0 12px #10B981);
+}
+.s1-restored-banner {
+  background: rgba(8, 20, 38, 0.92);
+  border: 2px solid #FFC953;
+  border-radius: 14px;
+  padding: 12px 16px;
+  text-align: center;
+  box-shadow: 0 0 28px rgba(255, 201, 83, 0.35);
+}
+.s1-restored-formula {
+  font-size: 22px;
+  font-weight: 900;
+  color: #FFC953;
+  margin-bottom: 4px;
+}
+.s1-restored-msg {
+  font-size: 13px;
+  color: #E2E8F0;
+  margin: 4px 0 10px;
+}
+.s1-restored-rewards {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.s1-reward-pill {
+  padding: 6px 14px;
+  border-radius: 99px;
+  font-size: 12.5px;
+  font-weight: 900;
+}
+.s1-reward-pill.gold {
+  background: rgba(255, 201, 83, 0.2);
+  border: 1.5px solid #FFC953;
+  color: #FEF08A;
+}
+.s1-reward-pill.cyan {
+  background: rgba(54, 222, 244, 0.18);
+  border: 1.5px solid #36DEF4;
+  color: #A5F3FC;
+}

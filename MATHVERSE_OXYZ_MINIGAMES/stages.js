@@ -14,16 +14,17 @@ const TEAM_ROLES_STANDARD = [
 
 const STAGES = [
   /* ═══════════════════════════════════════════════════════════════════════
-     CHẶNG 1. RỪNG VECTƠ KHỞI NGUYÊN (NHẬN BIẾT – 60 GIÂY)
+     CHẶNG 1. BÍ MẬT CÂY CẦU ĐẢO CHIỀU – RỪNG VECTƠ KHỞI NGUYÊN (NHẬN BIẾT – 60 GIÂY)
      ═══════════════════════════════════════════════════════════════════════ */
   {
     id: 1,
+    isCipherBridgeQuest: true,
     gameType: 'vector_adventure',
     defaultMode: 'hunt',
-    title: 'CHẶNG 1. RỪNG VECTƠ KHỞI NGUYÊN',
-    subtitle: 'Quy tắc hiệu hai vectơ',
+    title: 'BÍ MẬT CÂY CẦU ĐẢO CHIỀU',
+    subtitle: 'Rừng Vectơ Khởi Nguyên • Hiệu hai vectơ',
     shortName: 'Hiệu vectơ',
-    place: 'Rừng Vectơ Khởi Nguyên',
+    place: 'Bí Mật Cây Cầu Đảo Chiều',
     icon: '🏝️',
     biomeColor: '#10b981',
     levelBadge: 'NHẬN BIẾT',
@@ -33,15 +34,20 @@ const STAGES = [
     item: 'Ấn Hướng Đi',
     sealIcon: '🧭',
     digit: '3',
-    digitRule: 'Khôi phục Ấn Hướng Đi (Chặng 1 = 3).',
-    story: 'Cây cầu ánh sáng xuyên qua Rừng Vectơ bị Bóng Lỗi đảo chiều. Rồng Xanh cần đội thám hiểm nhận biết các vectơ để khôi phục đường đi.',
-    dragonIntro: 'Cây cầu bị đảo chiều rồi! Hãy nhận ra những mũi tên đúng để mở đường!',
-    dragonWin: 'Chính xác! Những mũi tên đã trở về đúng hướng!',
-    shadowIntro: 'Bóng Lỗi đã đảo chiều Cây cầu ánh sáng và đánh cắp Ấn Hướng Đi!',
-    groupTask: 'Cả đội quan sát sơ đồ 3 cột mốc A, B, C, kích hoạt các cột mốc và giải mã hiệu hai vectơ cùng gốc.',
-    teamRoles: TEAM_ROLES_STANDARD,
+    digitRule: 'Khôi phục Cây Cầu Ánh Sáng & nhận Ấn Hướng Đi (Chặng 1 = 3).',
+    story: 'Bóng Lỗi đã phá hủy cây cầu xuyên qua Rừng Vectơ. Rồng Xanh yêu cầu đội học sinh tìm ba mảnh mật thư tại các cột mốc A, B, C. Khi giải mã đúng, cây cầu ánh sáng được khôi phục và đội nhận Ấn Hướng Đi.',
+    dragonIntro: 'Cây cầu xuyên qua Rừng Vectơ đã bị phá hủy! Hãy tìm 3 mảnh mật thư tại các cột mốc A, B, C!',
+    dragonWin: 'Chính xác! Vectơ AB − vectơ AC = vectơ CB! Cây cầu ánh sáng đã được khôi phục, đội nhận Ấn Hướng Đi!',
+    shadowIntro: 'Bóng Lỗi đã phá hủy Cây cầu ánh sáng và giấu mật thư tại 3 cột mốc A, B, C!',
+    groupTask: 'Tìm 3 mảnh mật thư tại cột mốc A, B, C → Kéo thả ghép mật thư → Kéo mũi tên xác định hướng vectơ bí mật để khôi phục cây cầu.',
+    teamRoles: [
+      '🧭 Thành viên 1 (Thám hiểm): Khám phá và mở phong ấn tại 3 cột mốc đá A, B, C',
+      '📜 Thành viên 2 (Giải mã): Đọc và kéo thả ghép 3 mảnh mật thư thành biểu thức đúng',
+      '🏹 Thành viên 3 (Điều khiển): Nhấn điểm đầu và kéo mũi tên xác định hướng vectơ bí mật',
+      '✅ Thành viên 4 (Kiểm chứng): Kiểm tra chiều mũi tên và xác nhận khôi phục cây cầu'
+    ],
     visual3D: {
-      title: 'Quy tắc hiệu hai vectơ cùng điểm đầu',
+      title: 'Sơ đồ 3 cột mốc A, B, C trong Rừng Vectơ',
       type: 'vectorDiff',
       points: [
         { label: 'A', coords: [0, 0, 0], x: 0, y: 0, z: 0, color: '#38bdf8' },
@@ -51,85 +57,126 @@ const STAGES = [
       vectors: [
         { from: [0, 0, 0], to: [4, 2, 2], label: 'AB', color: '#38bdf8' },
         { from: [0, 0, 0], to: [2, 4, 0], label: 'AC', color: '#facc15' },
-        { from: [2, 4, 0], to: [4, 2, 2], label: 'CB = AB − AC', color: '#4ade80' }
+        { from: [2, 4, 0], to: [4, 2, 2], label: '?', color: '#4ade80' }
       ],
-      formula: 'AB − AC = CB   (hay AC − AB = BC)'
+      formula: 'Quy tắc hiệu hai vectơ chung gốc A: vectơ AB − vectơ AC = ?'
     },
     interactiveTask: {
-      type: 'pillars_abc',
-      title: 'Phần 1 – Khám phá: Kích hoạt 3 cột mốc A, B, C',
-      instruction: 'Chạm vào 3 cột mốc A, B, C trên sơ đồ để dựng hai vectơ xuất phát từ A và khôi phục chiều mũi tên trên Cây cầu ánh sáng!',
+      type: 'cipher_bridge_quest',
+      title: 'Bước 1 – Tìm mật thư tại 3 cột đá A, B, C',
+      instruction: 'Nhấn vào 3 cột đá cổ A, B, C đang phát sáng trong Rừng Vectơ để mở phong ấn và thu thập đủ 3 mảnh mật thư (0/3 → 3/3)!',
       targets: ['A', 'B', 'C'],
-      rewardText: 'Đã kích hoạt đủ 3 cột mốc A, B, C! Nhận Mảnh chìa khóa 1/3!'
+      rewardText: 'Đã tìm đủ 3/3 mảnh mật thư tại các cột đá A, B, C!'
     },
     interactiveChallenge: {
       id: '1.0',
+      stepType: 'find_pillars',
       isInteractive: true,
       level: 'NHẬN BIẾT',
-      label: 'Phần 1 · Khám phá 3 cột mốc A, B, C',
-      prompt: 'NHIỆM VỤ TƯƠNG TÁC: Hãy kích hoạt cả 3 cột mốc A, B, C trên sơ đồ Cây cầu ánh sáng để nhận mảnh chìa khóa đầu tiên (1/3)!',
+      label: 'Bước 1 · Tìm mật thư tại 3 cột đá A, B, C',
+      prompt: 'BƯỚC 1 – TÌM MẬT THƯ: Hãy nhấn vào 3 cột đá cổ A, B, C trong Rừng Vectơ để mở phong ấn và thu thập đủ 3 mảnh mật thư (0/3 → 3/3)!',
       options: [
-        'Đã kích hoạt 3 cột mốc A, B, C và quan sát chiều mũi tên',
-        'Chỉ kích hoạt 1 cột mốc A',
-        'Bỏ qua sơ đồ'
+        'Đã thu thập đủ 3/3 mảnh mật thư tại các cột đá A, B, C',
+        'Chỉ mới tìm thấy 1 mảnh mật thư',
+        'Chưa mở phong ấn cột đá'
       ],
       correct: 0,
-      shortAnswer: 'A',
+      shortAnswer: 'ABC',
       hints: [
-        'Hãy nhấp chuột vào từng cột mốc A, B, C trên hình vẽ bên trái rồi bấm Xác nhận.',
-        'Khi hai vectơ AB và AC cùng xuất phát từ A, hiệu AB − AC nối từ C tới B.'
+        'Hãy quan sát 3 cột đá cổ A, B, C đang phát sáng trên màn hình và nhấp vào từng cột đá để thu thập mảnh mật thư.',
+        'Mỗi cột đá A, B, C chứa 1 mảnh của biểu thức mật thư cổ.'
       ],
-      explain: 'Tuyệt vời! Ba cột mốc A, B, C đã phát sáng. Đội nhận Mảnh chìa khóa 1/3!',
-      keyBadge: 'Khóa 1/3'
+      explain: 'Tuyệt vời! Đội đã thu thập đủ 3/3 mảnh mật thư từ ba cột đá A, B, C!',
+      keyBadge: 'Mật thư 3/3'
     },
-    questionBank: [
+    fixedChallenges: [
+      {
+        id: '1.0',
+        stepType: 'find_pillars',
+        isInteractive: true,
+        level: 'NHẬN BIẾT',
+        label: 'Bước 1 · Tìm mật thư tại 3 cột đá A, B, C',
+        prompt: 'BƯỚC 1 – TÌM MẬT THƯ: Hãy nhấn vào 3 cột đá cổ A, B, C trong Rừng Vectơ để mở phong ấn và thu thập đủ 3 mảnh mật thư (0/3 → 3/3)!',
+        options: ['Đã thu thập đủ 3/3 mảnh mật thư tại cột đá A, B, C'],
+        correct: 0,
+        shortAnswer: 'ABC',
+        hints: [
+          'Nhấp vào từng cột đá cổ A, B, C đang phát sáng trong Rừng Vectơ để mở phong ấn.',
+          'Khi thu thập đủ 3/3 mảnh mật thư, bảng giải mã sẽ tự động mở ra.'
+        ],
+        explain: 'Đã thu thập đủ 3/3 mảnh mật thư cổ từ các cột mốc A, B, C!',
+        keyBadge: 'Mật thư 3/3'
+      },
       {
         id: '1.1',
+        stepType: 'assemble_cipher',
+        isInteractive: false,
         level: 'NHẬN BIẾT',
-        label: 'Câu 1.1 · Hiệu hai vectơ AB và AC',
-        prompt: 'Cho ba điểm A, B, C. Vectơ nào bằng hiệu của vectơ AB và vectơ AC?',
-        options: ['Vectơ CB.', 'Vectơ BC.', 'Vectơ BA.'],
+        label: 'Bước 2 · Ghép mật thư cổ',
+        prompt: 'BƯỚC 2 – GHÉP MẬT THƯ: Kéo thả và sắp xếp 3 mảnh mật thư vừa tìm được để tạo thành biểu thức hiệu của vectơ AB và vectơ AC!',
+        options: ['vectơ AB − vectơ AC = ?', 'vectơ AC − vectơ AB = ?', '− vectơ AB vectơ AC = ?'],
         correct: 0,
-        shortAnswer: 'CB',
+        shortAnswer: 'AB-AC',
         hints: [
-          'Quy tắc hiệu hai vectơ cùng gốc A: AB − AC có điểm đầu là C, điểm cuối là B.',
-          'AB − AC = CB.'
+          'Đặt mảnh [vectơ AB] vào ô thứ nhất, mảnh dấu [−] vào ô thứ hai, và mảnh [vectơ AC] vào ô thứ ba.',
+          'Biểu thức mật thư đúng là: vectơ AB − vectơ AC = ?'
         ],
-        explain: 'AB − AC = CB (các đại lượng đều là vectơ).',
-        keyBadge: 'Khóa 2/3'
+        explain: 'Đã ghép đúng mật thư: vectơ AB − vectơ AC = ? Hãy bước sang Bước 3 để tìm hướng vectơ bí mật!',
+        keyBadge: 'Giải mã mật thư'
       },
       {
         id: '1.2',
+        stepType: 'draw_vector_cb',
+        isInteractive: false,
         level: 'NHẬN BIẾT',
-        label: 'Câu 1.2 · Hiệu hai vectơ AC và AB',
-        prompt: 'Cho ba điểm A, B, C. Vectơ nào bằng AC − AB?',
-        options: ['Vectơ CB.', 'Vectơ BC.', 'Vectơ CA.'],
-        correct: 1,
-        shortAnswer: 'BC',
+        label: 'Bước 3 · Tìm hướng vectơ bí mật',
+        prompt: 'BƯỚC 3 – TÌM HƯỚNG VECTƠ BÍ MẬT: Trên sơ đồ tam giác A, B, C, hãy nhấn điểm bắt đầu và kéo mũi tên năng lượng đến điểm kết thúc để tạo vectơ bằng hiệu của vectơ AB và vectơ AC!',
+        options: ['Vectơ CB (Từ điểm C đến điểm B)', 'Vectơ BC (Từ điểm B đến điểm C)', 'Vectơ BA (Từ điểm B đến điểm A)'],
+        correct: 0,
+        shortAnswer: 'CB',
         hints: [
-          'Hai vectơ AC và AB cùng điểm đầu A: hiệu AC − AB hướng từ điểm B sang điểm C.',
-          'AC − AB = BC.'
+          'Theo quy tắc hiệu hai vectơ chung điểm đầu A: vectơ AB − vectơ AC nối giữa hai điểm cuối B và C.',
+          'Hãy nhấn giữ tại điểm C (điểm bắt đầu) và kéo mũi tên năng lượng tới điểm B (điểm kết thúc)!'
         ],
-        explain: 'AC − AB = BC.',
-        keyBadge: 'Khóa 2/3'
-      },
-      {
-        id: '1.3',
-        level: 'NHẬN BIẾT',
-        label: 'Câu 1.3 · Hiệu hai vectơ MN và MP',
-        prompt: 'Cho ba điểm M, N, P. Vectơ nào bằng MN − MP?',
-        options: ['Vectơ NP.', 'Vectơ NM.', 'Vectơ PN.'],
-        correct: 2,
-        shortAnswer: 'PN',
-        hints: [
-          'Hai vectơ MN và MP cùng gốc M: hiệu MN − MP hướng từ điểm cuối P của vectơ trừ tới điểm cuối N.',
-          'MN − MP = PN.'
-        ],
-        explain: 'MN − MP = PN.',
-        keyBadge: 'Khóa 3/3'
+        explain: 'vectơ AB − vectơ AC = vectơ CB (xuất phát tại C và kết thúc tại B). Cây cầu ánh sáng đã được khôi phục!',
+        keyBadge: 'Mở Cầu Ánh Sáng'
       }
     ],
-    // Default challenges array (1 interactive + 2 questions) for static fallback
+    questionBank: [
+      {
+        id: '1.1',
+        stepType: 'assemble_cipher',
+        level: 'NHẬN BIẾT',
+        label: 'Bước 2 · Ghép mật thư cổ (AB − AC = ?)',
+        prompt: 'Ghép 3 mảnh mật thư tại cột đá A, B, C thành biểu thức hiệu hai vectơ xuất phát từ A.',
+        options: ['vectơ AB − vectơ AC = ?', 'vectơ AC − vectơ AB = ?', '− vectơ AB vectơ AC = ?'],
+        correct: 0,
+        shortAnswer: 'AB-AC',
+        hints: [
+          'Đặt mảnh [vectơ AB] ở đầu, dấu [−] ở giữa, và mảnh [vectơ AC] ở cuối.',
+          'Biểu thức mật thư đúng là: vectơ AB − vectơ AC = ?'
+        ],
+        explain: 'Ghép đúng mật thư: vectơ AB − vectơ AC = ?',
+        keyBadge: 'Giải mã mật thư'
+      },
+      {
+        id: '1.2',
+        stepType: 'draw_vector_cb',
+        level: 'NHẬN BIẾT',
+        label: 'Bước 3 · Kéo hướng vectơ bí mật (C → B)',
+        prompt: 'Trên sơ đồ tam giác A, B, C: Nhấn điểm bắt đầu và kéo mũi tên đến điểm kết thúc để tạo vectơ bằng vectơ AB − vectơ AC.',
+        options: ['Vectơ CB (Từ C đến B)', 'Vectơ BC (Từ B đến C)', 'Vectơ BA (Từ B đến A)'],
+        correct: 0,
+        shortAnswer: 'CB',
+        hints: [
+          'Hai vectơ AB và AC cùng gốc A: hiệu AB − AC xuất phát từ điểm cuối C của AC và kết thúc tại điểm cuối B của AB.',
+          'Nhấn giữ tại C và kéo mũi tên tới B để tạo vectơ CB.'
+        ],
+        explain: 'vectơ AB − vectơ AC = vectơ CB.',
+        keyBadge: 'Mở Cầu Ánh Sáng'
+      }
+    ],
+    // Default challenges array
     challenges: []
   },
 
@@ -645,11 +692,15 @@ const STAGES = [
 
 // Khởi tạo challenges mặc định (Phần 1 tương tác + 2 câu đầu trong questionBank)
 STAGES.forEach(s => {
-  s.challenges = [
-    s.interactiveChallenge,
-    { ...s.questionBank[0], keyBadge: 'Khóa 2/3' },
-    { ...s.questionBank[1], keyBadge: 'Khóa 3/3' }
-  ];
+  if (s.fixedChallenges && s.fixedChallenges.length) {
+    s.challenges = s.fixedChallenges.map(c => ({ ...c }));
+  } else {
+    s.challenges = [
+      s.interactiveChallenge,
+      { ...s.questionBank[0], keyBadge: 'Khóa 2/3' },
+      { ...s.questionBank[1], keyBadge: 'Khóa 3/3' }
+    ];
+  }
 });
 
 const TOKEN_WORDS = {

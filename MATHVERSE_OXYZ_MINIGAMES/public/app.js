@@ -1099,6 +1099,16 @@ function startScreen(msg=''){
  <section class="setup grid grid-2" id="entry"><div class="panel" data-tabbox="teacher"><div class="section-title"><h2>🎓 Phòng điều khiển Giáo viên</h2></div><p>Giáo viên tạo mã phòng, phát mã PIN cho 4–8 nhóm học sinh (3–5 HS/đội), chiếu Hành trình Giải cứu Lục địa OXYZ (6 phút) và theo dõi tiến độ thu hồi 5 Ấn Vectơ thời gian thực.</p><div class="form-field"><label>Số đội tham gia</label><select id="teamCount"><option value="4">4 đội</option><option value="5">5 đội</option><option value="6" selected>6 đội</option><option value="7">7 đội</option><option value="8">8 đội</option></select></div>${btn('✨ TẠO PHÒNG MATHVERSE (6 PHÚT)','create','primary block')}</div>
  <div class="panel" data-tabbox="student"><div class="section-title"><h2>🚀 Đăng nhập Đội Thám Hiểm</h2></div><p>Nhận mã phòng và mã PIN đội từ giáo viên để cùng Rồng Xanh vượt qua 5 vùng đất và khôi phục Tâm Thạch Vectơ!</p><div class="form-field"><label>Mã phòng 6 chữ số</label><input id="roomInput" type="text" inputmode="numeric" maxlength="6" class="mono" value="${fRoom}" placeholder="VD: 123456" /></div><div class="form-field"><label>Đội thám hiểm</label><select id="teamSelect">${Array.from({length:8},(_,i)=>`<option value="doi-${i+1}" ${fTeam===`doi-${i+1}`?'selected':''}>Đội ${i+1}</option>`).join('')}</select></div><div class="form-field"><label>Mã đội 4 chữ số</label><input id="teamCode" type="password" inputmode="numeric" maxlength="4" placeholder="Mã PIN của đội" /></div>${btn('🗝️ VÀO HÀNH TRÌNH NGAY','join','teal block')}</div></section>`);
 }
+function getStageFormulaSafe(stageIdx, currentTeamStage) {
+ if (stageIdx === 0) {
+  const unlocked = (session?.role === 'teacher') || (Number(currentTeamStage) >= 1) || Boolean(vaState?.s1BridgeRestoredOverlay);
+  return unlocked
+   ? '\\vec{AB} − \\vec{AC} = \\vec{CB}'
+   : 'Bí mật Cây Cầu Đảo Chiều: \\vec{AB} − \\vec{AC} = ?';
+ }
+ return STAGE_FORMULAS_SHORT[stageIdx] || '';
+}
+
 function mapTrack(stage){
  return `<div class="hs-stage-map-bar">
   <div class="hs-stage-cards-grid">
@@ -1113,10 +1123,11 @@ function mapTrack(stage){
     const clickAttr = session?.role === 'student'
      ? `data-action="demoJumpStage" data-stage="${i}"`
      : `data-action="preview3DStage" data-stage="${i}"`;
+    const safeFormula = getStageFormulaSafe(i, stage);
     return `<div class="hs-stage-card ${state}" ${clickAttr}>
      <div class="mv-island-tooltip">
       <b style="color:#FFC953">Chặng ${i + 1}: ${esc(m.place)}</b><br/>
-      <span style="color:#A5F3FC">📐 ${formatMath(STAGE_FORMULAS_SHORT[i] || m.sub)}</span><br/>
+      <span style="color:#A5F3FC">📐 ${formatMath(safeFormula || m.sub)}</span><br/>
       <small style="color:#CBD5E1">🏅 Vật phẩm: ${esc(m.mode)}</small>
      </div>
      <div class="hs-stage-card-top">
@@ -1192,10 +1203,17 @@ function renderTeacherTeamModal() {
    </div>
 
    <div class="gv-inspector-kpis">
-    <div class="gv-mini-kpi"><span>Chặng hiện tại</span><b>${t.completed ? 'Hoàn thành 5/5' : ('Chặng ' + Math.min(5, t.stage + 1) + '/5 (Phần ' + (t.round + 1) + '/3)')}</b></div>
-    <div class="gv-mini-kpi"><span>Số câu đúng</span><b style="color:#35C992">${t.correctCount || 0} / 10 câu</b></div>
+    <div class="gv-mini-kpi"><span>Chặng hiện tại</span><b>${t.completed ? 'Hoàn thành 5/5' : ('Chặng ' + Math.min(5, t.stage + 1) + '/5 (Bước ' + (t.round + 1) + '/3)')}</b></div>
+    <div class="gv-mini-kpi"><span>Số bước giải mã đúng</span><b style="color:#35C992">${t.correctCount || 0} / 10</b></div>
     <div class="gv-mini-kpi"><span>Số lần thử sai / Gợi ý</span><b style="color:#FDA4AF">${t.wrong || 0} sai · ${t.hints || 0} gợi ý</b></div>
     <div class="gv-mini-kpi"><span>Điểm XP & Thưởng</span><b style="color:#FFC953">${t.score} XP (Hợp tác +${t.bonus || 0})</b></div>
+   </div>
+
+   <div class="gv-s1-live-box" style="margin:10px 0;padding:10px 14px;background:rgba(16,185,129,0.12);border:1px solid rgba(54,222,244,0.35);border-radius:10px;display:flex;flex-wrap:wrap;gap:14px;align-items:center;justify-content:space-between">
+    <strong style="color:#36DEF4;font-size:12.5px">🌲 CHẶNG 1 – BÍ MẬT CÂY CẦU ĐẢO CHIỀU:</strong>
+    <span style="font-size:12.5px;color:#F8FAFF">📜 Mật thư: <b style="color:#FFC953">${t.stage > 0 ? 3 : (t.stage1?.cluesFound ?? (t.round >= 1 ? 3 : 0))}/3</b></span>
+    <span style="font-size:12.5px;color:#F8FAFF">🧩 Ghép mật thư: <b style="color:${(t.stage > 0 || t.stage1?.cipherSolved || t.round >= 2) ? '#35C992' : '#94A3B8'}">${(t.stage > 0 || t.stage1?.cipherSolved || t.round >= 2) ? '✓ Đã hoàn thành' : 'Chưa xong'}</b></span>
+    <span style="font-size:12.5px;color:#F8FAFF">🌉 Cầu ánh sáng: <b style="color:${(t.stage > 0 || t.stage1?.bridgeOpened) ? '#35C992' : '#94A3B8'}">${(t.stage > 0 || t.stage1?.bridgeOpened) ? '✓ Đã mở cầu (Ấn Hướng Đi)' : 'Chưa mở'}</b></span>
    </div>
 
    <h3 style="color:#36DEF4;font-size:13.5px;margin:12px 0 8px">📋 Lịch sử câu trả lời & thời gian từng chặng (${logs.length} lượt):</h3>
@@ -1382,12 +1400,20 @@ function teacherScreen(){
       const rankNum = idx + 1;
       const rankCls = rankNum === 1 ? 'rank-1' : rankNum === 2 ? 'rank-2' : rankNum === 3 ? 'rank-3' : 'rank-n';
       const stgDisplay = t.completed ? '5/5' : `${Math.min(5, (t.stage || 0) + (t.round > 0 ? 1 : 1))}/5`;
-      const pct = t.completed ? 100 : Math.max(8, Math.round((((t.stage || 0) * 3 + (t.round || 0)) / 15) * 100));
+      const s1Clues = t.stage > 0 ? 3 : (t.stage1?.cluesFound ?? (t.round >= 1 ? 3 : 0));
+      const s1Cipher = Boolean(t.stage > 0 || t.stage1?.cipherSolved || t.round >= 2);
+      const s1Bridge = Boolean(t.stage > 0 || t.stage1?.bridgeOpened);
+      const pct = t.completed ? 100 : Math.max(8, Math.round((((t.stage || 0) * 3 + (t.round || 0) + (t.stage === 0 && t.round === 0 ? (s1Clues / 3) : 0)) / 15) * 100));
       const barColor = barColors[idx % barColors.length];
       const correctVal = t.correctCount ?? ((t.digits || []).length * 2);
-      return `<div class="gv-rank-row ${rankCls}" data-action="inspectTeamRow" data-team="${t.id}" title="Nhấn để xem chi tiết từng câu trả lời của ${esc(t.name)}">
+      const s1LiveBadge = `<div class="gv-s1-inline-badges">
+       <span class="gv-s1-pill ${s1Clues >= 3 ? 'done' : ''}" title="Số mảnh mật thư Chặng 1 đã tìm thấy">📜 ${s1Clues}/3</span>
+       <span class="gv-s1-pill ${s1Cipher ? 'done' : ''}" title="Trạng thái ghép mật thư Chặng 1">🧩 ${s1Cipher ? 'Đã ghép' : 'Chưa'}</span>
+       <span class="gv-s1-pill ${s1Bridge ? 'done' : ''}" title="Trạng thái mở Cầu ánh sáng Chặng 1">🌉 ${s1Bridge ? 'Đã mở cầu' : 'Chưa mở'}</span>
+      </div>`;
+      return `<div class="gv-rank-row ${rankCls}" data-action="inspectTeamRow" data-team="${t.id}" title="Nhấn để xem chi tiết từng bước của ${esc(t.name)}">
        <span class="gv-col-rank">#${rankNum}</span>
-       <span class="gv-col-team"><strong>${esc(t.name)}</strong></span>
+       <span class="gv-col-team"><strong>${esc(t.name)}</strong>${s1LiveBadge}</span>
        <span class="gv-col-stage">${stgDisplay}</span>
        <div class="gv-col-progress">
         <div class="gv-prog-track"><div class="gv-prog-fill" style="width:${pct}%;background:${barColor}"></div></div>
@@ -1536,12 +1562,15 @@ function displayScreen(){
     ${sortedTeams.map((t, idx) => {
      const rankNum = idx + 1;
      const rankCls = rankNum === 1 ? 'rank-1' : rankNum === 2 ? 'rank-2' : rankNum === 3 ? 'rank-3' : 'rank-n';
-     const pct = t.completed ? 100 : Math.max(8, Math.round((((t.stage || 0) * 3 + (t.round || 0)) / 15) * 100));
+     const s1Clues = t.stage > 0 ? 3 : (t.stage1?.cluesFound ?? (t.round >= 1 ? 3 : 0));
+     const s1Cipher = Boolean(t.stage > 0 || t.stage1?.cipherSolved || t.round >= 2);
+     const s1Bridge = Boolean(t.stage > 0 || t.stage1?.bridgeOpened);
+     const pct = t.completed ? 100 : Math.max(8, Math.round((((t.stage || 0) * 3 + (t.round || 0) + (t.stage === 0 && t.round === 0 ? (s1Clues / 3) : 0)) / 15) * 100));
      const barColor = barColors[idx % barColors.length];
      const seals = (t.digits || []).length;
      return `<div class="gv-rank-row ${rankCls}">
       <span class="gv-col-rank">#${rankNum}</span>
-      <span class="gv-col-team"><strong>${t.avatar} ${esc(t.name)}</strong></span>
+      <span class="gv-col-team"><strong>${t.avatar} ${esc(t.name)}</strong><div class="gv-s1-inline-badges"><span class="gv-s1-pill ${s1Clues >= 3 ? 'done' : ''}">📜 ${s1Clues}/3</span><span class="gv-s1-pill ${s1Cipher ? 'done' : ''}">🧩 ${s1Cipher ? 'Đã ghép' : 'Chưa'}</span><span class="gv-s1-pill ${s1Bridge ? 'done' : ''}">🌉 ${s1Bridge ? 'Đã mở cầu' : 'Chưa'}</span></div></span>
       <span class="gv-col-stage">${t.completed ? 'Đích 🏆' : `${Math.min(5, (t.stage||0)+1)}/5`}</span>
       <div class="gv-col-progress">
        <div class="gv-prog-track"><div class="gv-prog-fill" style="width:${pct}%;background:${barColor}"></div></div>
@@ -3370,6 +3399,12 @@ const vaState = {
   roundId: -1,
   selectedChoice: null,
   pillars: new Set(),       // Chặng 1: 'A', 'B', 'C'
+  s1CipherSlots: [null, null, null], // Chặng 1 Bước 2: ['AB', '-', 'AC']
+  s1ArrowFrom: null,        // Chặng 1 Bước 3: điểm bắt đầu ('A' | 'B' | 'C')
+  s1ArrowTo: null,          // Chặng 1 Bước 3: điểm kết thúc ('A' | 'B' | 'C')
+  s1Feedback: null,         // Phản hồi ngắn tại chỗ cho Chặng 1
+  s1BridgeRestoredOverlay: false, // Bước 4: Hiệu ứng khôi phục cây cầu ánh sáng
+  s1BridgeTimer: null,
   paths: new Set(),         // Chặng 2: 'AB', 'BC'
   paraEdges: new Set(),     // Chặng 3: 'AB', 'AD'
   midpointPct: 25,          // Chặng 4: 50 = Trung điểm I
@@ -3382,12 +3417,22 @@ const vaState = {
 };
 
 function ensureVaStateForStage(m) {
+  if (!m || !m.id) return;
   const dur = m.timeSeconds || (m.id <= 2 ? 60 : m.id <= 4 ? 65 : 70);
+  // Đồng bộ các cột đá A, B, C từ server nếu có
+  const srvPillars = world?.me?.stage1?.pillars;
+  if (m.id === 1 && Array.isArray(srvPillars)) {
+    srvPillars.forEach(p => vaState.pillars.add(p));
+  }
   if (vaState.stageId !== m.id) {
     vaState.stageId = m.id;
     vaState.roundId = m.round;
     vaState.selectedChoice = null;
-    vaState.pillars = new Set();
+    vaState.pillars = new Set(m.id === 1 && Array.isArray(srvPillars) ? srvPillars : []);
+    vaState.s1CipherSlots = [null, null, null];
+    vaState.s1ArrowFrom = null;
+    vaState.s1ArrowTo = null;
+    vaState.s1Feedback = null;
     vaState.paths = new Set();
     vaState.paraEdges = new Set();
     vaState.midpointPct = 25;
@@ -3400,6 +3445,12 @@ function ensureVaStateForStage(m) {
   } else if (vaState.roundId !== m.round) {
     vaState.roundId = m.round;
     vaState.selectedChoice = null;
+    vaState.s1Feedback = null;
+    if (m.id === 1 && m.round === 1) {
+      vaState.dragonMsg = 'Đã thu thập đủ 3 mảnh mật thư! Hãy kéo hoặc nhấn các mảnh để ghép biểu thức hiệu hai vectơ!';
+    } else if (m.id === 1 && m.round === 2) {
+      vaState.dragonMsg = 'Mật thư đã hiện ra: vectơ AB − vectơ AC = ? Hãy nhấn điểm bắt đầu và kéo mũi tên đến điểm kết thúc trên tam giác ABC!';
+    }
   }
 }
 
@@ -3704,8 +3755,445 @@ function formatMMSS(totalSeconds) {
   return mm + ':' + ss;
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   CHẶNG 1 NÂNG CẤP: GAME TRUY TÌM MẬT THƯ – "BÍ MẬT CÂY CẦU ĐẢO CHIỀU"
+   4 Bước tương tác: Tìm 3 cột đá A,B,C -> Ghép mật thư -> Kéo mũi tên CB -> Khôi phục cầu
+   ═══════════════════════════════════════════════════════════════════════════ */
+const S1_PILLAR_META = {
+  A: { id: 'A', label: 'Cột đá A', token: 'AB', tokenDisplay: '\\vec{AB}', left: 20, top: 52, rune: 'ᚠ' },
+  B: { id: 'B', label: 'Cột đá B', token: '-',  tokenDisplay: '−',         left: 52, top: 44, rune: 'ᛟ' },
+  C: { id: 'C', label: 'Cột đá C', token: 'AC', tokenDisplay: '\\vec{AC}', left: 81, top: 50, rune: 'ᛞ' }
+};
+
+const S1_VERTEX_COORDS = {
+  A: { x: 280, y: 56,  labelX: 280, labelY: 26 },
+  B: { x: 120, y: 224, labelX: 88,  labelY: 230 },
+  C: { x: 440, y: 224, labelX: 472, labelY: 230 }
+};
+
+function renderS1TokenLabel(token) {
+  if (token === 'AB') return formatMath('\\vec{AB}');
+  if (token === 'AC') return formatMath('\\vec{AC}');
+  if (token === '-')  return '<span style="font-size:24px;font-weight:900;color:#FFC953">−</span>';
+  return esc(token || '');
+}
+
+window.s1DragStart = function(ev, token, fromSlotIdx = null) {
+  try {
+    ev.dataTransfer.setData('text/plain', JSON.stringify({ token, fromSlotIdx }));
+  } catch (e) {}
+};
+
+window.s1DragOver = function(ev) {
+  ev.preventDefault();
+};
+
+window.s1DropSlot = function(ev, targetSlotIdx) {
+  ev.preventDefault();
+  try {
+    const raw = ev.dataTransfer.getData('text/plain');
+    if (!raw) return;
+    const data = JSON.parse(raw);
+    const token = data.token;
+    if (!token) return;
+    const prevInTarget = vaState.s1CipherSlots[targetSlotIdx];
+    if (data.fromSlotIdx !== null && data.fromSlotIdx !== undefined) {
+      vaState.s1CipherSlots[data.fromSlotIdx] = prevInTarget || null;
+    } else {
+      const existingIdx = vaState.s1CipherSlots.indexOf(token);
+      if (existingIdx !== -1) vaState.s1CipherSlots[existingIdx] = prevInTarget || null;
+    }
+    vaState.s1CipherSlots[targetSlotIdx] = token;
+    vaState.s1Feedback = null;
+    sound('step');
+    render();
+  } catch (e) {}
+};
+
+let s1DragVertexFrom = null;
+window.s1StartVertexDrag = function(ev, pt) {
+  s1DragVertexFrom = pt;
+  vaState.s1ArrowFrom = pt;
+  vaState.s1ArrowTo = null;
+  vaState.s1Feedback = null;
+  const svg = document.getElementById('s1VectorSvg');
+  const dragLine = document.getElementById('s1LiveDragLine');
+  const startCoord = S1_VERTEX_COORDS[pt];
+  if (!svg || !dragLine || !startCoord) return;
+
+  dragLine.setAttribute('x1', startCoord.x);
+  dragLine.setAttribute('y1', startCoord.y);
+  dragLine.setAttribute('x2', startCoord.x);
+  dragLine.setAttribute('y2', startCoord.y);
+  dragLine.style.display = 'block';
+
+  function onMove(moveEv) {
+    const rect = svg.getBoundingClientRect();
+    if (!rect.width || !rect.height) return;
+    const cx = ((moveEv.clientX - rect.left) / rect.width) * 560;
+    const cy = ((moveEv.clientY - rect.top) / rect.height) * 280;
+    dragLine.setAttribute('x2', Math.max(20, Math.min(540, cx)));
+    dragLine.setAttribute('y2', Math.max(20, Math.min(265, cy)));
+  }
+
+  function onUp(upEv) {
+    window.removeEventListener('pointermove', onMove);
+    window.removeEventListener('pointerup', onUp);
+    dragLine.style.display = 'none';
+    const rect = svg.getBoundingClientRect();
+    if (rect.width && rect.height) {
+      const ux = ((upEv.clientX - rect.left) / rect.width) * 560;
+      const uy = ((upEv.clientY - rect.top) / rect.height) * 280;
+      let nearestPt = null;
+      let minDist = 68; // ngưỡng bắt điểm đỉnh A, B, C
+      Object.entries(S1_VERTEX_COORDS).forEach(([k, v]) => {
+        const d = Math.hypot(ux - v.x, uy - v.y);
+        if (d < minDist) {
+          minDist = d;
+          nearestPt = k;
+        }
+      });
+      if (nearestPt && nearestPt !== s1DragVertexFrom) {
+        vaState.s1ArrowFrom = s1DragVertexFrom;
+        vaState.s1ArrowTo = nearestPt;
+        sound('target');
+        render();
+        return;
+      }
+    }
+    render();
+  }
+
+  window.addEventListener('pointermove', onMove);
+  window.addEventListener('pointerup', onUp);
+};
+
+function renderStage1RestoredBridgeStep() {
+  return `<div class="s1-quest-wrap s1-bridge-restored">
+    <div class="s1-step-ribbon">
+      <span class="s1-step-pill done">✓ Bước 1: 3/3 Mật thư</span>
+      <span class="s1-step-pill done">✓ Bước 2: Ghép mật thư</span>
+      <span class="s1-step-pill done">✓ Bước 3: Vectơ CB</span>
+      <span class="s1-step-pill active">✨ Bước 4: Khôi phục Cây Cầu Ánh Sáng</span>
+    </div>
+
+    <div class="s1-restored-showcase" style="background-image: linear-gradient(180deg, rgba(6,22,38,0.45), rgba(6,22,38,0.82)), url('/assets/Stage1_Restored_Bridge.jpg')">
+      <svg class="s1-restored-svg" viewBox="0 0 560 250" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="s1BridgeEnergyGrad" x1="100%" y1="0%" x2="0%" y2="0%">
+            <stop offset="0%" stop-color="#FFC953"/>
+            <stop offset="50%" stop-color="#36DEF4"/>
+            <stop offset="100%" stop-color="#10B981"/>
+          </linearGradient>
+          <marker id="s1ArrRestoredCB" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+            <path d="M 0 1 L 10 5 L 0 9 z" fill="#FFC953"/>
+          </marker>
+          <marker id="s1ArrCyanSub" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M 0 1 L 10 5 L 0 9 z" fill="#36DEF4"/>
+          </marker>
+        </defs>
+
+        <!-- Hai tia vectơ AB và AC -->
+        <line x1="280" y1="48" x2="128" y2="196" stroke="#36DEF4" stroke-width="4" stroke-opacity="0.85" marker-end="url(#s1ArrCyanSub)"/>
+        <line x1="280" y1="48" x2="432" y2="196" stroke="#36DEF4" stroke-width="4" stroke-opacity="0.85" marker-end="url(#s1ArrCyanSub)"/>
+        ${svgVecLabel(178, 118, 'AB', '#36DEF4', 16)}
+        ${svgVecLabel(382, 118, 'AC', '#36DEF4', 16)}
+
+        <!-- CẦU NĂNG LƯỢNG ÁNH SÁNG NỐI TỪ C SANG B -->
+        <rect x="120" y="192" width="320" height="24" rx="12" fill="url(#s1BridgeEnergyGrad)" opacity="0.38" class="s1-bridge-beam-glow"/>
+        <line x1="422" y1="204" x2="142" y2="204" stroke="#FFC953" stroke-width="6.5" marker-end="url(#s1ArrRestoredCB)" class="s1-cb-arrow-glow"/>
+        ${svgVecLabel(280, 184, 'CB', '#FFC953', 20)}
+
+        <!-- 3 CỘT ĐÁ A, B, C PHÁT SÁNG RỰC RỠ -->
+        <g class="s1-pillar-svg-glow">
+          <circle cx="280" cy="48" r="16" fill="#10B981" stroke="#FFC953" stroke-width="4"/>
+          <text x="280" y="54" text-anchor="middle" fill="#FFFFFF" font-size="15" font-weight="900">A</text>
+        </g>
+        <g class="s1-pillar-svg-glow">
+          <circle cx="120" cy="204" r="16" fill="#10B981" stroke="#FFC953" stroke-width="4"/>
+          <text x="120" y="210" text-anchor="middle" fill="#FFFFFF" font-size="15" font-weight="900">B</text>
+        </g>
+        <g class="s1-pillar-svg-glow">
+          <circle cx="440" cy="204" r="16" fill="#10B981" stroke="#FFC953" stroke-width="4"/>
+          <text x="440" y="210" text-anchor="middle" fill="#FFFFFF" font-size="15" font-weight="900">C</text>
+        </g>
+      </svg>
+
+      <div class="s1-restored-banner">
+        <div class="s1-restored-formula">${formatMath('\\vec{AB} − \\vec{AC} = \\vec{CB}')}</div>
+        <p class="s1-restored-msg">🐉 <b>Rồng Xanh:</b> “Tuyệt vời! Ba cột đá A, B, C và mũi tên <span class="math-vec"><span class="vec-arr">→</span><span>CB</span></span> đã phát sáng! Cây cầu năng lượng qua Rừng Vectơ đã khôi phục, đội nhận <b>Ấn Hướng Đi 🧭</b>!”</p>
+        <div class="s1-restored-rewards">
+          <span class="s1-reward-pill gold">🧭 Nhận Ấn Hướng Đi</span>
+          <span class="s1-reward-pill cyan">⭐ +Điểm XP & Vàng</span>
+          <button type="button" class="hs-confirm-btn" data-action="s1ProceedToStage2">
+            🌉 BƯỚC QUA CẦU SANG CHẶNG 2 →
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderStage1CipherBridgeGame(m) {
+  ensureVaStateForStage(m);
+  if (vaState.s1BridgeRestoredOverlay) {
+    return renderStage1RestoredBridgeStep();
+  }
+
+  const r = m.round || 0;
+  const cluesCount = r >= 1 ? 3 : vaState.pillars.size;
+  const roles = m.teamRoles || [
+    'Thành viên 1 (Thám hiểm): Tìm 3 cột đá A, B, C',
+    'Thành viên 2 (Giải mật thư): Ghép biểu thức vectơ',
+    'Thành viên 3 (Điều khiển): Kéo mũi tên chọn hướng',
+    'Thành viên 4 (Xác nhận): Mở khóa Cầu Ánh Sáng'
+  ];
+  const activeRoleText = r === 0 ? roles[0] : r === 1 ? roles[1] : (roles[2] + ' · ' + (roles[3] || ''));
+
+  const stepRibbonHtml = `<div class="s1-step-ribbon">
+    <span class="s1-step-pill ${r === 0 ? 'active' : 'done'}">${r > 0 ? '✓' : '1.'} Tìm mật thư (${cluesCount}/3)</span>
+    <span class="s1-step-pill ${r === 1 ? 'active' : r > 1 ? 'done' : ''}">${r > 1 ? '✓' : '2.'} Ghép mật thư</span>
+    <span class="s1-step-pill ${r === 2 ? 'active' : ''}">3. Tìm hướng vectơ</span>
+    <span class="s1-role-chip" title="Phân vai phối hợp nhóm 3–5 học sinh">👥 ${esc(activeRoleText)}</span>
+  </div>`;
+
+  // ─── BƯỚC 1: TÌM MẬT THƯ TẠI 3 CỘT ĐÁ A, B, C ───
+  if (r === 0) {
+    const allFound = cluesCount >= 3;
+    return `<div class="s1-quest-wrap">
+      ${stepRibbonHtml}
+      <div class="s1-forest-scene" style="background-image: linear-gradient(180deg, rgba(6,20,34,0.32), rgba(6,20,34,0.78)), url('/assets/Stage1_Pillars_Forest.jpg'), url('/assets/Stage_01_Rung_Vecto.png')">
+        <div class="s1-scene-top-hud">
+          <div class="s1-objective-badge">
+            🔍 <b>BƯỚC 1 – TÌM MẬT THƯ:</b> Nhấn vào 3 cột đá cổ <b>A, B, C</b> đang phát sáng trong Rừng Vectơ để thu thập 3 mảnh mật thư!
+          </div>
+          <div class="s1-clue-counter ${allFound ? 'complete' : ''}">
+            📜 Mật thư: <b>${cluesCount}/3</b>
+          </div>
+        </div>
+
+        <!-- 3 CỘT ĐÁ CỔ A, B, C TRÊN BỐI CẢNH RỪNG VECTƠ -->
+        <div class="s1-pillars-stage">
+          ${['A', 'B', 'C'].map(pid => {
+            const meta = S1_PILLAR_META[pid];
+            const isOpened = vaState.pillars.has(pid);
+            return `<button type="button" class="s1-pillar-node ${isOpened ? 'opened' : 'sealed'}" style="left:${meta.left}%;top:${meta.top}%" data-action="s1ClickPillar" data-pillar="${pid}" title="Nhấn để mở phong ấn ${meta.label}">
+              <span class="s1-pillar-aura"></span>
+              <span class="s1-pillar-stone">
+                <span class="s1-pillar-rune">${meta.rune}</span>
+                <strong class="s1-pillar-letter">${pid}</strong>
+                <small class="s1-pillar-status">${isOpened ? '✓ Đã thu thập' : 'Nhấn mở ấn'}</small>
+              </span>
+              ${isOpened ? `<span class="s1-pillar-shard">📜 ${renderS1TokenLabel(meta.token)}</span>` : ''}
+            </button>`;
+          }).join('')}
+        </div>
+
+        <!-- KHAY 3 MẢNH MẬT THƯ & NÚT CHUYỂN SANG BƯỚC 2 -->
+        <div class="s1-forest-bottom-bar">
+          <div class="s1-collected-tray">
+            <span>Mảnh mật thư thu được:</span>
+            ${['A', 'B', 'C'].map(pid => {
+              const meta = S1_PILLAR_META[pid];
+              const has = vaState.pillars.has(pid);
+              return `<span class="s1-mini-fragment ${has ? 'earned' : 'locked'}">
+                ${has ? `Cột ${pid}: ${renderS1TokenLabel(meta.token)}` : `Cột ${pid}: ?`}
+              </span>`;
+            }).join('')}
+          </div>
+          <button type="button" class="hs-confirm-btn ${allFound ? 'pulse-ready' : ''}" data-action="s1FinishStep1" ${!allFound ? 'disabled' : ''}>
+            ${allFound ? '📜 MỞ BẢNG GIẢI MÃ MẬT THƯ (3/3) →' : `Hãy tìm đủ 3 cột đá (${cluesCount}/3)`}
+          </button>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  // ─── BƯỚC 2: GHÉP MẬT THƯ (KÉO THẢ HOẶC NHẤN ĐỂ XẾP: vectơ AB − vectơ AC = ?) ───
+  if (r === 1) {
+    const allTokens = ['AC', 'AB', '-'];
+    const usedTokens = vaState.s1CipherSlots.filter(Boolean);
+    const availableTokens = allTokens.filter(t => !usedTokens.includes(t));
+    const isFull = usedTokens.length === 3;
+
+    return `<div class="s1-quest-wrap">
+      ${stepRibbonHtml}
+      <div class="s1-cipher-board" style="background-image: linear-gradient(180deg, rgba(8,15,32,0.72), rgba(8,15,32,0.88)), url('/assets/Stage1_Cipher_Scroll.jpg')">
+        <div class="s1-scene-top-hud">
+          <div class="s1-objective-badge">
+            🧩 <b>BƯỚC 2 – GHÉP MẬT THƯ:</b> Kéo thả (hoặc chạm) 3 mảnh mật thư từ 3 cột đá để ghép thành biểu thức <b>Hiệu hai vectơ xuất phát từ điểm A</b>!
+          </div>
+          <div class="s1-clue-counter complete">📜 Đủ 3/3 mảnh</div>
+        </div>
+
+        <!-- KHU VỰC 3 Ô GHÉP BIỂU THỨC: [ Ô 1 ] [ Ô 2 ] [ Ô 3 ] = ? (KHÔNG LỘ ĐÁP ÁN CB) -->
+        <div class="s1-cipher-equation-box">
+          <div class="s1-cipher-slots-row">
+            ${[0, 1, 2].map(slotIdx => {
+              const tok = vaState.s1CipherSlots[slotIdx];
+              const slotHints = ['Vectơ thứ nhất (từ A)', 'Phép toán', 'Vectơ thứ hai (từ A)'];
+              return `<div class="s1-cipher-slot ${tok ? 'filled' : 'empty'}"
+                ondragover="window.s1DragOver(event)"
+                ondrop="window.s1DropSlot(event, ${slotIdx})"
+                ${tok ? `draggable="true" ondragstart="window.s1DragStart(event, '${tok}', ${slotIdx})" data-action="s1RemoveCipherSlot" data-slot="${slotIdx}"` : ''}
+                title="${tok ? 'Nhấn để gỡ mảnh này ra' : slotHints[slotIdx]}">
+                <small class="s1-slot-index">Mảnh ${slotIdx + 1}</small>
+                <div class="s1-slot-content">
+                  ${tok ? renderS1TokenLabel(tok) : `<span class="s1-slot-placeholder">${esc(slotHints[slotIdx])}</span>`}
+                </div>
+              </div>`;
+            }).join('')}
+            <span class="s1-cipher-equals">=</span>
+            <div class="s1-cipher-mystery-box" title="Vectơ bí mật sẽ được giải mã ở Bước 3">?</div>
+          </div>
+        </div>
+
+        <!-- KHAY CÁC MẢNH MẬT THƯ ĐỂ KÉO THẢ HOẶC NHẤN CHỌN -->
+        <div class="s1-cipher-pool-area">
+          <div class="s1-pool-label">Kéo mảnh mật thư vào ô trống phía trên (hoặc nhấn trực tiếp vào mảnh):</div>
+          <div class="s1-cipher-tokens-row">
+            ${availableTokens.length > 0 ? availableTokens.map(tok => `
+              <button type="button" class="s1-cipher-token-chip"
+                draggable="true"
+                ondragstart="window.s1DragStart(event, '${tok}', null)"
+                data-action="s1PlaceCipherToken"
+                data-token="${tok}"
+                title="Kéo thả hoặc nhấn để đặt mảnh này vào ô trống">
+                <span class="s1-chip-grip">⋮⋮</span>
+                <span class="s1-chip-math">${renderS1TokenLabel(tok)}</span>
+              </button>
+            `).join('') : `<span class="s1-all-placed-note">✓ Đã đặt đủ 3 mảnh vào bảng giải mã. Nhấn "Giải mã mật thư" để kiểm tra!</span>`}
+          </div>
+        </div>
+
+        ${vaState.s1Feedback ? `<div class="s1-inline-feedback ${vaState.s1Feedback.good ? 'good' : 'warn'}">${esc(vaState.s1Feedback.text)}</div>` : ''}
+
+        <div class="s1-cipher-actions">
+          <button type="button" class="mv-chip-btn" data-action="s1ResetCipher">↺ Xếp lại các mảnh</button>
+          <button type="button" class="hs-confirm-btn" data-action="s1SubmitCipher" ${!isFull ? 'disabled' : ''}>
+            🔓 GIẢI MÃ MẬT THƯ
+          </button>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  // ─── BƯỚC 3: TÌM HƯỚNG VECTƠ BÍ MẬT (NHẤN ĐIỂM ĐẦU & KÉO MŨI TÊN ĐẾN ĐIỂM CUỐI TRÊN TAM GIÁC ABC) ───
+  const fromPt = vaState.s1ArrowFrom;
+  const toPt = vaState.s1ArrowTo;
+  const hasFullArrow = Boolean(fromPt && toPt && fromPt !== toPt);
+  const fCoord = fromPt ? S1_VERTEX_COORDS[fromPt] : null;
+  const tCoord = toPt ? S1_VERTEX_COORDS[toPt] : null;
+
+  // Rút ngắn nhẹ đầu mũi tên để không đè lên tâm đỉnh
+  let arrowLineHtml = '';
+  if (hasFullArrow && fCoord && tCoord) {
+    const dx = tCoord.x - fCoord.x;
+    const dy = tCoord.y - fCoord.y;
+    const len = Math.hypot(dx, dy) || 1;
+    const x1 = Math.round(fCoord.x + (dx / len) * 18);
+    const y1 = Math.round(fCoord.y + (dy / len) * 18);
+    const x2 = Math.round(tCoord.x - (dx / len) * 22);
+    const y2 = Math.round(tCoord.y - (dy / len) * 22);
+    const midX = Math.round((fCoord.x + tCoord.x) / 2);
+    const midY = Math.round((fCoord.y + tCoord.y) / 2 - 14);
+    arrowLineHtml = `
+      <line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#10B981" stroke-width="6" marker-end="url(#s1ArrPlayer)" class="s1-player-drawn-arrow"/>
+      ${svgVecLabel(midX, midY, fromPt + toPt, '#10B981', 20)}
+    `;
+  }
+
+  return `<div class="s1-quest-wrap">
+    ${stepRibbonHtml}
+    <div class="s1-vector-arena" style="background-image: linear-gradient(180deg, rgba(6,18,34,0.68), rgba(6,18,34,0.86)), url('/assets/Stage1_Vector_Triangle_Beams.jpg')">
+      <div class="s1-scene-top-hud">
+        <div class="s1-objective-badge">
+          🏹 <b>BƯỚC 3 – TÌM HƯỚNG VECTƠ BÍ MẬT:</b> Nhấn vào <b>điểm bắt đầu</b> và kéo mũi tên đến <b>điểm kết thúc</b> trên sơ đồ tam giác ABC để giải mã:
+        </div>
+        <div class="s1-decoded-expr-pill">
+          ${formatMath('\\vec{AB} − \\vec{AC} =')} <b style="color:#FFC953">${hasFullArrow ? formatMath('\\vec{' + fromPt + toPt + '}') : '?'}</b>
+        </div>
+      </div>
+
+      <div class="s1-svg-canvas-box">
+        <svg id="s1VectorSvg" class="va-svg-stage s1-interactive-svg" viewBox="0 0 560 280" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <marker id="s1ArrCyan" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto">
+              <path d="M 0 1 L 10 5 L 0 9 z" fill="#36DEF4"/>
+            </marker>
+            <marker id="s1ArrGold" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto">
+              <path d="M 0 1 L 10 5 L 0 9 z" fill="#FFC953"/>
+            </marker>
+            <marker id="s1ArrPlayer" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+              <path d="M 0 1 L 10 5 L 0 9 z" fill="#10B981"/>
+            </marker>
+          </defs>
+
+          <!-- Hai vectơ đã biết: AB (từ A xuống B) và AC (từ A xuống C) -->
+          <line x1="280" y1="56" x2="132" y2="210" stroke="#36DEF4" stroke-width="4.5" marker-end="url(#s1ArrCyan)"/>
+          ${svgVecLabel(172, 134, 'AB', '#36DEF4', 18)}
+
+          <line x1="280" y1="56" x2="428" y2="210" stroke="#FFC953" stroke-width="4.5" marker-end="url(#s1ArrGold)"/>
+          ${svgVecLabel(388, 134, 'AC', '#FFC953', 18)}
+
+          <!-- Khe vực cây cầu bị đứt giữa B và C (nét đứt, không lộ hướng) -->
+          <line x1="142" y1="224" x2="418" y2="224" stroke="rgba(244,114,182,0.55)" stroke-width="4" stroke-dasharray="10 8"/>
+          ${!hasFullArrow ? `<text x="280" y="214" text-anchor="middle" fill="#F472B6" font-size="22" font-weight="900">?</text>` : ''}
+
+          <!-- Mũi tên đang kéo trực tiếp bằng chuột/cảm ứng -->
+          <line id="s1LiveDragLine" x1="0" y1="0" x2="0" y2="0" stroke="#10B981" stroke-width="5" stroke-dasharray="6 4" marker-end="url(#s1ArrPlayer)" style="display:none;pointer-events:none"/>
+
+          <!-- Mũi tên do học sinh đã tạo -->
+          ${arrowLineHtml}
+
+          <!-- Ba đỉnh tương tác A, B, C (Hỗ trợ cả Kéo-Thả và Nhấn Điểm Đầu -> Nhấn Điểm Cuối) -->
+          ${['A', 'B', 'C'].map(pt => {
+            const c = S1_VERTEX_COORDS[pt];
+            const isStart = (fromPt === pt);
+            const isEnd = (toPt === pt);
+            const ringColor = isStart ? '#FFC953' : isEnd ? '#10B981' : '#36DEF4';
+            const fillBg = isStart ? '#F59E0B' : isEnd ? '#10B981' : '#0F172A';
+            return `<g class="s1-vertex-node ${isStart ? 'is-start' : ''} ${isEnd ? 'is-end' : ''}"
+              onpointerdown="window.s1StartVertexDrag(event, '${pt}')"
+              data-action="s1ClickVertex"
+              data-pt="${pt}">
+              <circle cx="${c.x}" cy="${c.y}" r="24" fill="rgba(54,222,244,0.12)" stroke="${ringColor}" stroke-width="2" stroke-dasharray="4 3"/>
+              <circle cx="${c.x}" cy="${c.y}" r="16" fill="${fillBg}" stroke="#FFFFFF" stroke-width="3.5"/>
+              <text x="${c.x}" y="${c.y + 6}" text-anchor="middle" fill="#FFFFFF" font-size="16" font-weight="900" style="pointer-events:none">${pt}</text>
+              <text x="${c.labelX}" y="${c.labelY}" text-anchor="middle" fill="${ringColor}" font-size="13" font-weight="900" style="pointer-events:none">
+                ${isStart ? 'Điểm đầu' : isEnd ? 'Điểm cuối' : ('Điểm ' + pt)}
+              </text>
+            </g>`;
+          }).join('')}
+        </svg>
+      </div>
+
+      ${vaState.s1Feedback ? `<div class="s1-inline-feedback ${vaState.s1Feedback.good ? 'good' : 'warn'}">${esc(vaState.s1Feedback.text)}</div>` : ''}
+
+      <div class="s1-vector-controls-bar">
+        <div class="s1-arrow-status-text">
+          ${!fromPt
+            ? '👆 Hãy <b>nhấn giữ Điểm bắt đầu rồi kéo tới Điểm kết thúc</b> (hoặc chạm lần lượt Điểm đầu → Điểm cuối)!'
+            : !toPt
+              ? `📍 Đã chọn điểm bắt đầu <b>${fromPt}</b>. Hãy kéo hoặc nhấn vào <b>Điểm kết thúc</b>!`
+              : `🏹 Đã tạo mũi tên từ <b>${fromPt} → ${toPt}</b> (${formatMath('\\vec{' + fromPt + toPt + '}')}). Nhấn xác nhận để khôi phục cầu!`}
+        </div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <button type="button" class="mv-chip-btn" data-action="s1ResetArrow">↺ Kéo lại mũi tên</button>
+          <button type="button" class="hs-confirm-btn" data-action="s1SubmitVectorArrow" ${!hasFullArrow ? 'disabled' : ''}>
+            ⚡ KÍCH HOẠT VECTƠ & MỞ CẦU
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
 function renderVectorAdventureStage(m) {
   ensureVaStateForStage(m);
+  if (m.id === 1 || vaState.s1BridgeRestoredOverlay) {
+    return renderStage1CipherBridgeGame(m);
+  }
   const r = m.round || 0;
   const q = m.challenge || {};
   const isPart1 = (r === 0);
@@ -3792,22 +4280,23 @@ function stageContent(m){
  const shortTitle = m.shortName || SHORT_STAGE_NAMES[(m.id || 1) - 1] || m.place;
 
  const stageFullTitles = [
-  'CHẶNG 1 · HIỆU HAI VECTƠ',
+  'CHẶNG 1 · BÍ MẬT CÂY CẦU ĐẢO CHIỀU',
   'CHẶNG 2 · TỔNG HAI VECTƠ',
   'CHẶNG 3 · QUY TẮC HÌNH BÌNH HÀNH',
   'CHẶNG 4 · TÍNH CHẤT TRUNG ĐIỂM',
   'CHẶNG 5 · TÍNH CHẤT TRỌNG TÂM'
  ];
  const stageSubtitles = [
-  'Rừng Vectơ Khởi Nguyên • Giải mã cây cầu bị đảo chiều',
+  'Rừng Vectơ Khởi Nguyên • Truy tìm 3 mảnh mật thư & giải mã hướng vectơ khôi phục cầu',
   'Pháo Đài Góc • Nối thông hai luồng năng lượng liên tiếp',
   'Tháp Pha Lê • Khôi phục đường chéo hình bình hành ABCD',
   'Mê Cung Trung Điểm • Cân bằng hai vectơ đối nhau tại điểm I',
   'Thành Trì Trí Tuệ • Hợp nhất 3 luồng năng lượng tại trọng tâm G'
  ];
 
- const headerTitle = stageFullTitles[(m.id || 1) - 1] || ('CHẶNG ' + m.id + ' · ' + m.title);
- const headerSub = stageSubtitles[(m.id || 1) - 1] || (m.place + ' • ' + m.story);
+ const isS1 = (m.id === 1 || vaState.s1BridgeRestoredOverlay);
+ const headerTitle = isS1 ? stageFullTitles[0] : (stageFullTitles[(m.id || 1) - 1] || ('CHẶNG ' + m.id + ' · ' + m.title));
+ const headerSub = isS1 ? stageSubtitles[0] : (stageSubtitles[(m.id || 1) - 1] || (m.place + ' • ' + m.story));
 
  const elapsedSec = Math.floor((Date.now() - vaState.stageStartedAt) / 1000);
  const remSec = Math.max(0, vaState.stageDurationSec - elapsedSec);
@@ -3815,6 +4304,7 @@ function stageContent(m){
 
  const meDigits = world.me?.digits || [];
  const ownedSet = new Set(meDigits.map(d => d.stage));
+ const s1ClueCount = isS1 ? (vaState.s1BridgeRestoredOverlay || curR >= 1 ? 3 : vaState.pillars.size) : 0;
 
  const drawerQuestHtml = !mvBriefingCollapsed ? `<div class="mv-drawer-panel" style="margin-bottom:10px">
   <div class="flex-between">
@@ -3825,28 +4315,38 @@ function stageContent(m){
   <div class="mv-drawer-grid">
    <div class="mv-drawer-box">
     <h4>🎯 Tiến độ trong chặng (${curR}/${totalR})</h4>
-    <div style="color:${curR >= 1 ? '#35C992' : '#E2E8F0'}">${curR >= 1 ? '✓' : '•'} Phần 1: Nhiệm vụ tương tác sơ đồ (Khóa 1/3)</div>
-    <div style="color:${curR >= 2 ? '#35C992' : '#E2E8F0'}">${curR >= 2 ? '✓' : '•'} Phần 2: Câu hỏi giải mã 1/2 (Khóa 2/3)</div>
-    <div style="color:${curR >= 3 ? '#35C992' : '#E2E8F0'}">${curR >= 3 ? '✓' : '•'} Phần 3: Câu hỏi giải mã 2/2 (Nhận ${esc(m.item)})</div>
+    ${isS1 ? `
+     <div style="color:${curR >= 1 ? '#35C992' : '#E2E8F0'}">${curR >= 1 ? '✓' : '•'} Bước 1: Tìm 3 mảnh mật thư tại cột đá A, B, C (${s1ClueCount}/3)</div>
+     <div style="color:${curR >= 2 ? '#35C992' : '#E2E8F0'}">${curR >= 2 ? '✓' : '•'} Bước 2: Ghép mật thư hiệu hai vectơ</div>
+     <div style="color:${vaState.s1BridgeRestoredOverlay ? '#35C992' : '#E2E8F0'}">${vaState.s1BridgeRestoredOverlay ? '✓' : '•'} Bước 3 & 4: Kéo mũi tên hướng vectơ & Mở cầu ánh sáng</div>
+    ` : `
+     <div style="color:${curR >= 1 ? '#35C992' : '#E2E8F0'}">${curR >= 1 ? '✓' : '•'} Phần 1: Nhiệm vụ tương tác sơ đồ (Khóa 1/3)</div>
+     <div style="color:${curR >= 2 ? '#35C992' : '#E2E8F0'}">${curR >= 2 ? '✓' : '•'} Phần 2: Câu hỏi giải mã 1/2 (Khóa 2/3)</div>
+     <div style="color:${curR >= 3 ? '#35C992' : '#E2E8F0'}">${curR >= 3 ? '✓' : '•'} Phần 3: Câu hỏi giải mã 2/2 (Nhận ${esc(m.item)})</div>
+    `}
    </div>
    <div class="mv-drawer-box">
     <h4>👥 Phân vai đội (3–5 học sinh)</h4>
     ${roles.map((r, idx) => `<div style="padding:2px 0;color:${idx === curR ? '#FFC953' : '#CBD5E1'}">• ${esc(r)}</div>`).join('')}
    </div>
    <div class="mv-drawer-box">
-    <h4>📐 Công thức trọng tâm</h4>
-    <div style="color:#A5F3FC;font-weight:800">${formatMath(STAGE_FORMULAS_SHORT[(m.id||1)-1] || '')}</div>
+    <h4>📐 Gợi ý quy tắc</h4>
+    <div style="color:#A5F3FC;font-weight:800">${formatMath(getStageFormulaSafe((m.id||1)-1, world.me?.stage ?? 0))}</div>
    </div>
   </div>
  </div>` : '';
 
+ const s1CardImg = ((m.id === 1) && ((world.me?.stage ?? 0) < 1) && !vaState.s1BridgeRestoredOverlay)
+  ? '/assets/Stage1_Cipher_Scroll.jpg'
+  : (['/images/scenario/card-1.jpg','/images/scenario/card-2.jpg','/images/scenario/card-3.jpg','/images/scenario/card-4.jpg','/images/scenario/card-5.jpg'][(m.id||1)-1]||'/images/scenario/card-1.jpg');
+
  const drawerKnowledgeHtml = oxyz3D.open ? `<div class="mv-knowledge-split" style="margin-bottom:10px">
   <div class="mv-knowledge-card-box">
    <div class="flex-between">
-    <strong style="color:#FFC953;font-size:12.5px">📘 Thẻ Kiến Thức Chặng ${m.id}: ${esc(shortTitle)}</strong>
+    <strong style="color:#FFC953;font-size:12.5px">📘 Thẻ Gợi Ý Chặng ${m.id}: ${esc(shortTitle)}</strong>
     <button type="button" class="mv-chip-btn" data-action="toggle3DPanel">✕ Đóng</button>
    </div>
-   <img src="${['/images/scenario/card-1.jpg','/images/scenario/card-2.jpg','/images/scenario/card-3.jpg','/images/scenario/card-4.jpg','/images/scenario/card-5.jpg'][(m.id||1)-1]||'/images/scenario/card-1.jpg'}" alt="Thẻ kiến thức Chặng ${m.id}" class="mv-knowledge-card-img" draggable="false"/>
+   <img src="${s1CardImg}" alt="Thẻ kiến thức Chặng ${m.id}" class="mv-knowledge-card-img" draggable="false"/>
   </div>
   <div>${renderOxyz3D(m, true)}</div>
  </div>` : '';
@@ -3869,7 +4369,7 @@ function stageContent(m){
   ${drawerQuestHtml}
   ${drawerKnowledgeHtml}
 
-  <!-- KHU VỰC TƯƠNG TÁC CHÍNH 2 CỘT -->
+  <!-- KHU VỰC TƯƠNG TÁC CHÍNH -->
   <div id="mvActiveGameCanvas">
    ${mvShowIntroHub ? renderIntroHubBanner(true) : renderVectorAdventureStage(m)}
   </div>
@@ -3880,7 +4380,6 @@ function stageContent(m){
     <span class="hs-bottom-label">ẤN VECTƠ</span>
     <div class="hs-mini-seals-list">
      ${[1,2,3,4,5].map(idx => {
-      const has = ownedSet.has(idx) || (idx === 1 && curR > 0 && ownedSet.size === 0 && idx === m.id);
       return ownedSet.has(idx)
        ? `<span class="hs-mini-seal earned" title="Đã thu hồi Ấn Chặng ${idx}">${SMALL_DIAMOND_SVG}</span>`
        : `<span class="hs-mini-seal empty" title="Ấn Chặng ${idx}"></span>`;
@@ -3889,7 +4388,8 @@ function stageContent(m){
    </div>
 
    <div class="hs-bottom-keys">
-    Chìa khóa: <b>${curR}/${totalR}</b>
+    ${isS1 ? `Mật thư: <b>${s1ClueCount}/3</b> · Bước: <b>${vaState.s1BridgeRestoredOverlay ? '4/4' : ((curR + 1) + '/4')}</b>` : `Chìa khóa: <b>${curR}/${totalR}</b>`}
+   </div>
    </div>
 
    <div class="hs-bottom-team-status">
@@ -4452,16 +4952,24 @@ function updateClock(){
   const pillNode = $('#vaStageTimerPill');
   if(stNode) stNode.textContent = formatMMSS(remSec);
   if(pillNode) pillNode.classList.toggle('urgent', remSec <= 15);
-  // Khi còn <= 15 giây: Rồng Xanh tự động đưa gợi ý
-  if(remSec === 15 && vaState.dragonMood !== 'hint'){
+  // Khi còn <= 15 giây: Rồng Xanh tự động đưa gợi ý (không lộ đáp án CB ở Chặng 1)
+  if(remSec === 15 && vaState.dragonMood !== 'hint' && !vaState.s1BridgeRestoredOverlay){
    vaState.dragonMood = 'hint';
    const m = world.current;
-   vaState.dragonMsg = '💡 Gợi ý nhanh: ' + (m.visual3D?.formula || m.dragonIntro);
+   if (m.id === 1) {
+    vaState.dragonMsg = m.round === 0
+     ? '💡 Gợi ý nhanh: Hãy nhấn vào đủ 3 cột đá cổ A, B, C đang phát sáng trong Rừng Vectơ!'
+     : m.round === 1
+       ? '💡 Gợi ý nhanh: Hãy ghép biểu thức hiệu hai vectơ chung gốc A: vectơ AB trừ vectơ AC!'
+       : '💡 Gợi ý nhanh: Quy tắc hiệu hai vectơ chung gốc A: Mũi tên bắt đầu từ điểm cuối của vectơ AC và kết thúc tại điểm cuối của vectơ AB!';
+   } else {
+    vaState.dragonMsg = '💡 Gợi ý nhanh: ' + (m.visual3D?.formula || m.dragonIntro);
+   }
    const sp = $('#vaDragonSpeech');
    if(sp) sp.innerHTML = formatMath(vaState.dragonMsg);
   }
   // Khi hết thời gian chặng (0s): tự động ghi nhận và chuyển sang chặng tiếp theo
-  if(remSec <= 0 && !vaState.stageTimeoutTriggered && !busy){
+  if(remSec <= 0 && !vaState.stageTimeoutTriggered && !vaState.s1BridgeRestoredOverlay && !busy){
    vaState.stageTimeoutTriggered = true;
    submit('/api/stageTimeout', {}).then(() => updateAfterAction()).catch(() => {});
   }
@@ -4469,7 +4977,7 @@ function updateClock(){
 }
 
 async function refresh(force=false){
- if(!session||busy)return;
+ if(!session||busy||vaState.s1BridgeRestoredOverlay)return;
  try{
   const d=await api('/api/state',{room:session.room,token:session.token});
   world=d;setClock();
@@ -4617,6 +5125,174 @@ async function handle(action,el){
   }
   if(action==='toggle3DProj'){oxyz3D.showProj=!oxyz3D.showProj;render();return;}
   if(action==='toggle3DPanel'){oxyz3D.open=!oxyz3D.open;render();return;}
+  /* ─── ACTIONS CHO CHẶNG 1: BÍ MẬT CÂY CẦU ĐẢO CHIỀU ─── */
+  if(action==='s1ClickPillar'){
+   const pid=el.dataset.pillar;
+   if(pid && ['A','B','C'].includes(pid)){
+    const wasNew=!vaState.pillars.has(pid);
+    vaState.pillars.add(pid);
+    sound('crystal');
+    if(wasNew && window.spawnJuiceFloater){
+     window.spawnJuiceFloater(`📜 Mảnh mật thư ${vaState.pillars.size}/3`, 'gold');
+    }
+    if(session?.room && session?.token){
+     api('/api/stage1Progress',{room:session.room,token:session.token,pillar:pid}).catch(()=>{});
+    }
+    if(vaState.pillars.size>=3){
+     vaState.dragonMsg='Tuyệt vời! Đội đã thu thập đủ 3/3 mảnh mật thư từ cột đá A, B, C! Hãy nhấn "Mở bảng giải mã mật thư"!';
+     vaState.dragonMood='win';
+    }else{
+     vaState.dragonMsg=`Đã mở phong ấn Cột đá ${pid} (${vaState.pillars.size}/3 mảnh mật thư). Hãy tìm tiếp cột đá còn lại!`;
+    }
+    render();
+   }
+   return;
+  }
+  if(action==='s1FinishStep1'){
+   if(vaState.pillars.size<3){
+    vaState.dragonMsg='Hãy nhấn mở đủ 3 cột đá A, B, C để thu thập đủ 3/3 mảnh mật thư trước nhé!';
+    render();
+    return;
+   }
+   sound('powerup');
+   const res=await submit('/api/answer',{stage:0,round:0,choice:0,interactiveDone:true});
+   if(res && res.correct){
+    if(window.spawnJuiceFloater) window.spawnJuiceFloater('+' + (res.points || 10) + ' XP ⭐', 'xp');
+    vaState.dragonMsg='Đã mở Bảng giải mã mật thư! Hãy kéo hoặc nhấn các mảnh để ghép biểu thức hiệu hai vectơ!';
+    vaState.dragonMood='win';
+    updateAfterAction();
+   }
+   return;
+  }
+  if(action==='s1PlaceCipherToken'){
+   const tok=el.dataset.token;
+   const emptyIdx=vaState.s1CipherSlots.indexOf(null);
+   if(tok && emptyIdx!==-1 && !vaState.s1CipherSlots.includes(tok)){
+    vaState.s1CipherSlots[emptyIdx]=tok;
+    vaState.s1Feedback=null;
+    sound('step');
+    render();
+   }
+   return;
+  }
+  if(action==='s1RemoveCipherSlot'){
+   const idx=Number(el.dataset.slot);
+   if(!isNaN(idx) && idx>=0 && idx<3){
+    vaState.s1CipherSlots[idx]=null;
+    vaState.s1Feedback=null;
+    sound('step');
+    render();
+   }
+   return;
+  }
+  if(action==='s1ResetCipher'){
+   vaState.s1CipherSlots=[null,null,null];
+   vaState.s1Feedback=null;
+   sound('step');
+   render();
+   return;
+  }
+  if(action==='s1SubmitCipher'){
+   const filled=vaState.s1CipherSlots.filter(Boolean);
+   if(filled.length<3){
+    vaState.s1Feedback={text:'Hãy đặt đủ 3 mảnh mật thư vào 3 ô trống trước khi giải mã!',good:false};
+    render();
+    return;
+   }
+   const expr=filled.join('');
+   const res=await submit('/api/answer',{stage:0,round:1,cipherOrder:expr,choice:expr==='AB-AC'?0:1});
+   if(res && res.correct){
+    sound('assemble');
+    if(window.spawnJuiceFloater){
+     window.spawnJuiceFloater('+' + (res.points || 10) + ' XP ⭐', 'xp');
+     window.spawnJuiceFloater('📜 Đã ghép mật thư!', 'gold');
+    }
+    vaState.s1Feedback=null;
+    vaState.dragonMsg='Chính xác! Biểu thức bí mật là vectơ AB − vectơ AC = ? Bây giờ hãy kéo mũi tên trên tam giác ABC để xác định hướng vectơ!';
+    vaState.dragonMood='win';
+    updateAfterAction();
+   }else{
+    sound('wrong');
+    const hintMsg=res?.hint||'Thứ tự chưa đúng! Hãy ghép thành biểu thức hiệu hai vectơ xuất phát từ điểm A: vectơ AB trừ vectơ AC.';
+    vaState.s1Feedback={text:hintMsg,good:false};
+    vaState.dragonMsg='Chưa khớp mật thư! ' + hintMsg;
+    vaState.dragonMood='hint';
+    render();
+   }
+   return;
+  }
+  if(action==='s1ClickVertex'){
+   const pt=el.dataset.pt;
+   if(!pt || !['A','B','C'].includes(pt))return;
+   if(!vaState.s1ArrowFrom || (vaState.s1ArrowFrom && vaState.s1ArrowTo)){
+    vaState.s1ArrowFrom=pt;
+    vaState.s1ArrowTo=null;
+    vaState.s1Feedback=null;
+    sound('step');
+    vaState.dragonMsg=`Đã chọn điểm bắt đầu ${pt}. Hãy nhấn hoặc kéo tới điểm kết thúc của vectơ!`;
+    render();
+   }else if(vaState.s1ArrowFrom !== pt){
+    vaState.s1ArrowTo=pt;
+    vaState.s1Feedback=null;
+    sound('target');
+    vaState.dragonMsg=`Đã tạo mũi tên từ ${vaState.s1ArrowFrom} đến ${pt}. Nhấn "Kích hoạt vectơ & Mở cầu" để giải mã!`;
+    render();
+   }
+   return;
+  }
+  if(action==='s1ResetArrow'){
+   vaState.s1ArrowFrom=null;
+   vaState.s1ArrowTo=null;
+   vaState.s1Feedback=null;
+   sound('step');
+   render();
+   return;
+  }
+  if(action==='s1SubmitVectorArrow'){
+   const from=vaState.s1ArrowFrom;
+   const to=vaState.s1ArrowTo;
+   if(!from || !to || from===to)return;
+   const res=await submit('/api/answer',{stage:0,round:2,vectorFrom:from,vectorTo:to});
+   if(res && res.correct){
+    sound('win');
+    triggerConfetti(2800);
+    if(window.spawnConfettiParticles){
+     window.spawnConfettiParticles(window.innerWidth / 2, window.innerHeight * 0.35, 65);
+    }
+    if(window.spawnJuiceFloater){
+     window.spawnJuiceFloater('+' + (res.points || 10) + ' XP ⭐', 'xp');
+     window.spawnJuiceFloater('🧭 Nhận Ấn Hướng Đi!', 'gold');
+    }
+    vaState.s1Feedback=null;
+    vaState.s1BridgeRestoredOverlay=true;
+    vaState.dragonMsg='Tuyệt vời! Ba cột đá A, B, C và mũi tên CB đã phát sáng! Cây cầu năng lượng qua Rừng Vectơ đã khôi phục, đội nhận Ấn Hướng Đi!';
+    vaState.dragonMood='win';
+    render();
+    if(vaState.s1BridgeTimer) clearTimeout(vaState.s1BridgeTimer);
+    vaState.s1BridgeTimer=setTimeout(()=>{
+     if(vaState.s1BridgeRestoredOverlay){
+      vaState.s1BridgeRestoredOverlay=false;
+      updateAfterAction();
+     }
+    }, 4200);
+   }else{
+    sound('wrong');
+    const errText=res?.hint||'Hướng vectơ chưa đúng! Quy tắc hiệu hai vectơ chung gốc A: mũi tên phải đi từ điểm cuối của vectơ thứ hai đến điểm cuối của vectơ thứ nhất. Hãy thử lại!';
+    vaState.s1Feedback={text:errText,good:false};
+    vaState.dragonMsg=errText;
+    vaState.dragonMood='hint';
+    vaState.s1ArrowFrom=null;
+    vaState.s1ArrowTo=null;
+    render();
+   }
+   return;
+  }
+  if(action==='s1ProceedToStage2'){
+   if(vaState.s1BridgeTimer) clearTimeout(vaState.s1BridgeTimer);
+   vaState.s1BridgeRestoredOverlay=false;
+   updateAfterAction();
+   return;
+  }
   if(action==='vaClickPillar'){
    const node=el.dataset.node;
    if(node)vaState.pillars.add(node);
@@ -4715,6 +5391,9 @@ async function handle(action,el){
   if(action==='hubEnterStage'){
    const stg=Number(el.dataset.stage||0);
    mvShowIntroHub=false;
+   if(vaState.s1BridgeTimer) clearTimeout(vaState.s1BridgeTimer);
+   vaState.s1BridgeRestoredOverlay=false;
+   vaState.stageId=-1;
    await submit('/api/demoJump',{stage:stg});
    await refresh(true);
    return;
@@ -4792,6 +5471,9 @@ async function handle(action,el){
   if(action==='demoTeacher'){saveSession({role:'teacher',room:'123456',token:'DEMO_GV'});await refresh(true);return;}
   if(action==='demoJumpStage'){
    mvShowIntroHub=false;
+   if(vaState.s1BridgeTimer) clearTimeout(vaState.s1BridgeTimer);
+   vaState.s1BridgeRestoredOverlay=false;
+   vaState.stageId=-1;
    const stg=Number(el.dataset.stage);
    await submit('/api/demoJump',{stage:stg});
    activePlayMode=null;
