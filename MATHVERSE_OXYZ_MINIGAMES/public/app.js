@@ -4204,6 +4204,7 @@ function ensureVaStateForStage(m) {
     vaState.s1ArrowFrom = null;
     vaState.s1ArrowTo = null;
     vaState.s1Feedback = null;
+    if (m.id === 1) resetS1ExplorerPosition();
     vaState.paths = new Set();
     vaState.paraEdges = new Set();
     vaState.midpointPct = 25;
@@ -4527,20 +4528,62 @@ function formatMMSS(totalSeconds) {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   CHẶNG 1 NÂNG CẤP: GAME TRUY TÌM MẬT THƯ – "BÍ MẬT CÂY CẦU ĐẢO CHIỀU"
-   4 Bước tương tác: Tìm 3 cột đá A,B,C -> Ghép mật thư -> Kéo mũi tên CB -> Khôi phục cầu
+   CHẶNG 1 MINI-GAME KHÁM PHÁ 2D: "MẬT THƯ CÂY CẦU ĐẢO CHIỀU" (60 GIÂY · NHẬN BIẾT)
+   4 Giai đoạn tương tác thực sự (Không dùng trắc nghiệm A/B/C):
+   - Giai đoạn 1: Điều khiển Rồng Xanh (WASD / Phím mũi tên / Chạm đường rừng) chạy tới 3 cột đá A, B, C thu thập mật thư.
+   - Giai đoạn 2: Kéo thả 3 mảnh mật thư tạo biểu thức vectơ AB − vectơ AC = ?
+   - Giai đoạn 3: Sơ đồ SVG 3 điểm A, B, C; vẽ/kéo mũi tên vectơ hiệu từ điểm đầu C đến điểm cuối B (vectơ CB).
+   - Giai đoạn 4: Khôi phục Cây Cầu Ánh Sáng, nhận Ấn Hướng Đi, Rồng Xanh chạy qua cầu và bay sang Chặng 2.
    ═══════════════════════════════════════════════════════════════════════════ */
 const S1_PILLAR_META = {
-  A: { id: 'A', label: 'Cột đá A', token: 'AB', tokenDisplay: '\\vec{AB}', left: 20, top: 52, rune: 'ᚠ' },
-  B: { id: 'B', label: 'Cột đá B', token: '-',  tokenDisplay: '−',         left: 52, top: 44, rune: 'ᛟ' },
-  C: { id: 'C', label: 'Cột đá C', token: 'AC', tokenDisplay: '\\vec{AC}', left: 81, top: 50, rune: 'ᛞ' }
+  A: { id: 'A', label: 'Cột đá A', token: 'AB', tokenDisplay: '\\vec{AB}', left: 17, top: 55, footX: 20, footY: 66, rune: 'ᚠ' },
+  B: { id: 'B', label: 'Cột đá B', token: '-',  tokenDisplay: '−',         left: 33, top: 42, footX: 35, footY: 56, rune: 'ᛟ' },
+  C: { id: 'C', label: 'Cột đá C', token: 'AC', tokenDisplay: '\\vec{AC}', left: 59, top: 47, footX: 59, footY: 60, rune: 'ᛞ' }
 };
 
 const S1_VERTEX_COORDS = {
-  A: { x: 280, y: 56,  labelX: 280, labelY: 26 },
-  B: { x: 120, y: 224, labelX: 88,  labelY: 230 },
-  C: { x: 440, y: 224, labelX: 472, labelY: 230 }
+  A: { x: 280, y: 54,  labelX: 280, labelY: 22 },
+  B: { x: 118, y: 228, labelX: 82,  labelY: 234 },
+  C: { x: 442, y: 228, labelX: 478, labelY: 234 }
 };
+
+// Trạng thái điều khiển Rồng Xanh 2D trong Rừng Vectơ (Chặng 1)
+const s1Explorer = {
+  x: 46,
+  y: 78,
+  targetX: null,
+  targetY: null,
+  targetPillar: null,
+  facing: 'left',
+  moving: false,
+  keys: new Set(),
+  nearPillar: null,
+  autoAdvancing: false,
+  bridgeCrossProgress: 0,
+  bridgeCrossing: false,
+  showHintBanner: false,
+  lastDustAt: 0,
+  lastStepSfxAt: 0,
+  items: [
+    { id: 's1-relic', x: 56, y: 74, icon: '🏵️', label: 'Cổ vật Ánh sáng', collected: false },
+    { id: 's1-gem1',  x: 26, y: 70, icon: '💎', label: 'Tinh thể Rừng',   collected: false },
+    { id: 's1-gem2',  x: 46, y: 60, icon: '💎', label: 'Tinh thể Rừng',   collected: false }
+  ]
+};
+
+function resetS1ExplorerPosition() {
+  s1Explorer.x = 46;
+  s1Explorer.y = 78;
+  s1Explorer.targetX = null;
+  s1Explorer.targetY = null;
+  s1Explorer.targetPillar = null;
+  s1Explorer.moving = false;
+  s1Explorer.keys.clear();
+  s1Explorer.nearPillar = null;
+  s1Explorer.autoAdvancing = false;
+  s1Explorer.bridgeCrossProgress = 0;
+  s1Explorer.bridgeCrossing = false;
+}
 
 function renderS1TokenLabel(token) {
   if (token === 'AB') return formatMath('\\vec{AB}');
@@ -4548,6 +4591,218 @@ function renderS1TokenLabel(token) {
   if (token === '-')  return '<span style="font-size:24px;font-weight:900;color:#FFC953">−</span>';
   return esc(token || '');
 }
+
+async function s1UnlockPillar(pid) {
+  if (!pid || !['A', 'B', 'C'].includes(pid)) return;
+  const wasNew = !vaState.pillars.has(pid);
+  vaState.pillars.add(pid);
+  if (wasNew) {
+    sound('crystal');
+    if (window.spawnJuiceFloater) {
+      window.spawnJuiceFloater(`📜 Mảnh mật thư ${vaState.pillars.size}/3 (${S1_PILLAR_META[pid].label})`, 'gold');
+    }
+    if (session?.room && session?.token) {
+      api('/api/stage1Progress', { room: session.room, token: session.token, pillar: pid }).catch(() => {});
+    }
+  }
+  if (vaState.pillars.size >= 3) {
+    vaState.dragonMsg = 'Tuyệt vời! Rồng Xanh đã thu thập đủ 3/3 mảnh mật thư tại cột đá A, B, C! Hãy ghép mật thư ở Giai đoạn 2!';
+    vaState.dragonMood = 'win';
+    render();
+    if (!s1Explorer.autoAdvancing && (world?.current?.round ?? 0) === 0) {
+      s1Explorer.autoAdvancing = true;
+      setTimeout(async () => {
+        try {
+          if ((world?.current?.round ?? 0) === 0 && vaState.pillars.size >= 3) {
+            sound('powerup');
+            const res = await submit('/api/answer', { stage: 0, round: 0, choice: 0, interactiveDone: true });
+            if (res && res.correct) {
+              if (window.spawnJuiceFloater) window.spawnJuiceFloater('+' + (res.points || 10) + ' XP ⭐', 'xp');
+              vaState.dragonMsg = 'Đã mở Bảng ghép mật thư! Hãy kéo thả 3 mảnh để tạo biểu thức vectơ AB − vectơ AC = ?';
+              vaState.dragonMood = 'win';
+              updateAfterAction();
+            }
+          }
+        } finally {
+          s1Explorer.autoAdvancing = false;
+        }
+      }, 650);
+    }
+  } else {
+    const remaining = ['A', 'B', 'C'].filter(k => !vaState.pillars.has(k));
+    vaState.dragonMsg = `Đã mở phong ấn Cột đá ${pid} (${vaState.pillars.size}/3 mảnh mật thư). Hãy điều khiển Rồng Xanh đến Cột đá ${remaining.join(', ')}!`;
+    render();
+  }
+}
+
+function s1SyncExplorerDOM(now = performance.now()) {
+  const actor = document.getElementById('s1DragonExplorer');
+  if (actor) {
+    actor.style.left = s1Explorer.x.toFixed(2) + '%';
+    actor.style.top = s1Explorer.y.toFixed(2) + '%';
+    actor.classList.toggle('is-running', s1Explorer.moving);
+    actor.classList.toggle('is-idle', !s1Explorer.moving);
+    actor.classList.toggle('facing-left', s1Explorer.facing === 'left');
+    actor.classList.toggle('facing-right', s1Explorer.facing !== 'left');
+  }
+  const promptEl = document.getElementById('s1DragonActionPrompt');
+  if (promptEl) {
+    if (s1Explorer.nearPillar && !vaState.pillars.has(s1Explorer.nearPillar)) {
+      promptEl.textContent = `[E / Space] Thu thập Cột ${s1Explorer.nearPillar}`;
+      promptEl.style.display = 'inline-flex';
+    } else if (s1Explorer.bridgeCrossing) {
+      promptEl.textContent = '🌉 Đang chạy qua Cầu Ánh Sáng!';
+      promptEl.style.display = 'inline-flex';
+    } else {
+      promptEl.style.display = 'none';
+    }
+  }
+  ['A', 'B', 'C'].forEach(pid => {
+    const pNode = document.getElementById('s1PillarNode-' + pid);
+    if (pNode) {
+      pNode.classList.toggle('in-range', s1Explorer.nearPillar === pid && !vaState.pillars.has(pid));
+    }
+  });
+  if (s1Explorer.moving && now - s1Explorer.lastDustAt > 110) {
+    s1Explorer.lastDustAt = now;
+    const trailLayer = document.getElementById('s1ForestTrailLayer');
+    if (trailLayer) {
+      const dot = document.createElement('span');
+      dot.className = s1Explorer.bridgeCrossing ? 's1-foot-particle star' : 's1-foot-particle dust';
+      dot.style.left = s1Explorer.x.toFixed(1) + '%';
+      dot.style.top = (s1Explorer.y + 3).toFixed(1) + '%';
+      dot.textContent = s1Explorer.bridgeCrossing ? '✦' : '•';
+      trailLayer.appendChild(dot);
+      setTimeout(() => dot.remove(), 750);
+    }
+  }
+}
+
+function s1Tick(now, dt) {
+  const viewport = document.getElementById('s1ForestViewport');
+  if (!viewport) return;
+
+  // Giai đoạn 4: Rồng Xanh chạy qua Cây Cầu Ánh Sáng vừa được khôi phục
+  if (vaState.s1BridgeRestoredOverlay) {
+    if (s1Explorer.bridgeCrossing) {
+      s1Explorer.bridgeCrossProgress = Math.min(1, s1Explorer.bridgeCrossProgress + dt * 0.58);
+      const t = s1Explorer.bridgeCrossProgress;
+      // Đường chạy từ đường rừng (50, 68) -> Đầu cầu C (66, 52) -> Cuối cầu B (88, 50)
+      if (t < 0.35) {
+        const u = t / 0.35;
+        s1Explorer.x = 50 + (66 - 50) * u;
+        s1Explorer.y = 68 + (52 - 68) * u;
+      } else {
+        const u = (t - 0.35) / 0.65;
+        s1Explorer.x = 66 + (88 - 66) * u;
+        s1Explorer.y = 52 + (50 - 52) * u;
+      }
+      s1Explorer.facing = 'right';
+      s1Explorer.moving = t < 1;
+      if (t >= 1) {
+        s1Explorer.bridgeCrossing = false;
+      }
+      s1SyncExplorerDOM(now);
+    }
+    return;
+  }
+
+  // Giai đoạn 1: Điều khiển Rồng Xanh bằng WASD / Phím mũi tên / Chạm đường rừng
+  if ((world?.current?.round ?? 0) !== 0) return;
+
+  let vx = 0, vy = 0;
+  if (s1Explorer.keys.has('left'))  vx -= 1;
+  if (s1Explorer.keys.has('right')) vx += 1;
+  if (s1Explorer.keys.has('up'))    vy -= 1;
+  if (s1Explorer.keys.has('down'))  vy += 1;
+
+  const speed = 34; // % khung cảnh mỗi giây
+  if (vx !== 0 || vy !== 0) {
+    const len = Math.hypot(vx, vy) || 1;
+    s1Explorer.x = Math.max(10, Math.min(90, s1Explorer.x + (vx / len) * speed * dt));
+    s1Explorer.y = Math.max(36, Math.min(86, s1Explorer.y + (vy / len) * speed * dt));
+    s1Explorer.moving = true;
+    s1Explorer.targetX = null;
+    s1Explorer.targetY = null;
+    if (vx < -0.05) s1Explorer.facing = 'left';
+    else if (vx > 0.05) s1Explorer.facing = 'right';
+  } else if (s1Explorer.targetX !== null && s1Explorer.targetY !== null) {
+    const dx = s1Explorer.targetX - s1Explorer.x;
+    const dy = s1Explorer.targetY - s1Explorer.y;
+    const dist = Math.hypot(dx, dy);
+    if (dist <= 1.2) {
+      s1Explorer.x = s1Explorer.targetX;
+      s1Explorer.y = s1Explorer.targetY;
+      s1Explorer.targetX = null;
+      s1Explorer.targetY = null;
+      s1Explorer.moving = false;
+      if (s1Explorer.targetPillar) {
+        const tp = s1Explorer.targetPillar;
+        s1Explorer.targetPillar = null;
+        s1UnlockPillar(tp);
+      }
+    } else {
+      const moveSpd = 40;
+      s1Explorer.x = Math.max(10, Math.min(90, s1Explorer.x + (dx / dist) * moveSpd * dt));
+      s1Explorer.y = Math.max(36, Math.min(86, s1Explorer.y + (dy / dist) * moveSpd * dt));
+      s1Explorer.moving = true;
+      if (dx < -0.1) s1Explorer.facing = 'left';
+      else if (dx > 0.1) s1Explorer.facing = 'right';
+    }
+  } else {
+    s1Explorer.moving = false;
+  }
+
+  if (s1Explorer.moving && now - s1Explorer.lastStepSfxAt > 290) {
+    s1Explorer.lastStepSfxAt = now;
+    sound('step');
+  }
+
+  // Kiểm tra nhặt vật phẩm cổ vật trên đường rừng
+  s1Explorer.items.forEach(it => {
+    if (!it.collected && Math.hypot(s1Explorer.x - it.x, s1Explorer.y - it.y) <= 6.2) {
+      it.collected = true;
+      sound('coin');
+      const el = document.getElementById('s1ForestItem-' + it.id);
+      if (el) el.style.display = 'none';
+      if (window.spawnJuiceFloater) window.spawnJuiceFloater(`✨ ${it.label}`, 'gold');
+    }
+  });
+
+  // Phát hiện tương tác với 3 cột đá A, B, C
+  let closestPid = null;
+  let closestDist = 999;
+  ['A', 'B', 'C'].forEach(pid => {
+    const m = S1_PILLAR_META[pid];
+    const d = Math.hypot(s1Explorer.x - m.footX, s1Explorer.y - m.footY);
+    if (d < closestDist) {
+      closestDist = d;
+      closestPid = pid;
+    }
+    // Tự động kích hoạt mở phong ấn khi Rồng Xanh chạy chạm tới chân cột đá (<= 8.2%)
+    if (d <= 8.2 && !vaState.pillars.has(pid)) {
+      s1UnlockPillar(pid);
+    }
+  });
+  s1Explorer.nearPillar = (closestDist <= 13.5) ? closestPid : null;
+
+  s1SyncExplorerDOM(now);
+}
+
+window.s1ClickForestCanvas = function(ev) {
+  if ((world?.current?.round ?? 0) !== 0 || vaState.s1BridgeRestoredOverlay) return;
+  if (ev.target.closest('button') || ev.target.closest('.s1-dpad-cluster')) return;
+  const vp = document.getElementById('s1ForestViewport');
+  if (!vp) return;
+  const rect = vp.getBoundingClientRect();
+  if (!rect.width || !rect.height) return;
+  const tx = Math.max(12, Math.min(88, ((ev.clientX - rect.left) / rect.width) * 100));
+  const ty = Math.max(38, Math.min(84, ((ev.clientY - rect.top) / rect.height) * 100));
+  s1Explorer.targetX = tx;
+  s1Explorer.targetY = ty;
+  s1Explorer.targetPillar = null;
+  sound('step');
+};
 
 window.s1DragStart = function(ev, token, fromSlotIdx = null) {
   try {
@@ -4639,21 +4894,45 @@ window.s1StartVertexDrag = function(ev, pt) {
   window.addEventListener('pointerup', onUp);
 };
 
+function renderStage1MinimalHud(objectiveText, cluesCount) {
+  const elapsedSec = Math.floor((Date.now() - vaState.stageStartedAt) / 1000);
+  const remSec = Math.max(0, vaState.stageDurationSec - elapsedSec);
+  const mmss = formatMMSS(remSec);
+  return `<div class="s1-minimal-hud-bar">
+    <div class="s1-hud-objective">
+      <span class="s1-hud-stage-tag">CHẶNG 1 · MẬT THƯ CÂY CẦU ĐẢO CHIỀU</span>
+      <span class="s1-hud-goal-text">${objectiveText}</span>
+    </div>
+    <div class="s1-hud-right-metrics">
+      <div class="s1-hud-pill clues ${cluesCount >= 3 ? 'done' : ''}" title="Số mảnh mật thư đã thu thập">
+        📜 Mật thư: <b>${cluesCount}/3</b>
+      </div>
+      <div class="s1-hud-pill timer ${remSec <= 15 ? 'urgent' : ''}" id="vaStageTimerPill" title="Thời gian còn lại của Chặng 1 (60 giây)">
+        ⏱️ <b id="vaStageSecText">${mmss}</b>
+      </div>
+      <button type="button" class="s1-hud-hint-btn" data-action="s1ToggleHint" title="Nhận gợi ý từ Rồng Xanh">
+        💡 Gợi ý
+      </button>
+    </div>
+  </div>
+  ${s1Explorer.showHintBanner ? `<div class="s1-dragon-hint-toast">
+    <img src="/assets/RongXanh.png" alt="Rồng Xanh" class="s1-hint-dragon-icon" draggable="false"/>
+    <div class="s1-hint-text"><b>Rồng Xanh gợi ý:</b> ${formatMath(vaState.dragonMsg || 'Hãy quan sát điểm đầu và điểm cuối của hai vectơ!')}</div>
+    <button type="button" class="mv-chip-btn" data-action="s1ToggleHint">✕</button>
+  </div>` : ''}`;
+}
+
 function renderStage1RestoredBridgeStep() {
   return `<div class="s1-quest-wrap s1-bridge-restored">
-    <div class="s1-step-ribbon">
-      <span class="s1-step-pill done">✓ Bước 1: 3/3 Mật thư</span>
-      <span class="s1-step-pill done">✓ Bước 2: Ghép mật thư</span>
-      <span class="s1-step-pill done">✓ Bước 3: Vectơ CB</span>
-      <span class="s1-step-pill active">✨ Bước 4: Khôi phục Cây Cầu Ánh Sáng</span>
-    </div>
+    ${renderStage1MinimalHud('✨ <b>Giai đoạn 4/4:</b> Khôi phục Cây Cầu Ánh Sáng, nhận Ấn Hướng Đi & vượt cầu sang Chặng 2!', 3)}
 
-    <div class="s1-restored-showcase" style="background-image: linear-gradient(180deg, rgba(6,22,38,0.45), rgba(6,22,38,0.82)), url('/assets/Stage1_Restored_Bridge.jpg')">
-      <svg class="s1-restored-svg" viewBox="0 0 560 250" xmlns="http://www.w3.org/2000/svg">
+    <div id="s1ForestViewport" class="s1-forest-scene s1-restored-showcase" style="background-image: linear-gradient(180deg, rgba(6,20,34,0.25), rgba(6,20,34,0.68)), url('/assets/Stage1_Mystic_Forest_2D.jpg'), url('/assets/Stage1_Restored_Bridge.jpg')">
+      <!-- Lớp SVG Cây Cầu Ánh Sáng nối liền 2 trụ đá qua thác nước & Sơ đồ vectơ CB -->
+      <svg class="s1-forest-svg-overlay" viewBox="0 0 1000 520" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
         <defs>
-          <linearGradient id="s1BridgeEnergyGrad" x1="100%" y1="0%" x2="0%" y2="0%">
-            <stop offset="0%" stop-color="#FFC953"/>
-            <stop offset="50%" stop-color="#36DEF4"/>
+          <linearGradient id="s1BridgeEnergyGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#36DEF4"/>
+            <stop offset="50%" stop-color="#FFC953"/>
             <stop offset="100%" stop-color="#10B981"/>
           </linearGradient>
           <marker id="s1ArrRestoredCB" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto">
@@ -4664,40 +4943,38 @@ function renderStage1RestoredBridgeStep() {
           </marker>
         </defs>
 
-        <!-- Hai tia vectơ AB và AC -->
-        <line x1="280" y1="48" x2="128" y2="196" stroke="#36DEF4" stroke-width="4" stroke-opacity="0.85" marker-end="url(#s1ArrCyanSub)"/>
-        <line x1="280" y1="48" x2="432" y2="196" stroke="#36DEF4" stroke-width="4" stroke-opacity="0.85" marker-end="url(#s1ArrCyanSub)"/>
-        ${svgVecLabel(178, 118, 'AB', '#36DEF4', 16)}
-        ${svgVecLabel(382, 118, 'AC', '#36DEF4', 16)}
+        <!-- Tia năng lượng nối từ 3 cột đá A, B, C tới Cây Cầu Ánh Sáng -->
+        <line x1="330" y1="220" x2="660" y2="265" stroke="#36DEF4" stroke-width="3.5" stroke-dasharray="8 6" opacity="0.75" marker-end="url(#s1ArrCyanSub)"/>
+        <line x1="330" y1="220" x2="880" y2="255" stroke="#36DEF4" stroke-width="3.5" stroke-dasharray="8 6" opacity="0.75" marker-end="url(#s1ArrCyanSub)"/>
 
-        <!-- CẦU NĂNG LƯỢNG ÁNH SÁNG NỐI TỪ C SANG B -->
-        <rect x="120" y="192" width="320" height="24" rx="12" fill="url(#s1BridgeEnergyGrad)" opacity="0.38" class="s1-bridge-beam-glow"/>
-        <line x1="422" y1="204" x2="142" y2="204" stroke="#FFC953" stroke-width="6.5" marker-end="url(#s1ArrRestoredCB)" class="s1-cb-arrow-glow"/>
-        ${svgVecLabel(280, 184, 'CB', '#FFC953', 20)}
+        <!-- CẦU NĂNG LƯỢNG ÁNH SÁNG NỐI QUA THÁC NƯỚC (TỪ TRỤ C SANG TRỤ B) -->
+        <rect x="645" y="246" width="250" height="36" rx="18" fill="url(#s1BridgeEnergyGrad)" opacity="0.48" class="s1-bridge-beam-glow"/>
+        <line x1="655" y1="264" x2="880" y2="256" stroke="#FFC953" stroke-width="8" marker-end="url(#s1ArrRestoredCB)" class="s1-cb-arrow-glow"/>
+        ${svgVecLabel(768, 232, 'CB', '#FFC953', 22)}
 
-        <!-- 3 CỘT ĐÁ A, B, C PHÁT SÁNG RỰC RỠ -->
-        <g class="s1-pillar-svg-glow">
-          <circle cx="280" cy="48" r="16" fill="#10B981" stroke="#FFC953" stroke-width="4"/>
-          <text x="280" y="54" text-anchor="middle" fill="#FFFFFF" font-size="15" font-weight="900">A</text>
-        </g>
-        <g class="s1-pillar-svg-glow">
-          <circle cx="120" cy="204" r="16" fill="#10B981" stroke="#FFC953" stroke-width="4"/>
-          <text x="120" y="210" text-anchor="middle" fill="#FFFFFF" font-size="15" font-weight="900">B</text>
-        </g>
-        <g class="s1-pillar-svg-glow">
-          <circle cx="440" cy="204" r="16" fill="#10B981" stroke="#FFC953" stroke-width="4"/>
-          <text x="440" y="210" text-anchor="middle" fill="#FFFFFF" font-size="15" font-weight="900">C</text>
-        </g>
+        <!-- Cổng dịch chuyển sang Chặng 2 ở đầu bên kia cầu -->
+        <ellipse cx="905" cy="256" rx="26" ry="42" fill="rgba(16,185,129,0.32)" stroke="#FFC953" stroke-width="4" class="s1-portal-ring"/>
       </svg>
 
+      <!-- Lớp hạt bụi sáng / sao sáng dưới chân Rồng Xanh -->
+      <div id="s1ForestTrailLayer" class="s1-forest-trail-layer" aria-hidden="true"></div>
+
+      <!-- Rồng Xanh thực sự chạy qua Cây Cầu Ánh Sáng vừa khôi phục -->
+      <div id="s1DragonExplorer" class="s1-dragon-explorer is-running facing-right" style="left:${s1Explorer.x.toFixed(1)}%;top:${s1Explorer.y.toFixed(1)}%">
+        <div class="s1-dragon-shadow"></div>
+        <img src="/assets/RongXanh.png" alt="Rồng Xanh" class="s1-dragon-sprite" draggable="false"/>
+        <div id="s1DragonActionPrompt" class="s1-dragon-prompt">🌉 Đang chạy qua Cầu Ánh Sáng!</div>
+      </div>
+
+      <!-- Bảng chúc mừng & nhận Ấn Hướng Đi -->
       <div class="s1-restored-banner">
         <div class="s1-restored-formula">${formatMath('\\vec{AB} − \\vec{AC} = \\vec{CB}')}</div>
-        <p class="s1-restored-msg">🐉 <b>Rồng Xanh:</b> “Tuyệt vời! Ba cột đá A, B, C và mũi tên <span class="math-vec"><span class="vec-arr">→</span><span>CB</span></span> đã phát sáng! Cây cầu năng lượng qua Rừng Vectơ đã khôi phục, đội nhận <b>Ấn Hướng Đi 🧭</b>!”</p>
+        <p class="s1-restored-msg">🐉 <b>Rồng Xanh:</b> “Cây Cầu Ánh Sáng đã khôi phục! Đội nhận <b>Ấn Hướng Đi 🧭</b>! Cùng chạy qua cầu để bay tới Chặng 2 – Pháo Đài Góc Vuông!”</p>
         <div class="s1-restored-rewards">
-          <span class="s1-reward-pill gold">🧭 Nhận Ấn Hướng Đi</span>
-          <span class="s1-reward-pill cyan">⭐ +Điểm XP & Vàng</span>
+          <span class="s1-reward-pill gold">🧭 Đã nhận Ấn Hướng Đi</span>
+          <span class="s1-reward-pill cyan">⭐ +XP & Vàng</span>
           <button type="button" class="hs-confirm-btn" data-action="s1ProceedToStage2">
-            🌉 BƯỚC QUA CẦU SANG CHẶNG 2 →
+            🌉 QUA CẦU ĐẾN CHẶNG 2 →
           </button>
         </div>
       </div>
@@ -4713,74 +4990,101 @@ function renderStage1CipherBridgeGame(m) {
 
   const r = m.round || 0;
   const cluesCount = r >= 1 ? 3 : vaState.pillars.size;
-  const roles = m.teamRoles || [
-    'Thành viên 1 (Thám hiểm): Tìm 3 cột đá A, B, C',
-    'Thành viên 2 (Giải mật thư): Ghép biểu thức vectơ',
-    'Thành viên 3 (Điều khiển): Kéo mũi tên chọn hướng',
-    'Thành viên 4 (Xác nhận): Mở khóa Cầu Ánh Sáng'
-  ];
-  const activeRoleText = r === 0 ? roles[0] : r === 1 ? roles[1] : (roles[2] + ' · ' + (roles[3] || ''));
 
-  const stepRibbonHtml = `<div class="s1-step-ribbon">
-    <span class="s1-step-pill ${r === 0 ? 'active' : 'done'}">${r > 0 ? '✓' : '1.'} Tìm mật thư (${cluesCount}/3)</span>
-    <span class="s1-step-pill ${r === 1 ? 'active' : r > 1 ? 'done' : ''}">${r > 1 ? '✓' : '2.'} Ghép mật thư</span>
-    <span class="s1-step-pill ${r === 2 ? 'active' : ''}">3. Tìm hướng vectơ</span>
-    <span class="s1-role-chip" title="Phân vai phối hợp nhóm 3–5 học sinh">👥 ${esc(activeRoleText)}</span>
-  </div>`;
-
-  // ─── BƯỚC 1: TÌM MẬT THƯ TẠI 3 CỘT ĐÁ A, B, C ───
+  // ─── GIAI ĐOẠN 1: ĐIỀU KHIỂN RỒNG XANH (WASD / MŨI TÊN) TƯƠNG TÁC 3 CỘT ĐÁ A, B, C ───
   if (r === 0) {
     const allFound = cluesCount >= 3;
     return `<div class="s1-quest-wrap">
-      ${stepRibbonHtml}
-      <div class="s1-forest-scene" style="background-image: linear-gradient(180deg, rgba(6,20,34,0.32), rgba(6,20,34,0.78)), url('/assets/Stage1_Pillars_Forest.jpg'), url('/assets/Stage_01_Rung_Vecto.png')">
-        <div class="s1-scene-top-hud">
-          <div class="s1-objective-badge">
-            🔍 <b>BƯỚC 1 – TÌM MẬT THƯ:</b> Nhấn vào 3 cột đá cổ <b>A, B, C</b> đang phát sáng trong Rừng Vectơ để thu thập 3 mảnh mật thư!
-          </div>
-          <div class="s1-clue-counter ${allFound ? 'complete' : ''}">
-            📜 Mật thư: <b>${cluesCount}/3</b>
-          </div>
-        </div>
+      ${renderStage1MinimalHud('🎮 <b>Giai đoạn 1/4:</b> Điều khiển Rồng Xanh (<b>WASD / Phím mũi tên</b> hoặc chạm cột đá) chạy đến 3 cột đá <b>A, B, C</b> thu thập mật thư!', cluesCount)}
 
-        <!-- 3 CỘT ĐÁ CỔ A, B, C TRÊN BỐI CẢNH RỪNG VECTƠ -->
+      <div id="s1ForestViewport" class="s1-forest-scene s1-2d-interactive-map"
+        onclick="window.s1ClickForestCanvas(event)"
+        style="background-image: linear-gradient(180deg, rgba(4,16,28,0.18), rgba(4,16,28,0.52)), url('/assets/Stage1_Mystic_Forest_2D.jpg'), url('/assets/Stage1_Pillars_Forest.jpg')">
+
+        <!-- Lớp SVG Đường mòn Rừng & Khe vực Cầu Ánh Sáng bị đứt bên phải -->
+        <svg class="s1-forest-svg-overlay" viewBox="0 0 1000 520" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- Đường mòn phát sáng dẫn tới 3 cột đá A, B, C -->
+          <path d="M 460 410 Q 320 390, 200 340" fill="none" stroke="rgba(54,222,244,0.38)" stroke-width="5" stroke-dasharray="10 10"/>
+          <path d="M 460 410 Q 395 350, 350 290" fill="none" stroke="rgba(54,222,244,0.38)" stroke-width="5" stroke-dasharray="10 10"/>
+          <path d="M 460 410 Q 535 360, 590 310" fill="none" stroke="rgba(54,222,244,0.38)" stroke-width="5" stroke-dasharray="10 10"/>
+
+          <!-- Khe vực Cây Cầu Ánh Sáng đang bị Bóng Lỗi phá hủy giữa hai trụ đá thác nước -->
+          <line x1="675" y1="252" x2="865" y2="252" stroke="rgba(244,63,94,0.78)" stroke-width="5" stroke-dasharray="12 10"/>
+          <rect x="705" y="212" width="130" height="28" rx="14" fill="rgba(15,23,42,0.85)" stroke="#F43F5E" stroke-width="2"/>
+          <text x="770" y="231" text-anchor="middle" fill="#FDA4AF" font-size="13" font-weight="900">🌉 Cầu bị đứt (?)</text>
+        </svg>
+
+        <!-- Lớp hạt bụi sáng dưới chân Rồng Xanh -->
+        <div id="s1ForestTrailLayer" class="s1-forest-trail-layer" aria-hidden="true"></div>
+
+        <!-- Các vật phẩm năng lượng nhỏ trên đường rừng -->
+        ${s1Explorer.items.map(it => !it.collected ? `
+          <div id="s1ForestItem-${it.id}" class="s1-forest-collectible" style="left:${it.x}%;top:${it.y}%" title="${esc(it.label)}">
+            <span>${it.icon}</span>
+          </div>
+        ` : '').join('')}
+
+        <!-- 3 CỘT ĐÁ RUNE CỔ A, B, C TƯƠNG TÁC -->
         <div class="s1-pillars-stage">
           ${['A', 'B', 'C'].map(pid => {
             const meta = S1_PILLAR_META[pid];
             const isOpened = vaState.pillars.has(pid);
-            return `<button type="button" class="s1-pillar-node ${isOpened ? 'opened' : 'sealed'}" style="left:${meta.left}%;top:${meta.top}%" data-action="s1ClickPillar" data-pillar="${pid}" title="Nhấn để mở phong ấn ${meta.label}">
+            const isNear = (s1Explorer.nearPillar === pid && !isOpened);
+            return `<button type="button" id="s1PillarNode-${pid}"
+              class="s1-pillar-node ${isOpened ? 'opened' : 'sealed'} ${isNear ? 'in-range' : ''}"
+              style="left:${meta.left}%;top:${meta.top}%"
+              data-action="s1ClickPillar"
+              data-pillar="${pid}"
+              title="Di chuyển Rồng Xanh tới ${meta.label} để thu thập mảnh mật thư">
               <span class="s1-pillar-aura"></span>
               <span class="s1-pillar-stone">
                 <span class="s1-pillar-rune">${meta.rune}</span>
                 <strong class="s1-pillar-letter">${pid}</strong>
-                <small class="s1-pillar-status">${isOpened ? '✓ Đã thu thập' : 'Nhấn mở ấn'}</small>
+                <small class="s1-pillar-status">${isOpened ? '✓ Đã thu thập' : 'Cột đá ' + pid}</small>
               </span>
               ${isOpened ? `<span class="s1-pillar-shard">📜 ${renderS1TokenLabel(meta.token)}</span>` : ''}
             </button>`;
           }).join('')}
         </div>
 
-        <!-- KHAY 3 MẢNH MẬT THƯ & NÚT CHUYỂN SANG BƯỚC 2 -->
+        <!-- NHÂN VẬT RỒNG XANH ĐIỀU KHIỂN TRỰC TIẾP TRÊN ĐƯỜNG RỪNG 2D -->
+        <div id="s1DragonExplorer"
+          class="s1-dragon-explorer ${s1Explorer.moving ? 'is-running' : 'is-idle'} ${s1Explorer.facing === 'left' ? 'facing-left' : 'facing-right'}"
+          style="left:${s1Explorer.x.toFixed(1)}%;top:${s1Explorer.y.toFixed(1)}%">
+          <div class="s1-dragon-shadow"></div>
+          <img src="/assets/RongXanh.png" alt="Rồng Xanh" class="s1-dragon-sprite" draggable="false"/>
+          <div id="s1DragonActionPrompt" class="s1-dragon-prompt" style="display:none"></div>
+        </div>
+
+        <!-- CỤM PHÍM ĐIỀU KHIỂN D-PAD / WASD & THANH MẢNH MẬT THƯ DƯỚI ĐÁY -->
         <div class="s1-forest-bottom-bar">
+          <div class="s1-dpad-cluster" title="Nhấn giữ phím WASD / Mũi tên hoặc các nút hướng để điều khiển Rồng Xanh">
+            <span class="s1-dpad-label">⌨️ WASD / Mũi tên:</span>
+            <button type="button" class="s1-dpad-btn" data-s1dpad="left" title="Qua trái (A / ←)">◀</button>
+            <button type="button" class="s1-dpad-btn" data-s1dpad="up" title="Lên trên (W / ↑)">▲</button>
+            <button type="button" class="s1-dpad-btn" data-s1dpad="down" title="Xuống dưới (S / ↓)">▼</button>
+            <button type="button" class="s1-dpad-btn" data-s1dpad="right" title="Qua phải (D / →)">▶</button>
+          </div>
+
           <div class="s1-collected-tray">
-            <span>Mảnh mật thư thu được:</span>
             ${['A', 'B', 'C'].map(pid => {
               const meta = S1_PILLAR_META[pid];
               const has = vaState.pillars.has(pid);
-              return `<span class="s1-mini-fragment ${has ? 'earned' : 'locked'}">
-                ${has ? `Cột ${pid}: ${renderS1TokenLabel(meta.token)}` : `Cột ${pid}: ?`}
-              </span>`;
+              return `<button type="button" class="s1-mini-fragment ${has ? 'earned' : 'locked'}" data-action="s1ClickPillar" data-pillar="${pid}" title="${has ? 'Đã thu thập tại Cột ' + pid : 'Nhấn để Rồng Xanh chạy tới Cột ' + pid}">
+                ${has ? `✓ Cột ${pid}: ${renderS1TokenLabel(meta.token)}` : `🏃 Tới Cột ${pid}`}
+              </button>`;
             }).join('')}
           </div>
+
           <button type="button" class="hs-confirm-btn ${allFound ? 'pulse-ready' : ''}" data-action="s1FinishStep1" ${!allFound ? 'disabled' : ''}>
-            ${allFound ? '📜 MỞ BẢNG GIẢI MÃ MẬT THƯ (3/3) →' : `Hãy tìm đủ 3 cột đá (${cluesCount}/3)`}
+            ${allFound ? '📜 GHÉP MẬT THƯ (3/3) →' : `Thu thập (${cluesCount}/3)`}
           </button>
         </div>
       </div>
     </div>`;
   }
 
-  // ─── BƯỚC 2: GHÉP MẬT THƯ (KÉO THẢ HOẶC NHẤN ĐỂ XẾP: vectơ AB − vectơ AC = ?) ───
+  // ─── GIAI ĐOẠN 2: KÉO THẢ 3 MẢNH MẬT THƯ TẠO BIỂU THỨC vectơ AB − vectơ AC = ? ───
   if (r === 1) {
     const allTokens = ['AC', 'AB', '-'];
     const usedTokens = vaState.s1CipherSlots.filter(Boolean);
@@ -4788,40 +5092,34 @@ function renderStage1CipherBridgeGame(m) {
     const isFull = usedTokens.length === 3;
 
     return `<div class="s1-quest-wrap">
-      ${stepRibbonHtml}
-      <div class="s1-cipher-board" style="background-image: linear-gradient(180deg, rgba(8,15,32,0.72), rgba(8,15,32,0.88)), url('/assets/Stage1_Cipher_Scroll.jpg')">
-        <div class="s1-scene-top-hud">
-          <div class="s1-objective-badge">
-            🧩 <b>BƯỚC 2 – GHÉP MẬT THƯ:</b> Kéo thả (hoặc chạm) 3 mảnh mật thư từ 3 cột đá để ghép thành biểu thức <b>Hiệu hai vectơ xuất phát từ điểm A</b>!
-          </div>
-          <div class="s1-clue-counter complete">📜 Đủ 3/3 mảnh</div>
-        </div>
+      ${renderStage1MinimalHud('🧩 <b>Giai đoạn 2/4:</b> Kéo thả 3 mảnh mật thư vào ô trống để tạo biểu thức <b>Hiệu hai vectơ chung gốc A</b>!', 3)}
 
+      <div class="s1-cipher-board" style="background-image: linear-gradient(180deg, rgba(6,16,30,0.74), rgba(6,16,30,0.88)), url('/assets/Stage1_Mystic_Forest_2D.jpg')">
         <!-- KHU VỰC 3 Ô GHÉP BIỂU THỨC: [ Ô 1 ] [ Ô 2 ] [ Ô 3 ] = ? (KHÔNG LỘ ĐÁP ÁN CB) -->
         <div class="s1-cipher-equation-box">
           <div class="s1-cipher-slots-row">
             ${[0, 1, 2].map(slotIdx => {
               const tok = vaState.s1CipherSlots[slotIdx];
-              const slotHints = ['Vectơ thứ nhất (từ A)', 'Phép toán', 'Vectơ thứ hai (từ A)'];
+              const slotHints = ['Vectơ từ cột A', 'Dấu phép toán', 'Vectơ từ cột C'];
               return `<div class="s1-cipher-slot ${tok ? 'filled' : 'empty'}"
                 ondragover="window.s1DragOver(event)"
                 ondrop="window.s1DropSlot(event, ${slotIdx})"
                 ${tok ? `draggable="true" ondragstart="window.s1DragStart(event, '${tok}', ${slotIdx})" data-action="s1RemoveCipherSlot" data-slot="${slotIdx}"` : ''}
                 title="${tok ? 'Nhấn để gỡ mảnh này ra' : slotHints[slotIdx]}">
-                <small class="s1-slot-index">Mảnh ${slotIdx + 1}</small>
+                <small class="s1-slot-index">Ô ${slotIdx + 1}</small>
                 <div class="s1-slot-content">
                   ${tok ? renderS1TokenLabel(tok) : `<span class="s1-slot-placeholder">${esc(slotHints[slotIdx])}</span>`}
                 </div>
               </div>`;
             }).join('')}
             <span class="s1-cipher-equals">=</span>
-            <div class="s1-cipher-mystery-box" title="Vectơ bí mật sẽ được giải mã ở Bước 3">?</div>
+            <div class="s1-cipher-mystery-box" title="Vectơ hiệu sẽ được vẽ ở Giai đoạn 3">?</div>
           </div>
         </div>
 
         <!-- KHAY CÁC MẢNH MẬT THƯ ĐỂ KÉO THẢ HOẶC NHẤN CHỌN -->
         <div class="s1-cipher-pool-area">
-          <div class="s1-pool-label">Kéo mảnh mật thư vào ô trống phía trên (hoặc nhấn trực tiếp vào mảnh):</div>
+          <div class="s1-pool-label">Kéo thả mảnh mật thư vào ô phía trên (hoặc chạm vào mảnh):</div>
           <div class="s1-cipher-tokens-row">
             ${availableTokens.length > 0 ? availableTokens.map(tok => `
               <button type="button" class="s1-cipher-token-chip"
@@ -4833,30 +5131,29 @@ function renderStage1CipherBridgeGame(m) {
                 <span class="s1-chip-grip">⋮⋮</span>
                 <span class="s1-chip-math">${renderS1TokenLabel(tok)}</span>
               </button>
-            `).join('') : `<span class="s1-all-placed-note">✓ Đã đặt đủ 3 mảnh vào bảng giải mã. Nhấn "Giải mã mật thư" để kiểm tra!</span>`}
+            `).join('') : `<span class="s1-all-placed-note">✓ Đã xếp đủ 3 mảnh mật thư. Nhấn "Xác nhận mật thư" bên dưới!</span>`}
           </div>
         </div>
 
         ${vaState.s1Feedback ? `<div class="s1-inline-feedback ${vaState.s1Feedback.good ? 'good' : 'warn'}">${esc(vaState.s1Feedback.text)}</div>` : ''}
 
         <div class="s1-cipher-actions">
-          <button type="button" class="mv-chip-btn" data-action="s1ResetCipher">↺ Xếp lại các mảnh</button>
+          <button type="button" class="mv-chip-btn" data-action="s1ResetCipher">↺ Xếp lại</button>
           <button type="button" class="hs-confirm-btn" data-action="s1SubmitCipher" ${!isFull ? 'disabled' : ''}>
-            🔓 GIẢI MÃ MẬT THƯ
+            🔓 XÁC NHẬN MẬT THƯ →
           </button>
         </div>
       </div>
     </div>`;
   }
 
-  // ─── BƯỚC 3: TÌM HƯỚNG VECTƠ BÍ MẬT (NHẤN ĐIỂM ĐẦU & KÉO MŨI TÊN ĐẾN ĐIỂM CUỐI TRÊN TAM GIÁC ABC) ───
+  // ─── GIAI ĐOẠN 3: SƠ ĐỒ SVG 3 ĐIỂM A, B, C & VẼ/KÉO MŨI TÊN VECTƠ HIỆU CB ───
   const fromPt = vaState.s1ArrowFrom;
   const toPt = vaState.s1ArrowTo;
   const hasFullArrow = Boolean(fromPt && toPt && fromPt !== toPt);
   const fCoord = fromPt ? S1_VERTEX_COORDS[fromPt] : null;
   const tCoord = toPt ? S1_VERTEX_COORDS[toPt] : null;
 
-  // Rút ngắn nhẹ đầu mũi tên để không đè lên tâm đỉnh
   let arrowLineHtml = '';
   if (hasFullArrow && fCoord && tCoord) {
     const dx = tCoord.x - fCoord.x;
@@ -4869,23 +5166,15 @@ function renderStage1CipherBridgeGame(m) {
     const midX = Math.round((fCoord.x + tCoord.x) / 2);
     const midY = Math.round((fCoord.y + tCoord.y) / 2 - 14);
     arrowLineHtml = `
-      <line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#10B981" stroke-width="6" marker-end="url(#s1ArrPlayer)" class="s1-player-drawn-arrow"/>
+      <line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#10B981" stroke-width="6.5" marker-end="url(#s1ArrPlayer)" class="s1-player-drawn-arrow"/>
       ${svgVecLabel(midX, midY, fromPt + toPt, '#10B981', 20)}
     `;
   }
 
   return `<div class="s1-quest-wrap">
-    ${stepRibbonHtml}
-    <div class="s1-vector-arena" style="background-image: linear-gradient(180deg, rgba(6,18,34,0.68), rgba(6,18,34,0.86)), url('/assets/Stage1_Vector_Triangle_Beams.jpg')">
-      <div class="s1-scene-top-hud">
-        <div class="s1-objective-badge">
-          🏹 <b>BƯỚC 3 – TÌM HƯỚNG VECTƠ BÍ MẬT:</b> Nhấn vào <b>điểm bắt đầu</b> và kéo mũi tên đến <b>điểm kết thúc</b> trên sơ đồ tam giác ABC để giải mã:
-        </div>
-        <div class="s1-decoded-expr-pill">
-          ${formatMath('\\vec{AB} − \\vec{AC} =')} <b style="color:#FFC953">${hasFullArrow ? formatMath('\\vec{' + fromPt + toPt + '}') : '?'}</b>
-        </div>
-      </div>
+    ${renderStage1MinimalHud(`🏹 <b>Giai đoạn 3/4:</b> Vẽ/kéo mũi tên trên sơ đồ 3 điểm A, B, C để biểu diễn <b>${formatMath('\\vec{AB} − \\vec{AC} =')} <span style="color:#FFC953">${hasFullArrow ? formatMath('\\vec{' + fromPt + toPt + '}') : '?'}</span></b>`, 3)}
 
+    <div class="s1-vector-arena" style="background-image: linear-gradient(180deg, rgba(6,18,34,0.70), rgba(6,18,34,0.88)), url('/assets/Stage1_Mystic_Forest_2D.jpg')">
       <div class="s1-svg-canvas-box">
         <svg id="s1VectorSvg" class="va-svg-stage s1-interactive-svg" viewBox="0 0 560 280" xmlns="http://www.w3.org/2000/svg">
           <defs>
@@ -4900,24 +5189,24 @@ function renderStage1CipherBridgeGame(m) {
             </marker>
           </defs>
 
-          <!-- Hai vectơ đã biết: AB (từ A xuống B) và AC (từ A xuống C) -->
-          <line x1="280" y1="56" x2="132" y2="210" stroke="#36DEF4" stroke-width="4.5" marker-end="url(#s1ArrCyan)"/>
+          <!-- Hai vectơ đã biết dựng bằng SVG: AB (từ A xuống B) và AC (từ A xuống C) -->
+          <line x1="280" y1="54" x2="130" y2="214" stroke="#36DEF4" stroke-width="4.5" marker-end="url(#s1ArrCyan)"/>
           ${svgVecLabel(172, 134, 'AB', '#36DEF4', 18)}
 
-          <line x1="280" y1="56" x2="428" y2="210" stroke="#FFC953" stroke-width="4.5" marker-end="url(#s1ArrGold)"/>
+          <line x1="280" y1="54" x2="430" y2="214" stroke="#FFC953" stroke-width="4.5" marker-end="url(#s1ArrGold)"/>
           ${svgVecLabel(388, 134, 'AC', '#FFC953', 18)}
 
-          <!-- Khe vực cây cầu bị đứt giữa B và C (nét đứt, không lộ hướng) -->
-          <line x1="142" y1="224" x2="418" y2="224" stroke="rgba(244,114,182,0.55)" stroke-width="4" stroke-dasharray="10 8"/>
-          ${!hasFullArrow ? `<text x="280" y="214" text-anchor="middle" fill="#F472B6" font-size="22" font-weight="900">?</text>` : ''}
+          <!-- Khe vực cây cầu bị đứt giữa C và B (nét đứt, không lộ hướng đáp án) -->
+          <line x1="140" y1="228" x2="420" y2="228" stroke="rgba(244,114,182,0.55)" stroke-width="4" stroke-dasharray="10 8"/>
+          ${!hasFullArrow ? `<text x="280" y="216" text-anchor="middle" fill="#F472B6" font-size="22" font-weight="900">?</text>` : ''}
 
           <!-- Mũi tên đang kéo trực tiếp bằng chuột/cảm ứng -->
           <line id="s1LiveDragLine" x1="0" y1="0" x2="0" y2="0" stroke="#10B981" stroke-width="5" stroke-dasharray="6 4" marker-end="url(#s1ArrPlayer)" style="display:none;pointer-events:none"/>
 
-          <!-- Mũi tên do học sinh đã tạo -->
+          <!-- Mũi tên do người chơi vừa vẽ -->
           ${arrowLineHtml}
 
-          <!-- Ba đỉnh tương tác A, B, C (Hỗ trợ cả Kéo-Thả và Nhấn Điểm Đầu -> Nhấn Điểm Cuối) -->
+          <!-- Ba điểm tương tác A, B, C (Nhấn giữ Điểm đầu & kéo tới Điểm cuối, hoặc chạm Điểm đầu -> Điểm cuối) -->
           ${['A', 'B', 'C'].map(pt => {
             const c = S1_VERTEX_COORDS[pt];
             const isStart = (fromPt === pt);
@@ -4928,11 +5217,11 @@ function renderStage1CipherBridgeGame(m) {
               onpointerdown="window.s1StartVertexDrag(event, '${pt}')"
               data-action="s1ClickVertex"
               data-pt="${pt}">
-              <circle cx="${c.x}" cy="${c.y}" r="24" fill="rgba(54,222,244,0.12)" stroke="${ringColor}" stroke-width="2" stroke-dasharray="4 3"/>
+              <circle cx="${c.x}" cy="${c.y}" r="25" fill="rgba(54,222,244,0.14)" stroke="${ringColor}" stroke-width="2.2" stroke-dasharray="4 3"/>
               <circle cx="${c.x}" cy="${c.y}" r="16" fill="${fillBg}" stroke="#FFFFFF" stroke-width="3.5"/>
               <text x="${c.x}" y="${c.y + 6}" text-anchor="middle" fill="#FFFFFF" font-size="16" font-weight="900" style="pointer-events:none">${pt}</text>
               <text x="${c.labelX}" y="${c.labelY}" text-anchor="middle" fill="${ringColor}" font-size="13" font-weight="900" style="pointer-events:none">
-                ${isStart ? 'Điểm đầu' : isEnd ? 'Điểm cuối' : ('Điểm ' + pt)}
+                ${isStart ? 'Điểm đầu (' + pt + ')' : isEnd ? 'Điểm cuối (' + pt + ')' : ('Điểm ' + pt)}
               </text>
             </g>`;
           }).join('')}
@@ -4944,15 +5233,15 @@ function renderStage1CipherBridgeGame(m) {
       <div class="s1-vector-controls-bar">
         <div class="s1-arrow-status-text">
           ${!fromPt
-            ? '👆 Hãy <b>nhấn giữ Điểm bắt đầu rồi kéo tới Điểm kết thúc</b> (hoặc chạm lần lượt Điểm đầu → Điểm cuối)!'
+            ? '👆 Hãy <b>nhấn giữ Điểm đầu rồi kéo tới Điểm cuối</b> (hoặc chạm lần lượt Điểm đầu → Điểm cuối)!'
             : !toPt
-              ? `📍 Đã chọn điểm bắt đầu <b>${fromPt}</b>. Hãy kéo hoặc nhấn vào <b>Điểm kết thúc</b>!`
-              : `🏹 Đã tạo mũi tên từ <b>${fromPt} → ${toPt}</b> (${formatMath('\\vec{' + fromPt + toPt + '}')}). Nhấn xác nhận để khôi phục cầu!`}
+              ? `📍 Đã chọn điểm đầu <b>${fromPt}</b>. Hãy kéo hoặc nhấn vào <b>Điểm cuối</b>!`
+              : `🏹 Đã vẽ mũi tên <b>${fromPt} → ${toPt}</b> (${formatMath('\\vec{' + fromPt + toPt + '}')}). Nhấn xác nhận để khôi phục cầu!`}
         </div>
         <div style="display:flex;gap:8px;align-items:center">
-          <button type="button" class="mv-chip-btn" data-action="s1ResetArrow">↺ Kéo lại mũi tên</button>
+          <button type="button" class="mv-chip-btn" data-action="s1ResetArrow">↺ Vẽ lại</button>
           <button type="button" class="hs-confirm-btn" data-action="s1SubmitVectorArrow" ${!hasFullArrow ? 'disabled' : ''}>
-            ⚡ KÍCH HOẠT VECTƠ & MỞ CẦU
+            ⚡ KHÔI PHỤC CẦU ÁNH SÁNG
           </button>
         </div>
       </div>
@@ -5051,14 +5340,14 @@ function stageContent(m){
  const shortTitle = m.shortName || SHORT_STAGE_NAMES[(m.id || 1) - 1] || m.place;
 
  const stageFullTitles = [
-  'CHẶNG 1 · BÍ MẬT CÂY CẦU ĐẢO CHIỀU',
+  'CHẶNG 1 · MẬT THƯ CÂY CẦU ĐẢO CHIỀU',
   'CHẶNG 2 · TỔNG HAI VECTƠ',
   'CHẶNG 3 · QUY TẮC HÌNH BÌNH HÀNH',
   'CHẶNG 4 · TÍNH CHẤT TRUNG ĐIỂM',
   'CHẶNG 5 · TÍNH CHẤT TRỌNG TÂM'
  ];
  const stageSubtitles = [
-  'Rừng Vectơ Khởi Nguyên • Truy tìm 3 mảnh mật thư & giải mã hướng vectơ khôi phục cầu',
+  'Rừng Vectơ Khởi Nguyên • Điều khiển Rồng Xanh tìm 3 mảnh mật thư, ghép biểu thức & vẽ mũi tên vectơ hiệu',
   'Pháo Đài Góc • Nối thông hai luồng năng lượng liên tiếp',
   'Tháp Pha Lê • Khôi phục đường chéo hình bình hành ABCD',
   'Mê Cung Trung Điểm • Cân bằng hai vectơ đối nhau tại điểm I',
@@ -5087,9 +5376,9 @@ function stageContent(m){
    <div class="mv-drawer-box">
     <h4>🎯 Tiến độ trong chặng (${curR}/${totalR})</h4>
     ${isS1 ? `
-     <div style="color:${curR >= 1 ? '#35C992' : '#E2E8F0'}">${curR >= 1 ? '✓' : '•'} Bước 1: Tìm 3 mảnh mật thư tại cột đá A, B, C (${s1ClueCount}/3)</div>
-     <div style="color:${curR >= 2 ? '#35C992' : '#E2E8F0'}">${curR >= 2 ? '✓' : '•'} Bước 2: Ghép mật thư hiệu hai vectơ</div>
-     <div style="color:${vaState.s1BridgeRestoredOverlay ? '#35C992' : '#E2E8F0'}">${vaState.s1BridgeRestoredOverlay ? '✓' : '•'} Bước 3 & 4: Kéo mũi tên hướng vectơ & Mở cầu ánh sáng</div>
+     <div style="color:${curR >= 1 ? '#35C992' : '#E2E8F0'}">${curR >= 1 ? '✓' : '•'} Giai đoạn 1: Điều khiển Rồng Xanh tìm 3 mảnh mật thư tại cột đá A, B, C (${s1ClueCount}/3)</div>
+     <div style="color:${curR >= 2 ? '#35C992' : '#E2E8F0'}">${curR >= 2 ? '✓' : '•'} Giai đoạn 2: Kéo thả ghép mật thư hiệu hai vectơ</div>
+     <div style="color:${vaState.s1BridgeRestoredOverlay ? '#35C992' : '#E2E8F0'}">${vaState.s1BridgeRestoredOverlay ? '✓' : '•'} Giai đoạn 3 & 4: Vẽ mũi tên vectơ hiệu CB & Khôi phục cầu ánh sáng</div>
     ` : `
      <div style="color:${curR >= 1 ? '#35C992' : '#E2E8F0'}">${curR >= 1 ? '✓' : '•'} Phần 1: Nhiệm vụ tương tác sơ đồ (Khóa 1/3)</div>
      <div style="color:${curR >= 2 ? '#35C992' : '#E2E8F0'}">${curR >= 2 ? '✓' : '•'} Phần 2: Câu hỏi giải mã 1/2 (Khóa 2/3)</div>
@@ -5122,8 +5411,10 @@ function stageContent(m){
   <div>${renderOxyz3D(m, true)}</div>
  </div>` : '';
 
+ const showOuterHeader = !isS1 || mvWorldMapOpen || StageTransitionController.isTransitioning();
+
  return `<div class="hs-main-frame">
-  <!-- HEADER CHẶNG & ĐỒNG HỒ ĐẾM NGƯỢC MM:SS -->
+  ${showOuterHeader ? `<!-- HEADER CHẶNG & ĐỒNG HỒ ĐẾM NGƯỢC MM:SS -->
   <div class="hs-stage-header">
    <div class="hs-stage-header-left">
     ${DIAMOND_ICON_SVG}
@@ -5135,7 +5426,7 @@ function stageContent(m){
    <div class="hs-stage-timer-box ${remSec <= 15 ? 'urgent' : ''}" id="vaStageTimerPill" title="Thời gian còn lại của chặng (${vaState.stageDurationSec} giây)">
     <span id="vaStageSecText">${mmss}</span>
    </div>
-  </div>
+  </div>` : ''}
 
   ${drawerQuestHtml}
   ${drawerKnowledgeHtml}
@@ -5760,10 +6051,20 @@ function updateClock(){
    const sp = $('#vaDragonSpeech');
    if(sp) sp.innerHTML = formatMath(vaState.dragonMsg);
   }
-  // Khi hết thời gian chặng (0s): tự động ghi nhận và chuyển sang chặng tiếp theo
+  // Khi hết thời gian chặng (0s): tự động ghi nhận và chuyển sang chặng tiếp theo trên Bản đồ Thế giới
   if(remSec <= 0 && !vaState.stageTimeoutTriggered && !vaState.s1BridgeRestoredOverlay && !busy){
    vaState.stageTimeoutTriggered = true;
-   submit('/api/stageTimeout', {}).then(() => updateAfterAction()).catch(() => {});
+   const prevStage = Math.max(0, Math.min(4, world?.me?.stage ?? 0));
+   submit('/api/stageTimeout', {}).then(res => {
+    updateAfterAction();
+    const nextStage = Math.max(prevStage + 1, Math.min(5, res?.nextStage ?? res?.stage ?? (prevStage + 1)));
+    lastSyncedTeamStage = nextStage;
+    StageTransitionController.beginStageTransition(prevStage, nextStage, {
+     sealName: STAGE_REWARDS_META[prevStage]?.sealName || `Ấn Chặng ${prevStage + 1}`,
+     points: 0,
+     goldEarned: 0
+    });
+   }).catch(() => {});
   }
  }
 }
@@ -5934,26 +6235,44 @@ async function handle(action,el){
   }
   if(action==='toggle3DProj'){oxyz3D.showProj=!oxyz3D.showProj;render();return;}
   if(action==='toggle3DPanel'){oxyz3D.open=!oxyz3D.open;render();return;}
-  /* ─── ACTIONS CHO CHẶNG 1: BÍ MẬT CÂY CẦU ĐẢO CHIỀU ─── */
+  /* ─── ACTIONS CHO CHẶNG 1: MẬT THƯ CÂY CẦU ĐẢO CHIỀU (2D KHÁM PHÁ) ─── */
+  if(action==='s1ToggleHint'){
+   s1Explorer.showHintBanner=!s1Explorer.showHintBanner;
+   const r = world?.current?.round ?? 0;
+   if(r===0){
+    vaState.dragonMsg='💡 Gợi ý Giai đoạn 1: Dùng phím WASD / Mũi tên (hoặc nhấn trực tiếp vào 3 cột đá A, B, C) để điều khiển Rồng Xanh chạy tới mở phong ấn và nhặt đủ 3/3 mảnh mật thư!';
+   }else if(r===1){
+    vaState.dragonMsg='💡 Gợi ý Giai đoạn 2: Hãy kéo hoặc nhấn các mảnh mật thư theo đúng thứ tự: mảnh [vectơ AB] vào Ô 1, dấu [−] vào Ô 2, và mảnh [vectơ AC] vào Ô 3!';
+   }else{
+    vaState.dragonMsg='💡 Gợi ý Giai đoạn 3: Theo quy tắc hiệu hai vectơ chung gốc A (vectơ AB − vectơ AC), vectơ hiệu có điểm đầu tại C và điểm cuối tại B. Hãy kéo mũi tên từ C đến B!';
+   }
+   vaState.dragonMood='hint';
+   render();
+   return;
+  }
   if(action==='s1ClickPillar'){
    const pid=el.dataset.pillar;
    if(pid && ['A','B','C'].includes(pid)){
-    const wasNew=!vaState.pillars.has(pid);
-    vaState.pillars.add(pid);
-    sound('crystal');
-    if(wasNew && window.spawnJuiceFloater){
-     window.spawnJuiceFloater(`📜 Mảnh mật thư ${vaState.pillars.size}/3`, 'gold');
-    }
-    if(session?.room && session?.token){
-     api('/api/stage1Progress',{room:session.room,token:session.token,pillar:pid}).catch(()=>{});
-    }
-    if(vaState.pillars.size>=3){
-     vaState.dragonMsg='Tuyệt vời! Đội đã thu thập đủ 3/3 mảnh mật thư từ cột đá A, B, C! Hãy nhấn "Mở bảng giải mã mật thư"!';
-     vaState.dragonMood='win';
+    const meta=S1_PILLAR_META[pid];
+    const r = world?.current?.round ?? 0;
+    if(r===0 && meta){
+     const dist=Math.hypot(s1Explorer.x - meta.footX, s1Explorer.y - meta.footY);
+     if(dist <= 13 || vaState.pillars.has(pid)){
+      s1Explorer.x = meta.footX;
+      s1Explorer.y = meta.footY;
+      await s1UnlockPillar(pid);
+     }else{
+      // Cho Rồng Xanh chạy trên đường rừng tới cột đá và tự động thu thập khi đến nơi
+      s1Explorer.targetX = meta.footX;
+      s1Explorer.targetY = meta.footY;
+      s1Explorer.targetPillar = pid;
+      s1Explorer.facing = meta.footX < s1Explorer.x ? 'left' : 'right';
+      sound('target');
+      s1SyncExplorerDOM();
+     }
     }else{
-     vaState.dragonMsg=`Đã mở phong ấn Cột đá ${pid} (${vaState.pillars.size}/3 mảnh mật thư). Hãy tìm tiếp cột đá còn lại!`;
+     await s1UnlockPillar(pid);
     }
-    render();
    }
    return;
   }
@@ -6079,20 +6398,27 @@ async function handle(action,el){
     lastSyncedTeamStage = 1;
     vaState.s1Feedback=null;
     vaState.s1BridgeRestoredOverlay=true;
-    vaState.dragonMsg='Tuyệt vời! Ba cột đá A, B, C và mũi tên CB đã phát sáng! Cây cầu năng lượng qua Rừng Vectơ đã khôi phục, đội nhận Ấn Hướng Đi!';
+    s1Explorer.x = 50;
+    s1Explorer.y = 68;
+    s1Explorer.facing = 'right';
+    s1Explorer.moving = true;
+    s1Explorer.bridgeCrossProgress = 0;
+    s1Explorer.bridgeCrossing = true;
+    vaState.dragonMsg='Tuyệt vời! Ba cột đá A, B, C và mũi tên CB đã phát sáng! Cây cầu năng lượng qua Rừng Vectơ đã khôi phục, Rồng Xanh đang chạy qua cầu!';
     vaState.dragonMood='win';
     render();
     if(vaState.s1BridgeTimer) clearTimeout(vaState.s1BridgeTimer);
     vaState.s1BridgeTimer=setTimeout(()=>{
      if(vaState.s1BridgeRestoredOverlay){
       vaState.s1BridgeRestoredOverlay=false;
+      s1Explorer.bridgeCrossing=false;
       StageTransitionController.beginStageTransition(0, 1, {
        sealName: 'Ấn Hướng Đi',
        points: res.points || 10,
        goldEarned: res.goldEarned || 140
       });
      }
-    }, 1500);
+    }, 2300);
    }else{
     sound('wrong');
     const errText=res?.hint||'Hướng vectơ chưa đúng! Quy tắc hiệu hai vectơ chung gốc A: mũi tên phải đi từ điểm cuối của vectơ thứ hai đến điểm cuối của vectơ thứ nhất. Hãy thử lại!';
@@ -6894,6 +7220,13 @@ document.addEventListener('click',e=>{
 });
 
 document.addEventListener('pointerdown',e=>{
+ const s1dbtn=e.target.closest('[data-s1dpad]');
+ if(s1dbtn){
+  e.preventDefault();
+  s1Explorer.keys.add(s1dbtn.dataset.s1dpad);
+  s1Explorer.targetX=null;s1Explorer.targetY=null;s1Explorer.targetPillar=null;
+  return;
+ }
  const dbtn=e.target.closest('[data-dpad]');
  if(dbtn){
   e.preventDefault();
@@ -6917,7 +7250,10 @@ document.addEventListener('pointermove',e=>{
 
 document.addEventListener('pointerup',()=>{
  isPointerDraggingMap=false;
- ['up','down','left','right'].forEach(k=>huntState.keysPressed.delete(k));
+ ['up','down','left','right'].forEach(k=>{
+  huntState.keysPressed.delete(k);
+  s1Explorer.keys.delete(k);
+ });
 });
 
 const keyMap={ArrowUp:'up',ArrowDown:'down',ArrowLeft:'left',ArrowRight:'right',KeyW:'up',KeyS:'down',KeyA:'left',KeyD:'right'};
@@ -6995,18 +7331,44 @@ window.addEventListener('keydown',e=>{
   }
  }
 
- // Điều khiển cho Chặng 1 (Săn Kho Báu 2D)
- if(e.code==='Space' && m.id===1 && !huntState.battleOpen){
-  if(m.huntMap?.stations?.[m.round]){
-   const curSt=m.huntMap.stations[m.round];
-   const dist=Math.hypot(curSt.x-huntState.x, curSt.y-huntState.y);
-   if(dist<=12){
-    e.preventDefault();
-    handle('openHuntBattle');
+ // Điều khiển cho Chặng 1 (MẬT THƯ CÂY CẦU ĐẢO CHIỀU – 2D Khám phá WASD / Phím mũi tên)
+ if(m.id===1){
+  if((e.code==='Space' || e.code==='KeyE' || e.code==='Enter') && (m.round??0)===0){
+   e.preventDefault();
+   if(s1Explorer.nearPillar && !vaState.pillars.has(s1Explorer.nearPillar)){
+    s1UnlockPillar(s1Explorer.nearPillar);
+    return;
+   }
+   const nextPillar = ['A','B','C'].find(k=>!vaState.pillars.has(k));
+   if(nextPillar){
+    const meta = S1_PILLAR_META[nextPillar];
+    s1Explorer.targetX = meta.footX;
+    s1Explorer.targetY = meta.footY;
+    s1Explorer.targetPillar = nextPillar;
+    s1Explorer.facing = meta.footX < s1Explorer.x ? 'left' : 'right';
+    return;
+   }
+   if(vaState.pillars.size >= 3){
+    handle('s1FinishStep1');
     return;
    }
   }
+  let dir1 = keyMap[e.code];
+  if(!dir1 && e.key){
+   const k1 = e.key.toLowerCase();
+   if(k1==='w'||k1==='arrowup') dir1='up';
+   else if(k1==='s'||k1==='arrowdown') dir1='down';
+   else if(k1==='a'||k1==='arrowleft') dir1='left';
+   else if(k1==='d'||k1==='arrowright') dir1='right';
+  }
+  if(dir1 && (m.round??0)===0){
+   e.preventDefault();
+   s1Explorer.keys.add(dir1);
+   s1Explorer.targetX=null;s1Explorer.targetY=null;s1Explorer.targetPillar=null;
+   return;
+  }
  }
+
  if((e.key==='Shift'||e.code==='ShiftLeft'||e.code==='ShiftRight') && m.id===1){
   huntState.isSprinting=true;
   updateHuntCamera();
@@ -7039,7 +7401,10 @@ window.addEventListener('keyup',e=>{
   else if(k==='a'||k==='arrowleft')dir='left';
   else if(k==='d'||k==='arrowright')dir='right';
  }
- if(dir)huntState.keysPressed.delete(dir);
+ if(dir){
+  huntState.keysPressed.delete(dir);
+  s1Explorer.keys.delete(dir);
+ }
 });
 
 document.addEventListener('change',e=>{
@@ -7053,6 +7418,12 @@ let lastFrameTs=performance.now();
 function gameLoop(now){
  const dt=Math.min(0.08,(now-lastFrameTs)/1000);
  lastFrameTs=now;
+
+ if(session?.role==='student'&&!world?.paused){
+  if((world?.current?.id === 1 || vaState.s1BridgeRestoredOverlay) && document.getElementById('s1ForestViewport')){
+   s1Tick(now, dt);
+  }
+ }
 
  if(session?.role==='student'&&world?.current&&!world.paused&&!world.me?.completed&&world.me?.stage<5){
   const m=world.current;

@@ -9,6 +9,24 @@ Tất cả những thay đổi quan trọng của dự án này sẽ được gh
 
 ---
 
+## [4.5.0] - 2026-11-07
+
+### Added & Upgraded (Thiết Kế Game Chặng 1 – Mini-Game Khám Phá 2D: "MẬT THƯ CÂY CẦU ĐẢO CHIỀU")
+- **Tích hợp Bối Cảnh 2D Rừng Vectơ Mới (`public/assets/Stage1_Mystic_Forest_2D.jpg` & `stages.js`):**
+  - Cập nhật bối cảnh 2D Rừng Vectơ với 3 cột đá rune cổ `A`, `B`, `C` phát sáng, đường mòn lát đá, cổ vật phát sáng và hai trụ cầu gãy bên thác nước.
+  - Đổi tên chính thức Chặng 1 thành **`MẬT THƯ CÂY CẦU ĐẢO CHIỀU`** (Thời gian: `60 giây`, Mức độ: `NHẬN BIẾT`).
+- **Xây dựng Hệ Thống Điều Khiển Nhân Vật 2D & 4 Giai Đoạn Tương Tác (`public/app.js`, `public/style.css`):**
+  1. **Giai đoạn 1 (Điều khiển Rồng Xanh WASD / Phím mũi tên thu thập mật thư):** Người chơi điều khiển trực tiếp Rồng Xanh (`#s1DragonExplorer`) chạy trên đường rừng bằng phím `WASD`, phím mũi tên, cụm phím D-Pad trên màn hình hoặc chạm vào đường rừng (`s1Tick` 60fps). Khi Rồng Xanh tiến lại gần các cột đá `A`, `B`, `C` (hoặc nhấn `E`/`Space`), hệ thống phát hiện tương tác khoảng cách thực sự (`s1UnlockPillar`), nhặt cổ vật dọc đường và thu thập đủ `3/3` mảnh mật thư (`0/3 → 1/3 → 2/3 → 3/3`), tự động chuyển sang Giai đoạn 2.
+  2. **Giai đoạn 2 (Kéo thả ghép mật thư):** Kéo thả (`Drag & Drop`) hoặc chạm vào 3 mảnh mật thư (`\vec{AB}`, `−`, `\vec{AC}`) để ghép thành biểu thức $\overrightarrow{AB} - \overrightarrow{AC} = \text{?}$ (không để lộ đáp án `CB`). Kiểm tra đúng/sai và gợi ý trực quan từ Rồng Xanh.
+  3. **Giai đoạn 3 (Dựng hình học SVG & Vẽ mũi tên vectơ hiệu):** Dựng hoàn toàn bằng **SVG thuần** (không dùng ảnh tĩnh có sẵn đáp án) sơ đồ tam giác `A, B, C` cùng hai vectơ $\overrightarrow{AB}$, $\overrightarrow{AC}$. Học sinh chọn điểm đầu và kéo mũi tên đến điểm kết thúc để tạo vectơ hiệu $\overrightarrow{CB}$ (điểm đầu `C`, điểm cuối `B`). Không sử dụng đáp án trắc nghiệm A/B/C.
+  4. **Giai đoạn 4 (Khôi phục Cây Cầu Ánh Sáng, chạy qua cầu & bay sang Chặng 2):** Khi giải mã đúng $\overrightarrow{CB}$, phát hoạt ảnh khôi phục Cây Cầu Ánh Sáng nối qua thác nước, trao **Ấn Hướng Đi (`🧭`)**, điều khiển Rồng Xanh chạy qua cây cầu vừa khôi phục và chuyển mượt sang Bản đồ Thế giới (`AdventureMap`) để bay tới Chặng 2.
+- **Giao Diện Tối Giản Trong Mini-Game (`renderStage1MinimalHud`):**
+  - Khi ở trong Chặng 1, giao diện chỉ hiển thị gọn gàng: **Mục tiêu hiện tại**, **Đồng hồ đếm ngược 60s**, **Số mảnh mật thư (`X/3`)** và **Nút Gợi ý của Rồng Xanh**, tối ưu hiển thị trên máy tính và máy chiếu lớp học.
+- **Kiểm Thử Toàn Diện E2E (`scratch/test_stage1_cipher_bridge.js` & `CHOI_THU_1_MAY.html`):**
+  - Kiểm thử đạt 100% toàn bộ các tình huống: Giai đoạn 1 thu thập 3 cột mốc & đồng bộ màn hình Giáo viên, Giai đoạn 2 ghép đúng/sai, Giai đoạn 3 vẽ vectơ đúng (`C → B`) / sai (`B → C`), Giai đoạn 4 chuyển sang Chặng 2, tình huống hết giờ (`60s Timeout`), chống cộng thưởng trùng và giữ nguyên tiến trình khi tải lại trang (`F5`).
+
+---
+
 ## [4.4.0] - 2026-11-07
 
 ### Added & Upgraded (Nâng Cấp Hệ Thống Rồng Xanh Di Chuyển Thực Sự Qua 5 Chặng Trên Bản Đồ Thế Giới 2D)
