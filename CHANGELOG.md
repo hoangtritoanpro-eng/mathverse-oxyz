@@ -9,6 +9,32 @@ Tất cả những thay đổi quan trọng của dự án này sẽ được gh
 
 ---
 
+## [4.8.0] - 2026-11-07
+
+### Added & Upgraded (Triển Khai Chặng 3 – Trò Chơi Bắn Zombie Vectơ "PHÁO ĐÀI GÓC VUÔNG" Chuẩn Giao Diện Ảnh Tham Chiếu)
+- **Giao Diện & Gameplay Đấu Trường Bắn Zombie Chặng 3 (`renderStage3ZombieShooterGame`, `z3State`, `z3Tick`, `z3FireEnergyBall` trong `public/app.js`, `public/style.css`, `server.js`):**
+  1. **Thanh Tiến Trình 5 Chặng Trên Cùng (`z3-top-nav-bar`):**
+     - Logo kim cương xanh `MATHVERSE OXYZ` bên trái + 5 thẻ tiến trình chặng (`Chặng 1: Hiệu hai vectơ`, `Chặng 2: Tổng hai vectơ`, `Chặng 3: Hình bình hành`, `Chặng 4: Trung điểm`, `Chặng 5: Trọng tâm`) hiển thị rõ trạng thái `✓ Đã hoàn thành`, `▶ Đang chơi`, `🔒 Khóa`.
+  2. **Thanh Phụ Pháo Đài & Cụm Chỉ Số (`z3-arena-subheader`):**
+     - Biểu trưng pháo đài (`public/assets/s3_zombie/s3_castle_crest.png`) kèm tiêu đề **`CHẶNG 3 - PHÁO ĐÀI GÓC VUÔNG`** (`Tổng hai vectơ (Nhận biết)`).
+     - Cụm 3 viên thuốc trạng thái bên phải: **3 Tim đỏ (`❤️ ❤️ ❤️`)**, **Điểm kinh nghiệm (`⭐ XP 240+`)** và **Đồng hồ đếm ngược (`🕒 00:56`)**.
+  3. **Sân Đấu Đá Isometric & Cổng Dịch Chuyển Phía Bắc (`#z3CourtyardViewport`):**
+     - Nền sân đấu pháo đài đá isometric (`public/assets/s3_zombie/s3_courtyard_clean.jpg`) với tường thành, đuốc lửa, cờ hiệu và cổng dịch chuyển ma thuật màu xanh lam ở chính giữa phía Bắc.
+     - **2 Cuộn Giấy Da Dê Bên Trái (`z3-left-parchments`):**
+       - **`🎯 Nhiệm vụ`:** *Tiêu diệt 5 zombie đang giữ vectơ kết quả của $\overrightarrow{AB} + \overrightarrow{BC}$.*
+       - **`💡 Gợi ý`:** *Tổng của hai vectơ nối tiếp bằng vectơ nối điểm đầu với điểm cuối.*
+     - **Nhân Vật Rồng Xanh Bắn Năng Lượng (`#z3DragonHero`):**
+       - Sprite Rồng Xanh chiến đấu (`public/assets/s3_zombie/s3_dragon_shooter.png`) có thanh máu xanh lá trên đầu, điều khiển di chuyển 2D mượt mà bằng **phím mũi tên (`↑ ↓ ← →`) / `WASD`** và bắn cầu năng lượng xanh lam bằng phím **`Space`** (hoặc nhấn trực tiếp vào zombie).
+     - **5 Zombie Cầm Bảng Gỗ Vectơ (`#z3ZombiesLayer`):**
+       - Sprite zombie hoạt hình (`public/assets/s3_zombie/s3_zombie_blank_sign.png`) cầm bảng gỗ trước ngực hiển thị các vectơ $\overrightarrow{BA}$, $\overrightarrow{CB}$, $\overrightarrow{AC}$, $\overrightarrow{AC}$, $\overrightarrow{AB}$ và vòng hào quang vàng rực rỡ (`.z3-target-aura`) quanh mục tiêu đang ngắm.
+       - Khi bắn trúng zombie mang vectơ đúng **$\overrightarrow{AC}$**, bộ đếm tăng từ `0/5 → 5/5`, cộng `+50 XP`, tự động triệu hồi zombie mới từ cổng dịch chuyển cho tới khi đạt `5/5`, hoàn thành Chặng 3 và trao **Ấn Cân Bằng**.
+  4. **Thanh HUD Dưới Cùng (`z3-bottom-hud`):**
+     - Hộp hướng dẫn phím **`Điều khiển Rồng Xanh`** (`↑ ← ↓ → Di chuyển` | `Space Bắn năng lượng`).
+     - Thanh tiến độ mục tiêu ở giữa: **`🎯 Tiêu diệt đúng vectơ: 0/5`** kèm 5 ô tròn trạng thái.
+     - Góc phải: Nhân vật Rồng Xanh đồng hành kèm bóng thoại nhắc công thức $\overrightarrow{AB} + \overrightarrow{BC}$.
+
+---
+
 ## [4.7.0] - 2026-11-07
 
 ### Added & Upgraded (Tái Tạo Chặng 1 "CHẶNG 1 – MẬT THƯ RỪNG VECTƠ" Chuẩn Giao Diện Ảnh Mẫu & Cơ Chế Hunt-Preview + Kịch Bản Slide Báo Cáo PPTX)

@@ -5618,10 +5618,645 @@ function renderStage1CipherBridgeGame(m) {
   </div>`;
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   CHẶNG 3 – TRÒ CHƠI BẮN ZOMBIE (PHÁO ĐÀI GÓC VUÔNG / THÁP PHA LÊ)
+   Giao diện & Gameplay khớp 100% thiết kế tham chiếu:
+   - Sân đá Isometric với cổng dịch chuyển xanh lam
+   - 2 cuộn giấy nhiệm vụ & gợi ý bên trái
+   - Rồng Xanh di chuyển 2D (↑↓←→ / WASD) & bắn cầu năng lượng xanh (Space / Click)
+   - 5 Zombie cầm bảng gỗ vectơ (BA, CB, AC, AC, AB), hiệu ứng hào quang vàng mục tiêu
+   - Tiêu diệt đủ 5/5 zombie mang vectơ AC để hoàn thành Chặng 3
+   ═══════════════════════════════════════════════════════════════════════════ */
+const Z3_INITIAL_ZOMBIES = [
+  { slotId: 1, x: 36.5, y: 37.0, homeX: 36.5, homeY: 37.0, vec: 'BA', isCorrect: false, phase: 0.2 },
+  { slotId: 2, x: 64.2, y: 37.0, homeX: 64.2, homeY: 37.0, vec: 'CB', isCorrect: false, phase: 1.5 },
+  { slotId: 3, x: 51.0, y: 53.5, homeX: 51.0, homeY: 53.5, vec: 'AC', isCorrect: true,  phase: 0.8 },
+  { slotId: 4, x: 79.0, y: 46.0, homeX: 79.0, homeY: 46.0, vec: 'AC', isCorrect: true,  phase: 2.1 },
+  { slotId: 5, x: 78.2, y: 66.5, homeX: 78.2, homeY: 66.5, vec: 'AB', isCorrect: false, phase: 3.0 }
+];
+
+const z3State = {
+  initedStage: -1,
+  dragonX: 25.0,
+  dragonY: 55.5,
+  dragonHp: 100,
+  hearts: 3,
+  xpBonus: 0,
+  kills: 0,
+  targetKills: 5,
+  targetVec: 'AC',
+  keys: new Set(),
+  aimedSlotId: 3,
+  zombies: [],
+  projectiles: [],
+  floaters: [],
+  muzzleFlashUntil: 0,
+  beamPreviewUntil: 0,
+  beamTargetX: 51.0,
+  beamTargetY: 53.5,
+  mascotMsg: 'Hãy bắn hạ những zombie mang đúng vectơ kết quả của <span class="z3-inline-vec"><span class="v-arr">→</span>AB</span> + <span class="z3-inline-vec"><span class="v-arr">→</span>BC</span> nhé!',
+  mascotMood: 'normal',
+  victoryOverlay: false,
+  submittingServer: false,
+  seq: 1
+};
+
+function ensureZ3State(m) {
+  const stgId = m?.id || 3;
+  if (z3State.initedStage !== stgId) {
+    z3State.initedStage = stgId;
+    z3State.dragonX = 25.0;
+    z3State.dragonY = 55.5;
+    z3State.dragonHp = 100;
+    z3State.hearts = Math.max(1, Math.min(3, world?.me?.health ?? 3));
+    z3State.xpBonus = 0;
+    const curRound = m?.round || 0;
+    z3State.kills = curRound >= 3 ? 5 : (curRound === 2 ? 3 : (curRound === 1 ? 1 : 0));
+    z3State.targetKills = 5;
+    z3State.targetVec = 'AC';
+    z3State.keys.clear();
+    z3State.aimedSlotId = 3;
+    z3State.zombies = Z3_INITIAL_ZOMBIES.map(z => ({
+      ...z,
+      alive: true,
+      hitFlashUntil: 0,
+      wrongShakeUntil: 0,
+      spawningUntil: 0
+    }));
+    z3State.projectiles = [];
+    z3State.floaters = [];
+    z3State.muzzleFlashUntil = performance.now() + 99999999; // Luôn hiển thị tia năng lượng mẫu lúc đầu như ảnh
+    z3State.beamPreviewUntil = performance.now() + 99999999;
+    z3State.beamTargetX = 51.0;
+    z3State.beamTargetY = 53.5;
+    z3State.mascotMsg = 'Hãy bắn hạ những zombie mang đúng vectơ kết quả của <span class="z3-inline-vec"><span class="v-arr">→</span>AB</span> + <span class="z3-inline-vec"><span class="v-arr">→</span>BC</span> nhé!';
+    z3State.mascotMood = 'normal';
+    z3State.victoryOverlay = false;
+    z3State.submittingServer = false;
+  }
+}
+
+function z3UpdateAimedZombie() {
+  const aliveList = z3State.zombies.filter(z => z.alive);
+  if (!aliveList.length) return null;
+  // Ưu tiên zombie đang nằm gần cùng hàng ngang (trục Y) phía bên phải Rồng Xanh
+  let best = null;
+  let bestScore = Infinity;
+  for (const z of aliveList) {
+    const dy = Math.abs(z.y - z3State.dragonY);
+    const dx = Math.abs(z.x - z3State.dragonX);
+    const rightPenalty = z.x >= z3State.dragonX - 4 ? 0 : 35;
+    const score = dy * 2.4 + dx * 0.55 + rightPenalty - (z.isCorrect ? 3 : 0);
+    if (score < bestScore) {
+      bestScore = score;
+      best = z;
+    }
+  }
+  if (best) {
+    z3State.aimedSlotId = best.slotId;
+    z3State.beamTargetX = best.x;
+    z3State.beamTargetY = best.y;
+  }
+  return best;
+}
+
+function z3SpawnFloater(x, y, text, cls = 'good') {
+  z3State.floaters.push({
+    id: ++z3State.seq,
+    x,
+    y,
+    text,
+    cls,
+    until: performance.now() + 1150
+  });
+}
+
+async function z3SyncServerProgress() {
+  if (z3State.submittingServer || !session || session.role !== 'student' || !world?.me) return;
+  const neededRound = z3State.kills >= 5 ? 3 : (z3State.kills >= 3 ? 2 : (z3State.kills >= 1 ? 1 : 0));
+  if ((world.me.round || 0) >= neededRound) return;
+  z3State.submittingServer = true;
+  try {
+    while ((world.me?.round || 0) < neededRound && (world.me?.stage ?? 0) === 2 && !world.me?.completed) {
+      const prevStageIdx = world.me.stage;
+      const r = await submit('/api/answer', {
+        stage: world.me.stage,
+        round: world.me.round,
+        choice: 0,
+        zombieTargetCleared: true,
+        targetVec: z3State.targetVec,
+        kills: z3State.kills
+      });
+      const state = await api('/api/state', { room: session.room, token: session.token });
+      world = state;
+      if (r && r.stageFinished) {
+        sound('fanfare');
+        triggerConfetti(2800);
+        z3State.victoryOverlay = true;
+        z3State.mascotMsg = '🎉 Tuyệt vời! Đội đã tiêu diệt đủ 5/5 zombie mang vectơ AC và mở khóa Chặng 4!';
+        render();
+        const nextStageIdx = Math.min(5, world.me?.stage ?? (prevStageIdx + 1));
+        lastSyncedTeamStage = nextStageIdx;
+        setTimeout(() => {
+          if (z3State.victoryOverlay) {
+            z3State.victoryOverlay = false;
+            StageTransitionController.beginStageTransition(prevStageIdx, nextStageIdx, {
+              sealName: 'Ấn Cân Bằng',
+              points: r.points || 10,
+              goldEarned: r.goldEarned || 130
+            });
+          }
+        }, 2000);
+        break;
+      }
+    }
+  } catch (err) {
+    // Bỏ qua lỗi mạng tạm thời để không ngắt mạch bắn
+  } finally {
+    z3State.submittingServer = false;
+  }
+}
+
+function z3HandleZombieHit(zombie) {
+  const now = performance.now();
+  if (!zombie || !zombie.alive) return;
+
+  if (zombie.isCorrect) {
+    sound('correct');
+    zombie.alive = false;
+    zombie.hitFlashUntil = now + 450;
+    z3State.kills = Math.min(z3State.targetKills, z3State.kills + 1);
+    z3State.xpBonus += 50;
+    z3SpawnFloater(zombie.x, zombie.y - 6, `💥 +50 XP · Đúng vectơ AC! (${z3State.kills}/5)`, 'good');
+    z3State.mascotMood = 'win';
+
+    if (z3State.kills >= z3State.targetKills) {
+      z3State.mascotMsg = '🏆 Xuất sắc! Đã hạ gục đủ 5/5 zombie mang vectơ <span class="z3-inline-vec"><span class="v-arr">→</span>AC</span>!';
+      z3SyncServerProgress();
+    } else {
+      z3State.mascotMsg = `Chính xác! <span class="z3-inline-vec"><span class="v-arr">→</span>AB</span> + <span class="z3-inline-vec"><span class="v-arr">→</span>BC</span> = <span class="z3-inline-vec"><span class="v-arr">→</span>AC</span> (${z3State.kills}/5). Tiếp tục bắn zombie mang bảng <b>AC</b> nhé!`;
+      if (z3State.kills === 1 || z3State.kills === 3) {
+        z3SyncServerProgress();
+      }
+      // Hồi sinh 1 zombie mới mang bảng AC bước ra từ cổng dịch chuyển phía bắc sau 650ms
+      const respawnSlot = zombie.slotId;
+      const homeX = zombie.homeX;
+      const homeY = zombie.homeY;
+      setTimeout(() => {
+        const targetZ = z3State.zombies.find(z => z.slotId === respawnSlot);
+        if (targetZ && z3State.kills < z3State.targetKills) {
+          targetZ.alive = true;
+          targetZ.vec = 'AC';
+          targetZ.isCorrect = true;
+          targetZ.x = 50.8 + (Math.random() * 6 - 3);
+          targetZ.y = 26.5;
+          targetZ.homeX = homeX + (Math.random() * 5 - 2.5);
+          targetZ.homeY = homeY + (Math.random() * 4 - 2.0);
+          targetZ.spawningUntil = performance.now() + 900;
+          z3UpdateAimedZombie();
+          z3SyncDOM();
+        }
+      }, 650);
+    }
+  } else {
+    sound('wrong');
+    zombie.wrongShakeUntil = now + 550;
+    z3State.hearts = Math.max(1, z3State.hearts - 1);
+    z3SpawnFloater(zombie.x, zombie.y - 6, `❌ Sai vectơ (${zombie.vec})!`, 'bad');
+    z3State.mascotMood = 'hint';
+    z3State.mascotMsg = `Cẩn thận! Vectơ <b>${zombie.vec}</b> chưa đúng. Tổng hai vectơ nối tiếp <span class="z3-inline-vec"><span class="v-arr">→</span>AB</span> + <span class="z3-inline-vec"><span class="v-arr">→</span>BC</span> phải nối điểm đầu <b>A</b> với điểm cuối <b>C</b> (vectơ <b>AC</b>)!`;
+  }
+
+  z3UpdateAimedZombie();
+  z3SyncDOM();
+}
+
+function z3FireEnergyBall(explicitSlotId = null) {
+  if (z3State.victoryOverlay || z3State.kills >= z3State.targetKills) return;
+  const now = performance.now();
+  let targetZ = null;
+  if (explicitSlotId !== null) {
+    targetZ = z3State.zombies.find(z => z.slotId === explicitSlotId && z.alive);
+  }
+  if (!targetZ) {
+    targetZ = z3State.zombies.find(z => z.slotId === z3State.aimedSlotId && z.alive) || z3UpdateAimedZombie();
+  }
+  if (!targetZ) return;
+
+  z3State.aimedSlotId = targetZ.slotId;
+  z3State.muzzleFlashUntil = now + 420;
+  z3State.beamPreviewUntil = now + 380;
+  z3State.beamTargetX = targetZ.x;
+  z3State.beamTargetY = targetZ.y;
+
+  const startX = z3State.dragonX + 6.8;
+  const startY = z3State.dragonY - 1.2;
+
+  sound('shoot');
+  z3State.projectiles.push({
+    id: ++z3State.seq,
+    x: startX,
+    y: startY,
+    startX,
+    startY,
+    targetX: targetZ.x,
+    targetY: targetZ.y,
+    targetSlotId: targetZ.slotId,
+    progress: 0,
+    speed: 4.2 // hoàn tất đường bay trong ~0.24s
+  });
+  z3SyncDOM();
+}
+
+function z3Tick(now, dt) {
+  const vp = document.getElementById('z3CourtyardViewport');
+  if (!vp) return;
+
+  let dirty = false;
+  // 1. Di chuyển Rồng Xanh bằng phím mũi tên / WASD
+  let vx = 0, vy = 0;
+  if (z3State.keys.has('left')) vx -= 1;
+  if (z3State.keys.has('right')) vx += 1;
+  if (z3State.keys.has('up')) vy -= 1;
+  if (z3State.keys.has('down')) vy += 1;
+
+  if (vx !== 0 || vy !== 0) {
+    const len = Math.hypot(vx, vy);
+    const speed = 28;
+    z3State.dragonX = Math.max(15, Math.min(72, z3State.dragonX + (vx / len) * speed * dt));
+    z3State.dragonY = Math.max(33, Math.min(72, z3State.dragonY + (vy / len) * speed * dt));
+    z3UpdateAimedZombie();
+    dirty = true;
+  }
+
+  // 2. Chuyển động bước đi của Zombie từ cổng dịch chuyển về vị trí sân đá + nhấp nhô nhẹ
+  for (const z of z3State.zombies) {
+    if (!z.alive) continue;
+    const dx = z.homeX - z.x;
+    const dy = z.homeY - z.y;
+    const dist = Math.hypot(dx, dy);
+    if (dist > 0.35) {
+      const step = Math.min(dist, 22 * dt);
+      z.x += (dx / dist) * step;
+      z.y += (dy / dist) * step;
+      dirty = true;
+    }
+  }
+
+  // 3. Cập nhật đường bay của quả cầu năng lượng xanh
+  if (z3State.projectiles.length > 0) {
+    for (let i = z3State.projectiles.length - 1; i >= 0; i--) {
+      const p = z3State.projectiles[i];
+      p.progress += p.speed * dt;
+      if (p.progress >= 1) {
+        z3State.projectiles.splice(i, 1);
+        const hitZ = z3State.zombies.find(z => z.slotId === p.targetSlotId && z.alive);
+        if (hitZ) {
+          z3HandleZombieHit(hitZ);
+        }
+      } else {
+        p.x = p.startX + (p.targetX - p.startX) * p.progress;
+        p.y = p.startY + (p.targetY - p.startY) * p.progress;
+      }
+    }
+    dirty = true;
+  }
+
+  // 4. Dọn dẹp hiệu ứng chữ nổi
+  if (z3State.floaters.length > 0) {
+    const beforeLen = z3State.floaters.length;
+    z3State.floaters = z3State.floaters.filter(f => f.until > now);
+    if (z3State.floaters.length !== beforeLen) dirty = true;
+  }
+
+  if (dirty) {
+    z3SyncDOM();
+  }
+}
+
+function z3SyncDOM() {
+  const heroEl = document.getElementById('z3DragonHero');
+  if (heroEl) {
+    heroEl.style.left = `${z3State.dragonX}%`;
+    heroEl.style.top = `${z3State.dragonY}%`;
+  }
+
+  // Cập nhật các zombie trên sân
+  z3State.zombies.forEach(z => {
+    const zEl = document.getElementById(`z3ZombieSlot_${z.slotId}`);
+    if (!zEl) return;
+    zEl.style.left = `${z.x}%`;
+    zEl.style.top = `${z.y}%`;
+    zEl.classList.toggle('is-dead', !z.alive);
+    zEl.classList.toggle('is-targeted', z.alive && z.slotId === z3State.aimedSlotId);
+    zEl.classList.toggle('is-wrong-shake', z.wrongShakeUntil > performance.now());
+    const signLetters = zEl.querySelector('.z3-vec-letters');
+    if (signLetters && signLetters.textContent !== z.vec) {
+      signLetters.textContent = z.vec;
+    }
+  });
+
+  // Cập nhật tia năng lượng mẫu & các quả cầu năng lượng đang bay
+  const beamLayer = document.getElementById('z3EnergyBeamLayer');
+  if (beamLayer) {
+    const startX = z3State.dragonX + 6.4;
+    const startY = z3State.dragonY - 1.2;
+    const aimedZ = z3State.zombies.find(z => z.slotId === z3State.aimedSlotId && z.alive);
+    const endX = aimedZ ? Math.min(aimedZ.x - 6, startX + 11.5) : (startX + 10.5);
+    const endY = aimedZ ? (startY + (aimedZ.y - startY) * 0.35) : startY;
+    const dx = endX - startX;
+    const dy = endY - startY;
+    const angleDeg = Math.atan2(dy, dx * 1.65) * (180 / Math.PI);
+    const distPct = Math.max(5.5, Math.min(14.5, Math.hypot(dx, dy)));
+
+    const projHtml = z3State.projectiles.map(p =>
+      `<div class="z3-flying-orb" style="left:${p.x}%;top:${p.y}%"></div>`
+    ).join('');
+
+    const floaterHtml = z3State.floaters.map(f =>
+      `<div class="z3-hit-floater ${f.cls}" style="left:${f.x}%;top:${f.y}%">${f.text}</div>`
+    ).join('');
+
+    beamLayer.innerHTML = `
+      <div class="z3-dragon-energy-beam" style="left:${startX}%;top:${startY}%;width:${distPct}%;transform:translateY(-50%) rotate(${angleDeg.toFixed(1)}deg)">
+        <span class="z3-beam-core"></span>
+        <span class="z3-beam-orb"></span>
+      </div>
+      ${projHtml}
+      ${floaterHtml}
+    `;
+  }
+
+  // Cập nhật thanh tiến độ 0/5 ở dưới cùng
+  const killText = document.getElementById('z3KillCountText');
+  if (killText) killText.textContent = `${z3State.kills}/${z3State.targetKills}`;
+
+  const slotsWrap = document.getElementById('z3KillSlotsWrap');
+  if (slotsWrap) {
+    slotsWrap.innerHTML = [0, 1, 2, 3, 4].map(i =>
+      `<span class="z3-kill-slot ${i < z3State.kills ? 'filled' : ''}">${i < z3State.kills ? '✓' : ''}</span>`
+    ).join('');
+  }
+
+  // Cập nhật điểm XP & Tim trên thanh trạng thái
+  const xpEl = document.getElementById('z3XpText');
+  if (xpEl) {
+    const baseXp = Math.max(240, (world?.me?.score || 20) * 10);
+    xpEl.textContent = `XP ${baseXp + z3State.xpBonus}`;
+  }
+
+  const heartsEl = document.getElementById('z3HeartsPill');
+  if (heartsEl) {
+    heartsEl.innerHTML = [1, 2, 3].map(h =>
+      `<span class="z3-heart-icon ${h <= z3State.hearts ? 'full' : 'lost'}">❤️</span>`
+    ).join('');
+  }
+
+  const bubbleEl = document.getElementById('z3MascotBubble');
+  if (bubbleEl) {
+    bubbleEl.innerHTML = z3State.mascotMsg;
+  }
+}
+
+function renderStage3ZombieShooterGame(m) {
+  ensureVaStateForStage(m);
+  ensureZ3State(m);
+  z3UpdateAimedZombie();
+
+  const elapsedSec = Math.floor((Date.now() - vaState.stageStartedAt) / 1000);
+  const remSec = Math.max(0, vaState.stageDurationSec - elapsedSec);
+  const mmss = formatMMSS(remSec);
+  const baseXp = Math.max(240, (world?.me?.score || 20) * 10);
+  const totalXp = baseXp + z3State.xpBonus;
+  const curStageIdx = world?.me?.stage ?? ((m?.id || 3) - 1);
+
+  const navStages = [
+    { idx: 0, num: 1, title: 'Hiệu hai vectơ' },
+    { idx: 1, num: 2, title: 'Tổng hai vectơ' },
+    { idx: 2, num: 3, title: 'Hình bình hành' },
+    { idx: 3, num: 4, title: 'Trung điểm' },
+    { idx: 4, num: 5, title: 'Trọng tâm' }
+  ];
+
+  const startX = z3State.dragonX + 6.4;
+  const startY = z3State.dragonY - 1.2;
+  const aimedZ = z3State.zombies.find(z => z.slotId === z3State.aimedSlotId && z.alive);
+  const endX = aimedZ ? Math.min(aimedZ.x - 6, startX + 11.5) : (startX + 10.5);
+  const endY = aimedZ ? (startY + (aimedZ.y - startY) * 0.35) : startY;
+  const dx = endX - startX;
+  const dy = endY - startY;
+  const angleDeg = Math.atan2(dy, dx * 1.65) * (180 / Math.PI);
+  const distPct = Math.max(5.5, Math.min(14.5, Math.hypot(dx, dy)));
+
+  return `<div class="z3-shooter-shell">
+    <!-- 1. THANH TIẾN TRÌNH 5 CHẶNG TRÊN CÙNG -->
+    <header class="z3-top-nav-bar">
+      <div class="z3-brand-block" data-action="toggleWorldMap" title="Mở Bản Đồ Thế Giới 5 Chặng">
+        <div class="z3-brand-gem">💎</div>
+        <div class="z3-brand-text">
+          <strong>MATHVERSE</strong>
+          <span>OXYZ</span>
+        </div>
+      </div>
+
+      <nav class="z3-stage-tabs" aria-label="Tiến trình 5 chặng">
+        ${navStages.map(st => {
+          const isDone = st.idx < curStageIdx;
+          const isCurrent = st.idx === curStageIdx;
+          const stateCls = isCurrent ? 'active' : (isDone ? 'done' : 'locked');
+          const statusLabel = isCurrent
+            ? '<span class="z3-tab-status current">▶ Đang chơi</span>'
+            : (isDone
+              ? '<span class="z3-tab-status done">✓ Đã hoàn thành</span>'
+              : '<span class="z3-tab-status locked">🔒 Khóa</span>');
+          const leftIcon = isCurrent
+            ? '<span class="z3-tab-icon play">▶</span>'
+            : (isDone
+              ? '<span class="z3-tab-icon check">✓</span>'
+              : (st.idx === 4 ? '<span class="z3-tab-icon lock">🔒</span>' : `<span class="z3-tab-icon num">${st.num}</span>`));
+          return `<button type="button" class="z3-stage-tab ${stateCls}" data-action="demoJumpStage" data-stage="${st.idx}">
+            ${leftIcon}
+            <div class="z3-tab-copy">
+              <small>Chặng ${st.num}</small>
+              <strong>${st.title}</strong>
+              ${statusLabel}
+            </div>
+          </button>`;
+        }).join('')}
+      </nav>
+    </header>
+
+    <!-- 2. THANH TIÊU ĐỀ PHÁO ĐÀI & CỤM CHỈ SỐ TIM / XP / ĐỒNG HỒ -->
+    <div class="z3-arena-subheader">
+      <div class="z3-fortress-banner">
+        <img src="/assets/s3_zombie/s3_castle_crest.png" alt="Pháo đài" class="z3-fortress-crest" draggable="false"/>
+        <div class="z3-fortress-titles">
+          <h2>CHẶNG ${m.id || 3} - PHÁO ĐÀI GÓC VUÔNG</h2>
+          <p>Tổng hai vectơ (${esc(m.levelBadge || 'Nhận biết')})</p>
+        </div>
+      </div>
+
+      <div class="z3-status-cluster">
+        <div class="z3-pill z3-pill-hearts" id="z3HeartsPill" title="Mạng năng lượng của đội">
+          ${[1, 2, 3].map(h => `<span class="z3-heart-icon ${h <= z3State.hearts ? 'full' : 'lost'}">❤️</span>`).join('')}
+        </div>
+        <div class="z3-pill z3-pill-xp" title="Điểm kinh nghiệm tích lũy">
+          <span class="z3-star-icon">⭐</span>
+          <strong id="z3XpText">XP ${totalXp}</strong>
+        </div>
+        <div class="z3-pill z3-pill-timer ${remSec <= 15 ? 'urgent' : ''}" id="vaStageTimerPill" title="Thời gian còn lại của chặng">
+          <span class="z3-clock-icon">🕒</span>
+          <strong id="vaStageSecText">${mmss}</strong>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. ĐẤU TRƯỜNG SÂN ĐÁ ISOMETRIC BẮN ZOMBIE -->
+    <div class="z3-courtyard-viewport" id="z3CourtyardViewport">
+      <img src="/assets/s3_zombie/s3_courtyard_clean.jpg" alt="Đấu trường Pháo đài" class="z3-courtyard-bg" draggable="false"/>
+
+      <!-- Hiệu ứng vòng xoáy cổng dịch chuyển phía Bắc -->
+      <div class="z3-portal-swirl" aria-hidden="true"></div>
+
+      <!-- Cột trái: 2 bảng da dê Nhiệm vụ & Gợi ý -->
+      <aside class="z3-left-parchments">
+        <div class="z3-parchment-scroll mission">
+          <div class="z3-parchment-head">
+            <span class="z3-parchment-icon">🎯</span>
+            <strong>Nhiệm vụ</strong>
+          </div>
+          <p class="z3-parchment-body">
+            Tiêu diệt 5 zombie đang giữ vectơ kết quả của
+            <span class="z3-math-formula">
+              <span class="z3-vec-token"><span class="arr">→</span>AB</span>
+              <b>+</b>
+              <span class="z3-vec-token"><span class="arr">→</span>BC</span>.
+            </span>
+          </p>
+        </div>
+
+        <div class="z3-parchment-scroll hint">
+          <div class="z3-parchment-head">
+            <span class="z3-parchment-icon">💡</span>
+            <strong>Gợi ý</strong>
+          </div>
+          <p class="z3-parchment-body">
+            Tổng của hai vectơ nối tiếp bằng vectơ nối điểm đầu với điểm cuối.
+          </p>
+        </div>
+      </aside>
+
+      <!-- Lớp tia năng lượng xanh & đạn bay -->
+      <div class="z3-energy-beam-layer" id="z3EnergyBeamLayer">
+        <div class="z3-dragon-energy-beam" style="left:${startX}%;top:${startY}%;width:${distPct}%;transform:translateY(-50%) rotate(${angleDeg.toFixed(1)}deg)">
+          <span class="z3-beam-core"></span>
+          <span class="z3-beam-orb"></span>
+        </div>
+      </div>
+
+      <!-- Nhân vật Rồng Xanh chiến đấu -->
+      <div class="z3-dragon-hero" id="z3DragonHero" style="left:${z3State.dragonX}%;top:${z3State.dragonY}%">
+        <div class="z3-dragon-hp-track">
+          <div class="z3-dragon-hp-fill" style="width:${z3State.dragonHp}%"></div>
+        </div>
+        <img src="/assets/s3_zombie/s3_dragon_shooter.png" alt="Rồng Xanh" class="z3-dragon-shooter-img" draggable="false"/>
+      </div>
+
+      <!-- 5 Zombie cầm bảng gỗ vectơ trên sân đá -->
+      <div class="z3-zombies-layer" id="z3ZombiesLayer">
+        ${z3State.zombies.map(z => {
+          const isTargeted = z.alive && z.slotId === z3State.aimedSlotId;
+          return `<button type="button"
+            class="z3-zombie-unit ${!z.alive ? 'is-dead' : ''} ${isTargeted ? 'is-targeted' : ''}"
+            id="z3ZombieSlot_${z.slotId}"
+            style="left:${z.x}%;top:${z.y}%"
+            data-action="z3ClickZombie"
+            data-slot="${z.slotId}"
+            title="Nhấn hoặc bấm Space để bắn Zombie mang vectơ ${z.vec}">
+            ${isTargeted ? '<span class="z3-target-aura" aria-hidden="true"></span><span class="z3-target-ring" aria-hidden="true"></span>' : ''}
+            <img src="/assets/s3_zombie/s3_zombie_blank_sign.png" alt="Zombie ${z.vec}" class="z3-zombie-sprite" draggable="false"/>
+            <div class="z3-zombie-board-label">
+              <span class="z3-vec-arrow">→</span>
+              <span class="z3-vec-letters">${z.vec}</span>
+            </div>
+          </button>`;
+        }).join('')}
+      </div>
+
+      <!-- Overlay chúc mừng khi hoàn thành 5/5 mục tiêu -->
+      ${z3State.victoryOverlay ? `
+        <div class="z3-victory-modal-backdrop">
+          <div class="z3-victory-modal">
+            <div class="z3-victory-seal">💠</div>
+            <h3>PHÁO ĐÀI ĐÃ ĐƯỢC BẢO VỆ!</h3>
+            <p>Đội đã tiêu diệt chính xác <strong>5/5 zombie</strong> mang vectơ kết quả <span class="z3-inline-vec"><span class="v-arr">→</span>AC</span> của phép cộng <span class="z3-inline-vec"><span class="v-arr">→</span>AB</span> + <span class="z3-inline-vec"><span class="v-arr">→</span>BC</span>!</p>
+            <div class="z3-victory-rewards">
+              <span>✨ +250 XP</span>
+              <span>🪙 +130 Vàng</span>
+              <span>💠 Nhận Ấn Cân Bằng</span>
+            </div>
+            <button type="button" class="z3-victory-next-btn" data-action="z3ProceedNextStage">
+              Tiếp tục hành trình sang Chặng 4 →
+            </button>
+          </div>
+        </div>
+      ` : ''}
+    </div>
+
+    <!-- 4. THANH ĐIỀU KHIỂN & TIẾN ĐỘ TIÊU DIỆT DƯỚI CÙNG -->
+    <footer class="z3-bottom-hud">
+      <!-- Khung điều khiển bàn phím bên trái -->
+      <div class="z3-controls-card">
+        <div class="z3-controls-title">Điều khiển Rồng Xanh</div>
+        <div class="z3-controls-row">
+          <div class="z3-arrow-pad">
+            <button type="button" class="z3-key-cap up" data-z3dpad="up" title="Di chuyển lên (↑ / W)">↑</button>
+            <div class="z3-arrow-bottom-row">
+              <button type="button" class="z3-key-cap left" data-z3dpad="left" title="Sang trái (← / A)">←</button>
+              <button type="button" class="z3-key-cap down" data-z3dpad="down" title="Di chuyển xuống (↓ / S)">↓</button>
+              <button type="button" class="z3-key-cap right" data-z3dpad="right" title="Sang phải (→ / D)">→</button>
+            </div>
+          </div>
+          <span class="z3-ctrl-label">Di chuyển</span>
+
+          <button type="button" class="z3-space-cap" data-action="z3Fire" title="Bấm Space hoặc nhấn vào đây để bắn cầu năng lượng">
+            Space
+          </button>
+          <span class="z3-ctrl-label">Bắn năng<br/>lượng</span>
+        </div>
+      </div>
+
+      <!-- Thanh tiến độ tiêu diệt 0/5 ở giữa -->
+      <div class="z3-kill-progress-bar">
+        <div class="z3-kill-label">
+          <span class="z3-bullseye-icon">🎯</span>
+          <span>Tiêu diệt đúng vectơ: <strong id="z3KillCountText">${z3State.kills}/${z3State.targetKills}</strong></span>
+        </div>
+        <div class="z3-kill-slots" id="z3KillSlotsWrap">
+          ${[0, 1, 2, 3, 4].map(i =>
+            `<span class="z3-kill-slot ${i < z3State.kills ? 'filled' : ''}">${i < z3State.kills ? '✓' : ''}</span>`
+          ).join('')}
+        </div>
+      </div>
+
+      <!-- Góc phải: Thoại Rồng Xanh & Mascot -->
+      <div class="z3-mascot-corner">
+        <div class="z3-speech-bubble" id="z3MascotBubble">
+          ${z3State.mascotMsg}
+        </div>
+        <img src="/assets/RongXanh.png" alt="Rồng Xanh đồng hành" class="z3-mascot-avatar" draggable="false"/>
+      </div>
+    </footer>
+  </div>`;
+}
+
 function renderVectorAdventureStage(m) {
   ensureVaStateForStage(m);
   if (m.id === 1 || vaState.s1BridgeRestoredOverlay) {
     return renderStage1CipherBridgeGame(m);
+  }
+  if (m.id === 3) {
+    return renderStage3ZombieShooterGame(m);
   }
   const r = m.round || 0;
   const q = m.challenge || {};
@@ -5780,7 +6415,7 @@ function stageContent(m){
   <div>${renderOxyz3D(m, true)}</div>
  </div>` : '';
 
- const isS1FullScreenView = isS1 && !mvWorldMapOpen && !StageTransitionController.isTransitioning() && !mvShowIntroHub;
+ const isS1FullScreenView = (isS1 || m.id === 3) && !mvWorldMapOpen && !StageTransitionController.isTransitioning() && !mvShowIntroHub;
  const showOuterHeader = !isS1FullScreenView;
 
  return `<div class="hs-main-frame ${isS1FullScreenView ? 's1-full-frame' : ''}">
@@ -5918,7 +6553,7 @@ function studentScreen(){
  const m = world.current || (world.stages && world.stages[curStageIdx]) || {};
  ensureVaStateForStage(m);
  const dragonText = vaState.dragonMsg || m.dragonIntro || 'Cùng nhau tìm đúng hướng của vectơ nhé!';
- const isS1DedicatedUI = !me.completed && me.stage < 5 && (m.id === 1 || vaState.s1BridgeRestoredOverlay) && !mvWorldMapOpen && !StageTransitionController.isTransitioning() && !mvShowIntroHub;
+ const isS1DedicatedUI = !me.completed && me.stage < 5 && (m.id === 1 || m.id === 3 || vaState.s1BridgeRestoredOverlay) && !mvWorldMapOpen && !StageTransitionController.isTransitioning() && !mvShowIntroHub;
 
  return `<div class="hs-screen-shell ${isS1DedicatedUI ? 's1-dedicated-shell' : ''}" style="--stage-bg: url('${stageBgUrl}')">
   ${!isS1DedicatedUI ? mapTrack(me.stage) : ''}
@@ -6740,6 +7375,26 @@ async function handle(action,el){
    });
    return;
   }
+  if(action==='z3Fire'){
+   z3FireEnergyBall();
+   return;
+  }
+  if(action==='z3ClickZombie'){
+   const slotId = Number(el.dataset.slot);
+   if(!isNaN(slotId)){
+    z3FireEnergyBall(slotId);
+   }
+   return;
+  }
+  if(action==='z3ProceedNextStage'){
+   z3State.victoryOverlay=false;
+   StageTransitionController.beginStageTransition(2, 3, {
+    sealName: 'Ấn Cân Bằng',
+    points: 10,
+    goldEarned: 130
+   });
+   return;
+  }
   if(action==='vaClickPillar'){
    const node=el.dataset.node;
    if(node)vaState.pillars.add(node);
@@ -7007,6 +7662,7 @@ async function handle(action,el){
    cdState.stageId=-1;
    cdState.roundId=-1;
    zdState.shooting=false;zdState.hitLane=null;zdState.hintMsg=null;zdState.rewardMsg=null;
+   z3State.initedStage=-1;z3State.victoryOverlay=false;
    mazeState.x=0;mazeState.y=0;mazeState.walking=false;mazeState.toastMsg=null;mazeState.hintMsg=null;
    msState.posX=50;msState.posY=82;msState.walking=false;msState.wobble=false;msState.shaking=false;msState.blastX=null;msState.explodedMines=[];msState.hintMsg=null;
    cipherState.open=false;cipherState.slots=[null,null,null,null,null];cipherState.error=null;
@@ -7519,6 +8175,12 @@ document.addEventListener('click',e=>{
 });
 
 document.addEventListener('pointerdown',e=>{
+ const z3dbtn=e.target.closest('[data-z3dpad]');
+ if(z3dbtn){
+  e.preventDefault();
+  z3State.keys.add(z3dbtn.dataset.z3dpad);
+  return;
+ }
  const s1dbtn=e.target.closest('[data-s1dpad]');
  if(s1dbtn){
   e.preventDefault();
@@ -7552,6 +8214,7 @@ document.addEventListener('pointerup',()=>{
  ['up','down','left','right'].forEach(k=>{
   huntState.keysPressed.delete(k);
   s1Explorer.keys.delete(k);
+  z3State.keys.delete(k);
  });
 });
 
@@ -7568,32 +8231,32 @@ window.addEventListener('keydown',e=>{
  if(session?.role!=='student' || !world?.current || cipherState.open) return;
  const m = world.current;
 
- // Phím tắt chọn đáp án nhanh 1/2/3/4 cho mọi chặng
- if(['1','2','3','4'].includes(e.key)){
+ // Phím tắt chọn đáp án nhanh 1/2/3/4/5 cho các chặng
+ if(['1','2','3','4','5'].includes(e.key)){
   const idx = Number(e.key) - 1;
-  if(m.id === 3){ e.preventDefault(); shootZombieLane(idx); return; }
-  if(m.id === 4){ e.preventDefault(); answerMazeQuestion(idx); return; }
-  if(m.id === 5 && !m.isBoss && !world.me?.bossReady){ e.preventDefault(); stepMinesweeperPad(idx); return; }
+  if(m.id === 3){ e.preventDefault(); z3FireEnergyBall(idx + 1); return; }
+  if(idx < 4 && m.id === 4){ e.preventDefault(); answerMazeQuestion(idx); return; }
+  if(idx < 4 && m.id === 5 && !m.isBoss && !world.me?.bossReady){ e.preventDefault(); stepMinesweeperPad(idx); return; }
  }
 
- // Điều khiển bàn phím riêng cho Chặng 3 (Chặn Zombie 4 Làn)
+ // Điều khiển bàn phím riêng cho Chặng 3 (Đấu Trường Bắn Zombie Vectơ)
  if(m.id === 3){
-  const k = (e.key||'').toLowerCase();
-  if(e.code==='ArrowUp' || k==='w'){
-   e.preventDefault();
-   zdState.lane = Math.max(0, zdState.lane - 1);
-   render();
-   return;
-  }
-  if(e.code==='ArrowDown' || k==='s'){
-   e.preventDefault();
-   zdState.lane = Math.min(3, zdState.lane + 1);
-   render();
-   return;
-  }
   if(e.code==='Space' || e.code==='Enter'){
    e.preventDefault();
-   shootZombieLane(zdState.lane);
+   if(!e.repeat) z3FireEnergyBall();
+   return;
+  }
+  let dir3 = keyMap[e.code];
+  if(!dir3 && e.key){
+   const k3 = e.key.toLowerCase();
+   if(k3==='w'||k3==='arrowup') dir3='up';
+   else if(k3==='s'||k3==='arrowdown') dir3='down';
+   else if(k3==='a'||k3==='arrowleft') dir3='left';
+   else if(k3==='d'||k3==='arrowright') dir3='right';
+  }
+  if(dir3){
+   e.preventDefault();
+   z3State.keys.add(dir3);
    return;
   }
   return;
@@ -7698,11 +8361,13 @@ window.addEventListener('keyup',e=>{
  if(dir){
   huntState.keysPressed.delete(dir);
   s1Explorer.keys.delete(dir);
+  z3State.keys.delete(dir);
  }
 });
 
 window.addEventListener('blur',()=>{
  s1Explorer.keys.clear();
+ z3State.keys.clear();
  s1Explorer.isSprinting=false;
  ['up','down','left','right'].forEach(k=>huntState.keysPressed.delete(k));
 });
@@ -7722,6 +8387,9 @@ function gameLoop(now){
  if(session?.role==='student'&&!world?.paused){
   if((world?.current?.id === 1 || vaState.s1BridgeRestoredOverlay) && document.getElementById('s1ForestViewport')){
    s1Tick(now, dt);
+  }
+  if(world?.current?.id === 3 && document.getElementById('z3CourtyardViewport')){
+   z3Tick(now, dt);
   }
  }
 

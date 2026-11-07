@@ -7392,3 +7392,856 @@ body {
     width: 100%;
   }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   CHẶNG 3 – TRÒ CHƠI BẮN ZOMBIE (z3-*)
+   Khớp bố cục, màu sắc và hiệu ứng tham chiếu 100%
+   ═══════════════════════════════════════════════════════════════════════════ */
+.z3-shooter-shell {
+  position: relative;
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
+  border-radius: 18px;
+  overflow: hidden;
+  background: linear-gradient(180deg, #09132B 0%, #131F42 40%, #0C152E 100%);
+  border: 2px solid rgba(96, 165, 250, 0.45);
+  box-shadow: 0 20px 55px rgba(0, 0, 0, 0.78), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  color: #F8FAFC;
+  user-select: none;
+}
+
+/* 1. Thanh tiến trình 5 chặng trên cùng */
+.z3-top-nav-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 14px;
+  background: linear-gradient(180deg, rgba(11, 23, 54, 0.96) 0%, rgba(7, 15, 38, 0.96) 100%);
+  border-bottom: 1.5px solid rgba(56, 189, 248, 0.35);
+}
+
+.z3-brand-block {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 10px 4px 4px;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: transform 0.16s ease;
+}
+.z3-brand-block:hover {
+  transform: scale(1.03);
+}
+.z3-brand-gem {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: radial-gradient(circle at 35% 30%, #67E8F9, #0284C7 75%);
+  border: 1.5px solid #BAE6FD;
+  box-shadow: 0 0 16px rgba(56, 189, 248, 0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 21px;
+}
+.z3-brand-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.05;
+}
+.z3-brand-text strong {
+  font-size: 16px;
+  font-weight: 900;
+  letter-spacing: 0.03em;
+  color: #FFFFFF;
+  text-shadow: 0 2px 8px rgba(56, 189, 248, 0.65);
+}
+.z3-brand-text span {
+  font-size: 15px;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  color: #7DD3FC;
+}
+
+.z3-stage-tabs {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 8px;
+  flex: 1;
+}
+
+.z3-stage-tab {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 6px 11px;
+  border-radius: 12px;
+  background: linear-gradient(180deg, rgba(20, 36, 74, 0.9) 0%, rgba(12, 23, 52, 0.92) 100%);
+  border: 1.5px solid rgba(100, 148, 237, 0.32);
+  color: #CBD5E1;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  position: relative;
+  overflow: hidden;
+}
+.z3-stage-tab:hover {
+  border-color: rgba(125, 211, 252, 0.75);
+  transform: translateY(-1px);
+}
+.z3-stage-tab.done {
+  background: linear-gradient(180deg, rgba(16, 48, 68, 0.92) 0%, rgba(11, 31, 52, 0.94) 100%);
+  border-color: rgba(52, 211, 153, 0.55);
+}
+.z3-stage-tab.active {
+  background: linear-gradient(180deg, rgba(120, 53, 15, 0.92) 0%, rgba(69, 26, 3, 0.95) 100%);
+  border: 2px solid #FBBF24;
+  box-shadow: 0 0 20px rgba(251, 191, 36, 0.5), inset 0 0 12px rgba(251, 191, 36, 0.25);
+}
+
+.z3-tab-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 900;
+  flex-shrink: 0;
+}
+.z3-tab-icon.check {
+  background: radial-gradient(circle, #10B981, #059669);
+  color: #FFFFFF;
+  border: 1.5px solid #6EE7B7;
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.6);
+}
+.z3-tab-icon.play {
+  background: radial-gradient(circle, #FBBF24, #D97706);
+  color: #451A03;
+  border: 1.5px solid #FEF08A;
+  box-shadow: 0 0 12px rgba(251, 191, 36, 0.75);
+}
+.z3-tab-icon.num,
+.z3-tab-icon.lock {
+  background: rgba(30, 41, 59, 0.85);
+  color: #94A3B8;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+}
+
+.z3-tab-copy {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.15;
+  min-width: 0;
+}
+.z3-tab-copy small {
+  font-size: 10.5px;
+  font-weight: 700;
+  color: #93C5FD;
+}
+.z3-stage-tab.active .z3-tab-copy small {
+  color: #FDE68A;
+}
+.z3-tab-copy strong {
+  font-size: 12.5px;
+  font-weight: 900;
+  color: #FFFFFF;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.z3-tab-status {
+  font-size: 10px;
+  font-weight: 800;
+  margin-top: 1px;
+}
+.z3-tab-status.done {
+  color: #34D399;
+}
+.z3-tab-status.current {
+  color: #FBBF24;
+}
+.z3-tab-status.locked {
+  color: #94A3B8;
+}
+
+/* 2. Thanh phụ Pháo đài & Tim / XP / Đồng hồ */
+.z3-arena-subheader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 6px 16px;
+  background: linear-gradient(90deg, rgba(14, 30, 68, 0.95) 0%, rgba(28, 39, 78, 0.82) 55%, rgba(20, 29, 58, 0.94) 100%);
+  border-bottom: 1.5px solid rgba(251, 191, 36, 0.35);
+}
+
+.z3-fortress-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 4px 20px 4px 8px;
+  border-radius: 14px;
+  background: linear-gradient(90deg, rgba(15, 38, 86, 0.96) 0%, rgba(28, 64, 128, 0.82) 75%, rgba(28, 64, 128, 0.1) 100%);
+  border: 1.5px solid rgba(96, 165, 250, 0.55);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45);
+}
+.z3-fortress-crest {
+  width: 50px;
+  height: 50px;
+  border-radius: 12px;
+  object-fit: cover;
+  border: 2px solid #FBBF24;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.55);
+}
+.z3-fortress-titles h2 {
+  margin: 0;
+  font-size: clamp(15px, 1.55vw, 20px);
+  font-weight: 900;
+  letter-spacing: 0.03em;
+  color: #FDE68A;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.75);
+}
+.z3-fortress-titles p {
+  margin: 2px 0 0;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #E2E8F0;
+}
+
+.z3-status-cluster {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.z3-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 16px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(64, 42, 24, 0.94) 0%, rgba(36, 22, 12, 0.96) 100%);
+  border: 2px solid #D97706;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(254, 240, 138, 0.35);
+}
+.z3-heart-icon {
+  font-size: 20px;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.6));
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+.z3-heart-icon.lost {
+  opacity: 0.28;
+  filter: grayscale(1);
+}
+.z3-pill-xp strong {
+  font-size: 17px;
+  font-weight: 900;
+  color: #FEF08A;
+  letter-spacing: 0.02em;
+}
+.z3-star-icon {
+  font-size: 19px;
+  filter: drop-shadow(0 0 8px rgba(250, 204, 21, 0.8));
+}
+.z3-pill-timer {
+  background: linear-gradient(180deg, rgba(120, 53, 15, 0.95) 0%, rgba(69, 26, 3, 0.98) 100%);
+  border-color: #FBBF24;
+  box-shadow: 0 0 16px rgba(251, 191, 36, 0.4);
+}
+.z3-pill-timer strong {
+  font-size: 22px;
+  font-weight: 900;
+  color: #FFFFFF;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
+}
+.z3-pill-timer.urgent {
+  border-color: #EF4444;
+  animation: pulseUrgentTimer 0.85s ease-in-out infinite;
+}
+
+/* 3. Sân đấu Isometric chính */
+.z3-courtyard-viewport {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 7.9;
+  min-height: 450px;
+  max-height: 620px;
+  overflow: hidden;
+  background: #1B2436;
+}
+.z3-courtyard-bg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 42%;
+  display: block;
+  pointer-events: none;
+}
+
+/* Vòng xoáy cổng dịch chuyển phía Bắc */
+.z3-portal-swirl {
+  position: absolute;
+  left: 50.8%;
+  top: 15.5%;
+  width: 8.5%;
+  aspect-ratio: 1 / 1.18;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(103, 232, 249, 0.55) 0%, rgba(14, 165, 233, 0.28) 55%, transparent 75%);
+  box-shadow: 0 0 32px rgba(56, 189, 248, 0.85);
+  pointer-events: none;
+  animation: z3PortalPulse 2.4s ease-in-out infinite;
+}
+@keyframes z3PortalPulse {
+  0%, 100% { transform: translate(-50%, -50%) scale(0.96); opacity: 0.82; }
+  50% { transform: translate(-50%, -50%) scale(1.08); opacity: 1; }
+}
+
+/* 2 Cuộn giấy da dê bên trái (Nhiệm vụ & Gợi ý) */
+.z3-left-parchments {
+  position: absolute;
+  left: 1.2%;
+  top: 4%;
+  width: clamp(200px, 16.5%, 245px);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  z-index: 6;
+}
+.z3-parchment-scroll {
+  padding: 13px 15px;
+  border-radius: 14px;
+  background:
+    radial-gradient(circle at 20% 20%, #FFFBEB 0%, #FDE68A 62%, #F59E0B 100%);
+  background: linear-gradient(180deg, #FDF3D7 0%, #F5DEB3 58%, #E6C288 100%);
+  border: 3px solid #92400E;
+  box-shadow:
+    0 10px 24px rgba(0, 0, 0, 0.62),
+    inset 0 2px 0 rgba(255, 255, 255, 0.75),
+    inset 0 -3px 8px rgba(146, 64, 14, 0.35);
+  color: #3B1906;
+  position: relative;
+}
+.z3-parchment-head {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding-bottom: 6px;
+  margin-bottom: 7px;
+  border-bottom: 1.5px solid rgba(146, 64, 14, 0.28);
+}
+.z3-parchment-icon {
+  font-size: 19px;
+}
+.z3-parchment-head strong {
+  font-size: 16.5px;
+  font-weight: 900;
+  color: #451A03;
+}
+.z3-parchment-body {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.42;
+  font-weight: 700;
+  color: #451A03;
+}
+.z3-math-formula {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+  padding: 2px 8px;
+  border-radius: 8px;
+  background: rgba(254, 243, 199, 0.85);
+  border: 1.5px solid rgba(180, 83, 9, 0.4);
+  font-size: 18px;
+  font-weight: 900;
+  color: #1E1B4B;
+}
+
+.z3-vec-token,
+.z3-inline-vec {
+  position: relative;
+  display: inline-block;
+  font-weight: 900;
+  padding-top: 0.36em;
+  line-height: 1;
+  margin: 0 2px;
+}
+.z3-vec-token .arr,
+.z3-inline-vec .v-arr {
+  position: absolute;
+  top: -0.18em;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-size: 0.78em;
+  font-weight: 900;
+  line-height: 1;
+}
+
+/* Nhân vật Rồng Xanh chiến đấu */
+.z3-dragon-hero {
+  position: absolute;
+  width: clamp(135px, 14.5%, 198px);
+  transform: translate(-50%, -56%);
+  z-index: 8;
+  pointer-events: none;
+  transition: left 0.05s linear, top 0.05s linear;
+}
+.z3-dragon-hp-track {
+  width: 76px;
+  height: 11px;
+  margin: 0 auto 4px;
+  border-radius: 99px;
+  background: rgba(15, 23, 42, 0.88);
+  border: 2px solid #FDE68A;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.65);
+}
+.z3-dragon-hp-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #22C55E, #4ADE80);
+  box-shadow: 0 0 8px #22C55E;
+}
+.z3-dragon-shooter-img {
+  width: 100%;
+  height: auto;
+  display: block;
+  filter: drop-shadow(0 10px 16px rgba(0, 0, 0, 0.72));
+  animation: z3DragonBreath 2.2s ease-in-out infinite;
+}
+@keyframes z3DragonBreath {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-4px) scale(1.02); }
+}
+
+/* Lớp tia năng lượng xanh & quả cầu năng lượng */
+.z3-energy-beam-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9;
+}
+.z3-dragon-energy-beam {
+  position: absolute;
+  height: 14px;
+  transform-origin: 0% 50%;
+  display: flex;
+  align-items: center;
+}
+.z3-beam-core {
+  width: 100%;
+  height: 8px;
+  border-radius: 99px;
+  background: linear-gradient(90deg, rgba(224, 242, 254, 0.95) 0%, rgba(56, 189, 248, 0.95) 65%, rgba(14, 165, 233, 0.2) 100%);
+  box-shadow: 0 0 16px #38BDF8, 0 0 28px #0284C7;
+}
+.z3-beam-orb {
+  position: absolute;
+  right: -14px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #FFFFFF 0%, #7DD3FC 45%, #0284C7 80%, transparent 100%);
+  box-shadow: 0 0 22px #38BDF8, 0 0 38px #67E8F9;
+  animation: z3OrbPulse 0.7s ease-in-out infinite alternate;
+}
+@keyframes z3OrbPulse {
+  from { transform: scale(0.9); }
+  to { transform: scale(1.16); }
+}
+
+.z3-flying-orb {
+  position: absolute;
+  width: 34px;
+  height: 34px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: radial-gradient(circle, #FFFFFF 0%, #67E8F9 45%, #0284C7 82%, transparent 100%);
+  box-shadow: 0 0 26px #38BDF8, 0 0 46px #BAE6FD;
+}
+
+.z3-hit-floater {
+  position: absolute;
+  transform: translate(-50%, -100%);
+  padding: 5px 12px;
+  border-radius: 99px;
+  font-size: 14px;
+  font-weight: 900;
+  white-space: nowrap;
+  z-index: 20;
+  animation: z3FloatUp 1.1s ease-out forwards;
+}
+.z3-hit-floater.good {
+  background: rgba(6, 78, 59, 0.95);
+  border: 2px solid #34D399;
+  color: #FEF08A;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.65);
+}
+.z3-hit-floater.bad {
+  background: rgba(127, 29, 29, 0.95);
+  border: 2px solid #F87171;
+  color: #FECACA;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.65);
+}
+@keyframes z3FloatUp {
+  0% { opacity: 1; transform: translate(-50%, -60%) scale(0.9); }
+  100% { opacity: 0; transform: translate(-50%, -190%) scale(1.06); }
+}
+
+/* 5 Zombie cầm bảng gỗ vectơ trên sân */
+.z3-zombies-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 7;
+  pointer-events: none;
+}
+.z3-zombie-unit {
+  position: absolute;
+  width: clamp(98px, 9.8%, 136px);
+  transform: translate(-50%, -56%);
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  pointer-events: auto;
+  transition: transform 0.16s ease, opacity 0.25s ease;
+}
+.z3-zombie-unit:hover {
+  transform: translate(-50%, -59%) scale(1.06);
+}
+.z3-zombie-unit.is-dead {
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, -50%) scale(0.35);
+}
+.z3-zombie-unit.is-wrong-shake {
+  animation: z3WrongShake 0.42s ease;
+}
+@keyframes z3WrongShake {
+  0%, 100% { transform: translate(-50%, -56%); }
+  25% { transform: translate(-58%, -56%) rotate(-5deg); }
+  75% { transform: translate(-42%, -56%) rotate(5deg); }
+}
+
+.z3-zombie-sprite {
+  width: 100%;
+  height: auto;
+  display: block;
+  position: relative;
+  z-index: 2;
+  filter: drop-shadow(0 10px 14px rgba(0, 0, 0, 0.72));
+  animation: z3ZombieBob 1.9s ease-in-out infinite;
+}
+@keyframes z3ZombieBob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+/* Hào quang vàng rực rỡ quanh Zombie mục tiêu đang ngắm */
+.z3-target-aura {
+  position: absolute;
+  inset: -16% -20% -10% -20%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(254, 240, 138, 0.55) 0%, rgba(250, 204, 21, 0.34) 48%, rgba(245, 158, 11, 0) 74%);
+  border: 2.5px solid rgba(254, 240, 138, 0.88);
+  box-shadow: 0 0 28px rgba(250, 204, 21, 0.9), inset 0 0 18px rgba(254, 240, 138, 0.65);
+  z-index: 1;
+  animation: z3AuraSpinPulse 1.6s ease-in-out infinite;
+}
+.z3-target-ring {
+  position: absolute;
+  left: 10%;
+  right: 10%;
+  bottom: 2%;
+  height: 22%;
+  border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(253, 224, 71, 0.75) 0%, rgba(245, 158, 11, 0.45) 60%, transparent 80%);
+  border: 2px solid #FEF08A;
+  box-shadow: 0 0 20px #FACC15;
+  z-index: 1;
+}
+@keyframes z3AuraSpinPulse {
+  0%, 100% { transform: scale(0.96); opacity: 0.88; }
+  50% { transform: scale(1.05); opacity: 1; }
+}
+
+/* Chữ Vectơ có dấu mũi tên trên tấm bảng gỗ trước ngực Zombie */
+.z3-zombie-board-label {
+  position: absolute;
+  left: 50%;
+  top: 56%;
+  transform: translate(-50%, -50%) rotate(-1.5deg);
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  line-height: 0.88;
+  pointer-events: none;
+  color: #FFFBEB;
+  text-shadow:
+    0 2px 0 #271203,
+    -1.5px -1.5px 0 #271203,
+    1.5px -1.5px 0 #271203,
+    -1.5px 1.5px 0 #271203,
+    1.5px 1.5px 0 #271203,
+    0 3px 6px rgba(0, 0, 0, 0.85);
+}
+.z3-zombie-board-label .z3-vec-arrow {
+  font-size: clamp(13px, 1.25vw, 17px);
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  margin-bottom: -2px;
+}
+.z3-zombie-board-label .z3-vec-letters {
+  font-size: clamp(16px, 1.65vw, 23px);
+  font-weight: 900;
+  font-style: italic;
+  letter-spacing: 0.03em;
+}
+
+/* 4. Thanh HUD dưới cùng: Bàn phím + Tiến độ 0/5 + Thoại Rồng Xanh */
+.z3-bottom-hud {
+  display: grid;
+  grid-template-columns: minmax(275px, 1.05fr) minmax(300px, 1.25fr) minmax(290px, 1.15fr);
+  align-items: center;
+  gap: 14px;
+  padding: 10px 18px;
+  background: linear-gradient(180deg, rgba(9, 19, 43, 0.94) 0%, rgba(6, 13, 31, 0.98) 100%);
+  border-top: 1.5px solid rgba(56, 189, 248, 0.4);
+  position: relative;
+  z-index: 12;
+}
+
+.z3-controls-card {
+  padding: 8px 14px;
+  border-radius: 16px;
+  background: linear-gradient(180deg, rgba(14, 34, 74, 0.92) 0%, rgba(8, 21, 48, 0.96) 100%);
+  border: 1.5px solid rgba(56, 189, 248, 0.55);
+  box-shadow: 0 0 18px rgba(14, 165, 233, 0.25);
+}
+.z3-controls-title {
+  font-size: 13px;
+  font-weight: 900;
+  color: #F8FAFC;
+  margin-bottom: 6px;
+}
+.z3-controls-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.z3-arrow-pad {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+}
+.z3-arrow-bottom-row {
+  display: flex;
+  gap: 3px;
+}
+.z3-key-cap {
+  width: 28px;
+  height: 25px;
+  border-radius: 6px;
+  background: linear-gradient(180deg, #FFFFFF 0%, #DBEAFE 100%);
+  border: 1.5px solid #60A5FA;
+  box-shadow: 0 3px 0 #1E3A8A;
+  color: #0F172A;
+  font-size: 13px;
+  font-weight: 900;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+.z3-key-cap:active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 #1E3A8A;
+}
+.z3-space-cap {
+  padding: 7px 16px;
+  border-radius: 8px;
+  background: linear-gradient(180deg, #FFFFFF 0%, #DBEAFE 100%);
+  border: 1.5px solid #60A5FA;
+  box-shadow: 0 3px 0 #1E3A8A;
+  color: #0F172A;
+  font-size: 13.5px;
+  font-weight: 900;
+  cursor: pointer;
+}
+.z3-space-cap:active {
+  transform: translateY(2px);
+}
+.z3-ctrl-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: #E2E8F0;
+  line-height: 1.2;
+}
+
+/* Thanh tiến độ tiêu diệt đúng vectơ: 0/5 */
+.z3-kill-progress-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 20px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(15, 31, 66, 0.95) 0%, rgba(9, 19, 44, 0.98) 100%);
+  border: 2px solid rgba(96, 165, 250, 0.55);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.55), inset 0 0 14px rgba(56, 189, 248, 0.18);
+}
+.z3-kill-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: clamp(14px, 1.35vw, 18px);
+  font-weight: 800;
+  color: #F8FAFC;
+  white-space: nowrap;
+}
+.z3-bullseye-icon {
+  font-size: 22px;
+  filter: drop-shadow(0 0 8px rgba(239, 68, 68, 0.75));
+}
+.z3-kill-label strong {
+  color: #FBBF24;
+  font-size: 1.1em;
+  font-weight: 900;
+}
+.z3-kill-slots {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.z3-kill-slot {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: rgba(15, 23, 42, 0.85);
+  border: 2px solid rgba(148, 163, 184, 0.55);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 900;
+  color: #FFFFFF;
+  transition: all 0.22s ease;
+}
+.z3-kill-slot.filled {
+  background: radial-gradient(circle, #34D399 0%, #059669 100%);
+  border-color: #A7F3D0;
+  box-shadow: 0 0 12px rgba(16, 185, 129, 0.85);
+}
+
+/* Góc phải: Thoại Rồng Xanh & Mascot */
+.z3-mascot-corner {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  position: relative;
+}
+.z3-speech-bubble {
+  padding: 10px 15px;
+  border-radius: 16px;
+  background: linear-gradient(180deg, rgba(16, 42, 92, 0.95) 0%, rgba(10, 26, 62, 0.98) 100%);
+  border: 2px solid #38BDF8;
+  box-shadow: 0 0 20px rgba(56, 189, 248, 0.4);
+  color: #F8FAFC;
+  font-size: 13.5px;
+  font-weight: 800;
+  line-height: 1.38;
+  max-width: 280px;
+}
+.z3-mascot-avatar {
+  width: 84px;
+  height: 84px;
+  object-fit: contain;
+  margin-top: -26px;
+  filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.7));
+  flex-shrink: 0;
+}
+
+/* Modal hoàn thành Chặng 3 */
+.z3-victory-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(6, 13, 31, 0.78);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 30;
+}
+.z3-victory-modal {
+  max-width: 460px;
+  width: 92%;
+  padding: 24px 26px;
+  border-radius: 20px;
+  background: linear-gradient(180deg, #0F244A 0%, #09152E 100%);
+  border: 2.5px solid #FBBF24;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.85), 0 0 35px rgba(251, 191, 36, 0.45);
+  text-align: center;
+}
+.z3-victory-seal {
+  font-size: 46px;
+  margin-bottom: 6px;
+}
+.z3-victory-modal h3 {
+  margin: 0 0 8px;
+  font-size: 22px;
+  font-weight: 900;
+  color: #FEF08A;
+}
+.z3-victory-modal p {
+  margin: 0 0 14px;
+  font-size: 14.5px;
+  line-height: 1.45;
+  color: #E2E8F0;
+}
+.z3-victory-rewards {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+.z3-victory-rewards span {
+  padding: 5px 12px;
+  border-radius: 99px;
+  background: rgba(16, 185, 129, 0.2);
+  border: 1.5px solid #34D399;
+  color: #A7F3D0;
+  font-size: 13px;
+  font-weight: 800;
+}
+.z3-victory-next-btn {
+  width: 100%;
+  padding: 12px 18px;
+  border-radius: 12px;
+  background: linear-gradient(180deg, #FBBF24 0%, #D97706 100%);
+  border: 2px solid #FEF08A;
+  color: #451A03;
+  font-size: 15px;
+  font-weight: 900;
+  cursor: pointer;
+  box-shadow: 0 6px 18px rgba(245, 158, 11, 0.5);
+}
+
+@media (max-width: 1080px) {
+  .z3-stage-tabs {
+    grid-template-columns: repeat(5, minmax(110px, 1fr));
+    overflow-x: auto;
+  }
+  .z3-bottom-hud {
+    grid-template-columns: 1fr;
+  }
+}

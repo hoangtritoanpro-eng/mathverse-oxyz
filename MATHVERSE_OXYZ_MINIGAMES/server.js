@@ -442,6 +442,9 @@ function processAction(endpoint,d){
      t.stage1.completedTimeSec=Math.max(1,Math.min(60,Math.round((Date.now()-(t.stageEnteredAt||Date.now()))/1000)));
     }
    }
+  }else if(d.zombieTargetCleared){
+   isCorrect=true;
+   chosenLogText=`Tiêu diệt zombie mang vectơ ${d.targetVec||'AC'} (${d.kills||5}/5)`;
   }else if(q.isInteractive && d.interactiveDone){
    isCorrect=true;
   }else if(d.shortText!==undefined&&String(d.shortText).trim()!==''){
