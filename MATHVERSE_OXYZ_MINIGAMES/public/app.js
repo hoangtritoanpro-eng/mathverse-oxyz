@@ -5635,6 +5635,45 @@ const Z3_RUSH_MULT = 6.5;          // Hệ số cả bầy zombie chạy nước
 const Z3_RUSH_MS = 1500;           // Thời gian cả bầy chạy nước rút (ms)
 const Z3_CHARGE_MS = 950;          // Thời gian zombie bị bắn nhầm lao từ vị trí hiện tại tới cắn Rồng Xanh
 
+const Z3_QUESTIONS = [
+  {
+    qIdx: 0,
+    badge: 'Câu 1/3',
+    shortLabel: 'Câu 1',
+    promptText: 'Tiêu diệt zombie đang giữ vectơ kết quả của',
+    contextNote: '',
+    v1: 'AB',
+    v2: 'BC',
+    targetVec: 'AC',
+    hintText: 'Tổng của hai vectơ nối tiếp bằng vectơ nối điểm đầu với điểm cuối (Quy tắc 3 điểm: A → B → C).',
+    boardVecs: ['BA', 'CB', 'AC', 'AC', 'AB']
+  },
+  {
+    qIdx: 1,
+    badge: 'Câu 2/3',
+    shortLabel: 'Câu 2',
+    promptText: 'Tiêu diệt zombie đang giữ vectơ kết quả của',
+    contextNote: '',
+    v1: 'MN',
+    v2: 'NP',
+    targetVec: 'MP',
+    hintText: 'Hai vectơ nối tiếp tại điểm trung gian N: tổng bằng vectơ nối điểm đầu M với điểm cuối P.',
+    boardVecs: ['PM', 'NP', 'MP', 'MP', 'MN']
+  },
+  {
+    qIdx: 2,
+    badge: 'Câu 3/3',
+    shortLabel: 'Câu 3',
+    promptText: 'Cho hình bình hành ABCD, tìm vectơ kết quả của',
+    contextNote: 'Hình bình hành ABCD',
+    v1: 'BA',
+    v2: 'BC',
+    targetVec: 'BD',
+    hintText: 'Quy tắc hình bình hành: tổng hai vectơ cạnh cùng xuất phát từ đỉnh B bằng vectơ đường chéo xuất phát từ B.',
+    boardVecs: ['DB', 'AC', 'BD', 'BD', 'CA']
+  }
+];
+
 const Z3_INITIAL_ZOMBIES = [
   { slotId: 1, spawnX: 54.0, spawnY: 37.0, laneY: 37.0, s: 0.18, vec: 'BA', isCorrect: false },
   { slotId: 2, spawnX: 70.0, spawnY: 37.0, laneY: 37.0, s: 0.12, vec: 'CB', isCorrect: false },
@@ -5654,6 +5693,7 @@ const z3State = {
   xpBonus: 0,
   kills: 0,
   targetKills: 5,
+  qIdx: 0,
   targetVec: 'AC',
   speedLevel: 0,
   rushUntil: 0,
@@ -5675,6 +5715,36 @@ const z3State = {
   submittingServer: false,
   seq: 1
 };
+
+function z3GetActiveQuestion() {
+  return Z3_QUESTIONS[Math.max(0, Math.min(Z3_QUESTIONS.length - 1, z3State.qIdx || 0))];
+}
+
+function z3ApplyQuestionToZombies(newQIdx, announce = false) {
+  const q = Z3_QUESTIONS[Math.max(0, Math.min(Z3_QUESTIONS.length - 1, newQIdx))];
+  z3State.qIdx = q.qIdx;
+  z3State.targetVec = q.targetVec;
+  z3State.zombies.forEach((z, idx) => {
+    const newVec = q.boardVecs[idx] || q.targetVec;
+    z.vec = newVec;
+    z.isCorrect = (newVec === q.targetVec);
+    if (!z.alive || z.dyingUntil > 0) {
+      z.alive = true;
+      z.dyingUntil = 0;
+      z.charging = false;
+      z.impacted = false;
+      z.s = 0.08 + (idx * 0.03);
+      const pos = z3ComputeZombieXY(z);
+      z.x = pos.x;
+      z.y = pos.y;
+    }
+  });
+  if (announce) {
+    z3State.mascotMsg = `📜 <b>${q.badge}:</b> Hãy bắn chặn những zombie mang đúng vectơ kết quả của <span class="z3-inline-vec"><span class="v-arr">→</span>${q.v1}</span> + <span class="z3-inline-vec"><span class="v-arr">→</span>${q.v2}</span> nhé!`;
+  }
+  z3EnsureCorrectZombieOnField();
+  z3UpdateAimedZombie();
+}
 
 function playZ3Sfx(type) {
   if (!soundEnabled) return;
@@ -5732,7 +5802,9 @@ function ensureZ3State(m) {
     const curRound = m?.round || 0;
     z3State.kills = curRound >= 3 ? 5 : (curRound === 2 ? 3 : (curRound === 1 ? 1 : 0));
     z3State.targetKills = 5;
-    z3State.targetVec = 'AC';
+    z3State.qIdx = Math.min(2, Math.max(0, curRound));
+    const initQ = Z3_QUESTIONS[z3State.qIdx];
+    z3State.targetVec = initQ.targetVec;
     z3State.speedLevel = 0;
     z3State.rushUntil = 0;
     z3State.playerHitUntil = 0;
@@ -5740,9 +5812,12 @@ function ensureZ3State(m) {
     z3State.biteMsg = null;
     z3State.keys.clear();
     z3State.aimedSlotId = 3;
-    z3State.zombies = Z3_INITIAL_ZOMBIES.map(z => {
+    z3State.zombies = Z3_INITIAL_ZOMBIES.map((z, idx) => {
+      const boardVec = initQ.boardVecs[idx] || initQ.targetVec;
       const copy = {
         ...z,
+        vec: boardVec,
+        isCorrect: boardVec === initQ.targetVec,
         alive: true,
         dyingUntil: 0,
         charging: false,
@@ -5766,7 +5841,7 @@ function ensureZ3State(m) {
     z3State.beamPreviewUntil = performance.now() + 99999999;
     z3State.beamTargetX = 51.0;
     z3State.beamTargetY = 53.5;
-    z3State.mascotMsg = 'Hãy bắn chặn những zombie mang đúng vectơ kết quả của <span class="z3-inline-vec"><span class="v-arr">→</span>AB</span> + <span class="z3-inline-vec"><span class="v-arr">→</span>BC</span> trước khi chúng chạm vạch phòng thủ nhé!';
+    z3State.mascotMsg = `Hãy bắn chặn những zombie mang đúng vectơ kết quả của <span class="z3-inline-vec"><span class="v-arr">→</span>${initQ.v1}</span> + <span class="z3-inline-vec"><span class="v-arr">→</span>${initQ.v2}</span> trước khi chúng chạm vạch phòng thủ nhé!`;
     z3State.mascotMood = 'normal';
     z3State.victoryOverlay = false;
     z3State.submittingServer = false;
@@ -5808,11 +5883,12 @@ function z3SpawnFloater(x, y, text, cls = 'good') {
 }
 
 function z3EnsureCorrectZombieOnField() {
+  const curQ = z3GetActiveQuestion();
   const aliveCorrect = z3State.zombies.filter(z => z.alive && !z.dyingUntil && z.isCorrect);
   if (aliveCorrect.length === 0) {
     const candidate = z3State.zombies.find(z => z.alive && !z.charging);
     if (candidate) {
-      candidate.vec = 'AC';
+      candidate.vec = curQ.targetVec;
       candidate.isCorrect = true;
     }
   }
@@ -5821,6 +5897,7 @@ function z3EnsureCorrectZombieOnField() {
 function z3StartCharge(zombie, reason = 'wrong_shot') {
   if (!zombie || !zombie.alive || zombie.charging) return;
   const now = performance.now();
+  const curQ = z3GetActiveQuestion();
   z3State.speedLevel = (z3State.speedLevel || 0) + 1;
   z3State.rushUntil = now + Z3_RUSH_MS;
   zombie.charging = true;
@@ -5837,9 +5914,9 @@ function z3StartCharge(zombie, reason = 'wrong_shot') {
   playZ3Sfx('roar');
   z3State.mascotMood = 'hint';
   if (reason === 'fence_breach') {
-    z3State.mascotMsg = `⚠️ Một zombie đã chạm hàng rào phòng thủ và lao vào tấn công! Hãy bắn hạ nhanh các zombie mang vectơ <b>AC</b>!`;
+    z3State.mascotMsg = `⚠️ Một zombie đã chạm hàng rào phòng thủ và lao vào tấn công! Hãy bắn hạ nhanh các zombie mang vectơ <b>${curQ.targetVec}</b>!`;
   } else {
-    z3State.mascotMsg = `💡 Bắn trượt (<b>${zombie.vec}</b>) – cả bầy zombie đã tăng tốc <b>x${z3SpeedMult().toFixed(1)}</b>! Nhớ quy tắc nối tiếp: <span class="z3-inline-vec"><span class="v-arr">→</span>AB</span> + <span class="z3-inline-vec"><span class="v-arr">→</span>BC</span> = <span class="z3-inline-vec"><span class="v-arr">→</span>AC</span>!`;
+    z3State.mascotMsg = `💡 Bắn trượt (<b>${zombie.vec}</b>) – cả bầy zombie đã tăng tốc <b>x${z3SpeedMult().toFixed(1)}</b>! Nhớ quy tắc: <span class="z3-inline-vec"><span class="v-arr">→</span>${curQ.v1}</span> + <span class="z3-inline-vec"><span class="v-arr">→</span>${curQ.v2}</span> = <span class="z3-inline-vec"><span class="v-arr">→</span>${curQ.targetVec}</span>!`;
   }
   z3SyncDOM();
 }
@@ -5936,6 +6013,7 @@ async function z3SyncServerProgress() {
 function z3HandleZombieHit(zombie) {
   const now = performance.now();
   if (!zombie || !zombie.alive || zombie.dyingUntil > now) return;
+  const hitQ = z3GetActiveQuestion();
 
   if (zombie.isCorrect) {
     playZ3Sfx('hit');
@@ -5947,7 +6025,7 @@ function z3HandleZombieHit(zombie) {
 
     z3State.kills = Math.min(z3State.targetKills, z3State.kills + 1);
     z3State.xpBonus += 50;
-    z3SpawnFloater(zombie.x, zombie.y - 7, `💥 TIÊU DIỆT ZOMBIE AC! +50 XP (${z3State.kills}/5)`, 'good');
+    z3SpawnFloater(zombie.x, zombie.y - 7, `💥 TIÊU DIỆT ZOMBIE ${hitQ.targetVec}! +50 XP (${z3State.kills}/5)`, 'good');
     z3State.mascotMood = 'win';
 
     // Xung kích năng lượng đẩy lùi nhẹ các zombie khác đang tiến công
@@ -5961,7 +6039,7 @@ function z3HandleZombieHit(zombie) {
     });
 
     if (z3State.kills >= z3State.targetKills) {
-      z3State.mascotMsg = '🏆 Xuất sắc! Đã chặn đứng đủ 5/5 đợt zombie mang vectơ <span class="z3-inline-vec"><span class="v-arr">→</span>AC</span>!';
+      z3State.mascotMsg = '🏆 Xuất sắc! Đội đã hoàn thành cả 3 câu hỏi và chặn đứng đủ 5/5 đợt zombie!';
       setTimeout(() => {
         zombie.alive = false;
         zombie.dyingUntil = 0;
@@ -5969,7 +6047,17 @@ function z3HandleZombieHit(zombie) {
       }, 550);
       z3SyncServerProgress();
     } else {
-      z3State.mascotMsg = `💥 Chính xác! <span class="z3-inline-vec"><span class="v-arr">→</span>AB</span> + <span class="z3-inline-vec"><span class="v-arr">→</span>BC</span> = <span class="z3-inline-vec"><span class="v-arr">→</span>AC</span> (${z3State.kills}/5). Tiếp tục bắn chặn zombie mang bảng <b>AC</b> đang tiến vào!`;
+      // Tự động chuyển sang Câu 2 khi đạt 2/5 kills, và chuyển sang Câu 3 khi đạt 4/5 kills
+      const nextQIdx = z3State.kills >= 4 ? 2 : (z3State.kills >= 2 ? 1 : z3State.qIdx);
+      const switchedQuestion = nextQIdx !== z3State.qIdx;
+      const nextQ = Z3_QUESTIONS[nextQIdx];
+
+      if (switchedQuestion) {
+        z3State.mascotMsg = `🎉 Đã vượt qua ${hitQ.shortLabel}! Chuyển sang <b>${nextQ.badge}:</b> Tìm vectơ kết quả của <span class="z3-inline-vec"><span class="v-arr">→</span>${nextQ.v1}</span> + <span class="z3-inline-vec"><span class="v-arr">→</span>${nextQ.v2}</span>!`;
+      } else {
+        z3State.mascotMsg = `💥 Chính xác! <span class="z3-inline-vec"><span class="v-arr">→</span>${hitQ.v1}</span> + <span class="z3-inline-vec"><span class="v-arr">→</span>${hitQ.v2}</span> = <span class="z3-inline-vec"><span class="v-arr">→</span>${hitQ.targetVec}</span> (${z3State.kills}/5). Tiếp tục bắn chặn zombie mang bảng <b>${nextQ.targetVec}</b>!`;
+      }
+
       if (z3State.kills === 1 || z3State.kills === 3) {
         z3SyncServerProgress();
       }
@@ -5981,8 +6069,6 @@ function z3HandleZombieHit(zombie) {
           targetZ.dyingUntil = 0;
           targetZ.charging = false;
           targetZ.impacted = false;
-          targetZ.vec = 'AC';
-          targetZ.isCorrect = true;
           targetZ.spawnX = 79 + (Math.random() * 5 - 2);
           targetZ.s = 0.02;
           const pos = z3ComputeZombieXY(targetZ);
@@ -5990,8 +6076,15 @@ function z3HandleZombieHit(zombie) {
           targetZ.y = pos.y;
           targetZ.respawnUntil = performance.now() + 600;
           targetZ.popText = null;
-          z3EnsureCorrectZombieOnField();
-          z3UpdateAimedZombie();
+          if (switchedQuestion) {
+            z3ApplyQuestionToZombies(nextQIdx, false);
+          } else {
+            const activeQ = z3GetActiveQuestion();
+            targetZ.vec = activeQ.targetVec;
+            targetZ.isCorrect = true;
+            z3EnsureCorrectZombieOnField();
+            z3UpdateAimedZombie();
+          }
           z3SyncDOM();
         }
       }, 640);
@@ -6260,9 +6353,72 @@ function z3SyncDOM() {
   if (bubbleEl) {
     bubbleEl.innerHTML = z3State.mascotMsg;
   }
+
+  const parchmentsEl = document.getElementById('z3LeftParchments');
+  if (parchmentsEl) {
+    parchmentsEl.innerHTML = z3RenderLeftParchmentsHtml();
+  }
 }
 
 function renderStage3ZombieShooterGame(m) {
+
+function z3RenderLeftParchmentsHtml() {
+  const curQ = z3GetActiveQuestion();
+  return `
+    <div class="z3-parchment-scroll mission">
+      <div class="z3-parchment-head">
+        <span class="z3-parchment-icon">🎯</span>
+        <strong>Nhiệm vụ</strong>
+        <span class="z3-q-badge-pill">${curQ.badge}</span>
+      </div>
+
+      <!-- Thanh chọn nhanh 3 câu hỏi -->
+      <div class="z3-q-tabs-row">
+        ${Z3_QUESTIONS.map(q => {
+          const isAct = q.qIdx === curQ.qIdx;
+          const isDone = (q.qIdx === 0 && z3State.kills >= 2) || (q.qIdx === 1 && z3State.kills >= 4) || (q.qIdx === 2 && z3State.kills >= 5);
+          return `<button type="button" class="z3-q-tab-btn ${isAct ? 'active' : ''} ${isDone ? 'done' : ''}" data-action="z3SelectQuestion" data-qidx="${q.qIdx}" title="Chuyển sang ${q.shortLabel}">
+            ${isDone ? '✓ ' : ''}${q.shortLabel}
+          </button>`;
+        }).join('')}
+      </div>
+
+      <p class="z3-parchment-body">
+        ${esc(curQ.promptText)}
+        <span class="z3-math-formula">
+          <span class="z3-vec-token"><span class="arr">→</span>${curQ.v1}</span>
+          <b>+</b>
+          <span class="z3-vec-token"><span class="arr">→</span>${curQ.v2}</span>.
+        </span>
+      </p>
+
+      <!-- Danh sách 3 câu hỏi trong chặng -->
+      <div class="z3-q-mini-list">
+        ${Z3_QUESTIONS.map(q => {
+          const isAct = q.qIdx === curQ.qIdx;
+          const isDone = (q.qIdx === 0 && z3State.kills >= 2) || (q.qIdx === 1 && z3State.kills >= 4) || (q.qIdx === 2 && z3State.kills >= 5);
+          return `<div class="z3-q-mini-item ${isAct ? 'active' : ''} ${isDone ? 'done' : ''}" data-action="z3SelectQuestion" data-qidx="${q.qIdx}">
+            <span class="z3-q-mini-dot">${isDone ? '✓' : (q.qIdx + 1)}</span>
+            <span class="z3-q-mini-expr">
+              ${q.contextNote ? `<small>${esc(q.contextNote)}:</small> ` : ''}
+              <span class="z3-inline-vec"><span class="v-arr">→</span>${q.v1}</span> + <span class="z3-inline-vec"><span class="v-arr">→</span>${q.v2}</span> = ?
+            </span>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>
+
+    <div class="z3-parchment-scroll hint">
+      <div class="z3-parchment-head">
+        <span class="z3-parchment-icon">💡</span>
+        <strong>Gợi ý (${curQ.shortLabel})</strong>
+      </div>
+      <p class="z3-parchment-body">
+        ${esc(curQ.hintText)}
+      </p>
+    </div>
+  `;
+}
   ensureVaStateForStage(m);
   ensureZ3State(m);
   z3UpdateAimedZombie();
@@ -6368,32 +6524,9 @@ function renderStage3ZombieShooterGame(m) {
       <!-- Vạch hàng rào năng lượng phòng thủ trước mặt Rồng Xanh -->
       <div class="z3-defense-barrier" aria-hidden="true"></div>
 
-      <!-- Cột trái: 2 bảng da dê Nhiệm vụ & Gợi ý -->
-      <aside class="z3-left-parchments">
-        <div class="z3-parchment-scroll mission">
-          <div class="z3-parchment-head">
-            <span class="z3-parchment-icon">🎯</span>
-            <strong>Nhiệm vụ</strong>
-          </div>
-          <p class="z3-parchment-body">
-            Tiêu diệt 5 zombie đang giữ vectơ kết quả của
-            <span class="z3-math-formula">
-              <span class="z3-vec-token"><span class="arr">→</span>AB</span>
-              <b>+</b>
-              <span class="z3-vec-token"><span class="arr">→</span>BC</span>.
-            </span>
-          </p>
-        </div>
-
-        <div class="z3-parchment-scroll hint">
-          <div class="z3-parchment-head">
-            <span class="z3-parchment-icon">💡</span>
-            <strong>Gợi ý</strong>
-          </div>
-          <p class="z3-parchment-body">
-            Tổng của hai vectơ nối tiếp bằng vectơ nối điểm đầu với điểm cuối.
-          </p>
-        </div>
+      <!-- Cột trái: 2 bảng da dê Nhiệm vụ (3 câu hỏi) & Gợi ý -->
+      <aside class="z3-left-parchments" id="z3LeftParchments">
+        ${z3RenderLeftParchmentsHtml()}
       </aside>
 
       <!-- Lớp tia năng lượng xanh & đạn bay -->
@@ -7636,6 +7769,15 @@ async function handle(action,el){
    const slotId = Number(el.dataset.slot);
    if(!isNaN(slotId)){
     z3FireEnergyBall(slotId);
+   }
+   return;
+  }
+  if(action==='z3SelectQuestion'){
+   const qIdx = Number(el.dataset.qidx);
+   if(!isNaN(qIdx)){
+    sound('step');
+    z3ApplyQuestionToZombies(qIdx, true);
+    z3SyncDOM();
    }
    return;
   }

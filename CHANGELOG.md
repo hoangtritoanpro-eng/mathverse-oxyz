@@ -9,6 +9,27 @@ Tất cả những thay đổi quan trọng của dự án này sẽ được gh
 
 ---
 
+## [5.0.0] - 2026-11-07
+
+### Added & Upgraded (Bổ Sung 2 Câu Hỏi Nâng Tổng Số Lên 3 Câu Hỏi Trong Thẻ `🎯 Nhiệm vụ` & `💡 Gợi ý` Của Chặng 3 – Chặn Zombie Vectơ)
+- **Hệ Thống 3 Câu Hỏi Nhiệm Vụ & Gợi Ý Động (`Z3_QUESTIONS`, `z3GetActiveQuestion`, `z3ApplyQuestionToZombies`, `z3RenderLeftParchmentsHtml` trong `public/app.js`, `public/style.css`):**
+  1. **Câu 1/3 (`qIdx: 0` – Quy tắc 3 điểm cơ bản):**
+     - **`🎯 Nhiệm vụ`:** *Tiêu diệt zombie đang giữ vectơ kết quả của $\overrightarrow{AB} + \overrightarrow{BC}$.*
+     - **`💡 Gợi ý`:** *Tổng của hai vectơ nối tiếp bằng vectơ nối điểm đầu với điểm cuối (Quy tắc 3 điểm: $A \to B \to C$).*
+     - **Bảng gỗ zombie trên sân:** `BA`, `CB`, `AC` (đúng), `AC` (đúng), `AB`.
+  2. **Câu 2/3 (`qIdx: 1` – Quy tắc 3 điểm mở rộng):**
+     - **`🎯 Nhiệm vụ`:** *Tiêu diệt zombie đang giữ vectơ kết quả của $\overrightarrow{MN} + \overrightarrow{NP}$.*
+     - **`💡 Gợi ý`:** *Hai vectơ nối tiếp tại điểm trung gian $N$: tổng bằng vectơ nối điểm đầu $M$ với điểm cuối $P$.*
+     - **Bảng gỗ zombie trên sân:** `PM`, `NP`, `MP` (đúng), `MP` (đúng), `MN`.
+  3. **Câu 3/3 (`qIdx: 2` – Quy tắc hình bình hành):**
+     - **`🎯 Nhiệm vụ`:** *Cho hình bình hành $ABCD$, tìm vectơ kết quả của $\overrightarrow{BA} + \overrightarrow{BC}$.*
+     - **`💡 Gợi ý`:** *Quy tắc hình bình hành: tổng hai vectơ cạnh cùng xuất phát từ đỉnh $B$ bằng vectơ đường chéo xuất phát từ $B$.*
+     - **Bảng gỗ zombie trên sân:** `DB`, `AC`, `BD` (đúng), `BD` (đúng), `CA`.
+  4. **Chuyển Câu Hỏi Tự Động & Thủ Công Trên Thẻ Giấy Da Dê (`#z3LeftParchments`):**
+     - Hiển thị thanh chuyển nhanh `Câu 1` | `Câu 2` | `Câu 3` (`data-action="z3SelectQuestion"`) và danh sách tóm tắt cả 3 câu hỏi (`z3-q-mini-list`) ngay trong thẻ `🎯 Nhiệm vụ`, đồng thời tự động chuyển tiếp câu hỏi theo tiến độ tiêu diệt zombie (`0..1/5` → Câu 1, `2..3/5` → Câu 2, `4/5` → Câu 3) kèm cập nhật lời nhắc của Rồng Xanh ở góc phải dưới.
+
+---
+
 ## [4.9.0] - 2026-11-07
 
 ### Added & Upgraded (Tích Hợp Cơ Chế Gameplay "Chặn Zombie" `zombie-defense` Vào Giao Diện Đấu Trường Chặng 3)
