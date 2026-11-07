@@ -161,6 +161,7 @@ function ensureTeamFields(t){
  if(t.stage5.medB===undefined)t.stage5.medB=false;
  if(t.stage5.mediansConnected===undefined)t.stage5.mediansConnected=(t.stage5.medA?1:0)+(t.stage5.medB?1:0);
  if(t.stage5.crystalPlaced===undefined)t.stage5.crystalPlaced=false;
+ if(t.stage5.quizSolvedCount===undefined)t.stage5.quizSolvedCount=0;
  if(t.stage5.vectorsActivated===undefined)t.stage5.vectorsActivated=false;
  if(t.stage5.wrongAttempts===undefined)t.stage5.wrongAttempts=0;
  if(t.stage5.hintsUsedCount===undefined)t.stage5.hintsUsedCount=0;
@@ -171,7 +172,7 @@ function ensureTeamFields(t){
   t.stage5.phase=5;
   t.stage5.mpBC=true;t.stage5.mpAC=true;t.stage5.midpointsFound=2;
   t.stage5.medA=true;t.stage5.medB=true;t.stage5.mediansConnected=2;
-  t.stage5.crystalPlaced=true;t.stage5.vectorsActivated=true;
+  t.stage5.crystalPlaced=true;t.stage5.quizSolvedCount=3;t.stage5.vectorsActivated=true;
  }
  const curStgPos=t.completed?5:Math.min(5,t.stage||0);
  if(!t.dragon||typeof t.dragon!=='object'){
@@ -300,6 +301,7 @@ function roomState(room,token){
     medB:Boolean(t.stage5?.medB),
     mediansConnected:t.stage5?.mediansConnected||0,
     crystalPlaced:Boolean(t.stage5?.crystalPlaced),
+    quizSolvedCount:t.stage5?.quizSolvedCount||0,
     vectorsActivated:Boolean(t.stage5?.vectorsActivated),
     wrongAttempts:t.stage5?.wrongAttempts||0,
     hintsUsedCount:t.stage5?.hintsUsedCount||0,
@@ -333,7 +335,7 @@ function roomState(room,token){
   stage1:team.stage1||{pillars:[],cluesFound:0,cipherSolved:false,bridgeOpened:false},
   stage2:team.stage2||{solvedCount:0,totalCount:6,shields:3,wrongAttempts:0,controllerRoleIdx:0,gateOpened:false,completedTimeSec:null},
   stage4:team.stage4||{modePairs:6,matchedPairs:[],matchedCount:0,totalPairs:6,flipCount:0,wrongMatches:0,hintsUsedCount:0,controllerRoleIdx:0,deckOrder:[],gateOpened:false,completedTimeSec:null},
-  stage5:team.stage5||{phase:1,mpBC:false,mpAC:false,midpointsFound:0,medA:false,medB:false,mediansConnected:0,crystalPlaced:false,vectorsActivated:false,wrongAttempts:0,hintsUsedCount:0,controllerRoleIdx:0,completedTimeSec:null,timedOut:false},
+  stage5:team.stage5||{phase:1,mpBC:false,mpAC:false,midpointsFound:0,medA:false,medB:false,mediansConnected:0,crystalPlaced:false,quizSolvedCount:0,vectorsActivated:false,wrongAttempts:0,hintsUsedCount:0,controllerRoleIdx:0,completedTimeSec:null,timedOut:false},
   dragon:team.dragon||{state:'PLAYING',fromStage:team.stage,toStage:team.stage,moveMode:'IDLE',transitionId:0},
   completed:team.completed,attempts:team.attempts,hintsUsed:team.hintsUsed,digits:team.digits,finishedAt:team.finishedAt},
   current:cur?publicStage(cur,team.round,team):null,cipherWords:team.stage>=5?TOKEN_WORDS:null};
@@ -584,8 +586,21 @@ function processAction(endpoint,d){
     emit(r,`💎 ${t.avatar} ${t.name} đã đặt viên Tâm Thạch vào đúng Trọng tâm G = (A+B+C)/3!`);
    }
   }
+  if(d.quizSolved){
+   const prevQ=t.stage5.quizSolvedCount||0;
+   const nextQ=Math.max(prevQ,Math.min(3,Number(d.quizSolvedCount)||(prevQ+1)));
+   if(nextQ>prevQ){
+    t.stage5.quizSolvedCount=nextQ;
+    t.score+=5;t.gold=(t.gold||120)+25;
+    t.correctCount=(t.correctCount||0)+1;
+    const qIdStr=String(d.questionId||`5.Q${nextQ}`);
+    t.answerLog.push({stage:5,qId:qIdStr,questionId:qIdStr,isQuiz:true,level:'THÔNG HIỂU',choice:0,chosenText:`Giải mã câu hỏi trọng tâm (${nextQ}/3): ${d.questionTitle||qIdStr}`,correct:true,at:new Date().toISOString()});
+    emit(r,`🧠 ${t.avatar} ${t.name} đã giải mã câu hỏi hiểu sâu Trọng tâm G (${nextQ}/3)!`);
+   }
+  }
   if(d.vectorsActivated){
    t.stage5.vectorsActivated=true;
+   t.stage5.quizSolvedCount=3;
    t.stage5.phase=5;
   }
   if(d.wrongAttempt){
@@ -628,7 +643,7 @@ function processAction(endpoint,d){
   t.stage1=stg>=1?{pillars:['1','2','3','4'],cluesFound:4,maxClues:4,cipherSolved:true,bridgeOpened:true,wrongAttempts:0,completedTimeSec:35,chestOpened:false,controllerRoleIdx:0,spawnVariant:0}:{pillars:[],cluesFound:0,maxClues:4,cipherSolved:false,bridgeOpened:false,wrongAttempts:0,completedTimeSec:null,chestOpened:false,controllerRoleIdx:0,spawnVariant:crypto.randomInt(3)};
   t.stage2=stg>=2?{solvedCount:6,totalCount:6,shields:3,wrongAttempts:0,controllerRoleIdx:0,gateOpened:true,completedTimeSec:42}:{solvedCount:0,totalCount:6,shields:3,wrongAttempts:0,controllerRoleIdx:0,gateOpened:false,completedTimeSec:null};
   t.stage4=stg>=4?{modePairs:6,matchedPairs:['P1','P2','P3','P4','P5','P6'],matchedCount:6,totalPairs:6,flipCount:8,wrongMatches:2,hintsUsedCount:0,controllerRoleIdx:0,deckOrder:[],gateOpened:true,completedTimeSec:48}:{modePairs:6,matchedPairs:[],matchedCount:0,totalPairs:6,flipCount:0,wrongMatches:0,hintsUsedCount:0,controllerRoleIdx:0,deckOrder:[],gateOpened:false,completedTimeSec:null};
-  t.stage5=stg>=5?{phase:5,mpBC:true,mpAC:true,midpointsFound:2,medA:true,medB:true,mediansConnected:2,crystalPlaced:true,vectorsActivated:true,wrongAttempts:0,hintsUsedCount:0,controllerRoleIdx:0,completedTimeSec:52,timedOut:false}:{phase:1,mpBC:false,mpAC:false,midpointsFound:0,medA:false,medB:false,mediansConnected:0,crystalPlaced:false,vectorsActivated:false,wrongAttempts:0,hintsUsedCount:0,controllerRoleIdx:0,completedTimeSec:null,timedOut:false};
+  t.stage5=stg>=5?{phase:5,mpBC:true,mpAC:true,midpointsFound:2,medA:true,medB:true,mediansConnected:2,crystalPlaced:true,quizSolvedCount:3,vectorsActivated:true,wrongAttempts:0,hintsUsedCount:0,controllerRoleIdx:0,completedTimeSec:52,timedOut:false}:{phase:1,mpBC:false,mpAC:false,midpointsFound:0,medA:false,medB:false,mediansConnected:0,crystalPlaced:false,quizSolvedCount:0,vectorsActivated:false,wrongAttempts:0,hintsUsedCount:0,controllerRoleIdx:0,completedTimeSec:null,timedOut:false};
   t.digits=STAGES.slice(0,stg).map((s,idx)=>({stage:idx+1,digit:s.digit,rule:s.digitRule,item:s.item}));
   t.score=stg*20;
   const nextPos=Math.min(5,stg);

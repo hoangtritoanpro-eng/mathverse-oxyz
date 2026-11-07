@@ -2008,6 +2008,7 @@ function renderTeacherTeamModal() {
     <span style="font-size:12.5px;color:#F8FAFF">📐 Trung điểm: <b style="color:#36DEF4">${t.stage > 4 ? 2 : (t.stage5?.midpointsFound ?? 0)}/2</b></span>
     <span style="font-size:12.5px;color:#F8FAFF">✨ Trung tuyến: <b style="color:#C084FC">${t.stage > 4 ? 2 : (t.stage5?.mediansConnected ?? 0)}/2</b></span>
     <span style="font-size:12.5px;color:#F8FAFF">💎 Tâm Thạch G: <b style="color:${(t.stage > 4 || t.stage5?.crystalPlaced) ? '#35C992' : '#FDE047'}">${(t.stage > 4 || t.stage5?.crystalPlaced) ? '✓ Đã đặt đúng G' : 'Đang tìm G'}</b></span>
+    <span style="font-size:12.5px;color:#F8FAFF">🧠 Câu hỏi trọng tâm: <b style="color:#38BDF8">${t.stage > 4 ? 3 : (t.stage5?.quizSolvedCount ?? 0)}/3</b></span>
     <span style="font-size:12.5px;color:#F8FAFF">❌ Đặt sai: <b style="color:#FDA4AF">${t.stage5?.wrongAttempts ?? 0} lần</b></span>
     <span style="font-size:12.5px;color:#F8FAFF">💡 Gợi ý: <b style="color:#FDE047">${t.stage5?.hintsUsedCount ?? 0}/3</b></span>
     <span style="font-size:12.5px;color:#F8FAFF">🏆 Ấn Trí Tuệ: <b style="color:${(t.stage > 4 || t.stage5?.completed) ? '#35C992' : '#94A3B8'}">${(t.stage > 4 || t.stage5?.completed) ? '✓ Đã khôi phục Tâm Thạch' : 'Đang giải cứu'}</b></span>
@@ -8700,9 +8701,60 @@ const S5_CONTEXT_HINTS = [
   }
 ];
 
+// BỘ 3 CÂU HỎI HIỂU SÂU SAU KHI NỐI & ĐẶT TRỌNG TÂM G (GIAI ĐOẠN 4)
+function getS5CentroidQuestions() {
+  return [
+    {
+      id: '5.Q1',
+      tag: 'Tỉ số 2:1 trên trung tuyến',
+      promptHtml: `Gọi <i>M</i> là trung điểm cạnh <i>BC</i> và <i>G</i> là trọng tâm Δ<i>ABC</i>. Quan sát tỉ lệ <b>2 phần : 1 phần</b> trên trung tuyến <i>AM</i>, đẳng thức vectơ nào sau đây <b>đúng</b>?`,
+      optionsHtml: [
+        `${s2RenderVecArrow('AG', 's5-q-vec')} = <span class="s5-q-frac">2/3</span>${s2RenderVecArrow('AM', 's5-q-vec')}`,
+        `${s2RenderVecArrow('AG', 's5-q-vec')} = −<span class="s5-q-frac">2/3</span>${s2RenderVecArrow('AM', 's5-q-vec')}`,
+        `${s2RenderVecArrow('AG', 's5-q-vec')} = <span class="s5-q-frac">1/3</span>${s2RenderVecArrow('AM', 's5-q-vec')}`,
+        `${s2RenderVecArrow('GA', 's5-q-vec')} = 2${s2RenderVecArrow('GM', 's5-q-vec')}`
+      ],
+      plainOptions: ['vectơ AG = (2/3) vectơ AM', 'vectơ AG = -(2/3) vectơ AM', 'vectơ AG = (1/3) vectơ AM', 'vectơ GA = 2 vectơ GM'],
+      correct: 0,
+      hintHtml: `💡 <b>Gợi ý Câu 1/3:</b> Trên trung tuyến <i>AM</i> (chia làm 3 phần bằng nhau), đoạn <i>AG</i> chiếm 2 phần và hai vectơ ${s2RenderVecArrow('AG', 's5-inline-vec')}, ${s2RenderVecArrow('AM', 's5-inline-vec')} <b>cùng hướng</b> từ <i>A</i> đến <i>M</i>! (Lưu ý: ${s2RenderVecArrow('GA', 's5-inline-vec')} và ${s2RenderVecArrow('GM', 's5-inline-vec')} ngược hướng nên phải là ${s2RenderVecArrow('GA', 's5-inline-vec')} = −2${s2RenderVecArrow('GM', 's5-inline-vec')}).`,
+      explainHtml: `✅ <b>Chính xác Câu 1/3!</b> Vì <i>AG = (2/3)AM</i> và hai vectơ cùng hướng nên <b>${s2RenderVecArrow('AG', 's5-inline-vec')} = (2/3)${s2RenderVecArrow('AM', 's5-inline-vec')}</b> (đồng thời <b>${s2RenderVecArrow('GA', 's5-inline-vec')} = −2${s2RenderVecArrow('GM', 's5-inline-vec')}</b>). Tiếp tục giải mã <b>Câu 2/3</b> nhé!`
+    },
+    {
+      id: '5.Q2',
+      tag: 'Hệ thức cân bằng tại G',
+      promptHtml: `Biết <i>M</i> là trung điểm <i>BC</i> nên ${s2RenderVecArrow('GB', 's5-inline-vec')} + ${s2RenderVecArrow('GC', 's5-inline-vec')} = 2${s2RenderVecArrow('GM', 's5-inline-vec')} và ${s2RenderVecArrow('GA', 's5-inline-vec')} = −2${s2RenderVecArrow('GM', 's5-inline-vec')}. Khi đặt Tâm Thạch tại <i>G</i>, tổng <b>${s2RenderVecArrow('GA', 's5-inline-vec')} + ${s2RenderVecArrow('GB', 's5-inline-vec')} + ${s2RenderVecArrow('GC', 's5-inline-vec')}</b> bằng:`,
+      optionsHtml: [
+        `2${s2RenderVecArrow('GM', 's5-q-vec')}`,
+        `${s2RenderVecArrow('0', 's5-q-vec')}`,
+        `3${s2RenderVecArrow('GA', 's5-q-vec')}`,
+        `${s2RenderVecArrow('AB', 's5-q-vec')} + ${s2RenderVecArrow('AC', 's5-q-vec')}`
+      ],
+      plainOptions: ['2 vectơ GM', 'vectơ 0', '3 vectơ GA', 'vectơ AB + vectơ AC'],
+      correct: 1,
+      hintHtml: `💡 <b>Gợi ý Câu 2/3:</b> Hãy thay ${s2RenderVecArrow('GB', 's5-inline-vec')} + ${s2RenderVecArrow('GC', 's5-inline-vec')} = 2${s2RenderVecArrow('GM', 's5-inline-vec')} và ${s2RenderVecArrow('GA', 's5-inline-vec')} = −2${s2RenderVecArrow('GM', 's5-inline-vec')} vào tổng: −2${s2RenderVecArrow('GM', 's5-inline-vec')} + 2${s2RenderVecArrow('GM', 's5-inline-vec')} bằng bao nhiêu?`,
+      explainHtml: `✅ <b>Chính xác Câu 2/3!</b> <b>${s2RenderVecArrow('GA', 's5-inline-vec')} + ${s2RenderVecArrow('GB', 's5-inline-vec')} + ${s2RenderVecArrow('GC', 's5-inline-vec')} = −2${s2RenderVecArrow('GM', 's5-inline-vec')} + 2${s2RenderVecArrow('GM', 's5-inline-vec')} = ${s2RenderVecArrow('0', 's5-inline-vec')}</b>! Ba nguồn năng lượng từ trọng tâm <i>G</i> tới 3 đỉnh luôn cân bằng tuyệt đối! Hãy bước sang <b>Câu 3/3</b>!`
+    },
+    {
+      id: '5.Q3',
+      tag: 'Hệ thức với điểm M bất kỳ',
+      promptHtml: `Với điểm <i>M</i> (hoặc gốc <i>O</i>) bất kỳ trong không gian Oxyz và <i>G</i> là trọng tâm Δ<i>ABC</i>, khi chèn điểm <i>G</i> vào ba vectơ ${s2RenderVecArrow('MA', 's5-inline-vec')}, ${s2RenderVecArrow('MB', 's5-inline-vec')}, ${s2RenderVecArrow('MC', 's5-inline-vec')}, hệ thức nào <b>đúng</b>?`,
+      optionsHtml: [
+        `${s2RenderVecArrow('MA', 's5-q-vec')} + ${s2RenderVecArrow('MB', 's5-q-vec')} + ${s2RenderVecArrow('MC', 's5-q-vec')} = ${s2RenderVecArrow('MG', 's5-q-vec')}`,
+        `${s2RenderVecArrow('MA', 's5-q-vec')} + ${s2RenderVecArrow('MB', 's5-q-vec')} + ${s2RenderVecArrow('MC', 's5-q-vec')} = 2${s2RenderVecArrow('MG', 's5-q-vec')}`,
+        `${s2RenderVecArrow('MA', 's5-q-vec')} + ${s2RenderVecArrow('MB', 's5-q-vec')} + ${s2RenderVecArrow('MC', 's5-q-vec')} = 3${s2RenderVecArrow('MG', 's5-q-vec')}`,
+        `${s2RenderVecArrow('MA', 's5-q-vec')} + ${s2RenderVecArrow('MB', 's5-q-vec')} + ${s2RenderVecArrow('MC', 's5-q-vec')} = ${s2RenderVecArrow('0', 's5-q-vec')}`
+      ],
+      plainOptions: ['MA + MB + MC = MG', 'MA + MB + MC = 2MG', 'MA + MB + MC = 3MG', 'MA + MB + MC = 0'],
+      correct: 2,
+      hintHtml: `💡 <b>Gợi ý Câu 3/3:</b> Chèn điểm <i>G</i> vào từng vectơ: (${s2RenderVecArrow('MG', 's5-inline-vec')} + ${s2RenderVecArrow('GA', 's5-inline-vec')}) + (${s2RenderVecArrow('MG', 's5-inline-vec')} + ${s2RenderVecArrow('GB', 's5-inline-vec')}) + (${s2RenderVecArrow('MG', 's5-inline-vec')} + ${s2RenderVecArrow('GC', 's5-inline-vec')}) = 3${s2RenderVecArrow('MG', 's5-inline-vec')} + (${s2RenderVecArrow('GA', 's5-inline-vec')} + ${s2RenderVecArrow('GB', 's5-inline-vec')} + ${s2RenderVecArrow('GC', 's5-inline-vec')}). Mà tổng trong ngoặc bằng ${s2RenderVecArrow('0', 's5-inline-vec')}!`,
+      explainHtml: `🏆 <b>Hoàn hảo 3/3!</b> <b>${s2RenderVecArrow('MA', 's5-inline-vec')} + ${s2RenderVecArrow('MB', 's5-inline-vec')} + ${s2RenderVecArrow('MC', 's5-inline-vec')} = 3${s2RenderVecArrow('MG', 's5-inline-vec')}</b> — đây chính là cơ sở suy ra công thức tọa độ trọng tâm <b>G = (A + B + C) / 3</b> trong không gian Oxyz! Hãy nhấn <b>⚡ KÍCH HOẠT TÂM THẠCH</b> để chiến thắng!`
+    }
+  ];
+}
+
 const s5State = {
   initedStageId: -1,
-  phase: 1, // 1: Tìm trung điểm, 2: Kích hoạt trung tuyến, 3: Đặt Tâm Thạch vào G, 4: Kích hoạt trận pháp vectơ, 5: Chiến thắng
+  phase: 1, // 1: Tìm trung điểm, 2: Kích hoạt trung tuyến, 3: Đặt Tâm Thạch vào G, 4: Giải mã 3 câu hỏi hệ thức vectơ trọng tâm, 5: Chiến thắng
   mpBC_t: 0.24,
   mpAC_t: 0.76,
   mpBC_done: false,
@@ -8717,6 +8769,10 @@ const s5State = {
   crystalY: 228,
   crystalPlaced: false,
   crystalWrongShake: false,
+  quizIdx: 0,           // Câu hỏi hiện tại (0..2) sau khi nối trọng tâm
+  quizSolvedCount: 0,   // Số câu hỏi hiểu sâu đã trả lời đúng (0..3)
+  quizSelectedChoice: null,
+  quizWrongChoice: null,
   vectorsActivated: false,
   victoryTriggered: false,
   timedOut: false,
@@ -8753,6 +8809,8 @@ const Stage5GameState = {
         crystalX: s5State.crystalX,
         crystalY: s5State.crystalY,
         crystalPlaced: s5State.crystalPlaced,
+        quizIdx: s5State.quizIdx,
+        quizSolvedCount: s5State.quizSolvedCount,
         vectorsActivated: s5State.vectorsActivated,
         victoryTriggered: s5State.victoryTriggered,
         wrongAttempts: s5State.wrongAttempts,
@@ -8803,6 +8861,11 @@ const Stage5GameState = {
     s5State.crystalY = s5State.crystalPlaced ? G.y : (saved?.crystalY ?? TriangleGeometry.crystalSpawn.y);
     s5State.crystalWrongShake = false;
 
+    s5State.quizSolvedCount = Math.min(3, Math.max(srv.quizSolvedCount || 0, saved?.quizSolvedCount || 0));
+    s5State.quizIdx = Math.min(2, s5State.quizSolvedCount);
+    s5State.quizSelectedChoice = null;
+    s5State.quizWrongChoice = null;
+
     s5State.vectorsActivated = Boolean(srv.vectorsActivated || saved?.vectorsActivated);
     s5State.victoryTriggered = Boolean(saved?.victoryTriggered || (world?.me?.stage ?? 0) >= 5);
     s5State.wrongAttempts = Math.max(srv.wrongAttempts || 0, saved?.wrongAttempts || 0);
@@ -8811,6 +8874,7 @@ const Stage5GameState = {
 
     if (s5State.victoryTriggered || s5State.vectorsActivated) {
       s5State.phase = 5;
+      s5State.quizSolvedCount = 3;
       s5State.kbFocusTarget = 'confirm';
       s5State.dragonMood = 'win';
       s5State.dragonSpeech = 'Chúng ta làm được rồi! Lục địa OXYZ đã được giải cứu!';
@@ -8818,7 +8882,11 @@ const Stage5GameState = {
       s5State.phase = 4;
       s5State.kbFocusTarget = 'confirm';
       s5State.dragonMood = 'win';
-      s5State.dragonSpeech = `Chính xác! Tổng ba vectơ từ trọng tâm đến ba đỉnh bằng vectơ không: ${s2RenderVecArrow('GA', 's5-inline-vec')} + ${s2RenderVecArrow('GB', 's5-inline-vec')} + ${s2RenderVecArrow('GC', 's5-inline-vec')} = ${s2RenderVecArrow('0', 's5-inline-vec')}! Hãy nhấn XÁC NHẬN để kích hoạt trận pháp!`;
+      if (s5State.quizSolvedCount >= 3) {
+        s5State.dragonSpeech = `Đã giải mã đủ 3/3 câu hỏi hệ thức vectơ Trọng tâm! Hãy nhấn <b>⚡ KÍCH HOẠT TÂM THẠCH</b> để hoàn tất hành trình!`;
+      } else {
+        s5State.dragonSpeech = `Tâm Thạch đã vào đúng Trọng tâm G! Hãy trả lời <b>Câu hỏi hiểu sâu ${s5State.quizSolvedCount + 1}/3</b> bên dưới và nhấn <b>XÁC NHẬN</b> để nạp năng lượng cho trận pháp!`;
+      }
     } else if (s5State.medA_done && s5State.medB_done) {
       s5State.phase = 3;
       s5State.kbFocusTarget = 'crystal';
@@ -9064,9 +9132,13 @@ const CrystalDragController = {
       s5State.crystalPlaced = true;
       s5State.crystalWrongShake = false;
       s5State.phase = 4;
+      s5State.quizIdx = 0;
+      s5State.quizSolvedCount = 0;
+      s5State.quizSelectedChoice = null;
+      s5State.quizWrongChoice = null;
       s5State.kbFocusTarget = 'confirm';
       s5State.dragonMood = 'win';
-      s5State.dragonSpeech = `Chính xác! Tổng ba vectơ từ trọng tâm đến ba đỉnh bằng vectơ không: <b>${s2RenderVecArrow('GA', 's5-inline-vec')} + ${s2RenderVecArrow('GB', 's5-inline-vec')} + ${s2RenderVecArrow('GC', 's5-inline-vec')} = ${s2RenderVecArrow('0', 's5-inline-vec')}</b>! Nhấn <b>XÁC NHẬN</b> để khôi phục Lục địa OXYZ!`;
+      s5State.dragonSpeech = `💎 Chính xác! Tâm Thạch đã đặt đúng vào Trọng tâm <b>G = (A+B+C)/3</b>! Bây giờ hãy trả lời <b>3 câu hỏi hiểu sâu</b> ngay bên dưới (bắt đầu với <b>Câu 1/3</b>) để nạp năng lượng kích hoạt trận pháp!`;
       sound('fanfare');
       if (window.spawnConfettiParticles) window.spawnConfettiParticles(window.innerWidth * 0.45, window.innerHeight * 0.5, 42);
       if (window.spawnJuiceFloater) {
@@ -9193,11 +9265,81 @@ const CentroidStage5 = {
       return;
     }
     if (s5State.phase === 4) {
+      if (s5State.quizSolvedCount < 3) {
+        this.submitQuizAnswer();
+        return;
+      }
       await this.activateVectorFormationAndWin();
       return;
     }
     if (s5State.phase === 5) {
       await this.proceedToFinalSummary();
+    }
+  },
+
+  selectQuizChoice(choiceIdx) {
+    if (s5State.timedOut || s5State.phase !== 4 || s5State.quizSolvedCount >= 3) return;
+    const idx = Number(choiceIdx);
+    if (isNaN(idx) || idx < 0 || idx > 3) return;
+    s5State.quizSelectedChoice = idx;
+    s5State.quizWrongChoice = null;
+    sound('step');
+    render();
+  },
+
+  submitQuizAnswer() {
+    if (s5State.timedOut || s5State.phase !== 4 || s5State.quizSolvedCount >= 3) return;
+    const questions = getS5CentroidQuestions();
+    const curQ = questions[s5State.quizIdx] || questions[0];
+    if (s5State.quizSelectedChoice === null || s5State.quizSelectedChoice === undefined) {
+      s5State.dragonMood = 'hint';
+      s5State.dragonSpeech = `Hãy chọn một đáp án <b>A, B, C</b> hoặc <b>D</b> của <b>Câu ${s5State.quizIdx + 1}/3</b> rồi nhấn nút <b>XÁC NHẬN</b> nhé!`;
+      sound('bleep');
+      render();
+      return;
+    }
+    const chosen = Number(s5State.quizSelectedChoice);
+    if (chosen === curQ.correct) {
+      s5State.quizSolvedCount = Math.min(3, s5State.quizIdx + 1);
+      s5State.quizSelectedChoice = null;
+      s5State.quizWrongChoice = null;
+      s5State.dragonMood = 'win';
+      s5State.dragonSpeech = curQ.explainHtml;
+      sound('correct');
+      if (window.spawnJuiceFloater) {
+        window.spawnJuiceFloater(`✨ Giải mã đúng Câu ${s5State.quizSolvedCount}/3! (+5 XP)`, 'xp');
+      }
+      if (session?.room && session?.token) {
+        api('/api/stage5Progress', {
+          room: session.room,
+          token: session.token,
+          quizSolved: true,
+          quizSolvedCount: s5State.quizSolvedCount,
+          qId: curQ.id,
+          chosenText: `Câu ${s5State.quizSolvedCount}/3 (${curQ.tag}): ${curQ.plainOptions[chosen]}`
+        }).catch(() => {});
+      }
+      if (s5State.quizSolvedCount < 3) {
+        s5State.quizIdx = s5State.quizSolvedCount;
+      }
+      Stage5GameState.saveSession();
+      render();
+    } else {
+      s5State.quizWrongChoice = chosen;
+      s5State.wrongAttempts++;
+      s5State.dragonMood = 'warn';
+      s5State.dragonSpeech = curQ.hintHtml;
+      sound('wrong');
+      if (session?.room && session?.token) {
+        api('/api/stage5Progress', {
+          room: session.room,
+          token: session.token,
+          wrongAttempt: true,
+          reason: `Chọn sai Câu ${s5State.quizIdx + 1}/3 (${curQ.plainOptions[chosen] || 'Đáp án ' + (chosen + 1)})`
+        }).catch(() => {});
+      }
+      Stage5GameState.saveSession();
+      render();
     }
   },
 
@@ -9306,10 +9448,14 @@ function renderStage5CentroidRescueGame(m) {
     'GIAI ĐOẠN 1/4: Kéo 2 điểm sáng về đúng TRUNG ĐIỂM cạnh BC và AC',
     'GIAI ĐOẠN 2/4: Kéo nối đỉnh A với trung điểm BC & đỉnh B với trung điểm AC',
     'GIAI ĐOẠN 3/4: Kéo viên TÂM THẠCH đặt vào đúng TRỌNG TÂM G',
-    'GIAI ĐOẠN 4/4: Quan sát trận pháp GA + GB + GC = 0 & nhấn XÁC NHẬN',
+    s5State.quizSolvedCount < 3
+      ? `GIAI ĐOẠN 4/4: Trả lời Câu hỏi hiểu sâu Trọng tâm (${s5State.quizSolvedCount + 1}/3) & nhấn XÁC NHẬN`
+      : 'GIAI ĐOẠN 4/4: Đã giải mã 3/3 câu hỏi! Nhấn ⚡ KÍCH HOẠT TÂM THẠCH để chiến thắng!',
     'HOÀN TẤT: Tâm Thạch & 5 Ấn Vectơ đã hợp nhất – Lục địa OXYZ được giải cứu!'
   ];
   const curPhaseBanner = phaseTitles[s5State.phase] || phaseTitles[1];
+  const s5Questions = getS5CentroidQuestions();
+  const curQuizObj = s5Questions[Math.min(2, s5State.quizIdx)] || s5Questions[0];
 
   const roles = m.teamRoles || [
     { role: 'Hoa tiêu Trung điểm', icon: '📐' },
@@ -9423,16 +9569,26 @@ function renderStage5CentroidRescueGame(m) {
           <span>${esc(curPhaseBanner)}</span>
         </div>
 
-        <!-- Hộp hiển thị Hệ thức Vectơ Trọng tâm khi đạt Giai đoạn 4 & 5 -->
+        <!-- Hộp hiển thị Hệ thức Vectơ Trọng tâm mở khóa dần theo 3 câu hỏi ở Giai đoạn 4 & 5 -->
         ${s5State.phase >= 4 ? `
           <div class="s5-vector-formula-banner" id="s5VectorFormulaBanner">
-            <div class="s5-formula-primary">
-              <span class="s5-f-tag">⚖️ Trận pháp cân bằng:</span>
-              <strong>${s2RenderVecArrow('GA', 's5-vec')} + ${s2RenderVecArrow('GB', 's5-vec')} + ${s2RenderVecArrow('GC', 's5-vec')} = ${s2RenderVecArrow('0', 's5-vec')}</strong>
+            <div class="s5-formula-primary ${s5State.quizSolvedCount >= 1 || s5State.phase === 5 ? 'unlocked' : 'locked'}">
+              <span class="s5-f-tag">① Trung tuyến:</span>
+              <strong>${(s5State.quizSolvedCount >= 1 || s5State.phase === 5)
+                ? `${s2RenderVecArrow('AG', 's5-vec')} = (2/3)${s2RenderVecArrow('AM', 's5-vec')}`
+                : '🔒 Giải mã Câu 1/3'}</strong>
             </div>
-            <div class="s5-formula-secondary">
-              <span>Với điểm <i>M</i> bất kỳ:</span>
-              <strong>${s2RenderVecArrow('MA', 's5-vec')} + ${s2RenderVecArrow('MB', 's5-vec')} + ${s2RenderVecArrow('MC', 's5-vec')} = 3${s2RenderVecArrow('MG', 's5-vec')}</strong>
+            <div class="s5-formula-primary ${s5State.quizSolvedCount >= 2 || s5State.phase === 5 ? 'unlocked' : 'locked'}">
+              <span class="s5-f-tag">② Cân bằng G:</span>
+              <strong>${(s5State.quizSolvedCount >= 2 || s5State.phase === 5)
+                ? `${s2RenderVecArrow('GA', 's5-vec')} + ${s2RenderVecArrow('GB', 's5-vec')} + ${s2RenderVecArrow('GC', 's5-vec')} = ${s2RenderVecArrow('0', 's5-vec')}`
+                : '🔒 Giải mã Câu 2/3'}</strong>
+            </div>
+            <div class="s5-formula-secondary ${s5State.quizSolvedCount >= 3 || s5State.phase === 5 ? 'unlocked' : 'locked'}">
+              <span>③ Điểm <i>M</i> bất kỳ:</span>
+              <strong>${(s5State.quizSolvedCount >= 3 || s5State.phase === 5)
+                ? `${s2RenderVecArrow('MA', 's5-vec')} + ${s2RenderVecArrow('MB', 's5-vec')} + ${s2RenderVecArrow('MC', 's5-vec')} = 3${s2RenderVecArrow('MG', 's5-vec')}`
+                : '🔒 Giải mã Câu 3/3'}</strong>
             </div>
           </div>
         ` : ''}
@@ -9711,6 +9867,50 @@ function renderStage5CentroidRescueGame(m) {
           </svg>
         </div>
 
+        <!-- HỘP 3 CÂU HỎI HIỂU SÂU SAU KHI NỐI & ĐẶT TRỌNG TÂM G (GIAI ĐOẠN 4) -->
+        ${s5State.phase === 4 ? `
+          <div class="s5-deep-quiz-panel" id="s5DeepQuizBox">
+            ${s5State.quizSolvedCount < 3 ? `
+              <div class="s5-dq-header">
+                <div class="s5-dq-badge">
+                  <span>🧠 CÂU HỎI HIỂU SÂU TRỌNG TÂM ${s5State.quizIdx + 1}/3</span>
+                  <small>· ${esc(curQuizObj.tag)}</small>
+                </div>
+                <div class="s5-dq-orbs">
+                  ${[0, 1, 2].map(i => `
+                    <span class="s5-dq-orb ${i < s5State.quizSolvedCount ? 'done' : (i === s5State.quizIdx ? 'active' : '')}">
+                      ${i < s5State.quizSolvedCount ? '✓' : (i + 1)}
+                    </span>
+                  `).join('')}
+                </div>
+              </div>
+              <div class="s5-dq-prompt">
+                ${curQuizObj.promptHtml}
+              </div>
+              <div class="s5-dq-options-grid">
+                ${curQuizObj.optionsHtml.map((optHtml, idx) => {
+                  const letter = ['A', 'B', 'C', 'D'][idx];
+                  const isSel = s5State.quizSelectedChoice === idx;
+                  const isWrong = s5State.quizWrongChoice === idx;
+                  return `
+                    <button type="button"
+                            class="s5-dq-opt-btn ${isSel ? 'is-selected' : ''} ${isWrong ? 'is-wrong' : ''}"
+                            data-action="s5SelectQuizChoice"
+                            data-choice="${idx}">
+                      <span class="s5-dq-opt-letter">${letter}</span>
+                      <span class="s5-dq-opt-math">${optHtml}</span>
+                    </button>
+                  `;
+                }).join('')}
+              </div>
+            ` : `
+              <div class="s5-dq-complete-banner">
+                <span>⚡ <b>ĐÃ GIẢI MÃ ĐỦ 3/3 CÂU HỎI HỆ THỨC TRỌNG TÂM!</b> Nhấn nút <b>⚡ KÍCH HOẠT TÂM THẠCH</b> bên dưới để hoàn tất hành trình!</span>
+              </div>
+            `}
+          </div>
+        ` : ''}
+
         <!-- F. THANH ĐIỀU KHIỂN BÊN DƯỚI (GIỐNG ẢNH MẪU: GỢI Ý | TIẾN ĐỘ / KIẾN THỨC | ẤN TRÍ TUỆ | NÚT XÁC NHẬN VÀNG KIM) -->
         <div class="s5-bottom-control-bar">
           <div class="s5-bottom-left-pills">
@@ -9732,7 +9932,11 @@ function renderStage5CentroidRescueGame(m) {
                   class="s5-gold-confirm-btn ${s5State.phase === 4 ? 'pulse-ready' : ''}"
                   data-action="s5ConfirmStep"
                   title="Xác nhận bước hiện tại hoặc kích hoạt trận pháp Trọng tâm (Phím Enter)">
-            <span>${s5State.phase === 5 ? '🏆 TỔNG KẾT HÀNH TRÌNH' : (s5State.phase === 4 ? '⚡ KÍCH HOẠT TÂM THẠCH' : 'XÁC NHẬN')}</span>
+            <span>${s5State.phase === 5
+              ? '🏆 TỔNG KẾT HÀNH TRÌNH'
+              : (s5State.phase === 4
+                  ? (s5State.quizSolvedCount < 3 ? `XÁC NHẬN CÂU ${s5State.quizIdx + 1}/3` : '⚡ KÍCH HOẠT TÂM THẠCH')
+                  : 'XÁC NHẬN')}</span>
           </button>
         </div>
       </section>
@@ -9770,7 +9974,7 @@ function renderStage5CentroidRescueGame(m) {
             <span class="${s5State.mpBC_done && s5State.mpAC_done ? 'done' : ''}">1. Trung điểm (${(s5State.mpBC_done ? 1 : 0) + (s5State.mpAC_done ? 1 : 0)}/2)</span>
             <span class="${s5State.medA_done && s5State.medB_done ? 'done' : ''}">2. Trung tuyến (${(s5State.medA_done ? 1 : 0) + (s5State.medB_done ? 1 : 0)}/2)</span>
             <span class="${s5State.crystalPlaced ? 'done' : ''}">3. Trọng tâm G (${s5State.crystalPlaced ? '✓' : '…'})</span>
-            <span class="${s5State.phase === 5 ? 'done' : ''}">4. Trận pháp (${s5State.phase === 5 ? '✓' : '…'})</span>
+            <span class="${s5State.quizSolvedCount >= 3 || s5State.phase === 5 ? 'done' : ''}">4. Câu hỏi (${s5State.phase === 5 ? 3 : s5State.quizSolvedCount}/3)</span>
           </div>
         </div>
 
@@ -11248,6 +11452,11 @@ async function handle(action,el){
    await CentroidStage5.confirmCurrentAction();
    return;
   }
+  if(action==='s5SelectQuizChoice'){
+   const ch = Number(el.dataset.choice);
+   CentroidStage5.selectQuizChoice(ch);
+   return;
+  }
   if(action==='s5FinishGrandJourney'){
    await CentroidStage5.proceedToFinalSummary();
    return;
@@ -12293,6 +12502,16 @@ window.addEventListener('keydown',e=>{
    e.preventDefault();
    if(!e.repeat) CentroidStage5.confirmCurrentAction();
    return;
+  }
+  if(s5State.phase === 4 && s5State.quizSolvedCount < 3){
+   const kUp = (e.key || '').toUpperCase();
+   const optIdx = ['A', 'B', 'C', 'D'].indexOf(kUp);
+   const numIdx = ['1', '2', '3', '4'].indexOf(kUp);
+   if(optIdx !== -1 || numIdx !== -1){
+    e.preventDefault();
+    CentroidStage5.selectQuizChoice(optIdx !== -1 ? optIdx : numIdx);
+    return;
+   }
   }
   if(['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(e.code)){
    e.preventDefault();

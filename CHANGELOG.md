@@ -9,6 +9,18 @@ Tất cả những thay đổi quan trọng của dự án này sẽ được gh
 
 ---
 
+## [5.5.1] - 2026-11-07
+
+### Added & Upgraded (Bổ Sung Chuỗi 3 Câu Hỏi Hiểu Sâu Sau Khi Nối & Đặt Trọng Tâm G Ở Chặng 5)
+- **Tích Hợp Hộp 3 Câu Hỏi Hiểu Sâu Trọng Tâm (`getS5CentroidQuestions`, `#s5DeepQuizBox`, `CentroidStage5.selectQuizChoice`, `CentroidStage5.submitQuizAnswer` trong `public/app.js`, `public/style.css`, `server.js`):**
+  1. **Luồng khám phá hình học kết hợp giải mã bản chất vectơ (Giai đoạn 4):** Ngay sau khi học sinh nối hai đường trung tuyến và đặt viên **Tâm Thạch** vào đúng trọng tâm $G = (A+B+C)/3$, tam giác $ABC$ vẫn hiển thị trực quan phía trên cùng tỉ lệ `2 phần : 1 phần` và 3 tia vectơ $\overrightarrow{GA}, \overrightarrow{GB}, \overrightarrow{GC}$, đồng thời mở hộp 3 câu hỏi hiểu sâu liên tiếp (`#s5DeepQuizBox`):
+     - **Câu 1/3 (`5.Q1` – Tỉ số vàng $2:1$ trên đường trung tuyến):** Phân biệt chiều và độ dài vectơ trên trung tuyến $AM$ để chọn đúng $\overrightarrow{AG} = \frac{2}{3}\overrightarrow{AM}$ (và hiểu vì sao $\overrightarrow{GA} = -2\overrightarrow{GM}$).
+     - **Câu 2/3 (`5.Q2` – Hệ thức cân bằng lực tại trọng tâm $G$):** Kết hợp tính chất trung điểm $\overrightarrow{GB} + \overrightarrow{GC} = 2\overrightarrow{GM}$ (từ Chặng 4) và $\overrightarrow{GA} = -2\overrightarrow{GM}$ (từ Câu 1) để suy ra $\overrightarrow{GA} + \overrightarrow{GB} + \overrightarrow{GC} = \overrightarrow{0}$.
+     - **Câu 3/3 (`5.Q3` – Hệ thức với điểm $M$ bất kỳ & gốc tọa độ Oxyz):** Dùng quy tắc chèn điểm $G$ để rút ra $\overrightarrow{MA} + \overrightarrow{MB} + \overrightarrow{MC} = 3\overrightarrow{MG}$ — cơ sở trực tiếp của công thức tọa độ trọng tâm $G = \frac{A+B+C}{3}$ trong không gian Oxyz.
+  2. **Mở khóa công thức lũy tiến & Đồng bộ Giáo viên:** Thanh công thức `#s5VectorFormulaBanner` giữ trạng thái khóa (`🔒 Giải mã Câu 1/3`, `2/3`, `3/3`) để không làm lộ đáp án trước, và lần lượt sáng lên thành công thức chuẩn sau khi học sinh giải đúng từng câu. Tiến độ `quizSolvedCount` (`0..3`) được đồng bộ thời gian thực qua `/api/stage5Progress` lên Dashboard Giáo viên và bản chơi thử 1 máy (`CHOI_THU_1_MAY.html`).
+
+---
+
 ## [5.5.0] - 2026-11-07
 
 ### Added & Upgraded (Triển Khai Chặng 5 – Giải Cứu Tâm Thạch: Bí Mật Trọng Tâm Tam Giác)
