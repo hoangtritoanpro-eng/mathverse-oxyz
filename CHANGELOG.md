@@ -9,6 +9,28 @@ Tất cả những thay đổi quan trọng của dự án này sẽ được gh
 
 ---
 
+## [5.3.0] - 2026-11-07
+
+### Added & Upgraded (Triển Khai Chặng 2 – Mật Trận Vectơ – Pháo Đài Góc Vuông Theo Đúng Hình Ảnh Tham Chiếu)
+- **Xây Dựng Mini-Game Dò Mìn Bằng Kiến Thức Vectơ Góc Nhìn Top-Down Fantasy RPG (`renderStage2VectorMatrixGame`, `s2Tick`, `s2ConfirmCurrentZone`, `S2_QUESTIONS` trong `public/app.js`, `public/style.css`, `stages.js`, `server.js`):**
+  1. **Bố Cục Giao Diện Khớp 100% Ảnh Tham Chiếu (`media_1794051702137_89657ffb.jpg`):**
+     - **A. Thanh trên cùng (`.s2-topbar`):** Nút `← Thoát`, logo `MATHVERSE OXYZ`, tiêu đề `CHẶNG 2 | Mật Trận Vectơ – Pháo Đài Góc Vuông`, nút `🎵 Nhạc nền` và `⛶ Toàn màn hình`.
+     - **B. Sân chơi trung tâm (`.s2-courtyard-viewport`, 77% chiều rộng):** Sân thành lát đá cổ góc nhìn từ trên xuống (`public/assets/s2_matrix/s2_courtyard_bg.jpg`), Cổng Pháo Đài Góc Vuông ở phía trên với biểu tượng tam giác vuông vàng kim, 4 bệ đá tương tác thật ở 4 góc (`NW`, `NE`, `SW`, `SE`) và nhân vật **Rồng Xanh** ở giữa sân.
+     - **C. Bảng công thức góc trên trái (`.s2-formula-board`):** Khung viền xanh hoàng gia - vàng kim hiển thị phép cộng vectơ với ký hiệu mũi tên trên đầu chữ cái chuẩn toán học ($\overrightarrow{AB} + \overrightarrow{BC} = \ ?$).
+     - **D. Sidebar bên phải (`.s2-right-sidebar`):** Hiển thị 4 thẻ thông tin (`⏱ Thời gian` đếm ngược 60 giây, `⭐ Lượt sống` 3 khiên năng lượng, `🚩 Tiến độ` `0 / 6` kèm 6 chấm tiến trình, `Ấn Vectơ` với rương kho báu **Ấn Kết Nối** và nút chuyển người điều khiển trong nhóm) cùng hướng dẫn phím `W A S D` + `E`.
+     - **E. Hộp thoại Rồng Xanh góc dưới trái (`.s2-companion-corner`):** Avatar Rồng Xanh đeo kính phi công (`public/assets/s2_matrix/s2_dragon_portrait.png`) và lời thoại động theo ngữ cảnh (*"Pháo đài bị đặt bẫy rồi! Hãy tìm vùng an toàn nhé!"*, *"Chính xác! Một bẫy đã được hóa giải!"*, *"Ôi! Bẫy phép thuật! Hãy thử hướng khác!"*, *"Nhanh lên! Cổng thành sắp đóng!"*, *"Tuyệt vời! Pháo đài đã được giải cứu!"*).
+  2. **Điều Khiển Nhân Vật & Cơ Chế 4 Vùng Dò Mìn Vectơ (`s2Tick`, `s2ClampAndCollide`, `s2ConfirmCurrentZone`):**
+     - Điều khiển Rồng Xanh bằng `W/A/S/D` hoặc `↑/↓/←/→` (tốc độ đường chéo được chuẩn hóa bằng `Math.hypot(vx, vy)`), có kiểm tra va chạm tường thành và vật cản, cùng 5 trạng thái hoạt ảnh (`idle`, `run`, `interact`, `hit`, `celebrate`).
+     - Trước khi nhấn `E`, cả 4 bệ đá đều có giao diện đá cổ trung tính như nhau (tuyệt đối không lộ trước vùng xanh); khi Rồng Xanh đi vào bệ đá sẽ phát sáng viền và hiện nhắc lệnh `[E] Xác nhận`, chưa nhấn `E` thì chưa kích hoạt bẫy và có thể tự do rời sang vùng khác; không cho phép chọn đáp án bằng chuột như trắc nghiệm A/B/C/D.
+     - Nhấn `E` tại **vùng đúng (`safe`)**: bệ đá bừng sáng xanh lục bảo - vàng kim kèm dấu tích `✓`, cộng `+1/6` tiến độ, phát hiệu ứng chúc mừng `0.5s`, đưa Rồng Xanh về giữa sân và nạp câu hỏi tiếp theo với vị trí 4 vùng được xáo trộn ngẫu nhiên (`s2ShuffleArray`).
+     - Nhấn `E` tại **vùng sai (`trap`)**: bệ đá kích hoạt pha lê tím kèm biểu tượng cảnh báo `!`, trừ 1 khiên năng lượng (`-1 Khiên`), phát hoạt ảnh `hit` nhẹ nhàng và đưa Rồng Xanh về giữa sân để thử lại.
+  3. **Ngân Hàng 6 Câu Hỏi Quy Tắc Cộng Vectơ & Chuyển Cảnh Mượt Sang Chặng 3 (`/api/stage2Progress`, `/api/answer`):**
+     - Đầy đủ 6 câu hỏi: $\overrightarrow{AB}+\overrightarrow{BC}=\overrightarrow{AC}$, $\overrightarrow{MN}+\overrightarrow{NP}=\overrightarrow{MP}$, $\overrightarrow{PQ}+\overrightarrow{QR}=\overrightarrow{PR}$, $\overrightarrow{BA}+\overrightarrow{AC}=\overrightarrow{BC}$, $\overrightarrow{AB}+\overrightarrow{BC}+\overrightarrow{CD}=\overrightarrow{AD}$, $\overrightarrow{OA}+\overrightarrow{AB}=\overrightarrow{OB}$.
+     - Khi hoàn thành đủ `6/6` câu: toàn bộ bẫy tím biến mất, Cổng Pháo Đài Góc Vuông phát sáng và mở ra, trao thưởng **Ấn Kết Nối** (mảnh mật mã `0`) đúng 1 lần không cộng trùng, Rồng Xanh chạy vào cổng thành và chuyển sang Bản đồ 5 Chặng bay tới **Chặng 3 – Tháp Pha Lê**.
+     - Đồng bộ trực tiếp tiến độ Chặng 2 (`solvedCount/6`, số khiên, số lần dẫm bẫy, thời gian hoàn thành) lên màn hình Giáo viên và bản chơi thử 1 máy (`CHOI_THU_1_MAY.html`).
+
+---
+
 ## [5.2.0] - 2026-11-07
 
 ### Fixed (Sửa Lỗi Khuất Đáp Án Trên Bảng Gỗ Cột 4 Zombie Chặng 3)

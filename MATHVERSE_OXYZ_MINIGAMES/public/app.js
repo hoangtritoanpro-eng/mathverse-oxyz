@@ -627,6 +627,12 @@ function layout(content){
   </nav>${content}`;
  }
 
+ // Khi học sinh đang ở trong Chặng 2 (Mật Trận Vectơ), ẩn thanh hs-topnav ngoài để dùng thanh topbar riêng của Chặng 2 đúng chuẩn ảnh mẫu
+ const isStage2DedicatedTopbar = isStudent && !world?.me?.completed && (world?.me?.stage ?? 0) === 1 && (world?.current?.id === 2) && !mvWorldMapOpen && !StageTransitionController.isTransitioning() && !mvShowIntroHub && !oxyz3D.open;
+ if (isStage2DedicatedTopbar) {
+  return content;
+ }
+
  return `<nav class="navbar hs-topnav">
   <div class="hs-brand" data-action="scrollTop" title="MATHVERSE OXYZ">
    ${DIAMOND_ICON_SVG}
@@ -1975,6 +1981,15 @@ function renderTeacherTeamModal() {
     <span style="font-size:12.5px;color:#F8FAFF">🐉 Rồng Xanh: <b style="color:#FFC953">${(t.dragon?.state && t.dragon.state !== 'PLAYING') ? `Đang di chuyển Chặng ${(t.dragon.fromStage ?? 0) + 1} → ${(t.dragon.toStage ?? 0) >= 5 ? 'Tâm Thạch' : ((t.dragon.toStage ?? 0) + 1)} (${t.dragon.moveMode || 'FLY'})` : (t.completed ? 'Đã khôi phục Tâm Thạch' : `Tại cổng Chặng ${Math.min(5, (t.stage || 0) + 1)}`)}</b></span>
    </div>
 
+   <div class="gv-s1-live-box" style="margin:10px 0;padding:10px 14px;background:rgba(59,130,246,0.12);border:1px solid rgba(56,189,248,0.35);border-radius:10px;display:flex;flex-wrap:wrap;gap:14px;align-items:center;justify-content:space-between">
+    <strong style="color:#38BDF8;font-size:12.5px">🏰 CHẶNG 2 – MẬT TRẬN VECTƠ:</strong>
+    <span style="font-size:12.5px;color:#F8FAFF">🚩 Mật trận đã giải: <b style="color:#FFC953">${t.stage > 1 ? 6 : Math.min(6, (t.stage2?.solvedCount ?? 0))}/6</b></span>
+    <span style="font-size:12.5px;color:#F8FAFF">🛡️ Khiên còn lại: <b style="color:#38BDF8">${t.stage2?.shields ?? 3}/3</b></span>
+    <span style="font-size:12.5px;color:#F8FAFF">🔓 Cổng Pháo Đài: <b style="color:${(t.stage > 1 || t.stage2?.gateOpened) ? '#35C992' : '#94A3B8'}">${(t.stage > 1 || t.stage2?.gateOpened) ? '✓ Đã mở cổng (Ấn Kết Nối)' : 'Đang dò mìn vectơ'}</b></span>
+    <span style="font-size:12.5px;color:#F8FAFF">⏱️ Thời gian: <b style="color:#36DEF4">${t.stage2?.completedTimeSec != null ? (t.stage2.completedTimeSec + 's') : (t.stage > 1 ? 'Đã qua chặng' : 'Đang làm')}</b></span>
+    <span style="font-size:12.5px;color:#F8FAFF">⚠️ Dẫm bẫy: <b style="color:#FDA4AF">${t.stage2?.wrongAttempts ?? 0} lần</b></span>
+   </div>
+
    <h3 style="color:#36DEF4;font-size:13.5px;margin:12px 0 8px">📋 Lịch sử câu trả lời & thời gian từng chặng (${logs.length} lượt):</h3>
    <div class="gv-log-table-wrap">
     ${logs.length ? `<table class="gv-log-table">
@@ -2179,8 +2194,8 @@ function teacherScreen(){
        <span class="gv-s1-pill ${drgMoving ? 'moving' : 'done'}" title="Vị trí & Trạng thái di chuyển của Rồng Xanh">${esc(drgPillText)}</span>
        <span class="gv-s1-pill ${s1Clues >= 4 ? 'done' : ''}" title="Số mảnh mật thư Chặng 1 đã tìm thấy">📜 ${s1Clues}/4</span>
        <span class="gv-s1-pill ${s1Bridge ? 'done' : ''}" title="Trạng thái giải mã & mở Cầu ánh sáng Chặng 1">🌉 ${s1Bridge ? 'Đã giải mã' : (s1Cipher ? 'Đủ 4/4 mảnh' : 'Tìm mật thư')}</span>
-       <span class="gv-s1-pill ${s1TimeSec != null ? 'done' : ''}" title="Thời gian hoàn thành Chặng 1">⏱️ ${s1TimeSec != null ? (s1TimeSec + 's') : '--'}</span>
-       <span class="gv-s1-pill" title="Số lần thử sai tại Chặng 1">❌ ${s1WrongCount} sai</span>
+       <span class="gv-s1-pill ${(t.stage > 1 || (t.stage2?.solvedCount ?? 0) >= 6) ? 'done' : ''}" title="Tiến độ Chặng 2 – Mật Trận Vectơ">🏰 Mật trận ${t.stage > 1 ? 6 : (t.stage2?.solvedCount ?? 0)}/6 · 🛡️${t.stage2?.shields ?? 3}</span>
+       <span class="gv-s1-pill" title="Số lần thử sai tại Chặng 1 & 2">❌ ${(s1WrongCount + (t.stage2?.wrongAttempts ?? 0))} sai</span>
       </div>`;
       return `<div class="gv-rank-row ${rankCls}" data-action="inspectTeamRow" data-team="${t.id}" title="Nhấn để xem chi tiết từng bước của ${esc(t.name)}">
        <span class="gv-col-rank">#${rankNum}</span>
@@ -6641,10 +6656,901 @@ function renderStage3ZombieShooterGame(m) {
   </div>`;
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   CHẶNG 2: MẬT TRẬN VECTƠ – PHÁO ĐÀI GÓC VUÔNG (TOP-DOWN RPG VECTOR MINESWEEPER)
+   Kiến thức: Quy tắc cộng hai vectơ nối tiếp (Toán 12 - Mức độ Nhận biết - 60s)
+   Điều khiển: WASD / Mũi tên di chuyển Rồng Xanh, nhấn E tại bệ đá để xác nhận
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+const S2_QUESTIONS = [
+  {
+    id: '2.1',
+    qNum: 1,
+    terms: ['AB', 'BC'],
+    correct: 'AC',
+    options: ['AC', 'CA', 'CB', 'BA'],
+    hint: 'Quy tắc ba điểm: Điểm cuối B của vectơ AB trùng với điểm đầu B của vectơ BC → nối từ điểm đầu A tới điểm cuối C!'
+  },
+  {
+    id: '2.2',
+    qNum: 2,
+    terms: ['MN', 'NP'],
+    correct: 'MP',
+    options: ['MP', 'PM', 'MN', 'NP'],
+    hint: 'Quy tắc ba điểm: Điểm đầu là M, đi qua điểm nối trung gian N tới điểm cuối P!'
+  },
+  {
+    id: '2.3',
+    qNum: 3,
+    terms: ['PQ', 'QR'],
+    correct: 'PR',
+    options: ['PR', 'RP', 'PQ', 'QR'],
+    hint: 'Quy tắc ba điểm: Điểm đầu P nối tiếp qua Q tới điểm cuối R!'
+  },
+  {
+    id: '2.4',
+    qNum: 4,
+    terms: ['BA', 'AC'],
+    correct: 'BC',
+    options: ['BC', 'CB', 'AC', 'BA'],
+    hint: 'Chú ý điểm xuất phát: Vectơ đầu xuất phát từ B, nối qua A và kết thúc tại C!'
+  },
+  {
+    id: '2.5',
+    qNum: 5,
+    terms: ['AB', 'BC', 'CD'],
+    correct: 'AD',
+    options: ['AD', 'DA', 'AC', 'BD'],
+    hint: 'Cộng nối tiếp ba vectơ: Xuất phát từ điểm đầu A, nối qua B và C tới điểm cuối D!'
+  },
+  {
+    id: '2.6',
+    qNum: 6,
+    terms: ['OA', 'AB'],
+    correct: 'OB',
+    options: ['OB', 'BO', 'OA', 'AB'],
+    hint: 'Quy tắc ba điểm: Xuất phát từ gốc O, nối qua điểm trung gian A tới điểm cuối B!'
+  }
+];
+
+const S2_PEDESTAL_SLOTS = [
+  { id: 'NW', name: 'Bệ đá Tây Bắc', x: 31.2, y: 40.2, radius: 10.6 },
+  { id: 'NE', name: 'Bệ đá Đông Bắc', x: 66.5, y: 40.2, radius: 10.6 },
+  { id: 'SW', name: 'Bệ đá Tây Nam', x: 29.5, y: 71.2, radius: 10.6 },
+  { id: 'SE', name: 'Bệ đá Đông Nam', x: 67.8, y: 71.2, radius: 10.6 }
+];
+
+const S2_CENTER_POS = { x: 49.0, y: 55.2 };
+const S2_GATE_POS = { x: 49.0, y: 18.5 };
+const S2_SESSION_KEY = 'mv_s2_matrix_state_v1';
+
+const s2State = {
+  initedKey: null,
+  questionIdx: 0,
+  solvedCount: 0,
+  totalQuestions: 6,
+  shields: 3,
+  wrongAttempts: 0,
+  controllerRoleIdx: 0,
+  dragonX: S2_CENTER_POS.x,
+  dragonY: S2_CENTER_POS.y,
+  facing: 'right',
+  animState: 'idle', // 'idle' | 'run' | 'interact' | 'hit' | 'celebrate'
+  isSprinting: false,
+  keys: new Set(),
+  zones: [], // [{ id, name, x, y, radius, vec, isCorrect, status: 'neutral'|'safe'|'trap' }]
+  hoveredZoneId: null,
+  lockedUntil: 0,
+  hitUntil: 0,
+  celebrateUntil: 0,
+  interactUntil: 0,
+  gateOpened: false,
+  gateOpeningWalk: false,
+  victoryBannerShown: false,
+  rewardSubmitted: false,
+  shieldDepletedModal: false,
+  warned10s: false,
+  companionMsg: 'Pháo đài bị đặt bẫy rồi! Hãy tìm vùng an toàn nhé!',
+  lastStepSoundAt: 0
+};
+
+function s2ShuffleArray(arr) {
+  const copy = [...arr];
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    const tmp = copy[i];
+    copy[i] = copy[j];
+    copy[j] = tmp;
+  }
+  return copy;
+}
+
+function s2RenderVecArrow(vecText, cls = '') {
+  const clean = String(vecText || '').replace(/[^A-Za-z0-9]/g, '').toUpperCase() || 'AC';
+  return `<span class="s2-vec-notation ${cls}" aria-label="Vectơ ${clean}">
+    <svg class="s2-vec-overarrow" viewBox="0 0 42 11" preserveAspectRatio="none" aria-hidden="true">
+      <line x1="2" y1="6" x2="34" y2="6" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/>
+      <path d="M 28 2 L 39 6 L 28 10" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <span class="s2-vec-letters">${clean}</span>
+  </span>`;
+}
+
+function s2RenderFormulaEquationHtml(q) {
+  const terms = (q && Array.isArray(q.terms) && q.terms.length) ? q.terms : ['AB', 'BC'];
+  const termsHtml = terms.map(t => s2RenderVecArrow(t, 'formula-vec')).join('<span class="s2-formula-op">+</span>');
+  return `${termsHtml}<span class="s2-formula-op">=</span><span class="s2-formula-qbox">?</span>`;
+}
+
+function s2SaveSessionState() {
+  try {
+    if (!session?.room) return;
+    const data = {
+      room: session.room,
+      team: world?.me?.id || session.team || 'doi-1',
+      questionIdx: s2State.questionIdx,
+      solvedCount: s2State.solvedCount,
+      shields: s2State.shields,
+      wrongAttempts: s2State.wrongAttempts,
+      controllerRoleIdx: s2State.controllerRoleIdx,
+      gateOpened: s2State.gateOpened,
+      rewardSubmitted: s2State.rewardSubmitted,
+      savedAt: Date.now()
+    };
+    sessionStorage.setItem(S2_SESSION_KEY, JSON.stringify(data));
+  } catch (e) {}
+}
+
+function s2LoadSessionState() {
+  try {
+    const raw = sessionStorage.getItem(S2_SESSION_KEY);
+    if (!raw) return null;
+    const data = JSON.parse(raw);
+    const curTeam = world?.me?.id || session?.team || 'doi-1';
+    if (data && data.room === session?.room && data.team === curTeam) {
+      return data;
+    }
+  } catch (e) {}
+  return null;
+}
+
+function s2LoadQuestion(qIdx, resetDragonToCenter = true) {
+  const safeIdx = Math.max(0, Math.min(S2_QUESTIONS.length - 1, Number(qIdx) || 0));
+  const q = S2_QUESTIONS[safeIdx];
+  s2State.questionIdx = safeIdx;
+  const shuffledOpts = s2ShuffleArray(q.options);
+  s2State.zones = S2_PEDESTAL_SLOTS.map((slot, idx) => {
+    const vec = shuffledOpts[idx] || q.options[idx];
+    return {
+      ...slot,
+      vec,
+      isCorrect: vec === q.correct,
+      status: 'neutral' // 'neutral' | 'safe' | 'trap'
+    };
+  });
+  if (resetDragonToCenter) {
+    s2State.dragonX = S2_CENTER_POS.x;
+    s2State.dragonY = S2_CENTER_POS.y;
+    s2State.hoveredZoneId = null;
+  }
+}
+
+function ensureS2State(m, forceReset = false) {
+  const teamId = world?.me?.id || session?.team || 'doi-1';
+  const key = `${session?.room || 'LOCAL'}_${teamId}_stage2`;
+  const srvS2 = world?.me?.stage2;
+
+  if (s2State.initedKey !== key || forceReset) {
+    s2State.initedKey = key;
+    const saved = !forceReset ? s2LoadSessionState() : null;
+    const srvSolved = Number(srvS2?.solvedCount || 0);
+    const savedSolved = Number(saved?.solvedCount || 0);
+    const solved = forceReset ? 0 : Math.min(6, Math.max(srvSolved, savedSolved));
+
+    s2State.solvedCount = solved;
+    s2State.questionIdx = Math.min(5, solved);
+    s2State.shields = forceReset
+      ? 3
+      : Math.max(1, Math.min(3, srvS2?.shields ?? saved?.shields ?? world?.me?.health ?? 3));
+    s2State.wrongAttempts = forceReset ? 0 : Math.max(srvS2?.wrongAttempts ?? 0, saved?.wrongAttempts ?? 0);
+    s2State.controllerRoleIdx = srvS2?.controllerRoleIdx ?? saved?.controllerRoleIdx ?? 0;
+    s2State.dragonX = S2_CENTER_POS.x;
+    s2State.dragonY = S2_CENTER_POS.y;
+    s2State.facing = 'right';
+    s2State.animState = 'idle';
+    s2State.isSprinting = false;
+    s2State.keys.clear();
+    s2State.hoveredZoneId = null;
+    s2State.lockedUntil = 0;
+    s2State.hitUntil = 0;
+    s2State.celebrateUntil = 0;
+    s2State.interactUntil = 0;
+    s2State.gateOpened = solved >= 6 || Boolean(srvS2?.gateOpened);
+    s2State.gateOpeningWalk = false;
+    s2State.victoryBannerShown = solved >= 6;
+    s2State.rewardSubmitted = Boolean(saved?.rewardSubmitted || (world?.me?.stage ?? 0) > 1);
+    s2State.shieldDepletedModal = false;
+    s2State.warned10s = false;
+    s2State.companionMsg = solved >= 6
+      ? 'Tuyệt vời! Pháo đài đã được giải cứu!'
+      : 'Pháo đài bị đặt bẫy rồi! Hãy tìm vùng an toàn nhé!';
+
+    s2LoadQuestion(s2State.questionIdx, true);
+    s2SaveSessionState();
+  } else if (srvS2) {
+    // Đồng bộ nếu giáo viên hồi đầy khiên hoặc cập nhật người điều khiển
+    if (srvS2.shields === 3 && s2State.shields < 3 && s2State.wrongAttempts === 0) {
+      s2State.shields = 3;
+    }
+    if (srvS2.controllerRoleIdx !== undefined) {
+      s2State.controllerRoleIdx = srvS2.controllerRoleIdx;
+    }
+  }
+}
+
+function s2ClampAndCollide(nx, ny) {
+  // Nếu cổng pháo đài đã mở và Rồng Xanh đang chạy lên cổng, cho phép tiến lên y = 16%
+  if (s2State.gateOpeningWalk) {
+    return {
+      x: Math.max(44, Math.min(54, nx)),
+      y: Math.max(15.5, Math.min(84, ny))
+    };
+  }
+
+  // Giới hạn tường thành bao quanh sân đá cổ
+  let x = Math.max(17.5, Math.min(80.5, nx));
+  let y = Math.max(24.5, Math.min(83.5, ny));
+
+  // Tránh đi xuyên vào Bảng công thức ở góc trên trái (x < 33.5, y < 30.5)
+  if (x < 33.5 && y < 30.5) {
+    const pushRight = 33.5 - x;
+    const pushDown = 30.5 - y;
+    if (pushRight < pushDown) x = 33.5;
+    else y = 30.5;
+  }
+
+  // Tránh đi xuyên vào Khung thoại Rồng Xanh ở góc dưới trái (x < 39.5, y > 79.5)
+  if (x < 39.5 && y > 79.5) {
+    const pushRight = 39.5 - x;
+    const pushUp = y - 79.5;
+    if (pushRight < pushUp) x = 39.5;
+    else y = 79.5;
+  }
+
+  // Hai trụ thành đá nhô vào ở hai bên trái/phải sân
+  if (x < 20.5 && y > 44 && y < 62) x = 20.5;
+  if (x > 77.5 && y > 44 && y < 62) x = 77.5;
+
+  return { x, y };
+}
+
+function s2DetectHoveredZone() {
+  let best = null;
+  let bestDist = Infinity;
+  for (const z of s2State.zones) {
+    const dx = s2State.dragonX - z.x;
+    const dy = (s2State.dragonY - z.y) * (9 / 14); // Chuẩn hóa tỉ lệ khung hình 16:9
+    const dist = Math.hypot(dx, dy);
+    if (dist <= z.radius && dist < bestDist) {
+      best = z;
+      bestDist = dist;
+    }
+  }
+  return best ? best.id : null;
+}
+
+function s2Tick(now, dt) {
+  if (!document.getElementById('s2MatrixViewport')) return;
+
+  // Kiểm tra cảnh báo khi đồng hồ còn <= 10 giây
+  const elapsedSec = Math.floor((Date.now() - vaState.stageStartedAt) / 1000);
+  const remSec = Math.max(0, (vaState.stageDurationSec || 60) - elapsedSec);
+  const timerEl = document.getElementById('s2TimerClockText');
+  if (timerEl) {
+    timerEl.textContent = formatMMSS(remSec);
+    timerEl.classList.toggle('urgent', remSec <= 10);
+  }
+  if (remSec <= 10 && remSec > 0 && !s2State.warned10s && !s2State.gateOpened) {
+    s2State.warned10s = true;
+    s2State.companionMsg = 'Nhanh lên! Cổng thành sắp đóng!';
+    const compEl = document.getElementById('s2CompanionText');
+    if (compEl) compEl.innerHTML = s2State.companionMsg;
+  }
+
+  // Nếu Rồng Xanh đang chạy thẳng qua Cổng Pháo Đài sau khi giải xong 6/6 câu
+  if (s2State.gateOpeningWalk) {
+    const dx = S2_GATE_POS.x - s2State.dragonX;
+    const dy = S2_GATE_POS.y - s2State.dragonY;
+    const dist = Math.hypot(dx, dy);
+    if (dist > 1.2) {
+      const step = Math.min(dist, 28 * dt);
+      s2State.dragonX += (dx / dist) * step;
+      s2State.dragonY += (dy / dist) * step;
+      s2State.animState = 'run';
+    } else {
+      s2State.animState = 'celebrate';
+    }
+    s2SyncDOM(now);
+    return;
+  }
+
+  // Nếu đang khóa ngắn để phát hiệu ứng đúng/sai hoặc đang mở modal hết khiên
+  if (now < s2State.lockedUntil || s2State.shieldDepletedModal || s2State.gateOpened) {
+    if (now < s2State.hitUntil) s2State.animState = 'hit';
+    else if (now < s2State.celebrateUntil) s2State.animState = 'celebrate';
+    else if (now < s2State.interactUntil) s2State.animState = 'interact';
+    else s2State.animState = 'idle';
+    s2SyncDOM(now);
+    return;
+  }
+
+  let vx = (s2State.keys.has('right') ? 1 : 0) - (s2State.keys.has('left') ? 1 : 0);
+  let vy = (s2State.keys.has('down') ? 1 : 0) - (s2State.keys.has('up') ? 1 : 0);
+
+  if (vx !== 0 || vy !== 0) {
+    // Chuẩn hóa vận tốc đường chéo để không chạy chéo nhanh hơn
+    const len = Math.hypot(vx, vy);
+    vx /= len;
+    vy /= len;
+
+    if (vx < -0.05) s2State.facing = 'left';
+    else if (vx > 0.05) s2State.facing = 'right';
+
+    const speed = s2State.isSprinting ? 37.0 : 27.5;
+    const nextPos = s2ClampAndCollide(
+      s2State.dragonX + vx * speed * dt,
+      s2State.dragonY + vy * speed * 1.12 * dt
+    );
+    s2State.dragonX = nextPos.x;
+    s2State.dragonY = nextPos.y;
+    s2State.animState = 'run';
+
+    if (now - s2State.lastStepSoundAt > 240) {
+      s2State.lastStepSoundAt = now;
+    }
+  } else {
+    if (now < s2State.hitUntil) s2State.animState = 'hit';
+    else if (now < s2State.celebrateUntil) s2State.animState = 'celebrate';
+    else if (now < s2State.interactUntil) s2State.animState = 'interact';
+    else s2State.animState = 'idle';
+  }
+
+  const prevHover = s2State.hoveredZoneId;
+  s2State.hoveredZoneId = s2DetectHoveredZone();
+  if (s2State.hoveredZoneId && s2State.hoveredZoneId !== prevHover) {
+    sound('bleep');
+  }
+
+  s2SyncDOM(now);
+}
+
+function s2SyncDOM(now = performance.now()) {
+  const dragonEl = document.getElementById('s2DragonActor');
+  if (dragonEl) {
+    dragonEl.style.left = `${s2State.dragonX.toFixed(2)}%`;
+    dragonEl.style.top = `${s2State.dragonY.toFixed(2)}%`;
+    dragonEl.dataset.anim = s2State.animState;
+    dragonEl.classList.toggle('facing-left', s2State.facing === 'left');
+    dragonEl.classList.toggle('facing-right', s2State.facing !== 'left');
+  }
+
+  // Đồng bộ hiệu ứng hover & nút [E] Xác nhận trên 4 bệ đá
+  s2State.zones.forEach(z => {
+    const zEl = document.getElementById(`s2Pedestal_${z.id}`);
+    if (!zEl) return;
+    const isHover = s2State.hoveredZoneId === z.id && !s2State.gateOpened;
+    zEl.classList.toggle('is-in-range', isHover);
+    zEl.classList.toggle('is-safe', z.status === 'safe');
+    zEl.classList.toggle('is-trap', z.status === 'trap');
+    zEl.classList.toggle('is-purified', s2State.gateOpened);
+  });
+
+  // Cập nhật nút nhắc tương tác E trên đầu Rồng Xanh
+  const promptEl = document.getElementById('s2DragonInteractPrompt');
+  if (promptEl) {
+    const hz = s2State.zones.find(z => z.id === s2State.hoveredZoneId);
+    if (hz && !s2State.gateOpened && now >= s2State.lockedUntil) {
+      promptEl.style.display = 'inline-flex';
+      promptEl.innerHTML = `<span class="s2-e-key-badge">E</span> <span>Xác nhận <b>Vectơ ${hz.vec}</b></span>`;
+    } else {
+      promptEl.style.display = 'none';
+    }
+  }
+}
+
+async function s2ConfirmCurrentZone() {
+  const now = performance.now();
+  if (now < s2State.lockedUntil || s2State.gateOpened || s2State.shieldDepletedModal) return;
+
+  const zone = s2State.zones.find(z => z.id === s2State.hoveredZoneId);
+  if (!zone) {
+    sound('bleep');
+    s2State.companionMsg = 'Hãy điều khiển Rồng Xanh (WASD / Phím mũi tên) đứng vào một trong 4 bệ đá rồi nhấn phím E!';
+    const compEl = document.getElementById('s2CompanionText');
+    if (compEl) compEl.innerHTML = s2State.companionMsg;
+    if (window.spawnJuiceFloater) {
+      window.spawnJuiceFloater('🐉 Hãy bước vào 1 trong 4 bệ đá trước khi nhấn E!', 'combo');
+    }
+    return;
+  }
+
+  if (zone.status === 'trap') {
+    sound('bleep');
+    s2State.companionMsg = `Bệ đá Vectơ ${zone.vec} là bẫy phép thuật đã lộ! Hãy di chuyển sang bệ đá khác nhé!`;
+    const compEl = document.getElementById('s2CompanionText');
+    if (compEl) compEl.innerHTML = s2State.companionMsg;
+    return;
+  }
+
+  const curQ = S2_QUESTIONS[s2State.questionIdx] || S2_QUESTIONS[0];
+  s2State.interactUntil = now + 260;
+
+  if (zone.isCorrect) {
+    // ĐÁP ÁN ĐÚNG -> Vùng sáng xanh ngọc lục bảo + dấu tích xanh
+    zone.status = 'safe';
+    sound('correct');
+    s2State.solvedCount = Math.min(6, s2State.questionIdx + 1);
+    s2State.animState = 'celebrate';
+    s2State.celebrateUntil = now + 620;
+    s2State.lockedUntil = now + 620;
+    s2State.companionMsg = 'Chính xác! Một bẫy đã được hóa giải!';
+    s2SaveSessionState();
+
+    if (window.spawnConfettiParticles) {
+      window.spawnConfettiParticles(window.innerWidth * 0.42, window.innerHeight * 0.45, 45);
+    }
+    if (window.spawnJuiceFloater) {
+      window.spawnJuiceFloater(`✓ Chính xác! Vectơ ${zone.vec} (+5 XP)`, 'xp');
+    }
+
+    if (session?.room && session?.token) {
+      api('/api/stage2Progress', {
+        room: session.room,
+        token: session.token,
+        correctZone: true,
+        questionIdx: s2State.questionIdx,
+        qId: curQ.id,
+        chosenVec: zone.vec
+      }).catch(() => {});
+    }
+
+    render();
+
+    if (s2State.solvedCount >= 6) {
+      // Đã hoàn thành đủ 6/6 câu hỏi!
+      setTimeout(() => {
+        s2TriggerFortressVictory();
+      }, 560);
+    } else {
+      // Sau 0.55 giây chúc mừng: Đưa Rồng Xanh về giữa sân & nạp câu hỏi tiếp theo với vị trí xáo trộn
+      setTimeout(() => {
+        s2LoadQuestion(s2State.solvedCount, true);
+        s2State.companionMsg = 'Hãy tìm vùng an toàn chứa vectơ đúng!';
+        s2SaveSessionState();
+        render();
+      }, 560);
+    }
+  } else {
+    // ĐÁP ÁN SAI -> Kích hoạt bẫy pha lê tím, mất 1 khiên, phản hồi nhẹ nhàng và đưa Rồng Xanh về giữa sân
+    zone.status = 'trap';
+    sound('wrong');
+    s2State.shields = Math.max(0, s2State.shields - 1);
+    s2State.wrongAttempts = (s2State.wrongAttempts || 0) + 1;
+    s2State.animState = 'hit';
+    s2State.hitUntil = now + 640;
+    s2State.lockedUntil = now + 640;
+
+    if (s2State.wrongAttempts >= 2) {
+      s2State.companionMsg = `Ôi! Bẫy phép thuật! 💡 Gợi ý: ${curQ.hint}`;
+    } else {
+      s2State.companionMsg = 'Ôi! Bẫy phép thuật! Hãy thử hướng khác!';
+    }
+    s2SaveSessionState();
+
+    if (window.spawnJuiceFloater) {
+      window.spawnJuiceFloater('⚠️ Bẫy phép thuật! -1 Khiên năng lượng', 'damage');
+    }
+
+    if (session?.room && session?.token) {
+      api('/api/stage2Progress', {
+        room: session.room,
+        token: session.token,
+        wrongZone: true,
+        questionIdx: s2State.questionIdx,
+        qId: curQ.id,
+        chosenVec: zone.vec
+      }).catch(() => {});
+    }
+
+    render();
+
+    setTimeout(() => {
+      s2State.dragonX = S2_CENTER_POS.x;
+      s2State.dragonY = S2_CENTER_POS.y;
+      s2State.hoveredZoneId = null;
+      if (s2State.shields <= 0) {
+        s2State.shieldDepletedModal = true;
+      }
+      render();
+    }, 620);
+  }
+}
+
+async function s2TriggerFortressVictory() {
+  s2State.gateOpened = true;
+  s2State.gateOpeningWalk = true;
+  s2State.victoryBannerShown = true;
+  s2State.companionMsg = 'Tuyệt vời! Pháo đài đã được giải cứu!';
+  s2SaveSessionState();
+  sound('powerup');
+  triggerConfetti(2800);
+  render();
+
+  if (!s2State.rewardSubmitted && session?.room && session?.token && (world?.me?.stage ?? 1) === 1) {
+    s2State.rewardSubmitted = true;
+    s2SaveSessionState();
+    try {
+      const prevStageIdx = 1;
+      const res = await submit('/api/answer', {
+        stage: 1,
+        round: world?.me?.round ?? 0,
+        choice: 0,
+        stage2MatrixCompleted: true
+      });
+      const updated = await api('/api/state', { room: session.room, token: session.token });
+      world = updated;
+      const nextStageIdx = Math.min(5, updated?.me?.stage ?? (prevStageIdx + 1));
+      lastSyncedTeamStage = nextStageIdx;
+
+      setTimeout(() => {
+        if (s2State.gateOpened && !StageTransitionController.isTransitioning()) {
+          s2State.gateOpeningWalk = false;
+          StageTransitionController.beginStageTransition(prevStageIdx, nextStageIdx, {
+            sealName: res?.item || 'Ấn Kết Nối',
+            points: res?.points || 20,
+            goldEarned: res?.goldEarned || 150
+          });
+        }
+      }, 2100);
+    } catch (e) {
+      console.warn('Stage 2 completion sync error:', e);
+    }
+  }
+}
+
+function renderStage2VectorMatrixGame(m) {
+  ensureS2State(m);
+  const curQ = S2_QUESTIONS[Math.min(S2_QUESTIONS.length - 1, s2State.questionIdx)] || S2_QUESTIONS[0];
+  const elapsedSec = Math.floor((Date.now() - vaState.stageStartedAt) / 1000);
+  const remSec = Math.max(0, (vaState.stageDurationSec || 60) - elapsedSec);
+  const roles = m.teamRoles || [
+    { role: 'Thủ lĩnh điều hướng', icon: '🧭' },
+    { role: 'Chuyên gia quy tắc 3 điểm', icon: '📐' },
+    { role: 'Hoa tiêu dò bẫy', icon: '🛡️' },
+    { role: 'Kiểm soát thời gian', icon: '⏱️' }
+  ];
+  const activeRole = roles[s2State.controllerRoleIdx % roles.length] || roles[0];
+  const hoveredZone = s2State.zones.find(z => z.id === s2State.hoveredZoneId);
+
+  return `
+  <div class="s2-matrix-shell" id="s2MatrixGameShell">
+    <!-- A. THANH TRÊN CÙNG (COMPACT TOP BAR GIỐNG HÌNH THAM CHIẾU) -->
+    <header class="s2-topbar">
+      <div class="s2-topbar-left">
+        <button type="button" class="s2-top-btn exit-btn" data-action="s2ExitToMap" title="Quay ra Bản đồ Lục địa OXYZ">
+          <span>←</span> <span>Thoát</span>
+        </button>
+        <div class="s2-brand-logo">
+          <span class="s2-logo-gem">💎</span>
+          <span class="s2-logo-text">MATHVERSE <em>OXYZ</em></span>
+        </div>
+        <span class="s2-top-divider">|</span>
+        <div class="s2-stage-title-group">
+          <span class="s2-stage-pill">CHẶNG 2</span>
+          <h1 class="s2-stage-heading">Mật Trận Vectơ – Pháo Đài Góc Vuông</h1>
+        </div>
+      </div>
+
+      <div class="s2-topbar-right">
+        <button type="button" class="s2-top-btn" data-action="toggleSound" title="Bật/Tắt nhạc nền & hiệu ứng âm thanh">
+          <span>${soundEnabled ? '🎵' : '🔇'}</span>
+          <span>Nhạc nền</span>
+        </button>
+        <button type="button" class="s2-top-btn" data-action="s2ToggleFullscreen" title="Chế độ Toàn màn hình">
+          <span>⛶</span>
+          <span>Toàn màn hình</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- KHU VỰC CHÍNH: SÂN CHƠI TRUNG TÂM (77%) + SIDEBAR BÊN PHẢI (23%) -->
+    <div class="s2-main-layout">
+      <!-- B. SÂN CHƠI TRUNG TÂM (TOP-DOWN FANTASY RPG COURTYARD) -->
+      <div class="s2-courtyard-viewport ${s2State.gateOpened ? 'gate-unlocked' : ''}" id="s2MatrixViewport">
+        <img src="/assets/s2_matrix/s2_courtyard_bg.jpg" alt="Sân thành Pháo Đài Góc Vuông" class="s2-courtyard-bg-img" draggable="false"/>
+
+        <!-- Hiệu ứng ánh sáng phép thuật cyan & tím trong sân thành -->
+        <div class="s2-ambient-glow-layer" aria-hidden="true"></div>
+
+        <!-- CỔNG PHÁO ĐÀI GÓC VUÔNG Ở PHÍA TRÊN -->
+        <div class="s2-fortress-gate ${s2State.gateOpened ? 'is-open' : ''}" id="s2FortressGate">
+          <div class="s2-gate-portal-glow"></div>
+          <div class="s2-gate-emblem" title="Biểu tượng Pháo Đài Góc Vuông">
+            <svg viewBox="0 0 64 64" class="s2-gate-triangle-svg">
+              <polygon points="18,46 46,46 46,18" fill="none" stroke="#FDE047" stroke-width="4" stroke-linejoin="round"/>
+              <polyline points="38,46 38,38 46,38" fill="none" stroke="#FDE047" stroke-width="2.6"/>
+            </svg>
+          </div>
+          ${s2State.gateOpened ? `<div class="s2-gate-open-banner">🔓 CỔNG PHÁO ĐÀI ĐÃ MỞ!</div>` : ''}
+        </div>
+
+        <!-- C. BẢNG CÔNG THỨC Ở GÓC TRÊN TRÁI SÂN CHƠI -->
+        <div class="s2-formula-board" id="s2FormulaBoard" role="region" aria-label="Bảng công thức Mật Trận Vectơ">
+          <div class="s2-formula-gem-crest" aria-hidden="true"></div>
+          <div class="s2-formula-header">
+            <span>Chặng 2: Mật Trận Vectơ</span>
+          </div>
+          <div class="s2-formula-parchment">
+            <div class="s2-formula-equation" id="s2FormulaEquation">
+              ${s2RenderFormulaEquationHtml(curQ)}
+            </div>
+            <div class="s2-formula-subcaption">
+              Câu ${s2State.questionIdx + 1}/6 · Quy tắc cộng vectơ (Nhận biết)
+            </div>
+          </div>
+        </div>
+
+        <!-- BỐN VÙNG BỆ ĐÁ DÒ MÌN TƯƠNG TÁC THẬT (NW, NE, SW, SE) -->
+        <div class="s2-pedestals-layer" id="s2PedestalsLayer">
+          ${s2State.zones.map(z => {
+            const isHover = s2State.hoveredZoneId === z.id && !s2State.gateOpened;
+            const statusCls = z.status === 'safe' ? 'is-safe' : z.status === 'trap' ? 'is-trap' : '';
+            return `
+              <div class="s2-pedestal-zone ${statusCls} ${isHover ? 'is-in-range' : ''} ${s2State.gateOpened ? 'is-purified' : ''}"
+                   id="s2Pedestal_${z.id}"
+                   style="left:${z.x}%;top:${z.y}%"
+                   data-action="s2PedestalClickRemind"
+                   data-zone="${z.id}">
+                <!-- Hào quang vòng tròn ma thuật dưới bệ đá -->
+                <div class="s2-pedestal-aura"></div>
+
+                <!-- Tinh thể pha lê tím trồi lên khi bẫy bị kích hoạt -->
+                <div class="s2-trap-crystals" aria-hidden="true">
+                  <span class="c-spike s1"></span>
+                  <span class="c-spike s2"></span>
+                  <span class="c-spike s3"></span>
+                  <span class="c-spike s4"></span>
+                  <span class="c-spike s5"></span>
+                  <span class="c-spike s6"></span>
+                </div>
+
+                <!-- Huy hiệu trạng thái phía trên bệ đá (✓ khi đúng, ⚠️ khi bẫy, [E] khi Rồng Xanh đứng vào) -->
+                <div class="s2-pedestal-top-badge">
+                  ${z.status === 'safe'
+                    ? `<span class="s2-badge-safe" title="Vùng an toàn chính xác!">✓</span>`
+                    : z.status === 'trap'
+                      ? `<span class="s2-badge-trap" title="Bẫy phép thuật tím!">!</span>`
+                      : `<span class="s2-badge-interact">[E] Xác nhận</span>`
+                  }
+                </div>
+
+                <!-- Vòng bệ đá cổ & Ký hiệu Vectơ có mũi tên trên đầu -->
+                <div class="s2-pedestal-stone-disc">
+                  <div class="s2-pedestal-inner-ring">
+                    ${s2RenderVecArrow(z.vec, 'pedestal-vec')}
+                  </div>
+                </div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+
+        <!-- E. NHÂN VẬT RỒNG XANH Ở GIỮA SÂN (CÓ IDLE, RUN, INTERACT, HIT, CELEBRATE) -->
+        <div class="s2-dragon-actor ${s2State.facing === 'left' ? 'facing-left' : 'facing-right'}"
+             id="s2DragonActor"
+             data-anim="${s2State.animState}"
+             style="left:${s2State.dragonX.toFixed(2)}%;top:${s2State.dragonY.toFixed(2)}%">
+          <!-- Vòng sáng định vị cyan dưới chân Rồng Xanh như ảnh mẫu -->
+          <div class="s2-dragon-foot-ring">
+            <div class="s2-dragon-foot-inner"></div>
+          </div>
+
+          <!-- Nhãn nhắc nhấn phím [E] khi đứng trong vùng bệ đá -->
+          <button type="button"
+                  class="s2-dragon-e-prompt"
+                  id="s2DragonInteractPrompt"
+                  data-action="s2PressConfirmE"
+                  style="display:${hoveredZone && !s2State.gateOpened ? 'inline-flex' : 'none'}">
+            <span class="s2-e-key-badge">E</span>
+            <span>Xác nhận <b>Vectơ ${hoveredZone ? hoveredZone.vec : ''}</b></span>
+          </button>
+
+          <!-- Hình ảnh Rồng Xanh của dự án với lớp hiệu ứng sprite animation -->
+          <div class="s2-dragon-sprite-wrap">
+            <img src="/assets/RongXanh.png" alt="Rồng Xanh" class="s2-dragon-sprite-img" draggable="false"/>
+          </div>
+        </div>
+
+        <!-- HỘP THOẠI RỒNG XANH ĐỒNG HÀNH Ở GÓC DƯỚI TRÁI (GIỐNG ẢNH MẪU) -->
+        <div class="s2-companion-corner" id="s2CompanionCorner">
+          <div class="s2-companion-avatar-wrap">
+            <img src="/assets/s2_matrix/s2_dragon_portrait.png" alt="Rồng Xanh" class="s2-companion-avatar" draggable="false"/>
+          </div>
+          <div class="s2-companion-bubble-wrap">
+            <div class="s2-companion-name-tag">Rồng Xanh</div>
+            <div class="s2-companion-speech-box">
+              <span id="s2CompanionText">${s2State.companionMsg}</span>
+              <span class="s2-speech-chevron">⌄</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bàn phím ảo hỗ trợ thiết bị cảm ứng / máy tính bảng (ẩn trên màn hình PC lớn trừ khi chạm) -->
+        <div class="s2-touch-dpad" aria-label="Điều khiển cảm ứng">
+          <button type="button" class="s2-dpad-btn up" data-action="s2MoveStep" data-dir="up">▲</button>
+          <div class="s2-dpad-mid">
+            <button type="button" class="s2-dpad-btn left" data-action="s2MoveStep" data-dir="left">◀</button>
+            <button type="button" class="s2-dpad-btn confirm-e" data-action="s2PressConfirmE">E</button>
+            <button type="button" class="s2-dpad-btn right" data-action="s2MoveStep" data-dir="right">▶</button>
+          </div>
+          <button type="button" class="s2-dpad-btn down" data-action="s2MoveStep" data-dir="down">▼</button>
+        </div>
+
+        <!-- OVERLAY KHI HẾT 3 KHIÊN NĂNG LƯỢNG -->
+        ${s2State.shieldDepletedModal && !s2State.gateOpened ? `
+          <div class="s2-overlay-backdrop">
+            <div class="s2-modal-card">
+              <div class="s2-modal-icon">🛡️⚡</div>
+              <h3>Khiên Năng Lượng Đã Cạn!</h3>
+              <p>Đội đã dẫm trúng 3 bẫy phép thuật liên tiếp. Hãy quan sát kỹ <b>điểm cuối của vectơ thứ nhất nối tiếp với điểm đầu của vectơ thứ hai</b> để nạp lại khiên và giải tiếp câu ${s2State.questionIdx + 1}/6 nhé!</p>
+              <div class="s2-modal-hint-box">💡 ${curQ.hint}</div>
+              <button type="button" class="s2-primary-cta-btn" data-action="s2RechargeShields">
+                🛡️ Khôi phục 3 Khiên & Tiếp tục ngay
+              </button>
+            </div>
+          </div>
+        ` : ''}
+
+        <!-- OVERLAY CHIẾN THẮNG KHI GIẢI ĐỦ 6/6 CÂU & MỞ CỔNG PHÁO ĐÀI -->
+        ${s2State.gateOpened ? `
+          <div class="s2-victory-floating-banner">
+            <div class="s2-victory-card">
+              <div class="s2-victory-seal-glow">
+                <img src="/assets/s2_matrix/s2_seal_chest.png" alt="Ấn Kết Nối" class="s2-victory-chest-img"/>
+              </div>
+              <div class="s2-victory-info">
+                <span class="s2-victory-kicker">✨ ĐÃ HÓA GIẢI 6/6 MẬT TRẬN VECTƠ!</span>
+                <h3>Cổng Pháo Đài Góc Vuông Đã Mở!</h3>
+                <p>Đội đã thu hồi thành công <b>🔗 Ấn Kết Nối</b> (Mảnh mật mã: <b>0</b>). Rồng Xanh đang tiến qua cổng thành để bay tới <b>Chặng 3 – Tháp Pha Lê</b>!</p>
+              </div>
+              <button type="button" class="s2-primary-cta-btn" data-action="s2ProceedNextStage">
+                Tiếp tục sang Chặng 3 →
+              </button>
+            </div>
+          </div>
+        ` : ''}
+      </div>
+
+      <!-- D. SIDEBAR BÊN PHẢI (4 MỤC + HƯỚNG DẪN ĐIỀU KHIỂN ĐÚNG NHƯ ẢNH MẪU) -->
+      <aside class="s2-right-sidebar" aria-label="Bảng thông tin Chặng 2">
+        <!-- MỤC 1: ĐỒNG HỒ 60 GIÂY -->
+        <div class="s2-side-card s2-timer-card">
+          <div class="s2-side-label">
+            <span class="s2-side-icon">⏱</span>
+            <span>Thời gian</span>
+          </div>
+          <div class="s2-timer-digits ${remSec <= 10 ? 'urgent' : ''}" id="s2TimerClockText">
+            ${formatMMSS(remSec)}
+          </div>
+        </div>
+
+        <!-- MỤC 2: BA KHIÊN NĂNG LƯỢNG -->
+        <div class="s2-side-card s2-shields-card">
+          <div class="s2-side-label">
+            <span class="s2-side-icon">⭐</span>
+            <span>Lượt sống</span>
+          </div>
+          <div class="s2-shields-row" id="s2ShieldsRow">
+            ${[1, 2, 3].map(idx => {
+              const active = idx <= s2State.shields;
+              return `
+                <div class="s2-shield-badge ${active ? 'active' : 'lost'}" title="${active ? 'Khiên năng lượng còn hoạt động' : 'Khiên đã mất do dẫm bẫy'}">
+                  <svg viewBox="0 0 44 48" class="s2-shield-svg">
+                    <defs>
+                      <linearGradient id="s2ShGold_${idx}" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#FDE047"/>
+                        <stop offset="100%" stop-color="#D97706"/>
+                      </linearGradient>
+                      <linearGradient id="s2ShBlue_${idx}" x1="0%" y1="0%" x2="0%" y2="100%">
+                        <stop offset="0%" stop-color="#38BDF8"/>
+                        <stop offset="100%" stop-color="#1D4ED8"/>
+                      </linearGradient>
+                    </defs>
+                    <path d="M22 3 L40 10 L40 23 C40 34 31 42 22 46 C13 42 4 34 4 23 L4 10 Z"
+                          fill="url(#s2ShBlue_${idx})"
+                          stroke="url(#s2ShGold_${idx})"
+                          stroke-width="3.2"/>
+                    <path d="M22 31 C22 31 12 24 12 17.5 C12 14.5 14.4 12.5 17.2 12.5 C19.3 12.5 21 13.8 22 15.5 C23 13.8 24.7 12.5 26.8 12.5 C29.6 12.5 32 14.5 32 17.5 C32 24 22 31 22 31 Z"
+                          fill="#E0F2FE"/>
+                  </svg>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        </div>
+
+        <!-- MỤC 3: TIẾN ĐỘ CÂU HỎI 0/6 -->
+        <div class="s2-side-card s2-progress-card">
+          <div class="s2-side-label">
+            <span class="s2-side-icon">🚩</span>
+            <span>Tiến độ</span>
+          </div>
+          <div class="s2-progress-ratio" id="s2ProgressRatioText">
+            ${s2State.solvedCount} / ${s2State.totalQuestions}
+          </div>
+          <div class="s2-progress-dots-track">
+            ${Array.from({ length: 6 }, (_, i) => {
+              const isDone = i < s2State.solvedCount;
+              const isCur = i === s2State.questionIdx && !s2State.gateOpened;
+              return `<span class="s2-prog-dot ${isDone ? 'done' : ''} ${isCur ? 'current' : ''}"></span>`;
+            }).join('<span class="s2-prog-line"></span>')}
+          </div>
+        </div>
+
+        <!-- MỤC 4: PHẦN THƯỞNG ẤN KẾT NỐI + PHỐI HỢP NHÓM -->
+        <div class="s2-side-card s2-reward-card ${s2State.gateOpened ? 'unlocked' : ''}">
+          <div class="s2-reward-heading">Ấn Vectơ</div>
+          <div class="s2-reward-chest-wrap">
+            <img src="/assets/s2_matrix/s2_seal_chest.png" alt="Rương Ấn Kết Nối" class="s2-reward-chest-img" draggable="false"/>
+          </div>
+          <div class="s2-reward-caption">
+            ${s2State.gateOpened
+              ? '<b style="color:#4ADE80">✓ Đã mở khóa Ấn Kết Nối!</b>'
+              : 'Thu thập để nhận<br/>thưởng đặc biệt!'}
+          </div>
+          <button type="button" class="s2-role-switch-btn" data-action="s2CycleControllerRole" title="Chuyển quyền điều khiển cho thành viên tiếp theo trong nhóm">
+            <span>${activeRole.icon || '🎮'}</span>
+            <span>ĐK: TV ${(s2State.controllerRoleIdx % 4) + 1}/4 · Đổi</span>
+          </button>
+        </div>
+
+        <!-- HƯỚNG DẪN ĐIỀU KHIỂN NGẮN BÊN DƯỚI -->
+        <div class="s2-side-card s2-controls-guide-card">
+          <div class="s2-ctrl-group">
+            <div class="s2-wasd-cluster">
+              <span class="s2-keycap w-key">W</span>
+              <div class="s2-asd-row">
+                <span class="s2-keycap">A</span>
+                <span class="s2-keycap">S</span>
+                <span class="s2-keycap">D</span>
+              </div>
+            </div>
+            <div class="s2-ctrl-desc">
+              <strong>Di chuyển</strong>
+              <small>(khám phá ô)</small>
+            </div>
+          </div>
+
+          <div class="s2-ctrl-group e-group">
+            <button type="button" class="s2-keycap e-key" data-action="s2PressConfirmE" title="Nhấn phím E để xác nhận vùng đáp án đang đứng">E</button>
+            <div class="s2-ctrl-desc">
+              <strong>Xác nhận</strong>
+              <small>(chọn vùng đáp án)</small>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>`;
+}
+
 function renderVectorAdventureStage(m) {
   ensureVaStateForStage(m);
   if (m.id === 1 || vaState.s1BridgeRestoredOverlay) {
     return renderStage1CipherBridgeGame(m);
+  }
+  if (m.id === 2) {
+    return renderStage2VectorMatrixGame(m);
   }
   if (m.id === 3) {
     return renderStage3ZombieShooterGame(m);
@@ -6944,7 +7850,7 @@ function studentScreen(){
  const m = world.current || (world.stages && world.stages[curStageIdx]) || {};
  ensureVaStateForStage(m);
  const dragonText = vaState.dragonMsg || m.dragonIntro || 'Cùng nhau tìm đúng hướng của vectơ nhé!';
- const isS1DedicatedUI = !me.completed && me.stage < 5 && (m.id === 1 || m.id === 3 || vaState.s1BridgeRestoredOverlay) && !mvWorldMapOpen && !StageTransitionController.isTransitioning() && !mvShowIntroHub;
+ const isS1DedicatedUI = !me.completed && me.stage < 5 && (m.id === 1 || m.id === 2 || m.id === 3 || vaState.s1BridgeRestoredOverlay) && !mvWorldMapOpen && !StageTransitionController.isTransitioning() && !mvShowIntroHub;
 
  return `<div class="hs-screen-shell ${isS1DedicatedUI ? 's1-dedicated-shell' : ''}" style="--stage-bg: url('${stageBgUrl}')">
   ${!isS1DedicatedUI ? mapTrack(me.stage) : ''}
@@ -7763,6 +8669,88 @@ async function handle(action,el){
     sealName: 'Ấn Hướng Đi',
     points: 10,
     goldEarned: 140
+   });
+   return;
+  }
+  if(action==='s2ExitToMap'){
+   s2State.keys.clear();
+   mvWorldMapOpen = true;
+   sound('bleep');
+   render();
+   return;
+  }
+  if(action==='s2ToggleFullscreen'){
+   const rootEl = document.getElementById('s2MatrixGameShell') || document.documentElement;
+   if(!document.fullscreenElement){
+    rootEl.requestFullscreen?.().catch(()=>{});
+   }else{
+    document.exitFullscreen?.().catch(()=>{});
+   }
+   return;
+  }
+  if(action==='s2PressConfirmE'){
+   await s2ConfirmCurrentZone();
+   return;
+  }
+  if(action==='s2PedestalClickRemind'){
+   // Không cho bấm chuột chọn đáp án trực tiếp — nhắc học sinh điều khiển Rồng Xanh đến bệ đá rồi nhấn E
+   sound('bleep');
+   s2State.companionMsg = 'Hãy dùng phím <b>WASD</b> hoặc <b>Phím mũi tên</b> điều khiển Rồng Xanh bước vào bệ đá rồi nhấn phím <b>E</b> để xác nhận nhé!';
+   const compEl = document.getElementById('s2CompanionText');
+   if(compEl) compEl.innerHTML = s2State.companionMsg;
+   if(window.spawnJuiceFloater){
+    window.spawnJuiceFloater('⌨️ Dùng phím WASD / Mũi tên đưa Rồng Xanh đến bệ đá rồi nhấn E!', 'combo');
+   }
+   return;
+  }
+  if(action==='s2MoveStep'){
+   const dir = el.dataset.dir;
+   if(dir){
+    const step = 6.5;
+    let dx = 0, dy = 0;
+    if(dir==='up') dy = -step;
+    else if(dir==='down') dy = step;
+    else if(dir==='left'){ dx = -step; s2State.facing = 'left'; }
+    else if(dir==='right'){ dx = step; s2State.facing = 'right'; }
+    const nextPos = s2ClampAndCollide(s2State.dragonX + dx, s2State.dragonY + dy);
+    s2State.dragonX = nextPos.x;
+    s2State.dragonY = nextPos.y;
+    s2State.animState = 'run';
+    s2State.hoveredZoneId = s2DetectHoveredZone();
+    s2SyncDOM();
+   }
+   return;
+  }
+  if(action==='s2CycleControllerRole'){
+   const nextIdx = ((s2State.controllerRoleIdx || 0) + 1) % 4;
+   s2State.controllerRoleIdx = nextIdx;
+   if(world?.me?.stage2) world.me.stage2.controllerRoleIdx = nextIdx;
+   s2SaveSessionState();
+   if(window.spawnJuiceFloater) window.spawnJuiceFloater(`🎮 Chuyển quyền điều khiển: Thành viên ${nextIdx + 1}/4`, 'xp');
+   if(session?.room && session?.token){
+    api('/api/stage2Progress',{room:session.room,token:session.token,controllerRoleIdx:nextIdx}).catch(()=>{});
+   }
+   render();
+   return;
+  }
+  if(action==='s2RechargeShields'){
+   s2State.shields = 3;
+   s2State.shieldDepletedModal = false;
+   s2State.companionMsg = 'Khiên năng lượng đã được nạp đầy! Hãy quan sát kỹ quy tắc cộng vectơ nhé!';
+   s2SaveSessionState();
+   sound('powerup');
+   if(session?.room && session?.token){
+    api('/api/stage2Progress',{room:session.room,token:session.token,resetShields:true}).catch(()=>{});
+   }
+   render();
+   return;
+  }
+  if(action==='s2ProceedNextStage'){
+   s2State.gateOpeningWalk = false;
+   StageTransitionController.beginStageTransition(1, 2, {
+    sealName: 'Ấn Kết Nối',
+    points: 20,
+    goldEarned: 150
    });
    return;
   }
@@ -8726,6 +9714,33 @@ window.addEventListener('keydown',e=>{
   }
  }
 
+ // Điều khiển bàn phím cho Chặng 2: MẬT TRẬN VECTƠ – PHÁO ĐÀI GÓC VUÔNG (WASD / Phím mũi tên + E + Shift)
+ if(m.id===2 && document.getElementById('s2MatrixViewport')){
+  if(e.key==='Shift'||e.code==='ShiftLeft'||e.code==='ShiftRight'){
+   s2State.isSprinting=true;
+   return;
+  }
+  if(e.code==='KeyE' || e.key==='e' || e.key==='E'){
+   e.preventDefault();
+   if(e.repeat) return;
+   s2ConfirmCurrentZone();
+   return;
+  }
+  let dir2 = keyMap[e.code];
+  if(!dir2 && e.key){
+   const k2 = e.key.toLowerCase();
+   if(k2==='w'||k2==='arrowup') dir2='up';
+   else if(k2==='s'||k2==='arrowdown') dir2='down';
+   else if(k2==='a'||k2==='arrowleft') dir2='left';
+   else if(k2==='d'||k2==='arrowright') dir2='right';
+  }
+  if(dir2){
+   e.preventDefault();
+   s2State.keys.add(dir2);
+   return;
+  }
+ }
+
  // Điều khiển bàn phím cho Chặng 1: MẬT THƯ RỪNG VECTƠ – CÂY CẦU ĐẢO CHIỀU (WASD / Phím mũi tên + E + Shift)
  if(m.id===1 || vaState.s1BridgeRestoredOverlay){
   if(e.key==='Shift'||e.code==='ShiftLeft'||e.code==='ShiftRight'){
@@ -8780,6 +9795,7 @@ window.addEventListener('keydown',e=>{
 window.addEventListener('keyup',e=>{
  if(e.key==='Shift'||e.code==='ShiftLeft'||e.code==='ShiftRight'){
   s1Explorer.isSprinting=false;
+  s2State.isSprinting=false;
   huntState.isSprinting=false;
   updateHuntCamera();
  }
@@ -8794,14 +9810,17 @@ window.addEventListener('keyup',e=>{
  if(dir){
   huntState.keysPressed.delete(dir);
   s1Explorer.keys.delete(dir);
+  s2State.keys.delete(dir);
   z3State.keys.delete(dir);
  }
 });
 
 window.addEventListener('blur',()=>{
  s1Explorer.keys.clear();
+ s2State.keys.clear();
  z3State.keys.clear();
  s1Explorer.isSprinting=false;
+ s2State.isSprinting=false;
  ['up','down','left','right'].forEach(k=>huntState.keysPressed.delete(k));
 });
 
@@ -8820,6 +9839,9 @@ function gameLoop(now){
  if(session?.role==='student'&&!world?.paused){
   if((world?.current?.id === 1 || vaState.s1BridgeRestoredOverlay) && document.getElementById('s1ForestViewport')){
    s1Tick(now, dt);
+  }
+  if(world?.current?.id === 2 && document.getElementById('s2MatrixViewport')){
+   s2Tick(now, dt);
   }
   if(world?.current?.id === 3 && document.getElementById('z3CourtyardViewport')){
    z3Tick(now, dt);

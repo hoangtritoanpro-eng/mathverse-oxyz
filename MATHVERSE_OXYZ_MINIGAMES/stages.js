@@ -186,26 +186,26 @@ const STAGES = [
   {
     id: 2,
     gameType: 'vector_adventure',
-    defaultMode: 'defense',
-    title: 'CHẶNG 2. PHÁO ĐÀI GÓC VUÔNG',
+    defaultMode: 'matrix',
+    title: 'CHẶNG 2. MẬT TRẬN VECTƠ – PHÁO ĐÀI GÓC VUÔNG',
     subtitle: 'Quy tắc cộng hai vectơ nối tiếp',
-    shortName: 'Tổng vectơ',
+    shortName: 'Mật Trận Vectơ',
     place: 'Pháo Đài Góc Vuông',
     icon: '🏰',
     biomeColor: '#f59e0b',
     levelBadge: 'NHẬN BIẾT',
     timeSeconds: 60,
     time: '60 giây',
-    tag: 'Nhận biết · Tổng hai vectơ (60 giây)',
+    tag: 'Nhận biết · Quy tắc cộng hai vectơ (60 giây)',
     item: 'Ấn Kết Nối',
     sealIcon: '🔗',
     digit: '0',
     digitRule: 'Khôi phục Ấn Kết Nối (Chặng 2 = 0).',
-    story: 'Pháo đài bị phong ấn bởi hai con đường năng lượng AB và BC. Muốn mở cổng thành, đội phải nhận biết quy tắc cộng hai vectơ.',
-    dragonIntro: 'Hai con đường đã bị tách rời! Hãy tìm vectơ tổng để nối chúng!',
-    dragonWin: 'Tuyệt vời! Các con đường đã hợp nhất!',
-    shadowIntro: 'Cổng Pháo Đài đã bị chia cắt thành hai đoạn rời rạc!',
-    groupTask: 'Kích hoạt lần lượt hai đoạn đường AB và BC trên bản đồ và giải mã quy tắc 3 điểm để mở cổng thành.',
+    story: 'Pháo Đài Góc Vuông bị đặt bẫy phép thuật tại bốn bệ đá cổ. Đội phải điều khiển Rồng Xanh dò mìn bằng kiến thức cộng hai vectơ để tìm vùng an toàn và mở cổng thành.',
+    dragonIntro: 'Pháo đài bị đặt bẫy rồi! Hãy tìm vùng an toàn nhé!',
+    dragonWin: 'Tuyệt vời! Pháo đài đã được giải cứu!',
+    shadowIntro: 'Bốn bệ đá trong sân thành đã bị cài bẫy phép thuật tím!',
+    groupTask: 'Điều khiển Rồng Xanh bằng phím WASD/Mũi tên đến bệ đá mang vectơ tổng đúng và nhấn E để hóa giải 6 mật trận.',
     teamRoles: TEAM_ROLES_STANDARD,
     visual3D: {
       title: 'Quy tắc ba điểm (Cộng hai vectơ nối tiếp)',
@@ -224,80 +224,103 @@ const STAGES = [
     },
     interactiveTask: {
       type: 'paths_ab_bc',
-      title: 'Phần 1 – Khám phá: Kích hoạt 2 đoạn đường AB và BC',
-      instruction: 'Nhấp kích hoạt lần lượt đoạn đường năng lượng AB rồi đến đoạn đường BC để dẫn luồng sáng tới cổng Pháo Đài!',
+      title: 'Mật Trận Vectơ – Dò mìn 4 bệ đá trong sân thành',
+      instruction: 'Điều khiển Rồng Xanh bằng phím WASD/Mũi tên đến bệ đá có vectơ tổng đúng và nhấn E để xác nhận!',
       targets: ['AB', 'BC'],
-      rewardText: 'Hai luồng sáng AB và BC đã kích hoạt! Nhận Mảnh chìa khóa 1/3!'
+      rewardText: 'Sáu mật trận đã được hóa giải! Mở khóa Ấn Kết Nối!'
     },
     interactiveChallenge: {
       id: '2.0',
       isInteractive: true,
       level: 'NHẬN BIẾT',
-      label: 'Phần 1 · Kích hoạt hai đoạn đường AB và BC',
-      prompt: 'NHIỆM VỤ TƯƠNG TÁC: Hãy kích hoạt lần lượt hai đoạn đường năng lượng AB và BC trên sơ đồ Pháo Đài để nhận mảnh chìa khóa đầu tiên (1/3)!',
+      label: 'Mật Trận Vectơ · Hóa giải 6 bẫy phép thuật trong sân thành',
+      prompt: 'NHIỆM VỤ DÒ MÌN VECTƠ: Điều khiển Rồng Xanh đến vùng an toàn chứa vectơ tổng đúng và nhấn E để hóa giải đủ 6 mật trận!',
       options: [
-        'Đã kích hoạt hai đoạn đường AB và BC nối tiếp nhau',
-        'Chỉ kích hoạt một đoạn đường',
-        'Bỏ qua sơ đồ'
+        'Đã hóa giải 6/6 mật trận vectơ và mở cổng Pháo Đài Góc Vuông',
+        'Chưa hóa giải hết mật trận',
+        'Bỏ qua mật trận'
       ],
       correct: 0,
-      shortAnswer: 'A',
+      shortAnswer: 'AC',
       hints: [
-        'Nhấp vào đoạn đường AB trước, sau đó nhấp vào đoạn đường BC trên sơ đồ bên trái.',
-        'Điểm cuối của vectơ AB nối tiếp với điểm đầu của vectơ BC tại B.'
+        'Quan sát điểm cuối của vectơ thứ nhất trùng với điểm đầu của vectơ thứ hai.',
+        'Áp dụng quy tắc ba điểm: vectơ AB + vectơ BC = vectơ AC.'
       ],
-      explain: 'Hai luồng năng lượng AB và BC đã rực sáng! Đội nhận Mảnh chìa khóa 1/3!',
-      keyBadge: 'Khóa 1/3'
+      explain: 'Sáu mật trận vectơ đã được hóa giải hoàn toàn! Cổng Pháo Đài Góc Vuông đã mở!',
+      keyBadge: 'Mật Trận 6/6'
     },
     questionBank: [
       {
         id: '2.1',
         level: 'NHẬN BIẾT',
-        label: 'Câu 2.1 · Tổng của vectơ AB và vectơ BC',
-        prompt: 'Cho ba điểm A, B, C. Tổng của vectơ AB và vectơ BC bằng vectơ nào?',
-        options: ['Vectơ CA.', 'Vectơ AC.', 'Vectơ CB.'],
-        correct: 1,
+        label: 'Câu 1 · Vectơ AB + Vectơ BC = ?',
+        prompt: 'Vectơ AB + Vectơ BC = ?',
+        options: ['Vectơ AC', 'Vectơ CA', 'Vectơ CB', 'Vectơ BA'],
+        correct: 0,
         shortAnswer: 'AC',
-        hints: [
-          'Áp dụng quy tắc ba điểm: điểm cuối B của vectơ thứ nhất trùng với điểm đầu B của vectơ thứ hai.',
-          'AB + BC = AC.'
-        ],
-        explain: 'AB + BC = AC.',
-        keyBadge: 'Khóa 2/3'
+        hints: ['Điểm cuối B nối tiếp với điểm đầu B: vectơ AB + vectơ BC = vectơ AC.'],
+        explain: 'Vectơ AB + Vectơ BC = Vectơ AC.',
+        keyBadge: 'Mật trận 1/6'
       },
       {
         id: '2.2',
         level: 'NHẬN BIẾT',
-        label: 'Câu 2.2 · Tổng của vectơ MN và vectơ NP',
-        prompt: 'Cho ba điểm M, N, P. Tổng của vectơ MN và vectơ NP bằng vectơ nào?',
-        options: ['Vectơ PM.', 'Vectơ PN.', 'Vectơ MP.'],
-        correct: 2,
+        label: 'Câu 2 · Vectơ MN + Vectơ NP = ?',
+        prompt: 'Vectơ MN + Vectơ NP = ?',
+        options: ['Vectơ MP', 'Vectơ PM', 'Vectơ MN', 'Vectơ NP'],
+        correct: 0,
         shortAnswer: 'MP',
-        hints: [
-          'Điểm đầu là M, nối qua trung gian N tới điểm cuối P.',
-          'MN + NP = MP.'
-        ],
-        explain: 'MN + NP = MP.',
-        keyBadge: 'Khóa 2/3'
+        hints: ['Điểm đầu là M, nối qua trung gian N tới điểm cuối P: vectơ MP.'],
+        explain: 'Vectơ MN + Vectơ NP = Vectơ MP.',
+        keyBadge: 'Mật trận 2/6'
       },
       {
         id: '2.3',
         level: 'NHẬN BIẾT',
-        label: 'Câu 2.3 · Cặp vectơ có tổng bằng AC',
-        prompt: 'Cặp vectơ nào sau đây có tổng bằng vectơ AC?',
-        options: [
-          'Vectơ AB và vectơ BC.',
-          'Vectơ AB và vectơ CB.',
-          'Vectơ BA và vectơ AC.'
-        ],
+        label: 'Câu 3 · Vectơ PQ + Vectơ QR = ?',
+        prompt: 'Vectơ PQ + Vectơ QR = ?',
+        options: ['Vectơ PR', 'Vectơ RP', 'Vectơ PQ', 'Vectơ QR'],
         correct: 0,
-        shortAnswer: 'A',
-        hints: [
-          'Để tổng bằng AC theo quy tắc 3 điểm, vectơ đầu phải xuất phát từ A và vectơ sau kết thúc tại C.',
-          'AB + BC = AC.'
-        ],
-        explain: 'Quy tắc ba điểm cho AB + BC = AC.',
-        keyBadge: 'Khóa 3/3'
+        shortAnswer: 'PR',
+        hints: ['Điểm đầu P nối qua Q tới điểm cuối R: vectơ PR.'],
+        explain: 'Vectơ PQ + Vectơ QR = Vectơ PR.',
+        keyBadge: 'Mật trận 3/6'
+      },
+      {
+        id: '2.4',
+        level: 'NHẬN BIẾT',
+        label: 'Câu 4 · Vectơ BA + Vectơ AC = ?',
+        prompt: 'Vectơ BA + Vectơ AC = ?',
+        options: ['Vectơ BC', 'Vectơ CB', 'Vectơ AC', 'Vectơ BA'],
+        correct: 0,
+        shortAnswer: 'BC',
+        hints: ['Điểm đầu là B, điểm nối trung gian là A, điểm cuối là C: vectơ BC.'],
+        explain: 'Vectơ BA + Vectơ AC = Vectơ BC.',
+        keyBadge: 'Mật trận 4/6'
+      },
+      {
+        id: '2.5',
+        level: 'NHẬN BIẾT',
+        label: 'Câu 5 · Vectơ AB + Vectơ BC + Vectơ CD = ?',
+        prompt: 'Vectơ AB + Vectơ BC + Vectơ CD = ?',
+        options: ['Vectơ AD', 'Vectơ DA', 'Vectơ AC', 'Vectơ BD'],
+        correct: 0,
+        shortAnswer: 'AD',
+        hints: ['Cộng nối tiếp từ điểm đầu A qua B, C tới điểm cuối D: vectơ AD.'],
+        explain: 'Vectơ AB + Vectơ BC + Vectơ CD = Vectơ AD.',
+        keyBadge: 'Mật trận 5/6'
+      },
+      {
+        id: '2.6',
+        level: 'NHẬN BIẾT',
+        label: 'Câu 6 · Vectơ OA + Vectơ AB = ?',
+        prompt: 'Vectơ OA + Vectơ AB = ?',
+        options: ['Vectơ OB', 'Vectơ BO', 'Vectơ OA', 'Vectơ AB'],
+        correct: 0,
+        shortAnswer: 'OB',
+        hints: ['Điểm đầu là O, nối qua trung gian A tới điểm cuối B: vectơ OB.'],
+        explain: 'Vectơ OA + Vectơ AB = Vectơ OB.',
+        keyBadge: 'Mật trận 6/6'
       }
     ],
     challenges: []
