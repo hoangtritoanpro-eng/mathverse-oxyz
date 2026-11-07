@@ -596,18 +596,18 @@ const STAGES = [
   },
 
   /* ═══════════════════════════════════════════════════════════════════════
-     CHẶNG 5. THÀNH TRÌ LÕI TRÍ TUỆ (THÔNG HIỂU – 70 GIÂY)
+     CHẶNG 5. GIẢI CỨU TÂM THẠCH – BÍ MẬT TRỌNG TÂM TAM GIÁC (THÔNG HIỂU – 70 GIÂY)
      ═══════════════════════════════════════════════════════════════════════ */
   {
     id: 5,
     gameType: 'vector_adventure',
-    defaultMode: 'minesweeper',
-    title: 'CHẶNG 5. THÀNH TRÌ LÕI TRÍ TUỆ',
-    subtitle: 'Tính chất vectơ của trọng tâm tam giác',
+    defaultMode: 'centroid_rescue',
+    title: 'CHẶNG 5 – GIẢI CỨU TÂM THẠCH',
+    subtitle: 'Trọng tâm tam giác & các hệ thức vectơ liên quan',
     shortName: 'Trọng tâm',
-    place: 'Thành Trì Lõi Trí Tuệ',
-    icon: '🏰',
-    biomeColor: '#ef4444',
+    place: 'Thành Trì Trí Tuệ',
+    icon: '👑',
+    biomeColor: '#f59e0b',
     levelBadge: 'THÔNG HIỂU',
     timeSeconds: 70,
     time: '70 giây',
@@ -616,12 +616,17 @@ const STAGES = [
     sealIcon: '👑',
     digit: '4',
     digitRule: 'Khôi phục Ấn Trí Tuệ & Tâm Thạch Vectơ (Chặng 5 = 4).',
-    story: 'Bóng Lỗi đã chiếm giữ Tâm Thạch Vectơ. Ba luồng năng lượng từ các đỉnh A, B, C đang mất cân bằng. Muốn chiến thắng, đội phải xác định trọng tâm và hiểu mối quan hệ giữa các vectơ tại trọng tâm.',
-    dragonIntro: 'Cả đội hãy cùng giải mã! Điểm cân bằng của tam giác sẽ cứu chúng ta!',
-    dragonWin: 'Các bạn làm được rồi! Sức mạnh của tri thức đã cứu Lục địa OXYZ!',
-    shadowIntro: 'Bóng Lỗi: "Các ngươi sẽ không thể tìm ra tâm điểm sức mạnh!"',
-    groupTask: 'Chọn giao điểm G của ba đường trung tuyến trong tam giác ABC, kích hoạt 3 luồng năng lượng GA, GB, GC và giải thích hệ thức trọng tâm.',
-    teamRoles: TEAM_ROLES_STANDARD,
+    story: 'Sau khi thu hồi bốn Ấn Vectơ, Rồng Xanh đến Thành Trì Trí Tuệ. Bóng Lỗi đã lấy Tâm Thạch khỏi vị trí cân bằng, khiến ba nguồn năng lượng tại các đỉnh A, B, C bị mất ổn định. Chỉ khi đặt viên Tâm Thạch về đúng trọng tâm G của tam giác ABC, ba nguồn năng lượng mới có thể hợp nhất.',
+    dragonIntro: 'Chúng ta đã đến thử thách cuối cùng! Hãy tìm trọng tâm G và đưa Tâm Thạch trở về vị trí cân bằng!',
+    dragonWin: 'Chúng ta làm được rồi! Lục địa OXYZ đã được giải cứu!',
+    shadowIntro: 'Bóng Lỗi: "Các ngươi sẽ không thể tìm ra tâm điểm cân bằng của tam giác ABC!"',
+    groupTask: 'Xác định trung điểm hai cạnh BC và AC, nối hai đường trung tuyến tìm giao điểm, kéo Tâm Thạch vào đúng trọng tâm G = (A+B+C)/3 và kích hoạt trận pháp vectơ GA + GB + GC = 0.',
+    teamRoles: [
+      { role: 'Hoa tiêu Trung điểm', icon: '📐', desc: 'Kéo điểm phát sáng về đúng trung điểm hai cạnh BC và AC' },
+      { role: 'Kỹ sư Trung tuyến', icon: '⚡', desc: 'Nối đỉnh A với trung điểm BC và đỉnh B với trung điểm AC' },
+      { role: 'Người giữ Tâm Thạch', icon: '💎', desc: 'Kéo viên Tâm Thạch đặt vào đúng giao điểm G của hai trung tuyến' },
+      { role: 'Pháp sư Trận pháp', icon: '👑', desc: 'Kích hoạt 3 luồng năng lượng GA, GB, GC và giải cứu Lục địa OXYZ' }
+    ],
     visual3D: {
       title: 'Tính chất trọng tâm G của tam giác ABC',
       type: 'centroid',

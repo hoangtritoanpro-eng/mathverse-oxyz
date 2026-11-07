@@ -627,10 +627,11 @@ function layout(content){
   </nav>${content}`;
  }
 
- // Khi học sinh đang ở trong Chặng 2 (Mật Trận Vectơ) hoặc Chặng 4 (Lật Thẻ Trung Điểm), ẩn thanh hs-topnav ngoài để dùng thanh topbar riêng đúng chuẩn ảnh mẫu
+ // Khi học sinh đang ở trong Chặng 2 (Mật Trận Vectơ), Chặng 4 (Lật Thẻ Trung Điểm) hoặc Chặng 5 (Giải Cứu Tâm Thạch), ẩn thanh hs-topnav ngoài để dùng thanh topbar riêng đúng chuẩn ảnh mẫu
  const isStage2DedicatedTopbar = isStudent && !world?.me?.completed && (
   ((world?.me?.stage ?? 0) === 1 && (world?.current?.id === 2)) ||
-  ((world?.me?.stage ?? 0) === 3 && (world?.current?.id === 4))
+  ((world?.me?.stage ?? 0) === 3 && (world?.current?.id === 4)) ||
+  ((world?.me?.stage ?? 0) === 4 && (world?.current?.id === 5))
  ) && !mvWorldMapOpen && !StageTransitionController.isTransitioning() && !mvShowIntroHub && !oxyz3D.open;
  if (isStage2DedicatedTopbar) {
   return content;
@@ -2002,6 +2003,16 @@ function renderTeacherTeamModal() {
     <span style="font-size:12.5px;color:#F8FAFF">🔓 Cổng Mê Cung: <b style="color:${(t.stage > 3 || t.stage4?.gateOpened) ? '#35C992' : '#94A3B8'}">${(t.stage > 3 || t.stage4?.gateOpened) ? '✓ Đã mở cổng (Ấn Cân Xứng)' : 'Đang giải mã thẻ'}</b></span>
    </div>
 
+   <div class="gv-s1-live-box" style="margin:10px 0;padding:10px 14px;background:rgba(245,158,11,0.12);border:1px solid rgba(251,191,36,0.42);border-radius:10px;display:flex;flex-wrap:wrap;gap:14px;align-items:center;justify-content:space-between">
+    <strong style="color:#FDE047;font-size:12.5px">👑 CHẶNG 5 – GIẢI CỨU TÂM THẠCH:</strong>
+    <span style="font-size:12.5px;color:#F8FAFF">📐 Trung điểm: <b style="color:#36DEF4">${t.stage > 4 ? 2 : (t.stage5?.midpointsFound ?? 0)}/2</b></span>
+    <span style="font-size:12.5px;color:#F8FAFF">✨ Trung tuyến: <b style="color:#C084FC">${t.stage > 4 ? 2 : (t.stage5?.mediansConnected ?? 0)}/2</b></span>
+    <span style="font-size:12.5px;color:#F8FAFF">💎 Tâm Thạch G: <b style="color:${(t.stage > 4 || t.stage5?.crystalPlaced) ? '#35C992' : '#FDE047'}">${(t.stage > 4 || t.stage5?.crystalPlaced) ? '✓ Đã đặt đúng G' : 'Đang tìm G'}</b></span>
+    <span style="font-size:12.5px;color:#F8FAFF">❌ Đặt sai: <b style="color:#FDA4AF">${t.stage5?.wrongAttempts ?? 0} lần</b></span>
+    <span style="font-size:12.5px;color:#F8FAFF">💡 Gợi ý: <b style="color:#FDE047">${t.stage5?.hintsUsedCount ?? 0}/3</b></span>
+    <span style="font-size:12.5px;color:#F8FAFF">🏆 Ấn Trí Tuệ: <b style="color:${(t.stage > 4 || t.stage5?.completed) ? '#35C992' : '#94A3B8'}">${(t.stage > 4 || t.stage5?.completed) ? '✓ Đã khôi phục Tâm Thạch' : 'Đang giải cứu'}</b></span>
+   </div>
+
    <h3 style="color:#36DEF4;font-size:13.5px;margin:12px 0 8px">📋 Lịch sử câu trả lời & thời gian từng chặng (${logs.length} lượt):</h3>
    <div class="gv-log-table-wrap">
     ${logs.length ? `<table class="gv-log-table">
@@ -2208,7 +2219,8 @@ function teacherScreen(){
        <span class="gv-s1-pill ${s1Bridge ? 'done' : ''}" title="Trạng thái giải mã & mở Cầu ánh sáng Chặng 1">🌉 ${s1Bridge ? 'Đã giải mã' : (s1Cipher ? 'Đủ 4/4 mảnh' : 'Tìm mật thư')}</span>
        <span class="gv-s1-pill ${(t.stage > 1 || (t.stage2?.solvedCount ?? 0) >= 6) ? 'done' : ''}" title="Tiến độ Chặng 2 – Mật Trận Vectơ">🏰 Mật trận ${t.stage > 1 ? 6 : (t.stage2?.solvedCount ?? 0)}/6 · 🛡️${t.stage2?.shields ?? 3}</span>
        <span class="gv-s1-pill ${(t.stage > 3 || (t.stage4?.matchedCount ?? 0) >= (t.stage4?.totalPairs || 6)) ? 'done' : ''}" title="Tiến độ Chặng 4 – Lật Thẻ Trung Điểm">🃏 Thẻ ${t.stage > 3 ? (t.stage4?.totalPairs || 6) : (t.stage4?.matchedCount ?? 0)}/${t.stage4?.totalPairs || 6} · 🔄${t.stage4?.flipCount ?? 0}</span>
-       <span class="gv-s1-pill" title="Số lần thử sai tại các chặng">❌ ${(s1WrongCount + (t.stage2?.wrongAttempts ?? 0) + (t.stage4?.wrongMatches ?? 0))} sai</span>
+       <span class="gv-s1-pill ${(t.stage > 4 || t.stage5?.completed) ? 'done' : ''}" title="Tiến độ Chặng 5 – Giải Cứu Tâm Thạch">👑 Tâm Thạch: ${(t.stage > 4 || t.stage5?.completed) ? 'Đã khôi phục' : (`B${t.stage5?.phase ?? 1}/4`)}</span>
+       <span class="gv-s1-pill" title="Số lần thử sai tại các chặng">❌ ${(s1WrongCount + (t.stage2?.wrongAttempts ?? 0) + (t.stage4?.wrongMatches ?? 0) + (t.stage5?.wrongAttempts ?? 0))} sai</span>
       </div>`;
       return `<div class="gv-rank-row ${rankCls}" data-action="inspectTeamRow" data-team="${t.id}" title="Nhấn để xem chi tiết từng bước của ${esc(t.name)}">
        <span class="gv-col-rank">#${rankNum}</span>
@@ -8583,6 +8595,1284 @@ function renderStage4MidpointMemoryGame(m) {
   </div>`;
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   CHẶNG 5: GIẢI CỨU TÂM THẠCH – BÍ MẬT TRỌNG TÂM TAM GIÁC (THÔNG HIỂU – 70 GIÂY)
+   Modules: TriangleGeometry, Stage5GameState, MidpointDragController,
+            MedianConnectionController, CrystalDragController, CentroidStage5
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+const TriangleGeometry = {
+  // Hệ tọa độ nội bộ SVG ổn định (800 x 540), độc lập với độ phân giải màn hình
+  viewBoxWidth: 800,
+  viewBoxHeight: 540,
+  vertices: {
+    A: { x: 360, y: 84 },
+    B: { x: 168, y: 432 },
+    C: { x: 588, y: 432 }
+  },
+  crystalSpawn: { x: 648, y: 228 },
+
+  // Tính trung điểm của đoạn thẳng bằng trung bình cộng tọa độ hai đầu mút: M = (P1 + P2) / 2
+  midpoint(p1, p2) {
+    return {
+      x: (p1.x + p2.x) / 2,
+      y: (p1.y + p2.y) / 2
+    };
+  },
+
+  // Tính trọng tâm G của tam giác ABC bằng trung bình cộng tọa độ ba đỉnh: G = (A + B + C) / 3
+  centroid(A = this.vertices.A, B = this.vertices.B, C = this.vertices.C) {
+    return {
+      x: (A.x + B.x + C.x) / 3,
+      y: (A.y + B.y + C.y) / 3
+    };
+  },
+
+  getMidpoints() {
+    const { A, B, C } = this.vertices;
+    return {
+      BC: this.midpoint(B, C), // (378, 432)
+      AC: this.midpoint(A, C), // (474, 258)
+      AB: this.midpoint(A, B)  // (264, 258)
+    };
+  },
+
+  // Nội suy điểm trên đoạn P1 -> P2 theo tham số t thuộc [0, 1]
+  pointOnSegment(p1, p2, t) {
+    const clamped = Math.max(0.08, Math.min(0.92, t));
+    return {
+      x: p1.x + (p2.x - p1.x) * clamped,
+      y: p1.y + (p2.y - p1.y) * clamped,
+      t: clamped
+    };
+  },
+
+  // Chiếu một điểm (x, y) vuông góc lên đoạn thẳng P1 -> P2 và trả về tham số t
+  projectOntoSegment(pt, p1, p2) {
+    const dx = p2.x - p1.x;
+    const dy = p2.y - p1.y;
+    const lenSq = dx * dx + dy * dy;
+    if (lenSq <= 0.0001) return 0.5;
+    const rawT = ((pt.x - p1.x) * dx + (pt.y - p1.y) * dy) / lenSq;
+    return Math.max(0.08, Math.min(0.92, rawT));
+  },
+
+  distance(p1, p2) {
+    return Math.hypot(p1.x - p2.x, p1.y - p2.y);
+  },
+
+  // Chuyển đổi tọa độ chuột (clientX, clientY) sang hệ tọa độ nội bộ SVG (800 x 540)
+  clientToSvgPoint(clientX, clientY) {
+    const svg = document.getElementById('s5GeometrySvg');
+    if (!svg) return { x: 400, y: 270 };
+    const rect = svg.getBoundingClientRect();
+    if (!rect.width || !rect.height) return { x: 400, y: 270 };
+    const x = ((clientX - rect.left) / rect.width) * this.viewBoxWidth;
+    const y = ((clientY - rect.top) / rect.height) * this.viewBoxHeight;
+    return {
+      x: Math.max(16, Math.min(this.viewBoxWidth - 16, x)),
+      y: Math.max(16, Math.min(this.viewBoxHeight - 16, y))
+    };
+  }
+};
+
+const S5_CONTEXT_HINTS = [
+  {
+    level: 1,
+    badge: '(1)',
+    icon: '📖',
+    title: 'Gợi ý 1 · Trung điểm & Trung tuyến',
+    text: 'Trung tuyến nối một đỉnh với trung điểm của cạnh đối diện (điểm chia cạnh đó thành hai phần bằng nhau).'
+  },
+  {
+    level: 2,
+    badge: '(2)',
+    icon: '📐',
+    title: 'Gợi ý 2 · Giao điểm Trọng tâm',
+    text: 'Trọng tâm chính là giao điểm của các đường trung tuyến trong tam giác.'
+  },
+  {
+    level: 3,
+    badge: '(3)',
+    icon: '2:1',
+    title: 'Gợi ý 3 · Tỉ số Trọng tâm 2:1',
+    text: 'Trọng tâm chia mỗi đường trung tuyến thành hai phần theo tỉ số 2:1 tính từ đỉnh đến trung điểm.'
+  }
+];
+
+const s5State = {
+  initedStageId: -1,
+  phase: 1, // 1: Tìm trung điểm, 2: Kích hoạt trung tuyến, 3: Đặt Tâm Thạch vào G, 4: Kích hoạt trận pháp vectơ, 5: Chiến thắng
+  mpBC_t: 0.24,
+  mpAC_t: 0.76,
+  mpBC_done: false,
+  mpAC_done: false,
+  mpBC_wrong: false,
+  mpAC_wrong: false,
+  medA_done: false, // Trung tuyến từ A đến trung điểm BC
+  medB_done: false, // Trung tuyến từ B đến trung điểm AC
+  activeLineFrom: null, // 'A' hoặc 'B'
+  dragLinePos: null,    // { x, y } khi đang kéo tia nối trung tuyến
+  crystalX: 648,
+  crystalY: 228,
+  crystalPlaced: false,
+  crystalWrongShake: false,
+  vectorsActivated: false,
+  victoryTriggered: false,
+  timedOut: false,
+  warned15s: false,
+  wrongAttempts: 0,
+  hintsUsedCount: 0,
+  activeHintLevel: 0,
+  controllerRoleIdx: 0,
+  knowledgeModalOpen: false,
+  sealInfoModalOpen: false,
+  dragonMood: 'normal',
+  dragonSpeech: 'Chúng ta đã đến thử thách cuối cùng! Hãy tìm trọng tâm G và đưa Tâm Thạch trở về vị trí cân bằng!',
+  draggingKind: null, // 'mpBC' | 'mpAC' | 'median' | 'crystal' | null
+  kbFocusTarget: 'mpBC' // 'mpBC' | 'mpAC' | 'medA' | 'medB' | 'crystal' | 'confirm'
+};
+
+const Stage5GameState = {
+  getSessionKey() {
+    const rm = session?.room || 'DEMO';
+    const tid = world?.me?.id || session?.teamId || 'doi-1';
+    return `mv_s5_centroid_${rm}_${tid}`;
+  },
+
+  saveSession() {
+    try {
+      const payload = {
+        phase: s5State.phase,
+        mpBC_t: s5State.mpBC_t,
+        mpAC_t: s5State.mpAC_t,
+        mpBC_done: s5State.mpBC_done,
+        mpAC_done: s5State.mpAC_done,
+        medA_done: s5State.medA_done,
+        medB_done: s5State.medB_done,
+        crystalX: s5State.crystalX,
+        crystalY: s5State.crystalY,
+        crystalPlaced: s5State.crystalPlaced,
+        vectorsActivated: s5State.vectorsActivated,
+        victoryTriggered: s5State.victoryTriggered,
+        wrongAttempts: s5State.wrongAttempts,
+        hintsUsedCount: s5State.hintsUsedCount,
+        controllerRoleIdx: s5State.controllerRoleIdx
+      };
+      sessionStorage.setItem(this.getSessionKey(), JSON.stringify(payload));
+    } catch (e) {}
+  },
+
+  loadSession() {
+    try {
+      const raw = sessionStorage.getItem(this.getSessionKey());
+      if (!raw) return null;
+      return JSON.parse(raw);
+    } catch (e) {
+      return null;
+    }
+  },
+
+  ensureInitialized(m, forceReset = false) {
+    if (!forceReset && s5State.initedStageId === 5) return;
+    s5State.initedStageId = 5;
+    s5State.draggingKind = null;
+    s5State.activeLineFrom = null;
+    s5State.dragLinePos = null;
+    s5State.timedOut = false;
+    s5State.warned15s = false;
+    s5State.knowledgeModalOpen = false;
+    s5State.sealInfoModalOpen = false;
+
+    const srv = world?.me?.stage5 || {};
+    const saved = !forceReset ? this.loadSession() : null;
+
+    s5State.mpBC_done = Boolean(srv.mpBC || saved?.mpBC_done);
+    s5State.mpAC_done = Boolean(srv.mpAC || saved?.mpAC_done);
+    s5State.mpBC_t = s5State.mpBC_done ? 0.5 : (saved?.mpBC_t ?? 0.24);
+    s5State.mpAC_t = s5State.mpAC_done ? 0.5 : (saved?.mpAC_t ?? 0.76);
+    s5State.mpBC_wrong = false;
+    s5State.mpAC_wrong = false;
+
+    s5State.medA_done = Boolean(srv.medA || saved?.medA_done);
+    s5State.medB_done = Boolean(srv.medB || saved?.medB_done);
+
+    const G = TriangleGeometry.centroid();
+    s5State.crystalPlaced = Boolean(srv.crystalPlaced || saved?.crystalPlaced);
+    s5State.crystalX = s5State.crystalPlaced ? G.x : (saved?.crystalX ?? TriangleGeometry.crystalSpawn.x);
+    s5State.crystalY = s5State.crystalPlaced ? G.y : (saved?.crystalY ?? TriangleGeometry.crystalSpawn.y);
+    s5State.crystalWrongShake = false;
+
+    s5State.vectorsActivated = Boolean(srv.vectorsActivated || saved?.vectorsActivated);
+    s5State.victoryTriggered = Boolean(saved?.victoryTriggered || (world?.me?.stage ?? 0) >= 5);
+    s5State.wrongAttempts = Math.max(srv.wrongAttempts || 0, saved?.wrongAttempts || 0);
+    s5State.hintsUsedCount = Math.max(srv.hintsUsedCount || 0, saved?.hintsUsedCount || 0);
+    s5State.controllerRoleIdx = srv.controllerRoleIdx ?? saved?.controllerRoleIdx ?? 0;
+
+    if (s5State.victoryTriggered || s5State.vectorsActivated) {
+      s5State.phase = 5;
+      s5State.kbFocusTarget = 'confirm';
+      s5State.dragonMood = 'win';
+      s5State.dragonSpeech = 'Chúng ta làm được rồi! Lục địa OXYZ đã được giải cứu!';
+    } else if (s5State.crystalPlaced) {
+      s5State.phase = 4;
+      s5State.kbFocusTarget = 'confirm';
+      s5State.dragonMood = 'win';
+      s5State.dragonSpeech = `Chính xác! Tổng ba vectơ từ trọng tâm đến ba đỉnh bằng vectơ không: ${s2RenderVecArrow('GA', 's5-inline-vec')} + ${s2RenderVecArrow('GB', 's5-inline-vec')} + ${s2RenderVecArrow('GC', 's5-inline-vec')} = ${s2RenderVecArrow('0', 's5-inline-vec')}! Hãy nhấn XÁC NHẬN để kích hoạt trận pháp!`;
+    } else if (s5State.medA_done && s5State.medB_done) {
+      s5State.phase = 3;
+      s5State.kbFocusTarget = 'crystal';
+      s5State.dragonMood = 'normal';
+      s5State.dragonSpeech = 'Hai trung tuyến đã xuất hiện! Điểm giao nhau của chúng đang giữ bí mật cuối cùng! Hãy kéo Tâm Thạch vào đúng trọng tâm G!';
+    } else if (s5State.mpBC_done && s5State.mpAC_done) {
+      s5State.phase = 2;
+      s5State.kbFocusTarget = 'medA';
+      s5State.dragonMood = 'normal';
+      s5State.dragonSpeech = 'Tuyệt vời! Bây giờ hãy kéo nối đỉnh A với trung điểm cạnh BC, và nối đỉnh B với trung điểm cạnh AC để kích hoạt 2 đường trung tuyến!';
+    } else {
+      s5State.phase = 1;
+      s5State.kbFocusTarget = 'mpBC';
+      s5State.dragonMood = 'normal';
+      s5State.dragonSpeech = 'Chúng ta đã đến thử thách cuối cùng! Bước 1: Hãy kéo 2 điểm phát sáng trên cạnh BC và AC về đúng vị trí trung điểm của mỗi cạnh!';
+    }
+    this.saveSession();
+  }
+};
+
+/* ─── GIAI ĐOẠN 1: BỘ ĐIỀU KHIỂN KÉO THẢ TRUNG ĐIỂM (MidpointDragController) ─── */
+const MidpointDragController = {
+  toleranceT: 0.085, // Sai số tương tác cho phép dọc theo cạnh (tương ứng ~30 đơn vị SVG quanh t = 0.5)
+
+  startDrag(which) {
+    if (s5State.timedOut || s5State.phase !== 1) return;
+    if (which === 'mpBC' && s5State.mpBC_done) return;
+    if (which === 'mpAC' && s5State.mpAC_done) return;
+    s5State.draggingKind = which;
+    s5State.kbFocusTarget = which;
+    if (which === 'mpBC') s5State.mpBC_wrong = false;
+    if (which === 'mpAC') s5State.mpAC_wrong = false;
+  },
+
+  moveDrag(svgPt) {
+    const { A, B, C } = TriangleGeometry.vertices;
+    if (s5State.draggingKind === 'mpBC' && !s5State.mpBC_done) {
+      s5State.mpBC_t = TriangleGeometry.projectOntoSegment(svgPt, B, C);
+      CentroidStage5.syncLiveSvgDOM();
+    } else if (s5State.draggingKind === 'mpAC' && !s5State.mpAC_done) {
+      s5State.mpAC_t = TriangleGeometry.projectOntoSegment(svgPt, A, C);
+      CentroidStage5.syncLiveSvgDOM();
+    }
+  },
+
+  finishDrag(which) {
+    if (s5State.timedOut) return;
+    const target = which || s5State.draggingKind;
+    s5State.draggingKind = null;
+    if (target !== 'mpBC' && target !== 'mpAC') return;
+
+    const isBC = target === 'mpBC';
+    if ((isBC && s5State.mpBC_done) || (!isBC && s5State.mpAC_done)) return;
+
+    const curT = isBC ? s5State.mpBC_t : s5State.mpAC_t;
+    const isMidpoint = Math.abs(curT - 0.5) <= this.toleranceT;
+
+    if (isMidpoint) {
+      if (isBC) {
+        s5State.mpBC_t = 0.5;
+        s5State.mpBC_done = true;
+        s5State.mpBC_wrong = false;
+      } else {
+        s5State.mpAC_t = 0.5;
+        s5State.mpAC_done = true;
+        s5State.mpAC_wrong = false;
+      }
+      sound('correct');
+      if (window.spawnJuiceFloater) {
+        window.spawnJuiceFloater(`✓ Đã xác định trung điểm cạnh ${isBC ? 'BC' : 'AC'}! (+5 XP)`, 'xp');
+      }
+      if (session?.room && session?.token) {
+        api('/api/stage5Progress', {
+          room: session.room,
+          token: session.token,
+          midpointFound: true,
+          edge: isBC ? 'BC' : 'AC'
+        }).catch(() => {});
+      }
+
+      if (s5State.mpBC_done && s5State.mpAC_done) {
+        s5State.phase = 2;
+        s5State.kbFocusTarget = 'medA';
+        s5State.dragonMood = 'win';
+        s5State.dragonSpeech = 'Chính xác! Cả 2 trung điểm đã phát sáng xanh ngọc! Bước 2: Hãy kéo từ đỉnh A tới trung điểm BC, và từ đỉnh B tới trung điểm AC!';
+      } else {
+        s5State.kbFocusTarget = s5State.mpBC_done ? 'mpAC' : 'mpBC';
+        s5State.dragonMood = 'win';
+        s5State.dragonSpeech = `Đã tìm đúng trung điểm cạnh ${isBC ? 'BC' : 'AC'}! Hãy kéo tiếp điểm sáng trên cạnh ${isBC ? 'AC' : 'BC'} về chính giữa nhé!`;
+      }
+      Stage5GameState.saveSession();
+      render();
+    } else {
+      if (isBC) s5State.mpBC_wrong = true;
+      else s5State.mpAC_wrong = true;
+      s5State.wrongAttempts++;
+      s5State.dragonMood = 'warn';
+      s5State.dragonSpeech = 'Hãy tìm vị trí chia cạnh thành hai phần bằng nhau!';
+      sound('wrong');
+      if (session?.room && session?.token) {
+        api('/api/stage5Progress', {
+          room: session.room,
+          token: session.token,
+          wrongAttempt: true,
+          reason: `Kéo trung điểm cạnh ${isBC ? 'BC' : 'AC'} lệch vị trí chính giữa`
+        }).catch(() => {});
+      }
+      Stage5GameState.saveSession();
+      render();
+    }
+  }
+};
+
+/* ─── GIAI ĐOẠN 2: BỘ ĐIỀU KHIỂN KÍCH HOẠT TRUNG TUYẾN (MedianConnectionController) ─── */
+const MedianConnectionController = {
+  hitRadius: 42,
+
+  startConnection(vertexKey) {
+    if (s5State.timedOut || s5State.phase !== 2) return;
+    if (vertexKey === 'A' && s5State.medA_done) return;
+    if (vertexKey === 'B' && s5State.medB_done) return;
+    s5State.draggingKind = 'median';
+    s5State.activeLineFrom = vertexKey;
+    const vPos = TriangleGeometry.vertices[vertexKey];
+    s5State.dragLinePos = { x: vPos.x, y: vPos.y };
+    CentroidStage5.syncLiveSvgDOM();
+  },
+
+  moveConnection(svgPt) {
+    if (s5State.draggingKind !== 'median' || !s5State.activeLineFrom) return;
+    s5State.dragLinePos = svgPt;
+    CentroidStage5.syncLiveSvgDOM();
+  },
+
+  finishConnection(svgPt, explicitTarget = null) {
+    if (s5State.timedOut || s5State.phase !== 2) return;
+    const fromVtx = s5State.activeLineFrom;
+    s5State.draggingKind = null;
+    s5State.activeLineFrom = null;
+    s5State.dragLinePos = null;
+    if (!fromVtx) return;
+
+    const mids = TriangleGeometry.getMidpoints();
+    const expectedTarget = fromVtx === 'A' ? mids.BC : mids.AC;
+    const wrongMidTarget = fromVtx === 'A' ? mids.AC : mids.BC;
+
+    let isCorrect = false;
+    let isWrongAttempt = false;
+
+    if (explicitTarget) {
+      isCorrect = (fromVtx === 'A' && explicitTarget === 'mpBC') || (fromVtx === 'B' && explicitTarget === 'mpAC');
+      isWrongAttempt = !isCorrect;
+    } else if (svgPt) {
+      const distCorrect = TriangleGeometry.distance(svgPt, expectedTarget);
+      const distWrongMid = TriangleGeometry.distance(svgPt, wrongMidTarget);
+      const distVertexC = TriangleGeometry.distance(svgPt, TriangleGeometry.vertices.C);
+      if (distCorrect <= this.hitRadius) {
+        isCorrect = true;
+      } else if (distWrongMid <= this.hitRadius || distVertexC <= this.hitRadius) {
+        isWrongAttempt = true;
+      }
+    }
+
+    if (isCorrect) {
+      if (fromVtx === 'A') s5State.medA_done = true;
+      if (fromVtx === 'B') s5State.medB_done = true;
+      sound('powerup');
+      if (window.spawnJuiceFloater) {
+        window.spawnJuiceFloater(`⚡ Đã kích hoạt trung tuyến từ đỉnh ${fromVtx}! (+5 XP)`, 'xp');
+      }
+      if (session?.room && session?.token) {
+        api('/api/stage5Progress', {
+          room: session.room,
+          token: session.token,
+          medianConnected: true,
+          vertex: fromVtx
+        }).catch(() => {});
+      }
+
+      if (s5State.medA_done && s5State.medB_done) {
+        s5State.phase = 3;
+        s5State.kbFocusTarget = 'crystal';
+        s5State.dragonMood = 'win';
+        s5State.dragonSpeech = 'Hai trung tuyến đã xuất hiện! Điểm giao nhau của chúng đang giữ bí mật cuối cùng! Hãy kéo Tâm Thạch vào vị trí trọng tâm G!';
+      } else {
+        s5State.kbFocusTarget = s5State.medA_done ? 'medB' : 'medA';
+        s5State.dragonMood = 'win';
+        s5State.dragonSpeech = `Trung tuyến từ đỉnh ${fromVtx} đã phát sáng! Hãy nối tiếp đường trung tuyến còn lại từ đỉnh ${fromVtx === 'A' ? 'B tới trung điểm AC' : 'A tới trung điểm BC'}!`;
+      }
+      Stage5GameState.saveSession();
+      render();
+    } else if (isWrongAttempt) {
+      s5State.wrongAttempts++;
+      s5State.dragonMood = 'warn';
+      s5State.dragonSpeech = 'Trung tuyến phải nối một đỉnh với trung điểm của cạnh đối diện! Hãy thử nối lại nhé!';
+      sound('wrong');
+      if (session?.room && session?.token) {
+        api('/api/stage5Progress', {
+          room: session.room,
+          token: session.token,
+          wrongAttempt: true,
+          reason: `Nối trung tuyến từ đỉnh ${fromVtx} sai điểm đích`
+        }).catch(() => {});
+      }
+      Stage5GameState.saveSession();
+      render();
+    } else {
+      CentroidStage5.syncLiveSvgDOM();
+    }
+  }
+};
+
+/* ─── GIAI ĐOẠN 3: BỘ ĐIỀU KHIỂN KÉO THẢ VIÊN TÂM THẠCH VÀO TRỌNG TÂM G (CrystalDragController) ─── */
+const CrystalDragController = {
+  snapTolerance: 36, // Sai số tương tác cho phép quanh G = (A + B + C) / 3
+
+  startDrag() {
+    if (s5State.timedOut || s5State.phase !== 3 || s5State.crystalPlaced) return;
+    s5State.draggingKind = 'crystal';
+    s5State.kbFocusTarget = 'crystal';
+    s5State.crystalWrongShake = false;
+  },
+
+  moveDrag(svgPt) {
+    if (s5State.draggingKind !== 'crystal' || s5State.crystalPlaced) return;
+    s5State.crystalX = svgPt.x;
+    s5State.crystalY = svgPt.y;
+    CentroidStage5.syncLiveSvgDOM();
+  },
+
+  finishDrag() {
+    if (s5State.timedOut || s5State.phase !== 3 || s5State.crystalPlaced) return;
+    s5State.draggingKind = null;
+
+    // Tính trọng tâm chính xác bằng công thức G = (A + B + C) / 3
+    const G = TriangleGeometry.centroid();
+    const dropPos = { x: s5State.crystalX, y: s5State.crystalY };
+    const distToG = TriangleGeometry.distance(dropPos, G);
+
+    if (distToG <= this.snapTolerance) {
+      s5State.crystalX = G.x;
+      s5State.crystalY = G.y;
+      s5State.crystalPlaced = true;
+      s5State.crystalWrongShake = false;
+      s5State.phase = 4;
+      s5State.kbFocusTarget = 'confirm';
+      s5State.dragonMood = 'win';
+      s5State.dragonSpeech = `Chính xác! Tổng ba vectơ từ trọng tâm đến ba đỉnh bằng vectơ không: <b>${s2RenderVecArrow('GA', 's5-inline-vec')} + ${s2RenderVecArrow('GB', 's5-inline-vec')} + ${s2RenderVecArrow('GC', 's5-inline-vec')} = ${s2RenderVecArrow('0', 's5-inline-vec')}</b>! Nhấn <b>XÁC NHẬN</b> để khôi phục Lục địa OXYZ!`;
+      sound('fanfare');
+      if (window.spawnConfettiParticles) window.spawnConfettiParticles(window.innerWidth * 0.45, window.innerHeight * 0.5, 42);
+      if (window.spawnJuiceFloater) {
+        window.spawnJuiceFloater('💎 Đã đặt Tâm Thạch đúng Trọng tâm G = (A+B+C)/3! (+10 XP)', 'xp');
+      }
+      if (session?.room && session?.token) {
+        api('/api/stage5Progress', {
+          room: session.room,
+          token: session.token,
+          crystalPlaced: true
+        }).catch(() => {});
+      }
+      Stage5GameState.saveSession();
+      render();
+    } else {
+      // Trả viên pha lê về vị trí ban đầu để học sinh thử lại
+      s5State.crystalX = TriangleGeometry.crystalSpawn.x;
+      s5State.crystalY = TriangleGeometry.crystalSpawn.y;
+      s5State.crystalWrongShake = true;
+      s5State.wrongAttempts++;
+      s5State.dragonMood = 'warn';
+      s5State.dragonSpeech = 'Vị trí đó chưa phải trọng tâm! Hãy kéo Tâm Thạch vào đúng giao điểm của hai đường trung tuyến!';
+      sound('wrong');
+      if (session?.room && session?.token) {
+        api('/api/stage5Progress', {
+          room: session.room,
+          token: session.token,
+          wrongAttempt: true,
+          reason: 'Đặt Tâm Thạch lệch khỏi giao điểm G của hai trung tuyến'
+        }).catch(() => {});
+      }
+      Stage5GameState.saveSession();
+      render();
+    }
+  }
+};
+
+/* ─── BỘ ĐIỀU KHIỂN CHÍNH CHẶNG 5 (CentroidStage5) ─── */
+const CentroidStage5 = {
+  syncLiveSvgDOM() {
+    const { A, B, C } = TriangleGeometry.vertices;
+    const mpBC_pt = TriangleGeometry.pointOnSegment(B, C, s5State.mpBC_t);
+    const mpAC_pt = TriangleGeometry.pointOnSegment(A, C, s5State.mpAC_t);
+
+    const mpBCEl = document.getElementById('s5NodeMpBC');
+    if (mpBCEl) {
+      mpBCEl.setAttribute('transform', `translate(${mpBC_pt.x.toFixed(1)}, ${mpBC_pt.y.toFixed(1)})`);
+    }
+    const mpACEl = document.getElementById('s5NodeMpAC');
+    if (mpACEl) {
+      mpACEl.setAttribute('transform', `translate(${mpAC_pt.x.toFixed(1)}, ${mpAC_pt.y.toFixed(1)})`);
+    }
+
+    const dragLineEl = document.getElementById('s5ActiveDragMedianLine');
+    if (dragLineEl) {
+      if (s5State.draggingKind === 'median' && s5State.activeLineFrom && s5State.dragLinePos) {
+        const startPt = TriangleGeometry.vertices[s5State.activeLineFrom];
+        dragLineEl.setAttribute('x1', startPt.x);
+        dragLineEl.setAttribute('y1', startPt.y);
+        dragLineEl.setAttribute('x2', s5State.dragLinePos.x.toFixed(1));
+        dragLineEl.setAttribute('y2', s5State.dragLinePos.y.toFixed(1));
+        dragLineEl.style.display = 'block';
+      } else {
+        dragLineEl.style.display = 'none';
+      }
+    }
+
+    const crystalEl = document.getElementById('s5CrystalGroup');
+    if (crystalEl) {
+      crystalEl.setAttribute('transform', `translate(${s5State.crystalX.toFixed(1)}, ${s5State.crystalY.toFixed(1)})`);
+    }
+  },
+
+  triggerHint(requestedLevel = null) {
+    if (s5State.timedOut || s5State.phase >= 5) return;
+    // Chọn cấp gợi ý phù hợp với giai đoạn hiện tại nếu không chỉ định rõ
+    let targetLevel = requestedLevel;
+    if (!targetLevel) {
+      if (s5State.phase === 1) targetLevel = 1;
+      else if (s5State.phase === 2 || s5State.phase === 3) targetLevel = 2;
+      else targetLevel = 3;
+    }
+    targetLevel = Math.max(1, Math.min(3, Number(targetLevel) || 1));
+    s5State.activeHintLevel = targetLevel;
+    if (targetLevel > s5State.hintsUsedCount) {
+      s5State.hintsUsedCount = targetLevel;
+    }
+    const hintObj = S5_CONTEXT_HINTS[targetLevel - 1] || S5_CONTEXT_HINTS[0];
+    s5State.dragonMood = 'hint';
+    s5State.dragonSpeech = `💡 <b>${esc(hintObj.title)}:</b> “${esc(hintObj.text)}”`;
+    sound('powerup');
+    if (session?.room && session?.token) {
+      api('/api/stage5Progress', {
+        room: session.room,
+        token: session.token,
+        useHint: true,
+        hintLevel: targetLevel
+      }).catch(() => {});
+    }
+    Stage5GameState.saveSession();
+    render();
+  },
+
+  async confirmCurrentAction() {
+    if (s5State.timedOut) return;
+    if (s5State.phase === 1) {
+      const target = !s5State.mpBC_done ? 'mpBC' : 'mpAC';
+      MidpointDragController.finishDrag(target);
+      return;
+    }
+    if (s5State.phase === 2) {
+      // Nếu học sinh bấm XÁC NHẬN khi đang chọn đỉnh bằng bàn phím
+      if (!s5State.medA_done) {
+        MedianConnectionController.startConnection('A');
+        MedianConnectionController.finishConnection(null, 'mpBC');
+      } else if (!s5State.medB_done) {
+        MedianConnectionController.startConnection('B');
+        MedianConnectionController.finishConnection(null, 'mpAC');
+      }
+      return;
+    }
+    if (s5State.phase === 3) {
+      CrystalDragController.finishDrag();
+      return;
+    }
+    if (s5State.phase === 4) {
+      await this.activateVectorFormationAndWin();
+      return;
+    }
+    if (s5State.phase === 5) {
+      await this.proceedToFinalSummary();
+    }
+  },
+
+  async activateVectorFormationAndWin() {
+    if (s5State.victoryTriggered) return;
+    s5State.vectorsActivated = true;
+    s5State.victoryTriggered = true;
+    s5State.phase = 5;
+    s5State.dragonMood = 'win';
+    s5State.dragonSpeech = 'Chúng ta làm được rồi! Lục địa OXYZ đã được giải cứu!';
+    Stage5GameState.saveSession();
+
+    sound('fanfare');
+    triggerConfetti(4200);
+    if (window.spawnConfettiParticles) window.spawnConfettiParticles(window.innerWidth / 2, window.innerHeight * 0.4, 85);
+
+    const elapsedSec = Math.max(1, Math.min(70, Math.floor((Date.now() - vaState.stageStartedAt) / 1000)));
+    if (session?.room && session?.token) {
+      try {
+        await api('/api/stage5Progress', {
+          room: session.room,
+          token: session.token,
+          vectorsActivated: true
+        });
+        const res = await submit('/api/answer', {
+          stage: 4,
+          round: 0,
+          choice: 0,
+          stage5CentroidCompleted: true,
+          completedTimeSec: elapsedSec
+        });
+        if (res && world?.me) {
+          world.me.stage = 5;
+          world.me.round = 0;
+        }
+      } catch (e) {
+        console.warn('Stage 5 completion sync error:', e);
+      }
+    }
+    render();
+  },
+
+  async proceedToFinalSummary() {
+    if (session?.room && session?.token) {
+      try {
+        if ((world?.me?.stage ?? 0) >= 5 && !world?.me?.completed) {
+          await submit('/api/final', { code: '30524', choice: 0 });
+        }
+        await refresh(true);
+      } catch (e) {
+        render();
+      }
+    } else {
+      render();
+    }
+  }
+};
+
+function s5Tick(now, dt) {
+  if (!document.getElementById('s5CentroidShell')) return;
+  const elapsedSec = Math.floor((Date.now() - vaState.stageStartedAt) / 1000);
+  const remSec = Math.max(0, (vaState.stageDurationSec || 70) - elapsedSec);
+  const timerEl = document.getElementById('s5TimerClockText');
+  if (timerEl) {
+    timerEl.textContent = formatMMSS(remSec);
+    timerEl.classList.toggle('urgent', remSec <= 15);
+  }
+
+  if (remSec <= 15 && remSec > 0 && !s5State.warned15s && s5State.phase < 5 && !s5State.timedOut) {
+    s5State.warned15s = true;
+    s5State.dragonMood = 'warn';
+    s5State.dragonSpeech = '⏳ Chỉ còn 15 giây! Hãy nhấn nút Gợi ý hoặc hoàn thành bước hiện tại để khôi phục Tâm Thạch!';
+    render();
+  }
+
+  if (remSec <= 0 && !s5State.timedOut && s5State.phase < 5) {
+    s5State.timedOut = true;
+    s5State.draggingKind = null;
+    s5State.dragonMood = 'warn';
+    s5State.dragonSpeech = `⏱️ Đã hết 70 giây của Chặng 5! Hệ thống đã ghi nhận tiến độ thực tế của đội (Giai đoạn ${s5State.phase}/4).`;
+    if (session?.room && session?.token) {
+      api('/api/stage5Progress', {
+        room: session.room,
+        token: session.token,
+        timedOut: true
+      }).catch(() => {});
+    }
+    render();
+  }
+}
+
+function renderStage5CentroidRescueGame(m) {
+  Stage5GameState.ensureInitialized(m);
+  const elapsedSec = Math.floor((Date.now() - vaState.stageStartedAt) / 1000);
+  const remSec = Math.max(0, (vaState.stageDurationSec || 70) - elapsedSec);
+
+  const { A, B, C } = TriangleGeometry.vertices;
+  const mids = TriangleGeometry.getMidpoints();
+  const G = TriangleGeometry.centroid();
+
+  const mpBC_pt = TriangleGeometry.pointOnSegment(B, C, s5State.mpBC_t);
+  const mpAC_pt = TriangleGeometry.pointOnSegment(A, C, s5State.mpAC_t);
+
+  const phaseTitles = [
+    '',
+    'GIAI ĐOẠN 1/4: Kéo 2 điểm sáng về đúng TRUNG ĐIỂM cạnh BC và AC',
+    'GIAI ĐOẠN 2/4: Kéo nối đỉnh A với trung điểm BC & đỉnh B với trung điểm AC',
+    'GIAI ĐOẠN 3/4: Kéo viên TÂM THẠCH đặt vào đúng TRỌNG TÂM G',
+    'GIAI ĐOẠN 4/4: Quan sát trận pháp GA + GB + GC = 0 & nhấn XÁC NHẬN',
+    'HOÀN TẤT: Tâm Thạch & 5 Ấn Vectơ đã hợp nhất – Lục địa OXYZ được giải cứu!'
+  ];
+  const curPhaseBanner = phaseTitles[s5State.phase] || phaseTitles[1];
+
+  const roles = m.teamRoles || [
+    { role: 'Hoa tiêu Trung điểm', icon: '📐' },
+    { role: 'Kỹ sư Trung tuyến', icon: '⚡' },
+    { role: 'Người giữ Tâm Thạch', icon: '💎' },
+    { role: 'Pháp sư Trận pháp', icon: '👑' }
+  ];
+  const activeRole = roles[s5State.controllerRoleIdx % roles.length] || roles[0];
+
+  // Ký hiệu vạch chia đôi bằng nhau trên cạnh BC (||) và AC (|) khi đã tìm đúng trung điểm
+  const bcMidpointTicksSvg = s5State.mpBC_done ? `
+    <g class="s5-equal-ticks" stroke="#FEF08A" stroke-width="3" stroke-linecap="round">
+      <!-- Nửa trái BM -->
+      <line x1="269" y1="423" x2="269" y2="441"/>
+      <line x1="277" y1="423" x2="277" y2="441"/>
+      <!-- Nửa phải MC -->
+      <line x1="479" y1="423" x2="479" y2="441"/>
+      <line x1="487" y1="423" x2="487" y2="441"/>
+    </g>
+  ` : '';
+
+  const acMidpointTicksSvg = s5State.mpAC_done ? `
+    <g class="s5-equal-ticks" stroke="#FEF08A" stroke-width="3" stroke-linecap="round">
+      <!-- Nửa trên AN -->
+      <line x1="409" y1="176" x2="425" y2="166"/>
+      <!-- Nửa dưới NC -->
+      <line x1="523" y1="350" x2="539" y2="340"/>
+    </g>
+  ` : '';
+
+  const abMidpointTicksSvg = s5State.phase >= 4 ? `
+    <g class="s5-equal-ticks" stroke="#FEF08A" stroke-width="3" stroke-linecap="round">
+      <line x1="304" y1="166" x2="320" y2="176"/>
+      <line x1="300" y1="173" x2="316" y2="183"/>
+      <line x1="208" y1="340" x2="224" y2="350"/>
+      <line x1="204" y1="347" x2="220" y2="357"/>
+    </g>
+  ` : '';
+
+  return `
+  <div class="s5-centroid-shell ${s5State.phase === 5 ? 'is-victory' : ''}" id="s5CentroidShell">
+    <!-- A. BỐI CẢNH THÀNH TRÌ TRÍ TUỆ & SÂN ĐÁ CỔ PHÉP THUẬT -->
+    <img src="/assets/s5_citadel/s5_citadel_bg.jpg" alt="Thành Trì Trí Tuệ" class="s5-citadel-bg-img" draggable="false"/>
+    <div class="s5-ambient-particles" aria-hidden="true">
+      <span class="s5-spark sp-1"></span>
+      <span class="s5-spark sp-2"></span>
+      <span class="s5-spark sp-3"></span>
+      <span class="s5-spark sp-4"></span>
+      <span class="s5-spark sp-5"></span>
+      <span class="s5-spark sp-6"></span>
+    </div>
+
+    <!-- B. THANH TIÊU ĐỀ TRÊN CÙNG GIỐNG ẢNH MẪU -->
+    <header class="s5-top-header">
+      <div class="s5-header-left">
+        <button type="button" class="s5-circle-btn" data-action="s5ExitToMap" title="Mở Bản đồ 5 Chặng">
+          🏠
+        </button>
+        <div class="s5-brand-book-crest">
+          <span class="s5-crest-gem">💎</span>
+          <div class="s5-crest-text">
+            <strong>MATHVERSE</strong>
+            <span>OXYZ</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="s5-header-center-banner">
+        <div class="s5-main-title-plaque">
+          <h1>CHẶNG 5 – GIẢI CỨU TÂM THẠCH</h1>
+        </div>
+        <div class="s5-sub-title-plaque">
+          <span>✦ Trọng tâm tam giác ✦</span>
+        </div>
+      </div>
+
+      <div class="s5-header-right">
+        <button type="button" class="s5-circle-btn" data-action="toggleSound" title="${soundEnabled ? 'Âm thanh: Bật' : 'Âm thanh: Tắt'}">
+          ${soundEnabled ? '🔊' : '🔇'}
+        </button>
+        <button type="button" class="s5-circle-btn" data-action="s5ToggleFullscreen" title="Toàn màn hình">
+          ⛶
+        </button>
+      </div>
+    </header>
+
+    <!-- BỐ CỤC CHÍNH 3 KHU VỰC: TRÁI (RỒNG XANH) + GIỮA (TAM GIÁC ABC 65–70%) + PHẢI (SIDEBAR) -->
+    <div class="s5-main-stage-grid">
+      <!-- D. KHU VỰC RỒNG XANH Ở GÓC TRÁI -->
+      <aside class="s5-left-dragon-col" aria-label="Rồng Xanh dẫn dắt Chặng 5">
+        <div class="s5-dragon-speech-bubble ${s5State.dragonMood}" id="s5DragonSpeechBubble">
+          <div class="s5-speech-step-tag">
+            ${s5State.phase === 5 ? '🏆 CHIẾN THẮNG CHẶNG CUỐI' : `✨ Bước ${Math.min(4, s5State.phase)}/4 · Thông hiểu`}
+          </div>
+          <div class="s5-speech-content" id="s5DragonSpeechText">
+            ${s5State.dragonSpeech}
+          </div>
+        </div>
+
+        <div class="s5-dragon-character-wrap ${s5State.phase === 5 ? 'celebrating' : ''}">
+          <div class="s5-dragon-floor-aura"></div>
+          <img src="/assets/RongXanh.png" alt="Rồng Xanh" class="s5-dragon-mascot-img" draggable="false"/>
+        </div>
+      </aside>
+
+      <!-- C. KHU VỰC TRÒ CHƠI TRUNG TÂM (65–70% CHIỀU RỘNG): HỆ THỐNG HÌNH HỌC TAM GIÁC ABC TƯƠNG TÁC THẬT -->
+      <section class="s5-center-geometry-arena" aria-label="Bàn giải mã Trọng tâm tam giác ABC">
+        <!-- Băng-rôn hướng dẫn giai đoạn hiện tại gọn trên đỉnh vùng tam giác -->
+        <div class="s5-phase-instruction-pill">
+          <span class="s5-phase-dot"></span>
+          <span>${esc(curPhaseBanner)}</span>
+        </div>
+
+        <!-- Hộp hiển thị Hệ thức Vectơ Trọng tâm khi đạt Giai đoạn 4 & 5 -->
+        ${s5State.phase >= 4 ? `
+          <div class="s5-vector-formula-banner" id="s5VectorFormulaBanner">
+            <div class="s5-formula-primary">
+              <span class="s5-f-tag">⚖️ Trận pháp cân bằng:</span>
+              <strong>${s2RenderVecArrow('GA', 's5-vec')} + ${s2RenderVecArrow('GB', 's5-vec')} + ${s2RenderVecArrow('GC', 's5-vec')} = ${s2RenderVecArrow('0', 's5-vec')}</strong>
+            </div>
+            <div class="s5-formula-secondary">
+              <span>Với điểm <i>M</i> bất kỳ:</span>
+              <strong>${s2RenderVecArrow('MA', 's5-vec')} + ${s2RenderVecArrow('MB', 's5-vec')} + ${s2RenderVecArrow('MC', 's5-vec')} = 3${s2RenderVecArrow('MG', 's5-vec')}</strong>
+            </div>
+          </div>
+        ` : ''}
+
+        <!-- SƠ ĐỒ HÌNH HỌC SVG TƯƠNG TÁC TRỰC TIẾP (TỌA ĐỘ TOÁN HỌC CHÍNH XÁC) -->
+        <div class="s5-svg-container">
+          <svg id="s5GeometrySvg"
+               class="s5-geometry-svg"
+               viewBox="0 0 800 540"
+               preserveAspectRatio="xMidYMid meet"
+               role="application"
+               aria-label="Tam giác ABC tương tác tìm Trọng tâm G">
+            <defs>
+              <filter id="s5CyanGlow" x="-30%" y="-30%" width="160%" height="160%">
+                <feGaussianBlur stdDeviation="5" result="blur"/>
+                <feMerge>
+                  <feMergeNode in="blur"/>
+                  <feMergeNode in="SourceGraphic"/>
+                </feMerge>
+              </filter>
+              <filter id="s5GoldGlow" x="-40%" y="-40%" width="180%" height="180%">
+                <feGaussianBlur stdDeviation="7" result="blur"/>
+                <feMerge>
+                  <feMergeNode in="blur"/>
+                  <feMergeNode in="SourceGraphic"/>
+                </feMerge>
+              </filter>
+              <linearGradient id="s5EdgeCyanGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#E0F2FE"/>
+                <stop offset="50%" stop-color="#38BDF8"/>
+                <stop offset="100%" stop-color="#0284C7"/>
+              </linearGradient>
+              <linearGradient id="s5MedianBeamGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#FEF08A"/>
+                <stop offset="50%" stop-color="#F472B6"/>
+                <stop offset="100%" stop-color="#C084FC"/>
+              </linearGradient>
+              <linearGradient id="s5CrystalGoldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#FFFBEB"/>
+                <stop offset="35%" stop-color="#FDE047"/>
+                <stop offset="75%" stop-color="#F59E0B"/>
+                <stop offset="100%" stop-color="#B45309"/>
+              </linearGradient>
+              <marker id="s5VecArrowGA" markerWidth="10" markerHeight="10" refX="7" refY="5" orient="auto">
+                <path d="M0,1 L9,5 L0,9 Z" fill="#FDE047"/>
+              </marker>
+            </defs>
+
+            <!-- Vòng tròn ma trận cổ dưới chân tam giác -->
+            <ellipse cx="372" cy="368" rx="255" ry="96"
+                     fill="rgba(14, 116, 144, 0.10)"
+                     stroke="rgba(56, 189, 248, 0.38)"
+                     stroke-width="2"
+                     stroke-dasharray="8 6"/>
+
+            <!-- Gợi ý cấp 1 hoặc cấp 2: Đường nét đứt mờ định hướng khi học sinh dùng gợi ý -->
+            ${s5State.activeHintLevel >= 2 && s5State.phase === 2 ? `
+              <line x1="${A.x}" y1="${A.y}" x2="${mids.BC.x}" y2="${mids.BC.y}" stroke="rgba(250,204,21,0.45)" stroke-width="3" stroke-dasharray="7 7"/>
+              <line x1="${B.x}" y1="${B.y}" x2="${mids.AC.x}" y2="${mids.AC.y}" stroke="rgba(250,204,21,0.45)" stroke-width="3" stroke-dasharray="7 7"/>
+            ` : ''}
+
+            <!-- BA CẠNH CỦA TAM GIÁC ABC (TÍNH BẰNG TỌA ĐỘ ĐỈNH A, B, C) -->
+            <polygon points="${A.x},${A.y} ${B.x},${B.y} ${C.x},${C.y}"
+                     fill="rgba(15, 23, 42, 0.26)"
+                     stroke="url(#s5EdgeCyanGrad)"
+                     stroke-width="5"
+                     filter="url(#s5CyanGlow)"/>
+
+            ${bcMidpointTicksSvg}
+            ${acMidpointTicksSvg}
+            ${abMidpointTicksSvg}
+
+            <!-- ĐƯỜNG TRUNG TUYẾN THỨ BA (TỪ C ĐẾN TRUNG ĐIỂM AB) – PHÁT SÁNG KHI ĐẶT ĐÚNG TÂM THẠCH TẠI G -->
+            ${s5State.phase >= 4 ? `
+              <line x1="${C.x}" y1="${C.y}" x2="${mids.AB.x}" y2="${mids.AB.y}"
+                    stroke="#E879F9"
+                    stroke-width="3.5"
+                    stroke-dasharray="9 6"
+                    filter="url(#s5CyanGlow)"/>
+              <circle cx="${mids.AB.x}" cy="${mids.AB.y}" r="8" fill="#FDE047" stroke="#FFFFFF" stroke-width="2"/>
+            ` : ''}
+
+            <!-- HAI ĐƯỜNG TRUNG TUYẾN CHÍNH (AM_BC VÀ BM_AC) -->
+            ${s5State.medA_done ? `
+              <line x1="${A.x}" y1="${A.y}" x2="${mids.BC.x}" y2="${mids.BC.y}"
+                    class="s5-median-line"
+                    stroke="url(#s5MedianBeamGrad)"
+                    stroke-width="5"
+                    filter="url(#s5GoldGlow)"/>
+            ` : ''}
+            ${s5State.medB_done ? `
+              <line x1="${B.x}" y1="${B.y}" x2="${mids.AC.x}" y2="${mids.AC.y}"
+                    class="s5-median-line"
+                    stroke="url(#s5MedianBeamGrad)"
+                    stroke-width="5"
+                    filter="url(#s5GoldGlow)"/>
+            ` : ''}
+
+            <!-- TIA NĂNG LƯỢNG ĐANG KÉO TỪ ĐỈNH TRONG GIAI ĐOẠN 2 -->
+            <line id="s5ActiveDragMedianLine"
+                  x1="${A.x}" y1="${A.y}" x2="${A.x}" y2="${A.y}"
+                  stroke="#FEF08A"
+                  stroke-width="4.5"
+                  stroke-dasharray="8 5"
+                  style="display:none;pointer-events:none"
+                  filter="url(#s5GoldGlow)"/>
+
+            <!-- HIỂN THỊ TỈ SỐ 2:1 TRÊN TRUNG TUYẾN AM KHI ĐẶT ĐÚNG TÂM THẠCH (GIAI ĐOẠN 4+) -->
+            ${(s5State.phase >= 4 || s5State.activeHintLevel >= 3) && s5State.medA_done ? `
+              <g class="s5-ratio-2-1-markers">
+                <rect x="${((A.x + G.x) / 2) - 44}" y="${((A.y + G.y) / 2) - 13}" width="68" height="24" rx="8" fill="rgba(15,23,42,0.88)" stroke="#FACC15" stroke-width="1.5"/>
+                <text x="${((A.x + G.x) / 2) - 10}" y="${((A.y + G.y) / 2) + 4}" fill="#FEF08A" font-size="13" font-weight="900" text-anchor="middle">2 phần</text>
+                <rect x="${((G.x + mids.BC.x) / 2) - 44}" y="${((G.y + mids.BC.y) / 2) - 13}" width="68" height="24" rx="8" fill="rgba(15,23,42,0.88)" stroke="#38BDF8" stroke-width="1.5"/>
+                <text x="${((G.x + mids.BC.x) / 2) - 10}" y="${((G.y + mids.BC.y) / 2) + 4}" fill="#7DD3FC" font-size="13" font-weight="900" text-anchor="middle">1 phần</text>
+              </g>
+            ` : ''}
+
+            <!-- GIAI ĐOẠN 4 & 5: BA LUỒNG NĂNG LƯỢNG VECTƠ GA, GB, GC XUẤT PHÁT TỪ TRỌNG TÂM G -->
+            ${s5State.phase >= 4 ? `
+              <g class="s5-centroid-vectors-group">
+                <line x1="${G.x}" y1="${G.y}" x2="${A.x}" y2="${A.y + 16}"
+                      stroke="#FDE047" stroke-width="4.5" marker-end="url(#s5VecArrowGA)" filter="url(#s5GoldGlow)"/>
+                <line x1="${G.x}" y1="${G.y}" x2="${B.x + 14}" y2="${B.y - 8}"
+                      stroke="#FDE047" stroke-width="4.5" marker-end="url(#s5VecArrowGA)" filter="url(#s5GoldGlow)"/>
+                <line x1="${G.x}" y1="${G.y}" x2="${C.x - 14}" y2="${C.y - 8}"
+                      stroke="#FDE047" stroke-width="4.5" marker-end="url(#s5VecArrowGA)" filter="url(#s5GoldGlow)"/>
+
+                <!-- Nhãn vectơ GA, GB, GC trên 3 luồng sáng -->
+                <g transform="translate(${(G.x + A.x) / 2 + 28}, ${(G.y + A.y) / 2})">
+                  <rect x="-24" y="-15" width="48" height="26" rx="7" fill="rgba(15,23,42,0.9)" stroke="#FACC15" stroke-width="1.5"/>
+                  <text x="0" y="4" fill="#FEF08A" font-size="14" font-weight="900" text-anchor="middle">GA⃗</text>
+                </g>
+                <g transform="translate(${(G.x + B.x) / 2 - 22}, ${(G.y + B.y) / 2 - 14})">
+                  <rect x="-24" y="-15" width="48" height="26" rx="7" fill="rgba(15,23,42,0.9)" stroke="#FACC15" stroke-width="1.5"/>
+                  <text x="0" y="4" fill="#FEF08A" font-size="14" font-weight="900" text-anchor="middle">GB⃗</text>
+                </g>
+                <g transform="translate(${(G.x + C.x) / 2 + 22}, ${(G.y + C.y) / 2 - 14})">
+                  <rect x="-24" y="-15" width="48" height="26" rx="7" fill="rgba(15,23,42,0.9)" stroke="#FACC15" stroke-width="1.5"/>
+                  <text x="0" y="4" fill="#FEF08A" font-size="14" font-weight="900" text-anchor="middle">GC⃗</text>
+                </g>
+              </g>
+            ` : ''}
+
+            <!-- ĐIỂM GIAO NHAU CỦA HAI TRUNG TUYẾN: KHÔNG HIỆN CHỮ G TRƯỚC KHI HỌC SINH ĐẶT ĐÚNG TÂM THẠCH -->
+            ${s5State.medA_done && s5State.medB_done && !s5State.crystalPlaced ? `
+              <circle cx="${G.x}" cy="${G.y}" r="9"
+                      fill="#FFFFFF"
+                      stroke="#F472B6"
+                      stroke-width="3"
+                      filter="url(#s5GoldGlow)"/>
+            ` : ''}
+
+            <!-- KÝ HIỆU TRỌNG TÂM G (CHỈ XUẤT HIỆN SAU KHI ĐẶT ĐÚNG TÂM THẠCH VÀO G) -->
+            ${s5State.crystalPlaced ? `
+              <g class="s5-centroid-g-label" transform="translate(${G.x + 28}, ${G.y + 26})">
+                <text x="0" y="0"
+                      fill="#F0ABFC"
+                      stroke="#1E1B4B"
+                      stroke-width="4"
+                      paint-order="stroke"
+                      font-size="30"
+                      font-weight="900"
+                      font-style="italic"
+                      text-anchor="middle">G</text>
+              </g>
+            ` : ''}
+
+            <!-- HAI ĐIỂM TRUNG ĐIỂM TƯƠNG TÁC TRÊN CẠNH BC VÀ AC -->
+            <g id="s5NodeMpBC"
+               class="s5-Interactive-node ${s5State.mpBC_done ? 'is-done' : ''} ${s5State.mpBC_wrong ? 'is-wrong' : ''} ${s5State.kbFocusTarget === 'mpBC' && s5State.phase === 1 ? 'is-kb-focus' : ''}"
+               transform="translate(${mpBC_pt.x.toFixed(1)}, ${mpBC_pt.y.toFixed(1)})"
+               data-s5drag="mpBC"
+               style="cursor:${s5State.phase === 1 && !s5State.mpBC_done ? 'grab' : 'pointer'}">
+              <circle r="22" fill="transparent"/>
+              <circle r="11"
+                      fill="${s5State.mpBC_done ? '#2DD4BF' : (s5State.mpBC_wrong ? '#C084FC' : '#FACC15')}"
+                      stroke="#FFFFFF"
+                      stroke-width="3"
+                      filter="url(#s5GoldGlow)"/>
+              ${s5State.mpBC_done
+                ? `<text x="0" y="4" fill="#0F172A" font-size="13" font-weight="900" text-anchor="middle">✓</text>
+                   <text x="0" y="28" fill="#5EEAD4" font-size="14" font-weight="900" text-anchor="middle">M (Trung điểm BC)</text>`
+                : `<text x="0" y="-18" fill="#FEF08A" font-size="13" font-weight="800" text-anchor="middle">↔ Kéo tìm trung điểm BC</text>`}
+            </g>
+
+            <g id="s5NodeMpAC"
+               class="s5-Interactive-node ${s5State.mpAC_done ? 'is-done' : ''} ${s5State.mpAC_wrong ? 'is-wrong' : ''} ${s5State.kbFocusTarget === 'mpAC' && s5State.phase === 1 ? 'is-kb-focus' : ''}"
+               transform="translate(${mpAC_pt.x.toFixed(1)}, ${mpAC_pt.y.toFixed(1)})"
+               data-s5drag="mpAC"
+               style="cursor:${s5State.phase === 1 && !s5State.mpAC_done ? 'grab' : 'pointer'}">
+              <circle r="22" fill="transparent"/>
+              <circle r="11"
+                      fill="${s5State.mpAC_done ? '#2DD4BF' : (s5State.mpAC_wrong ? '#C084FC' : '#FACC15')}"
+                      stroke="#FFFFFF"
+                      stroke-width="3"
+                      filter="url(#s5GoldGlow)"/>
+              ${s5State.mpAC_done
+                ? `<text x="0" y="4" fill="#0F172A" font-size="13" font-weight="900" text-anchor="middle">✓</text>
+                   <text x="58" y="4" fill="#5EEAD4" font-size="14" font-weight="900" text-anchor="middle">N (Trung điểm AC)</text>`
+                : `<text x="68" y="-10" fill="#FEF08A" font-size="13" font-weight="800" text-anchor="middle">↕ Kéo tìm trung điểm AC</text>`}
+            </g>
+
+            <!-- BA ĐỈNH A, B, C CỦA TAM GIÁC (CÓ THỂ KÉO NỐI TRUNG TUYẾN Ở GIAI ĐOẠN 2) -->
+            <g class="s5-vertex-node ${s5State.phase === 2 && !s5State.medA_done ? 'pulse-connect' : ''}"
+               transform="translate(${A.x}, ${A.y})"
+               data-s5vertex="A"
+               style="cursor:${s5State.phase === 2 && !s5State.medA_done ? 'crosshair' : 'default'}">
+              <circle r="24" fill="transparent"/>
+              <circle r="10" fill="#E0F2FE" stroke="#38BDF8" stroke-width="3.5" filter="url(#s5CyanGlow)"/>
+              <text x="0" y="-20" fill="#FFFFFF" stroke="#0F172A" stroke-width="4" paint-order="stroke" font-size="28" font-weight="900" font-style="italic" text-anchor="middle">A</text>
+              ${s5State.phase === 2 && !s5State.medA_done ? `<text x="0" y="-46" fill="#FEF08A" font-size="13" font-weight="900" text-anchor="middle">⚡ Kéo từ A → M</text>` : ''}
+            </g>
+
+            <g class="s5-vertex-node ${s5State.phase === 2 && !s5State.medB_done ? 'pulse-connect' : ''}"
+               transform="translate(${B.x}, ${B.y})"
+               data-s5vertex="B"
+               style="cursor:${s5State.phase === 2 && !s5State.medB_done ? 'crosshair' : 'default'}">
+              <circle r="24" fill="transparent"/>
+              <circle r="10" fill="#E0F2FE" stroke="#38BDF8" stroke-width="3.5" filter="url(#s5CyanGlow)"/>
+              <text x="-24" y="26" fill="#FFFFFF" stroke="#0F172A" stroke-width="4" paint-order="stroke" font-size="28" font-weight="900" font-style="italic" text-anchor="middle">B</text>
+              ${s5State.phase === 2 && !s5State.medB_done ? `<text x="-10" y="-22" fill="#FEF08A" font-size="13" font-weight="900" text-anchor="middle">⚡ Kéo từ B → N</text>` : ''}
+            </g>
+
+            <g class="s5-vertex-node" transform="translate(${C.x}, ${C.y})" data-s5vertex="C">
+              <circle r="10" fill="#E0F2FE" stroke="#38BDF8" stroke-width="3.5" filter="url(#s5CyanGlow)"/>
+              <text x="24" y="26" fill="#FFFFFF" stroke="#0F172A" stroke-width="4" paint-order="stroke" font-size="28" font-weight="900" font-style="italic" text-anchor="middle">C</text>
+            </g>
+
+            <!-- GIAI ĐOẠN 3+: VIÊN TÂM THẠCH VÀNG KIM CÓ THỂ KÉO THẢ VÀO TRỌNG TÂM G -->
+            ${s5State.phase >= 3 ? `
+              <!-- Đường mũi tên nét đứt gợi ý kéo Tâm Thạch khi ở Giai đoạn 3 -->
+              ${!s5State.crystalPlaced ? `
+                <path d="M 615 245 Q 520 310 ${G.x + 26} ${G.y - 6}"
+                      fill="none"
+                      stroke="#FEF08A"
+                      stroke-width="3"
+                      stroke-dasharray="7 6"
+                      marker-end="url(#s5VecArrowGA)"
+                      opacity="0.85"/>
+              ` : ''}
+
+              <g id="s5CrystalGroup"
+                 class="s5-crystal-node ${s5State.crystalPlaced ? 'is-placed' : 'is-draggable'} ${s5State.crystalWrongShake ? 'is-wrong-shake' : ''}"
+                 transform="translate(${s5State.crystalX.toFixed(1)}, ${s5State.crystalY.toFixed(1)})"
+                 data-s5drag="crystal"
+                 style="cursor:${s5State.crystalPlaced ? 'default' : 'grab'}">
+                <!-- Nhãn "Tâm Thạch" phía trên viên pha lê giống ảnh mẫu -->
+                ${!s5State.crystalPlaced ? `
+                  <g transform="translate(0, -56)">
+                    <rect x="-56" y="-16" width="112" height="28" rx="14" fill="rgba(30, 27, 75, 0.92)" stroke="#FACC15" stroke-width="2"/>
+                    <text x="0" y="3" fill="#FEF08A" font-size="14" font-weight="900" text-anchor="middle">Tâm Thạch</text>
+                  </g>
+                ` : ''}
+
+                <!-- Quầng hào quang xoay quanh Tâm Thạch -->
+                <ellipse cx="0" cy="0" rx="36" ry="15"
+                         fill="none"
+                         stroke="#FEF08A"
+                         stroke-width="2"
+                         transform="rotate(-18)"
+                         filter="url(#s5GoldGlow)"/>
+                <circle r="${s5State.crystalPlaced ? 26 : 32}"
+                        fill="rgba(250, 204, 21, 0.25)"
+                        filter="url(#s5GoldGlow)"/>
+
+                <!-- Hình khối Pha lê Tâm Thạch đa diện vàng kim -->
+                <polygon points="0,-30 20,-8 13,24 0,32 -13,24 -20,-8"
+                         fill="url(#s5CrystalGoldGrad)"
+                         stroke="#FFFFFF"
+                         stroke-width="2.2"
+                         filter="url(#s5GoldGlow)"/>
+                <polygon points="0,-30 10,-6 0,16 -10,-6"
+                         fill="rgba(255, 255, 255, 0.48)"/>
+              </g>
+            ` : ''}
+          </svg>
+        </div>
+
+        <!-- F. THANH ĐIỀU KHIỂN BÊN DƯỚI (GIỐNG ẢNH MẪU: GỢI Ý | TIẾN ĐỘ / KIẾN THỨC | ẤN TRÍ TUỆ | NÚT XÁC NHẬN VÀNG KIM) -->
+        <div class="s5-bottom-control-bar">
+          <div class="s5-bottom-left-pills">
+            <button type="button" class="s5-purple-pill-btn" data-action="s5UseHint" title="Nhận gợi ý theo giai đoạn hiện tại (Phím H)">
+              <span>💡</span>
+              <span>Gợi ý</span>
+            </button>
+            <button type="button" class="s5-purple-pill-btn" data-action="s5ToggleKnowledgeModal" title="Xem Kiến thức Trọng tâm tam giác (Phím K)">
+              <span>📊</span>
+              <span>Kiến thức</span>
+            </button>
+            <button type="button" class="s5-purple-pill-btn" data-action="s5CycleControllerRole" title="Chuyển thành viên thao tác trong nhóm">
+              <span>🧠</span>
+              <span>Ấn Trí Tuệ · TV ${(s5State.controllerRoleIdx % 4) + 1}/4</span>
+            </button>
+          </div>
+
+          <button type="button"
+                  class="s5-gold-confirm-btn ${s5State.phase === 4 ? 'pulse-ready' : ''}"
+                  data-action="s5ConfirmStep"
+                  title="Xác nhận bước hiện tại hoặc kích hoạt trận pháp Trọng tâm (Phím Enter)">
+            <span>${s5State.phase === 5 ? '🏆 TỔNG KẾT HÀNH TRÌNH' : (s5State.phase === 4 ? '⚡ KÍCH HOẠT TÂM THẠCH' : 'XÁC NHẬN')}</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- E. SIDEBAR BÊN PHẢI GIỐNG ẢNH MẪU -->
+      <aside class="s5-right-sidebar" aria-label="Thông số Chặng 5">
+        <!-- 1. Đồng hồ 70 giây (01:10) -->
+        <div class="s5-side-section">
+          <div class="s5-side-title">
+            <span>⏱</span>
+            <span>Thời gian còn lại</span>
+          </div>
+          <div class="s5-timer-box ${remSec <= 15 ? 'urgent' : ''}">
+            <strong id="s5TimerClockText">${formatMMSS(remSec)}</strong>
+          </div>
+        </div>
+
+        <!-- 2. Tiến độ 4 chặng trước đã hoàn thành + Chặng 5 -->
+        <div class="s5-side-section">
+          <div class="s5-side-title">
+            <span>Tiến độ chặng</span>
+          </div>
+          <div class="s5-stages-chain">
+            <span class="s5-chain-node done" title="Chặng 1: Đã hoàn thành">✓</span>
+            <span class="s5-chain-bar done"></span>
+            <span class="s5-chain-node done" title="Chặng 2: Đã hoàn thành">✓</span>
+            <span class="s5-chain-bar done"></span>
+            <span class="s5-chain-node done" title="Chặng 3: Đã hoàn thành">✓</span>
+            <span class="s5-chain-bar done"></span>
+            <span class="s5-chain-node done" title="Chặng 4: Đã hoàn thành">✓</span>
+            <span class="s5-chain-bar done"></span>
+            <span class="s5-chain-node current ${s5State.phase === 5 ? 'done' : ''}" title="Chặng 5: Giải Cứu Tâm Thạch">5</span>
+          </div>
+          <div class="s5-sub-progress-steps">
+            <span class="${s5State.mpBC_done && s5State.mpAC_done ? 'done' : ''}">1. Trung điểm (${(s5State.mpBC_done ? 1 : 0) + (s5State.mpAC_done ? 1 : 0)}/2)</span>
+            <span class="${s5State.medA_done && s5State.medB_done ? 'done' : ''}">2. Trung tuyến (${(s5State.medA_done ? 1 : 0) + (s5State.medB_done ? 1 : 0)}/2)</span>
+            <span class="${s5State.crystalPlaced ? 'done' : ''}">3. Trọng tâm G (${s5State.crystalPlaced ? '✓' : '…'})</span>
+            <span class="${s5State.phase === 5 ? 'done' : ''}">4. Trận pháp (${s5State.phase === 5 ? '✓' : '…'})</span>
+          </div>
+        </div>
+
+        <!-- 3. Hệ thống 3 cấp Gợi ý (1), (2), (3) đúng chuẩn ảnh mẫu -->
+        <div class="s5-side-section">
+          <div class="s5-side-title">
+            <span>💡</span>
+            <span>Gợi ý (3 lần)</span>
+          </div>
+          <div class="s5-hint-slots-row">
+            ${S5_CONTEXT_HINTS.map(h => {
+              const isUnlocked = s5State.hintsUsedCount >= h.level || s5State.activeHintLevel === h.level;
+              return `
+                <button type="button"
+                        class="s5-hint-slot-btn ${isUnlocked ? 'active' : ''}"
+                        data-action="s5SelectHintLevel"
+                        data-level="${h.level}"
+                        title="${esc(h.title)}: ${esc(h.text)}">
+                  <span class="s5-hint-box-icon">${h.icon}</span>
+                  <small>${h.badge}</small>
+                </button>
+              `;
+            }).join('')}
+          </div>
+        </div>
+
+        <!-- 4. Phần thưởng cuối cùng: Huy hiệu Ấn Trí Tuệ -->
+        <div class="s5-side-section s5-reward-section ${s5State.phase === 5 ? 'unlocked' : ''}">
+          <div class="s5-side-title">
+            <span>🌟</span>
+            <span>Phần thưởng cuối chặng</span>
+          </div>
+          <div class="s5-emblem-card">
+            <img src="/assets/s5_citadel/s5_seal_emblem.png" alt="Huy hiệu Ấn Trí Tuệ" class="s5-emblem-img" draggable="false"/>
+            <div class="s5-emblem-caption">
+              ${s5State.phase === 5 ? '✓ Đã nhận Ấn Trí Tuệ (Mật mã: 4)' : 'Huy hiệu Ấn Trí Tuệ'}
+            </div>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <!-- GIAI ĐOẠN 5: OVERLAY CHIẾN THẮNG TOÀN HÀNH TRÌNH & HỢP NHẤT 5 ẤN VECTƠ -->
+    ${s5State.phase === 5 ? `
+      <div class="s5-grand-victory-overlay" id="s5GrandVictoryOverlay">
+        <div class="s5-victory-halo" aria-hidden="true"></div>
+        <div class="s5-victory-card">
+          <div class="s5-victory-crown">👑💎✨</div>
+          <span class="s5-victory-kicker">CHÚC MỪNG ĐỘI ĐÃ HOÀN THÀNH CẢ 5 CHẶNG!</span>
+          <h2>Lục Địa OXYZ Đã Được Giải Cứu!</h2>
+          <p>Viên <b>Tâm Thạch</b> đã trở về đúng <b>Trọng tâm G = (A + B + C) / 3</b>! Ba luồng năng lượng <b>${s2RenderVecArrow('GA', 's5-inline-vec')} + ${s2RenderVecArrow('GB', 's5-inline-vec')} + ${s2RenderVecArrow('GC', 's5-inline-vec')} = ${s2RenderVecArrow('0', 's5-inline-vec')}</b> đã cân bằng hoàn hảo và xóa tan Bóng Lỗi!</p>
+
+          <div class="s5-five-seals-unison">
+            <div class="s5-seal-chip"><span>🧭</span><small>Ấn Hướng Đi (3)</small></div>
+            <div class="s5-seal-chip"><span>🔗</span><small>Ấn Kết Nối (0)</small></div>
+            <div class="s5-seal-chip"><span>⚡</span><small>Ấn Cân Bằng (5)</small></div>
+            <div class="s5-seal-chip"><span>⚖️</span><small>Ấn Cân Xứng (2)</small></div>
+            <div class="s5-seal-chip highlight"><span>👑</span><small>Ấn Trí Tuệ (4)</small></div>
+          </div>
+
+          <div class="s5-victory-formulas-box">
+            <div>• <b>Hệ thức trọng tâm:</b> ${s2RenderVecArrow('GA', 's5-inline-vec')} + ${s2RenderVecArrow('GB', 's5-inline-vec')} + ${s2RenderVecArrow('GC', 's5-inline-vec')} = ${s2RenderVecArrow('0', 's5-inline-vec')}</div>
+            <div>• <b>Với điểm M bất kỳ:</b> ${s2RenderVecArrow('MA', 's5-inline-vec')} + ${s2RenderVecArrow('MB', 's5-inline-vec')} + ${s2RenderVecArrow('MC', 's5-inline-vec')} = 3${s2RenderVecArrow('MG', 's5-inline-vec')}</div>
+          </div>
+
+          <button type="button" class="s5-victory-finish-btn" data-action="s5FinishGrandJourney">
+            🏆 MỞ BẢNG VINH DANH & TỔNG KẾT HÀNH TRÌNH →
+          </button>
+        </div>
+      </div>
+    ` : ''}
+
+    <!-- MODAL KIẾN THỨC TRỌNG TÂM TAM GIÁC -->
+    ${s5State.knowledgeModalOpen ? `
+      <div class="s4-knowledge-backdrop" data-action="s5CloseKnowledgeModal">
+        <div class="s4-knowledge-modal" role="dialog" aria-modal="true" onclick="event.stopPropagation()">
+          <div class="s4-know-header">
+            <h3>📐 Sổ Tay Kiến Thức: Trọng Tâm Tam Giác & Hệ Thức Vectơ</h3>
+            <button type="button" class="s4-know-close-btn" data-action="s5CloseKnowledgeModal">✕ Đóng</button>
+          </div>
+          <div class="s4-know-body">
+            <div class="s4-know-item">
+              <strong>1. Giao điểm ba đường trung tuyến:</strong>
+              <p>Trọng tâm <i>G</i> của tam giác <i>ABC</i> là giao điểm của ba đường trung tuyến. Trên mỗi đường trung tuyến, <i>G</i> chia đoạn từ đỉnh đến trung điểm theo tỉ số <b>2 : 1</b> (ví dụ: <i>AG = 2GM</i>).</p>
+            </div>
+            <div class="s4-know-item">
+              <strong>2. Hệ thức cân bằng vectơ tại trọng tâm G:</strong>
+              <p>Với <i>G</i> là trọng tâm tam giác <i>ABC</i>, tổng ba vectơ xuất phát từ <i>G</i> đến ba đỉnh luôn bằng vectơ-không:
+              <b>${s2RenderVecArrow('GA', 's5-inline-vec')} + ${s2RenderVecArrow('GB', 's5-inline-vec')} + ${s2RenderVecArrow('GC', 's5-inline-vec')} = ${s2RenderVecArrow('0', 's5-inline-vec')}</b>.</p>
+            </div>
+            <div class="s4-know-item">
+              <strong>3. Hệ thức tổng quát với điểm M bất kỳ:</strong>
+              <p>Với mọi điểm <i>M</i> trong không gian, chèn điểm <i>G</i> vào ba vectơ ta có:
+              <b>${s2RenderVecArrow('MA', 's5-inline-vec')} + ${s2RenderVecArrow('MB', 's5-inline-vec')} + ${s2RenderVecArrow('MC', 's5-inline-vec')} = 3${s2RenderVecArrow('MG', 's5-inline-vec')}</b>.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    ` : ''}
+  </div>`;
+}
+
 function renderVectorAdventureStage(m) {
   ensureVaStateForStage(m);
   if (m.id === 1 || vaState.s1BridgeRestoredOverlay) {
@@ -8596,6 +9886,9 @@ function renderVectorAdventureStage(m) {
   }
   if (m.id === 4) {
     return renderStage4MidpointMemoryGame(m);
+  }
+  if (m.id === 5) {
+    return renderStage5CentroidRescueGame(m);
   }
   const r = m.round || 0;
   const q = m.challenge || {};
@@ -8754,7 +10047,7 @@ function stageContent(m){
   <div>${renderOxyz3D(m, true)}</div>
  </div>` : '';
 
- const isS1FullScreenView = (isS1 || m.id === 2 || m.id === 3 || m.id === 4) && !mvWorldMapOpen && !StageTransitionController.isTransitioning() && !mvShowIntroHub;
+ const isS1FullScreenView = (isS1 || m.id === 2 || m.id === 3 || m.id === 4 || m.id === 5) && !mvWorldMapOpen && !StageTransitionController.isTransitioning() && !mvShowIntroHub;
  const showOuterHeader = !isS1FullScreenView;
 
  return `<div class="hs-main-frame ${isS1FullScreenView ? 's1-full-frame' : ''}">
@@ -8892,7 +10185,7 @@ function studentScreen(){
  const m = world.current || (world.stages && world.stages[curStageIdx]) || {};
  ensureVaStateForStage(m);
  const dragonText = vaState.dragonMsg || m.dragonIntro || 'Cùng nhau tìm đúng hướng của vectơ nhé!';
- const isS1DedicatedUI = !me.completed && me.stage < 5 && (m.id === 1 || m.id === 2 || m.id === 3 || m.id === 4 || vaState.s1BridgeRestoredOverlay) && !mvWorldMapOpen && !StageTransitionController.isTransitioning() && !mvShowIntroHub;
+ const isS1DedicatedUI = !me.completed && me.stage < 5 && (m.id === 1 || m.id === 2 || m.id === 3 || m.id === 4 || m.id === 5 || vaState.s1BridgeRestoredOverlay) && !mvWorldMapOpen && !StageTransitionController.isTransitioning() && !mvShowIntroHub;
 
  return `<div class="hs-screen-shell ${isS1DedicatedUI ? 's1-dedicated-shell' : ''}" style="--stage-bg: url('${stageBgUrl}')">
   ${!isS1DedicatedUI ? mapTrack(me.stage) : ''}
@@ -9920,6 +11213,59 @@ async function handle(action,el){
    });
    return;
   }
+  /* ─── ACTIONS CHO CHẶNG 5: GIẢI CỨU TÂM THẠCH – BÍ MẬT TRỌNG TÂM TAM GIÁC ─── */
+  if(action==='s5UseHint'){
+   CentroidStage5.triggerHint();
+   return;
+  }
+  if(action==='s5SelectHintLevel'){
+   const lv = Number(el.dataset.level || 1);
+   CentroidStage5.triggerHint(lv);
+   return;
+  }
+  if(action==='s5ToggleKnowledgeModal'){
+   s5State.knowledgeModalOpen = !s5State.knowledgeModalOpen;
+   sound('step');
+   render();
+   return;
+  }
+  if(action==='s5CloseKnowledgeModal'){
+   s5State.knowledgeModalOpen = false;
+   render();
+   return;
+  }
+  if(action==='s5CycleControllerRole'){
+   s5State.controllerRoleIdx = (s5State.controllerRoleIdx + 1) % 4;
+   sound('step');
+   Stage5GameState.saveSession();
+   if(session?.room && session?.token){
+    api('/api/stage5Progress', { room: session.room, token: session.token, controllerRoleIdx: s5State.controllerRoleIdx }).catch(()=>{});
+   }
+   render();
+   return;
+  }
+  if(action==='s5ConfirmStep'){
+   await CentroidStage5.confirmCurrentAction();
+   return;
+  }
+  if(action==='s5FinishGrandJourney'){
+   await CentroidStage5.proceedToFinalSummary();
+   return;
+  }
+  if(action==='s5ExitToMap'){
+   mvWorldMapOpen = true;
+   render();
+   return;
+  }
+  if(action==='s5ToggleFullscreen'){
+   const shell = document.getElementById('s5CentroidShell') || document.documentElement;
+   if(!document.fullscreenElement){
+    shell.requestFullscreen?.().catch(()=>{});
+   }else{
+    document.exitFullscreen?.().catch(()=>{});
+   }
+   return;
+  }
   if(action==='vaClickPillar'){
    const node=el.dataset.node;
    if(node)vaState.pillars.add(node);
@@ -10189,6 +11535,7 @@ async function handle(action,el){
    zdState.shooting=false;zdState.hitLane=null;zdState.hintMsg=null;zdState.rewardMsg=null;
    z3State.initedStage=-1;z3State.victoryOverlay=false;
    s4State.initedStageId=-1;s4State.gateOpened=false;s4State.knowledgeModalOpen=false;
+   s5State.initedStageId=-1;s5State.victoryTriggered=false;s5State.knowledgeModalOpen=false;
    mazeState.x=0;mazeState.y=0;mazeState.walking=false;mazeState.toastMsg=null;mazeState.hintMsg=null;
    msState.posX=50;msState.posY=82;msState.walking=false;msState.wobble=false;msState.shaking=false;msState.blastX=null;msState.explodedMines=[];msState.hintMsg=null;
    cipherState.open=false;cipherState.slots=[null,null,null,null,null];cipherState.error=null;
@@ -10701,6 +12048,36 @@ document.addEventListener('click',e=>{
 });
 
 document.addEventListener('pointerdown',e=>{
+ // Tương tác kéo thả hình học cho Chặng 5: Giải Cứu Tâm Thạch
+ if(world?.current?.id === 5 && document.getElementById('s5CentroidShell') && !s5State.knowledgeModalOpen && !s5State.victoryTriggered){
+  const dragEl = e.target.closest('[data-s5drag]');
+  if(dragEl){
+   const kind = dragEl.dataset.s5drag;
+   const svgPt = TriangleGeometry.clientToSvgPoint(e.clientX, e.clientY);
+   if(svgPt){
+    if(kind === 'mpBC' || kind === 'mpAC'){
+     e.preventDefault();
+     MidpointDragController.startDrag(kind, svgPt);
+     return;
+    }
+    if(kind === 'crystal'){
+     e.preventDefault();
+     CrystalDragController.startDrag(svgPt);
+     return;
+    }
+   }
+  }
+  const vtxEl = e.target.closest('[data-s5vertex]');
+  if(vtxEl && s5State.phase === 2){
+   const vKey = vtxEl.dataset.s5vertex;
+   const svgPt = TriangleGeometry.clientToSvgPoint(e.clientX, e.clientY);
+   if(svgPt && (vKey === 'A' || vKey === 'B')){
+    e.preventDefault();
+    MedianConnectionController.startConnection(vKey, svgPt);
+    return;
+   }
+  }
+ }
  const z3dbtn=e.target.closest('[data-z3dpad]');
  if(z3dbtn){
   e.preventDefault();
@@ -10730,12 +12107,37 @@ document.addEventListener('pointerdown',e=>{
 });
 
 document.addEventListener('pointermove',e=>{
+ if(s5State.draggingKind && world?.current?.id === 5){
+  const svgPt = TriangleGeometry.clientToSvgPoint(e.clientX, e.clientY);
+  if(svgPt){
+   if(s5State.draggingKind === 'mpBC' || s5State.draggingKind === 'mpAC'){
+    MidpointDragController.moveDrag(svgPt);
+   }else if(s5State.draggingKind === 'median' || s5State.draggingKind === 'medianA' || s5State.draggingKind === 'medianB'){
+    MedianConnectionController.moveConnection(svgPt);
+   }else if(s5State.draggingKind === 'crystal'){
+    CrystalDragController.moveDrag(svgPt);
+   }
+  }
+  return;
+ }
  if(isPointerDraggingMap){
   updateTargetFromPointer(e);
  }
 });
 
-document.addEventListener('pointerup',()=>{
+document.addEventListener('pointerup',e=>{
+ if(s5State.draggingKind && world?.current?.id === 5){
+  const kind = s5State.draggingKind;
+  const svgPt = TriangleGeometry.clientToSvgPoint(e.clientX, e.clientY);
+  if(kind === 'mpBC' || kind === 'mpAC'){
+   MidpointDragController.finishDrag();
+  }else if(kind === 'median' || kind === 'medianA' || kind === 'medianB'){
+   MedianConnectionController.finishConnection(svgPt);
+  }else if(kind === 'crystal'){
+   CrystalDragController.finishDrag();
+  }
+  return;
+ }
  isPointerDraggingMap=false;
  ['up','down','left','right'].forEach(k=>{
   huntState.keysPressed.delete(k);
@@ -10761,7 +12163,6 @@ window.addEventListener('keydown',e=>{
  if(['1','2','3','4','5'].includes(e.key)){
   const idx = Number(e.key) - 1;
   if(idx < 4 && m.id === 3){ e.preventDefault(); z3ShootColumnLane(null, idx); return; }
-  if(idx < 4 && m.id === 5 && !m.isBoss && !world.me?.bossReady){ e.preventDefault(); stepMinesweeperPad(idx); return; }
  }
 
  // Điều khiển bàn phím riêng cho Chặng 3 (Đấu Trường Chặn Zombie 4 làn A/B/C/D)
@@ -10857,15 +12258,63 @@ window.addEventListener('keydown',e=>{
   return;
  }
 
- // Điều khiển phím tắt A/B/C/D cho Chặng 5 Dò Mìn
- if(m.id === 5 && !m.isBoss && !world.me?.bossReady){
-  const k = (e.key||'').toUpperCase();
-  const cIdx = ['A','B','C','D'].indexOf(k);
-  if(cIdx !== -1){
+ // Điều khiển bàn phím cho Chặng 5: Giải Cứu Tâm Thạch – Bí Mật Trọng Tâm Tam Giác
+ if(m.id === 5 && document.getElementById('s5CentroidShell')){
+  if(e.key === 'Escape' && s5State.knowledgeModalOpen){
    e.preventDefault();
-   stepMinesweeperPad(cIdx);
+   s5State.knowledgeModalOpen = false;
+   render();
    return;
   }
+  if(e.key === 'k' || e.key === 'K'){
+   e.preventDefault();
+   if(!e.repeat){
+    s5State.knowledgeModalOpen = !s5State.knowledgeModalOpen;
+    sound('step');
+    render();
+   }
+   return;
+  }
+  if(e.key === 'h' || e.key === 'H'){
+   e.preventDefault();
+   if(!e.repeat) CentroidStage5.triggerHint();
+   return;
+  }
+  if(s5State.knowledgeModalOpen) return;
+  if(e.key === 'Tab'){
+   e.preventDefault();
+   const focusOrder = ['mpBC', 'mpAC', 'crystal', 'confirm'];
+   const curIdx = focusOrder.indexOf(s5State.kbFocusTarget);
+   s5State.kbFocusTarget = focusOrder[(curIdx + 1) % focusOrder.length];
+   sound('step');
+   return;
+  }
+  if(e.code === 'Enter' || e.code === 'Space'){
+   e.preventDefault();
+   if(!e.repeat) CentroidStage5.confirmCurrentAction();
+   return;
+  }
+  if(['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(e.code)){
+   e.preventDefault();
+   if(s5State.phase === 1){
+    const delta = (e.code === 'ArrowRight' || e.code === 'ArrowUp') ? 0.04 : -0.04;
+    if(!s5State.mpBC_done){
+     s5State.mpBC_t = Math.max(0.08, Math.min(0.92, s5State.mpBC_t + delta));
+    }else if(!s5State.mpAC_done){
+     s5State.mpAC_t = Math.max(0.08, Math.min(0.92, s5State.mpAC_t + delta));
+    }
+    CentroidStage5.syncLiveSvgDOM();
+   }else if(s5State.phase === 3 && !s5State.crystalPlaced){
+    const step = 14;
+    if(e.code === 'ArrowLeft') s5State.crystalX = Math.max(80, s5State.crystalX - step);
+    if(e.code === 'ArrowRight') s5State.crystalX = Math.min(720, s5State.crystalX + step);
+    if(e.code === 'ArrowUp') s5State.crystalY = Math.max(60, s5State.crystalY - step);
+    if(e.code === 'ArrowDown') s5State.crystalY = Math.min(480, s5State.crystalY + step);
+    CentroidStage5.syncLiveSvgDOM();
+   }
+   return;
+  }
+  return;
  }
 
  // Điều khiển bàn phím cho Chặng 2: MẬT TRẬN VECTƠ – PHÁO ĐÀI GÓC VUÔNG (WASD / Phím mũi tên + E + Shift)
@@ -11002,6 +12451,9 @@ function gameLoop(now){
   }
   if(world?.current?.id === 4 && document.getElementById('s4MazeMemoryShell')){
    s4Tick(now, dt);
+  }
+  if(world?.current?.id === 5 && document.getElementById('s5CentroidShell')){
+   s5Tick(now, dt);
   }
  }
 

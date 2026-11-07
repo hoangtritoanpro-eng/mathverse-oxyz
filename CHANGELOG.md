@@ -9,6 +9,26 @@ Tất cả những thay đổi quan trọng của dự án này sẽ được gh
 
 ---
 
+## [5.5.0] - 2026-11-07
+
+### Added & Upgraded (Triển Khai Chặng 5 – Giải Cứu Tâm Thạch: Bí Mật Trọng Tâm Tam Giác)
+- **Xây Dựng Mini-Game Kéo Thả & Tương Tác Hình Học Trọng Tâm Tam Giác Mức Độ Thông Hiểu (`renderStage5CentroidRescueGame`, `TriangleGeometry`, `Stage5GameState`, `MidpointDragController`, `MedianConnectionController`, `CrystalDragController`, `CentroidStage5` trong `public/app.js`, `public/style.css`, `stages.js`, `server.js`):**
+  1. **Giao Diện & Bối Cảnh Khớp Chuẩn Hình Ảnh Tham Chiếu (`media_1794059608488_6807f589.jpg`):**
+     - **A. Bối cảnh Thành Trì Trí Tuệ (`.s5-centroid-shell`, `public/assets/s5_citadel/s5_citadel_bg.jpg`):** Sân đá cổ hình tròn có ký hiệu phép thuật phát sáng cyan, lâu đài trên đỉnh thác tím và cầu vòm đá cổ phía sau, cờ hiệu tam giác tím cùng các bệ pha lê xanh ngọc và hạt phép thuật bay lơ lửng.
+     - **B. Thanh tiêu đề trên cùng (`.s5-top-header`):** Huy hiệu sách ngọc `MATHVERSE OXYZ` + nút `🏠` bên trái, bảng tên trung tâm viền vàng kim `CHẶNG 5 – GIẢI CỨU TÂM THẠCH` kèm phụ đề `✦ Trọng tâm tam giác ✦`, nút âm thanh và toàn màn hình bên phải.
+     - **C. Khu vực trò chơi hình học trung tâm (~65–70% chiều rộng – `.s5-center-geometry-arena`):** Sơ đồ SVG tương tác trực tiếp (`#s5GeometrySvg`, `viewBox="0 0 800 540"`) với ba đỉnh $A(360, 84)$, $B(168, 432)$, $C(588, 432)$, các trung điểm tính bằng $M = (P_1+P_2)/2$, các đường trung tuyến, trọng tâm $G(372, 316)$ tính bằng $G = (A+B+C)/3$ (ẩn chữ $G$ trước khi học sinh đặt đúng Tâm Thạch), và viên **Tâm Thạch** vàng kim đa diện có thể kéo thả.
+     - **D. Khu vực Rồng Xanh bên trái (`.s5-left-dragon-col`):** Nhân vật **Rồng Xanh** (`RongXanh.png`) kèm bong bóng thoại dẫn dắt từng bước và giải thích toán học trực quan.
+     - **E. Sidebar bên phải (`.s5-right-sidebar`):** Đồng hồ `70 giây` (`01:10`), chuỗi tiến độ 5 chặng (`✓-✓-✓-✓-(5)`) + 4 bước con, 3 ô gợi ý theo ngữ cảnh `(1) 📖`, `(2) 📐`, `(3) 2:1`, và phần thưởng cuối cùng **Huy hiệu Ấn Trí Tuệ** (`public/assets/s5_citadel/s5_seal_emblem.png`).
+     - **F. Thanh điều khiển bên dưới (`.s5-bottom-control-bar`):** Ba nút tròn dài `💡 Gợi ý`, `📊 Kiến thức`, `🧠 Ấn Trí Tuệ · TV X/4` và nút lục giác vàng kim lớn `XÁC NHẬN` ở chính giữa.
+  2. **Cơ Chế Gameplay 4 Giai Đoạn Hình Học Liên Tiếp + Giai Đoạn 5 Chiến Thắng:**
+     - **Giai đoạn 1 (0–15 giây) – Tìm trung điểm (`MidpointDragController`):** Học sinh kéo hai điểm sáng trên cạnh $BC$ và $AC$ về đúng trung điểm $M_{BC}(378, 432)$ và $M_{AC}(474, 258)$. Khi đặt đúng: phát sáng xanh ngọc, hiện dấu `✓` và vạch chia hai đoạn bằng nhau (`||`, `|`); khi đặt lệch: đổi màu tím nhạt và Rồng Xanh nhắc *"Hãy tìm vị trí chia cạnh thành hai phần bằng nhau!"*.
+     - **Giai đoạn 2 (15–30 giây) – Kích hoạt trung tuyến (`MedianConnectionController`):** Học sinh kéo nối từ đỉnh $A$ đến trung điểm cạnh $BC$ và từ đỉnh $B$ đến trung điểm cạnh $AC$. Hai đường trung tuyến phát sáng và tạo giao điểm nhưng chưa hiện chữ $G$.
+     - **Giai đoạn 3 (30–50 giây) – Đặt Tâm Thạch vào Trọng tâm (`CrystalDragController`):** Học sinh kéo viên **Tâm Thạch** vàng kim vào đúng giao điểm $G = (A+B+C)/3$. Khi đặt đúng ($\text{dist} \le 36$): Tâm Thạch khóa vào $G$, hiện nhãn $G$, trung tuyến thứ ba từ $C$ đến trung điểm $AB$ phát sáng và hiển thị tỉ lệ `2 phần : 1 phần` trên trung tuyến; khi đặt sai: Tâm Thạch bật trở về vị trí ban đầu $(648, 228)$ kèm lời nhắc của Rồng Xanh.
+     - **Giai đoạn 4 (50–60 giây) – Kích hoạt trận pháp vectơ:** Hiển thị 3 mũi tên vectơ cân bằng $\overrightarrow{GA}, \overrightarrow{GB}, \overrightarrow{GC}$ xuất phát từ $G$ tới 3 đỉnh cùng 2 hệ thức trọng tâm $\overrightarrow{GA} + \overrightarrow{GB} + \overrightarrow{GC} = \overrightarrow{0}$ và $\overrightarrow{MA} + \overrightarrow{MB} + \overrightarrow{MC} = 3\overrightarrow{MG}$.
+     - **Giai đoạn 5 (60–70 giây) – Chiến thắng & Hợp nhất 5 Ấn Vectơ:** Nhấn `XÁC NHẬN` trao **👑 Huy hiệu Ấn Trí Tuệ** (mảnh mật mã `4`) đúng 1 lần duy nhất, hợp nhất trọn bộ 5 Ấn Vectơ (`30524`), mở Đại Màn Hình Chiến Thắng Toàn Hành Trình và đồng bộ trực tiếp lên bảng điều khiển Giáo viên cùng bản chơi thử 1 máy (`CHOI_THU_1_MAY.html`).
+
+---
+
 ## [5.4.0] - 2026-11-07
 
 ### Added & Upgraded (Triển Khai Chặng 4 – Lật Thẻ Trung Điểm: Mê Cung Trung Điểm – Giải Mã Thẻ Phép Thuật)
