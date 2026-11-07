@@ -9,6 +9,18 @@ Tất cả những thay đổi quan trọng của dự án này sẽ được gh
 
 ---
 
+## [5.2.0] - 2026-11-07
+
+### Fixed (Sửa Lỗi Khuất Đáp Án Trên Bảng Gỗ Cột 4 Zombie Chặng 3)
+- **Tối Ưu Khoảng Cách 4 Làn `A`, `B`, `C`, `D` & Bố Cục Chữ Vectơ Trên Bảng Gỗ Zombie (`Z3_LANE_Y`, `Z3_SPAWN_X`, `.z3-zombie-unit`, `.z3-zombie-board-label` trong `public/app.js`, `public/style.css`):**
+  1. **Loại Bỏ Hoàn Toàn Hiện Tượng Chồng Lấn Giữa 4 Zombie Cùng Cột:**
+     - Giãn cách đều 4 làn `A`, `B`, `C`, `D` theo chiều dọc (`Z3_LANE_Y = [31.0, 48.0, 65.0, 82.0]` — cách nhau `17%` chiều cao sân đấu) và quy chuẩn chiều cao `.z3-zombie-unit { height: 15.6%; width: auto; }` để đầu của zombie phía dưới không bao giờ che khuất tấm bảng gỗ của zombie phía trên.
+     - Đưa điểm xuất phát cột zombie vào trong sân đá (`Z3_SPAWN_X = 76.0%`) để toàn bộ thân zombie và đáp án không bị cắt ở mép phải màn hình.
+  2. **Hiển Thị Rõ Ràng Đáp Án Vectơ ($\overrightarrow{BA}$, $\overrightarrow{CB}$, $\overrightarrow{AC}$, $\overrightarrow{AB}$) Chính Giữa Bảng Gỗ:**
+     - Gỡ bỏ `flex-direction: row !important` trên `.z3-zombie-board-label`, khôi phục bố cục xếp dọc (`flex-direction: column`) đặt mũi tên `→` nằm ngay phía trên hai chữ cái vectơ (`BA`, `CB`, `AC`, `AB`) ở chính giữa bảng gỗ, và tách huy hiệu làn (`A`, `B`, `C`, `D`) sang góc trái bảng gỗ (`left: 22%`).
+
+---
+
 ## [5.1.0] - 2026-11-07
 
 ### Added & Upgraded (Thiết Kế Logic Chặng 3 Theo Kiểu 4 Làn A/B/C/D & Cột Zombie `ZombieDefensePlayer` Nhưng Giữ Nguyên 100% Hình Ảnh Đấu Trường)

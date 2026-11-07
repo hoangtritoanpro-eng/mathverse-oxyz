@@ -5628,16 +5628,16 @@ function renderStage1CipherBridgeGame(m) {
      + Bắn trượt (bắn nhầm BA, CB, AB) hoặc để Zombie chạm vạch phòng thủ:
        Tốc độ zombie tăng vọt (x1.6, x2.2...), cả bầy chạy nước rút (Rush) và Zombie bị bắn nhầm hóa đỏ lao thẳng tới cắn Rồng Xanh (-1 ❤️, rung màn hình) rồi bật lùi về điểm xuất phát!
    ═══════════════════════════════════════════════════════════════════════════ */
-const Z3_DEFENSE_LINE_X = 35.0; // Hàng rào phòng thủ trước mặt Rồng Xanh (A, B, C, D)
-const Z3_SPAWN_X = 85.5;        // Điểm xuất phát cột zombie bên phải sân đá
-const Z3_WALK_SECONDS = 30;     // Thời gian 1 cột zombie đi từ điểm xuất phát tới hàng rào (giây)
-const Z3_SPAWN_MS = 13500;      // Khoảng cách thời gian tự sinh cột câu hỏi kế tiếp nếu chưa diệt xong (ms)
+const Z3_DEFENSE_LINE_X = 35.5; // Hàng rào phòng thủ trước mặt Rồng Xanh (A, B, C, D)
+const Z3_SPAWN_X = 76.0;        // Điểm xuất phát cột zombie bên trong sân đá (không bị khuất mép phải)
+const Z3_WALK_SECONDS = 32;     // Thời gian 1 cột zombie đi từ điểm xuất phát tới hàng rào (giây)
+const Z3_SPAWN_MS = 14000;      // Khoảng cách thời gian tự sinh cột câu hỏi kế tiếp nếu chưa diệt xong (ms)
 const Z3_SPRINT_MULT = 3.0;     // Hệ số cả đàn zombie bứt tốc khi bắn sai (chuẩn ZombieDefensePlayer)
 const Z3_SPRINT_MS = 2000;      // Thời gian bứt tốc sau khi bắn sai (ms)
 const Z3_BULLET_MS = 320;       // Thời gian cầu năng lượng bay tới mục tiêu (je = 320ms)
 const Z3_DYING_MS = 650;        // Thời gian hoạt ảnh zombie tan biến (Nt = 650ms)
 const Z3_LANE_KEYS = ['A', 'B', 'C', 'D'];
-const Z3_LANE_Y = [34.0, 47.0, 60.0, 73.0]; // Tọa độ Y (%) của 4 làn ngang A, B, C, D trên sân đá
+const Z3_LANE_Y = [31.0, 48.0, 65.0, 82.0]; // Tọa độ Y (%) của 4 làn ngang A, B, C, D cách đều 17.0% không chồng lấn
 
 const Z3_QUESTIONS = [
   {
@@ -6201,9 +6201,10 @@ function z3RenderColumnsLayerHtml() {
         <span class="z3-target-aura" aria-hidden="true"></span>
         <span class="z3-target-ring" aria-hidden="true"></span>
         <img src="/assets/s3_zombie/s3_zombie_blank_sign.png" alt="Zombie ${z.key} ${z.vec}" class="z3-zombie-sprite" draggable="false"/>
+        <span class="z3-lane-key-chip">${z.key}</span>
         <div class="z3-zombie-board-label">
-          <span class="z3-lane-key-chip">${z.key}</span>
-          <span class="z3-vec-letters"><span class="z3-vec-arrow">→</span>${z.vec}</span>
+          <span class="z3-vec-arrow">→</span>
+          <span class="z3-vec-letters">${z.vec}</span>
         </div>
       </button>`;
     }).join('');
@@ -6506,7 +6507,7 @@ function renderStage3ZombieShooterGame(m) {
       <div class="z3-lanes-overlay" aria-hidden="false">
         ${Z3_LANE_KEYS.map((k, idx) => `
           <div class="z3-courtyard-lane ${idx % 2 === 1 ? 'odd' : 'even'} ${idx === z3State.dragonLane ? 'is-aimed' : ''}"
-               style="top:${(Z3_LANE_Y[idx] - 6.5).toFixed(1)}%;height:13%"
+               style="top:${(Z3_LANE_Y[idx] - 8.2).toFixed(1)}%;height:16.4%"
                data-action="z3ShootLane"
                data-lane="${idx}"
                title="Làn ${k} — Bấm để Rồng Xanh di chuyển tới làn ${k} và bắn">

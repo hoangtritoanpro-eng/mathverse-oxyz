@@ -8069,8 +8069,10 @@ body {
 }
 .z3-zombie-unit {
   position: absolute;
-  width: clamp(98px, 9.8%, 136px);
-  transform: translate(-50%, -56%);
+  height: 15.6%;
+  width: auto;
+  aspect-ratio: 1 / 1.04;
+  transform: translate(-50%, -50%);
   background: transparent;
   border: none;
   padding: 0;
@@ -8079,7 +8081,7 @@ body {
   transition: transform 0.16s ease, opacity 0.25s ease;
 }
 .z3-zombie-unit:hover {
-  transform: translate(-50%, -59%) scale(1.06);
+  transform: translate(-50%, -52%) scale(1.06);
 }
 .z3-zombie-unit.is-dead {
   opacity: 0;
@@ -8134,11 +8136,12 @@ body {
 
 .z3-zombie-sprite {
   width: 100%;
-  height: auto;
+  height: 100%;
+  object-fit: contain;
   display: block;
   position: relative;
   z-index: 2;
-  filter: drop-shadow(0 10px 14px rgba(0, 0, 0, 0.72));
+  filter: drop-shadow(0 8px 12px rgba(0, 0, 0, 0.72));
   animation: z3ZombieWalkBob 0.95s ease-in-out infinite;
 }
 @keyframes z3ZombieWalkBob {
@@ -8529,9 +8532,9 @@ body {
 /* Thẻ câu hỏi CÂU 1 / CÂU 2 / CÂU 3 di chuyển phía trên cột 4 Zombie */
 .z3-column-question-card {
   position: absolute;
-  top: 3.2%;
-  width: clamp(230px, 26%, 320px);
-  padding: 8px 14px 10px;
+  top: 1.4%;
+  width: clamp(220px, 24%, 305px);
+  padding: 5px 12px 7px;
   border-radius: 12px;
   background: rgba(30, 41, 59, 0.92);
   border: 2px solid rgba(148, 163, 184, 0.65);
@@ -8584,24 +8587,50 @@ body {
 
 /* Chữ A / B / C / D kèm Vectơ trên bảng gỗ của mỗi Zombie trong cột */
 .z3-zombie-board-label {
-  flex-direction: row !important;
-  gap: 5px;
-  padding: 0 4px;
+  position: absolute;
+  left: 55%;
+  top: 56%;
+  transform: translate(-50%, -50%) rotate(-1.5deg);
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  line-height: 0.86;
+  pointer-events: none;
+}
+.z3-zombie-board-label .z3-vec-arrow {
+  font-size: clamp(12px, 1.1vw, 15px);
+  font-weight: 900;
+  color: #FEF08A;
+  margin-bottom: -2px;
+}
+.z3-zombie-board-label .z3-vec-letters {
+  font-size: clamp(14px, 1.35vw, 19px);
+  font-weight: 900;
+  font-style: italic;
+  color: #FFFFFF;
+  letter-spacing: 0.03em;
 }
 .z3-lane-key-chip {
-  width: 19px;
-  height: 19px;
+  position: absolute;
+  left: 22%;
+  top: 56%;
+  transform: translate(-50%, -50%);
+  z-index: 5;
+  width: 18px;
+  height: 18px;
   border-radius: 50%;
-  background: rgba(45, 22, 6, 0.88);
+  background: rgba(45, 22, 6, 0.94);
   border: 1.5px solid #FDE68A;
   color: #FEF08A;
-  font-size: 11px;
+  font-size: 10.5px;
   font-weight: 900;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.65);
+  pointer-events: none;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.75);
 }
 .z3-zombie-unit.is-wrong {
   filter: grayscale(0.7) brightness(0.75);
@@ -14621,16 +14650,16 @@ function renderStage1CipherBridgeGame(m) {
      + Bắn trượt (bắn nhầm BA, CB, AB) hoặc để Zombie chạm vạch phòng thủ:
        Tốc độ zombie tăng vọt (x1.6, x2.2...), cả bầy chạy nước rút (Rush) và Zombie bị bắn nhầm hóa đỏ lao thẳng tới cắn Rồng Xanh (-1 ❤️, rung màn hình) rồi bật lùi về điểm xuất phát!
    ═══════════════════════════════════════════════════════════════════════════ */
-const Z3_DEFENSE_LINE_X = 35.0; // Hàng rào phòng thủ trước mặt Rồng Xanh (A, B, C, D)
-const Z3_SPAWN_X = 85.5;        // Điểm xuất phát cột zombie bên phải sân đá
-const Z3_WALK_SECONDS = 30;     // Thời gian 1 cột zombie đi từ điểm xuất phát tới hàng rào (giây)
-const Z3_SPAWN_MS = 13500;      // Khoảng cách thời gian tự sinh cột câu hỏi kế tiếp nếu chưa diệt xong (ms)
+const Z3_DEFENSE_LINE_X = 35.5; // Hàng rào phòng thủ trước mặt Rồng Xanh (A, B, C, D)
+const Z3_SPAWN_X = 76.0;        // Điểm xuất phát cột zombie bên trong sân đá (không bị khuất mép phải)
+const Z3_WALK_SECONDS = 32;     // Thời gian 1 cột zombie đi từ điểm xuất phát tới hàng rào (giây)
+const Z3_SPAWN_MS = 14000;      // Khoảng cách thời gian tự sinh cột câu hỏi kế tiếp nếu chưa diệt xong (ms)
 const Z3_SPRINT_MULT = 3.0;     // Hệ số cả đàn zombie bứt tốc khi bắn sai (chuẩn ZombieDefensePlayer)
 const Z3_SPRINT_MS = 2000;      // Thời gian bứt tốc sau khi bắn sai (ms)
 const Z3_BULLET_MS = 320;       // Thời gian cầu năng lượng bay tới mục tiêu (je = 320ms)
 const Z3_DYING_MS = 650;        // Thời gian hoạt ảnh zombie tan biến (Nt = 650ms)
 const Z3_LANE_KEYS = ['A', 'B', 'C', 'D'];
-const Z3_LANE_Y = [34.0, 47.0, 60.0, 73.0]; // Tọa độ Y (%) của 4 làn ngang A, B, C, D trên sân đá
+const Z3_LANE_Y = [31.0, 48.0, 65.0, 82.0]; // Tọa độ Y (%) của 4 làn ngang A, B, C, D cách đều 17.0% không chồng lấn
 
 const Z3_QUESTIONS = [
   {
@@ -15194,9 +15223,10 @@ function z3RenderColumnsLayerHtml() {
         <span class="z3-target-aura" aria-hidden="true"></span>
         <span class="z3-target-ring" aria-hidden="true"></span>
         <img src="public/assets/s3_zombie/s3_zombie_blank_sign.png" alt="Zombie ${z.key} ${z.vec}" class="z3-zombie-sprite" draggable="false"/>
+        <span class="z3-lane-key-chip">${z.key}</span>
         <div class="z3-zombie-board-label">
-          <span class="z3-lane-key-chip">${z.key}</span>
-          <span class="z3-vec-letters"><span class="z3-vec-arrow">→</span>${z.vec}</span>
+          <span class="z3-vec-arrow">→</span>
+          <span class="z3-vec-letters">${z.vec}</span>
         </div>
       </button>`;
     }).join('');
@@ -15499,7 +15529,7 @@ function renderStage3ZombieShooterGame(m) {
       <div class="z3-lanes-overlay" aria-hidden="false">
         ${Z3_LANE_KEYS.map((k, idx) => `
           <div class="z3-courtyard-lane ${idx % 2 === 1 ? 'odd' : 'even'} ${idx === z3State.dragonLane ? 'is-aimed' : ''}"
-               style="top:${(Z3_LANE_Y[idx] - 6.5).toFixed(1)}%;height:13%"
+               style="top:${(Z3_LANE_Y[idx] - 8.2).toFixed(1)}%;height:16.4%"
                data-action="z3ShootLane"
                data-lane="${idx}"
                title="Làn ${k} — Bấm để Rồng Xanh di chuyển tới làn ${k} và bắn">
