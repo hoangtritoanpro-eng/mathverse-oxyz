@@ -8754,7 +8754,7 @@ function stageContent(m){
   <div>${renderOxyz3D(m, true)}</div>
  </div>` : '';
 
- const isS1FullScreenView = (isS1 || m.id === 3) && !mvWorldMapOpen && !StageTransitionController.isTransitioning() && !mvShowIntroHub;
+ const isS1FullScreenView = (isS1 || m.id === 2 || m.id === 3 || m.id === 4) && !mvWorldMapOpen && !StageTransitionController.isTransitioning() && !mvShowIntroHub;
  const showOuterHeader = !isS1FullScreenView;
 
  return `<div class="hs-main-frame ${isS1FullScreenView ? 's1-full-frame' : ''}">
