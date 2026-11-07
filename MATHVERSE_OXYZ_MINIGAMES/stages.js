@@ -456,26 +456,26 @@ const STAGES = [
   {
     id: 4,
     gameType: 'vector_adventure',
-    defaultMode: 'maze',
-    title: 'CHẶNG 4. MÊ CUNG TRUNG ĐIỂM',
-    subtitle: 'Tính chất vectơ của trung điểm đoạn thẳng',
-    shortName: 'Trung điểm',
+    defaultMode: 'memory',
+    title: 'CHẶNG 4. MÊ CUNG TRUNG ĐIỂM – GIẢI MÃ THẺ PHÉP THUẬT',
+    subtitle: 'Tính chất trung điểm của đoạn thẳng và hệ thức vectơ',
+    shortName: 'Lật Thẻ Trung Điểm',
     place: 'Mê Cung Trung Điểm',
     icon: '🌀',
     biomeColor: '#14b8a6',
     levelBadge: 'THÔNG HIỂU',
     timeSeconds: 65,
     time: '65 giây',
-    tag: 'Thông hiểu · Trung điểm đoạn thẳng (65 giây)',
+    tag: 'Thông hiểu · Lật thẻ trung điểm (65 giây)',
     item: 'Ấn Cân Xứng',
     sealIcon: '⚖️',
     digit: '2',
     digitRule: 'Khôi phục Ấn Cân Xứng (Chặng 4 = 2).',
-    story: 'Trong mê cung, hai nguồn năng lượng tại A và B đang kéo ngược nhau. Cánh cổng chỉ xuất hiện khi đội tìm được điểm cân bằng và hiểu vì sao các vectơ tại đó triệt tiêu.',
-    dragonIntro: 'Đừng chỉ tìm điểm ở giữa! Hãy giải thích vì sao nơi đó tạo ra sự cân bằng!',
-    dragonWin: 'Các bạn đã hiểu bí mật của điểm cân bằng!',
-    shadowIntro: 'Hai nguồn lực tại A và B đang xung đột dữ dội trong mê cung!',
-    groupTask: 'Kéo viên pha lê I vào vị trí trung điểm của đoạn AB, quan sát hai vectơ IA, IB và thảo luận giải thích tính chất triệt tiêu.',
+    story: 'Trong Mê Cung Trung Điểm, các hệ thức vectơ bị phong ấn bên dưới 12 tấm thẻ phép thuật. Đội phải lật thẻ, tìm đúng các cặp hình vẽ – hệ thức tương ứng và hiểu bản chất triệt tiêu tại trung điểm I để mở cổng mê cung.',
+    dragonIntro: 'Lật thẻ và ghép đúng cặp kiến thức về trung điểm nhé!',
+    dragonWin: 'Tuyệt vời! Sáu cặp thẻ phép thuật đã hợp nhất mở cổng Mê Cung Trung Điểm!',
+    shadowIntro: 'Mười hai tấm thẻ phép thuật trong mê cung đã bị đảo lộn!',
+    groupTask: 'Thay phiên lật thẻ trên bàn 3×4, ghi nhớ vị trí và ghép đúng 6 cặp hình học – hệ thức vectơ trung điểm.',
     teamRoles: TEAM_ROLES_STANDARD,
     visual3D: {
       title: 'Tính chất trung điểm I của đoạn thẳng AB',
@@ -492,89 +492,104 @@ const STAGES = [
       formula: 'IA + IB = 0   và   MA + MB = 2MI'
     },
     interactiveTask: {
-      type: 'midpoint_slider',
-      title: 'Phần 1 – Khám phá: Đưa viên pha lê I về đúng Trung điểm AB',
-      instruction: 'Di chuyển viên pha lê I vào đúng vị trí chính giữa (trung điểm) của đoạn thẳng AB để cân bằng hai vectơ IA và IB!',
+      type: 'midpoint_memory',
+      title: 'Lật Thẻ Trung Điểm – Ghép 6 cặp thẻ phép thuật',
+      instruction: 'Lật các thẻ đang úp, ghi nhớ vị trí và ghép hai thẻ có nội dung toán học tương ứng về trung điểm I!',
       targets: ['MIDPOINT_I'],
-      rewardText: 'Viên pha lê I đã nằm đúng trung điểm AB (IA = IB, ngược hướng)! Nhận Mảnh chìa khóa 1/3!'
+      rewardText: 'Đã ghép đủ các cặp thẻ trung điểm! Mở khóa Ấn Cân Xứng!'
     },
     interactiveChallenge: {
       id: '4.0',
       isInteractive: true,
       level: 'THÔNG HIỂU',
-      label: 'Phần 1 · Đặt viên pha lê I tại trung điểm AB',
-      prompt: 'NHIỆM VỤ TƯƠNG TÁC: Hãy đưa viên pha lê I vào đúng vị trí trung điểm của đoạn AB để hai vectơ IA và IB cân bằng nhau và nhận mảnh chìa khóa đầu tiên (1/3)!',
+      label: 'Lật Thẻ Trung Điểm · Giải mã 6 cặp thẻ phép thuật',
+      prompt: 'NHIỆM VỤ LẬT THẺ TRUNG ĐIỂM: Ghép đúng các cặp thẻ hình học và hệ thức vectơ trung điểm để mở cổng Mê Cung!',
       options: [
-        'Đã đặt viên pha lê I tại trung điểm AB (IA = IB và ngược hướng)',
-        'Đặt I lệch về phía A',
-        'Đặt I lệch về phía B'
+        'Đã ghép hoàn tất các cặp thẻ trung điểm và mở cổng Mê Cung',
+        'Chưa ghép đủ các cặp thẻ',
+        'Bỏ qua bàn thẻ'
       ],
       correct: 0,
       shortAnswer: 'A',
       hints: [
-        'Kéo thanh trượt hoặc nhấn nút "Đặt tại Trung điểm I (50%)" trên sơ đồ bên trái.',
-        'Tại trung điểm I, hai vectơ IA và IB có cùng độ dài và ngược hướng.'
+        'Tại trung điểm I của AB, hai vectơ IA và IB cùng độ dài nhưng ngược hướng nên IA + IB = 0.',
+        'Với điểm M bất kỳ: MA + MB = (MI + IA) + (MI + IB) = 2MI.'
       ],
-      explain: 'Chính xác! Tại trung điểm I, hai vectơ IA và IB đối nhau nên cân bằng tuyệt đối. Đội nhận Mảnh chìa khóa 1/3!',
-      keyBadge: 'Khóa 1/3'
+      explain: 'Chính xác! Toàn bộ các cặp thẻ trung điểm đã được giải mã! Đội nhận Ấn Cân Xứng!',
+      keyBadge: 'Cặp thẻ 6/6'
     },
     questionBank: [
       {
         id: '4.1',
         level: 'THÔNG HIỂU',
-        label: 'Câu 4.1 · Giải thích tính chất IA + IB = 0',
-        prompt: 'Cho I là trung điểm của đoạn AB. Vì sao vectơ IA + vectơ IB bằng vectơ không?',
-        options: [
-          'Vì hai vectơ cùng hướng.',
-          'Vì hai vectơ có cùng độ dài và ngược hướng.',
-          'Vì hai vectơ luôn vuông góc.'
-        ],
-        correct: 1,
-        shortAnswer: 'B',
-        hints: [
-          'Quan sát hướng và độ dài của hai mũi tên IA và IB xuất phát từ trung điểm I.',
-          'Hai vectơ có cùng độ dài và ngược hướng là hai vectơ đối nhau.'
-        ],
-        explain: 'Hai vectơ IA và IB là hai vectơ đối nhau nên tổng bằng vectơ không.',
-        keyBadge: 'Khóa 2/3'
+        label: 'Cặp 1 · Nhận biết hình học trung điểm (AI = IB)',
+        prompt: 'Hình đoạn thẳng AB có I nằm chính giữa (AI = IB) ↔ I là trung điểm của đoạn thẳng AB.',
+        options: ['Ghép đúng Cặp 1 (Hình đoạn AB có AI = IB ↔ I là trung điểm của AB)', 'Ghép nhầm cặp thẻ', 'Chưa ghép'],
+        correct: 0,
+        shortAnswer: 'P1',
+        hints: ['Điểm I nằm trên đoạn AB và cách đều A, B (IA = IB) là trung điểm của AB.'],
+        explain: 'I nằm giữa A, B và IA = IB nên I là trung điểm của đoạn thẳng AB.',
+        keyBadge: 'Cặp 1/6'
       },
       {
         id: '4.2',
         level: 'THÔNG HIỂU',
-        label: 'Câu 4.2 · Giải thích hệ thức MA + MB = 2MI',
-        prompt: 'Cho I là trung điểm AB và M là điểm bất kỳ. Vì sao vectơ MA + vectơ MB = 2 vectơ MI?',
-        options: [
-          'Vì MA và MB luôn bằng nhau.',
-          'Vì MI luôn là vectơ không.',
-          'Vì khi phân tích MA và MB qua I, hai vectơ IA và IB triệt tiêu nhau.'
-        ],
-        correct: 2,
-        shortAnswer: 'C',
-        hints: [
-          'Hãy chèn điểm trung điểm I vào hai vectơ MA và MB theo quy tắc ba điểm.',
-          'MA + MB = (MI + IA) + (MI + IB) = 2MI + (IA + IB) = 2MI + 0 = 2MI.'
-        ],
-        explain: 'MA = MI + IA, MB = MI + IB. Vì IA + IB = 0 nên MA + MB = 2MI.',
-        keyBadge: 'Khóa 2/3'
+        label: 'Cặp 2 · Tính chất hai vectơ đối nhau từ trung điểm (IA + IB = 0)',
+        prompt: 'Hình hai vectơ IA và IB ngược hướng, cùng độ dài ↔ Hệ thức vectơ IA + vectơ IB = vectơ 0.',
+        options: ['Ghép đúng Cặp 2 (Hình hai vectơ IA, IB ngược hướng ↔ IA + IB = 0)', 'Ghép nhầm cặp thẻ', 'Chưa ghép'],
+        correct: 0,
+        shortAnswer: 'P2',
+        hints: ['Hai vectơ IA và IB cùng độ dài, ngược hướng nên tổng của chúng bằng vectơ-không.'],
+        explain: 'Đúng rồi! Hai vectơ cùng độ dài, ngược hướng nên tổng bằng vectơ-không!',
+        keyBadge: 'Cặp 2/6'
       },
       {
         id: '4.3',
         level: 'THÔNG HIỂU',
-        label: 'Câu 4.3 · Khi I không phải là trung điểm AB',
-        prompt: 'Điểm I nằm trên đoạn AB nhưng IA không bằng IB về độ dài. Nhận định nào đúng?',
-        options: [
-          'Vectơ IA + vectơ IB khác vectơ không.',
-          'Vectơ IA + vectơ IB bằng vectơ không.',
-          'Vectơ IA và vectơ IB là hai vectơ đối nhau.'
-        ],
+        label: 'Cặp 3 · Hệ thức trung điểm với điểm M bất kỳ (MA + MB = 2MI)',
+        prompt: 'Hình điểm M bất kỳ nối tới đoạn AB qua trung điểm I ↔ Hệ thức vectơ MA + vectơ MB = 2 vectơ MI.',
+        options: ['Ghép đúng Cặp 3 (Hình tam giác MAB có trung tuyến MI ↔ MA + MB = 2MI)', 'Ghép nhầm cặp thẻ', 'Chưa ghép'],
         correct: 0,
-        shortAnswer: 'A',
-        hints: [
-          'Hai vectơ đối nhau bắt buộc phải vừa ngược hướng vừa có cùng độ dài.',
-          'Vì độ dài IA ≠ IB nên hai vectơ không thể triệt tiêu hoàn toàn.'
-        ],
-        explain: 'Hai vectơ IA, IB ngược hướng nhưng khác độ dài nên tổng của chúng không bằng vectơ không.',
-        keyBadge: 'Khóa 3/3'
+        shortAnswer: 'P3',
+        hints: ['Vì MA = MI + IA và MB = MI + IB, mà IA + IB = 0 nên MA + MB = 2MI.'],
+        explain: 'Vì MA = MI + IA và MB = MI + IB, mà IA + IB = 0 nên MA + MB = 2MI.',
+        keyBadge: 'Cặp 3/6'
+      },
+      {
+        id: '4.4',
+        level: 'THÔNG HIỂU',
+        label: 'Cặp 4 · Phân tích hai vectơ MA, MB qua trung điểm I',
+        prompt: 'Vectơ MA = vectơ MI + vectơ IA ↔ Vectơ MB = vectơ MI + vectơ IB (Chèn điểm I theo quy tắc 3 điểm).',
+        options: ['Ghép đúng Cặp 4 (MA = MI + IA ↔ MB = MI + IB)', 'Ghép nhầm cặp thẻ', 'Chưa ghép'],
+        correct: 0,
+        shortAnswer: 'P4',
+        hints: ['Chèn điểm I vào giữa MA và MB để tách thành hai mảnh bổ sung tạo nên hệ thức tổng 2MI.'],
+        explain: 'Hai mảnh phân tích MA = MI + IA và MB = MI + IB khi cộng lại sẽ triệt tiêu IA + IB = 0 để tạo thành 2MI!',
+        keyBadge: 'Cặp 4/6'
+      },
+      {
+        id: '4.5',
+        level: 'THÔNG HIỂU',
+        label: 'Cặp 5 · Bản chất triệt tiêu của hai vectơ đối nhau',
+        prompt: 'Hai vectơ IA và IB có cùng độ dài, ngược hướng (IA = −IB) ↔ Tổng của hai vectơ đối nhau bằng vectơ-không.',
+        options: ['Ghép đúng Cặp 5 (IA = −IB cùng độ dài ngược hướng ↔ Tổng hai vectơ đối bằng 0)', 'Ghép nhầm cặp thẻ', 'Chưa ghép'],
+        correct: 0,
+        shortAnswer: 'P5',
+        hints: ['Hai vectơ đối nhau có cùng độ dài và ngược hướng nên luôn triệt tiêu nhau.'],
+        explain: 'Vectơ IA và vectơ IB đối nhau (IA = −IB) nên tổng của chúng triệt tiêu bằng vectơ-không!',
+        keyBadge: 'Cặp 5/6'
+      },
+      {
+        id: '4.6',
+        level: 'THÔNG HIỂU',
+        label: 'Cặp 6 · Quan hệ vectơ nửa đoạn thẳng tại trung điểm (AI = IB = 1/2 AB)',
+        prompt: 'Hình hai vectơ AI và IB cùng hướng trên đoạn AB ↔ Hệ thức vectơ AI = vectơ IB = 1/2 vectơ AB.',
+        options: ['Ghép đúng Cặp 6 (Hình AI, IB cùng hướng ↔ AI = IB = 1/2 AB)', 'Ghép nhầm cặp thẻ', 'Chưa ghép'],
+        correct: 0,
+        shortAnswer: 'P6',
+        hints: ['Điểm I chia đôi đoạn AB theo cùng chiều từ A đến B nên vectơ AI = vectơ IB = 1/2 vectơ AB.'],
+        explain: 'Vì I chia đôi đoạn AB theo chiều A → I → B nên vectơ AI = vectơ IB = 1/2 vectơ AB!',
+        keyBadge: 'Cặp 6/6'
       }
     ],
     challenges: []

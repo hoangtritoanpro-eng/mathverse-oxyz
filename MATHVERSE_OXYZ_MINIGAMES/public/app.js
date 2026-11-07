@@ -627,8 +627,11 @@ function layout(content){
   </nav>${content}`;
  }
 
- // Khi học sinh đang ở trong Chặng 2 (Mật Trận Vectơ), ẩn thanh hs-topnav ngoài để dùng thanh topbar riêng của Chặng 2 đúng chuẩn ảnh mẫu
- const isStage2DedicatedTopbar = isStudent && !world?.me?.completed && (world?.me?.stage ?? 0) === 1 && (world?.current?.id === 2) && !mvWorldMapOpen && !StageTransitionController.isTransitioning() && !mvShowIntroHub && !oxyz3D.open;
+ // Khi học sinh đang ở trong Chặng 2 (Mật Trận Vectơ) hoặc Chặng 4 (Lật Thẻ Trung Điểm), ẩn thanh hs-topnav ngoài để dùng thanh topbar riêng đúng chuẩn ảnh mẫu
+ const isStage2DedicatedTopbar = isStudent && !world?.me?.completed && (
+  ((world?.me?.stage ?? 0) === 1 && (world?.current?.id === 2)) ||
+  ((world?.me?.stage ?? 0) === 3 && (world?.current?.id === 4))
+ ) && !mvWorldMapOpen && !StageTransitionController.isTransitioning() && !mvShowIntroHub && !oxyz3D.open;
  if (isStage2DedicatedTopbar) {
   return content;
  }
@@ -1990,6 +1993,15 @@ function renderTeacherTeamModal() {
     <span style="font-size:12.5px;color:#F8FAFF">⚠️ Dẫm bẫy: <b style="color:#FDA4AF">${t.stage2?.wrongAttempts ?? 0} lần</b></span>
    </div>
 
+   <div class="gv-s1-live-box" style="margin:10px 0;padding:10px 14px;background:rgba(168,85,247,0.12);border:1px solid rgba(192,132,252,0.38);border-radius:10px;display:flex;flex-wrap:wrap;gap:14px;align-items:center;justify-content:space-between">
+    <strong style="color:#C084FC;font-size:12.5px">🌀 CHẶNG 4 – LẬT THẺ TRUNG ĐIỂM:</strong>
+    <span style="font-size:12.5px;color:#F8FAFF">🃏 Cặp đã ghép: <b style="color:#FFC953">${t.stage > 3 ? (t.stage4?.totalPairs || 6) : (t.stage4?.matchedCount ?? 0)}/${t.stage4?.totalPairs || 6}</b></span>
+    <span style="font-size:12.5px;color:#F8FAFF">🔄 Số lượt lật: <b style="color:#38BDF8">${t.stage4?.flipCount ?? 0} lượt</b></span>
+    <span style="font-size:12.5px;color:#F8FAFF">❌ Ghép sai: <b style="color:#FDA4AF">${t.stage4?.wrongMatches ?? 0} lần</b></span>
+    <span style="font-size:12.5px;color:#F8FAFF">💡 Gợi ý: <b style="color:#FDE047">${t.stage4?.hintsUsedCount ?? 0}/2</b></span>
+    <span style="font-size:12.5px;color:#F8FAFF">🔓 Cổng Mê Cung: <b style="color:${(t.stage > 3 || t.stage4?.gateOpened) ? '#35C992' : '#94A3B8'}">${(t.stage > 3 || t.stage4?.gateOpened) ? '✓ Đã mở cổng (Ấn Cân Xứng)' : 'Đang giải mã thẻ'}</b></span>
+   </div>
+
    <h3 style="color:#36DEF4;font-size:13.5px;margin:12px 0 8px">📋 Lịch sử câu trả lời & thời gian từng chặng (${logs.length} lượt):</h3>
    <div class="gv-log-table-wrap">
     ${logs.length ? `<table class="gv-log-table">
@@ -2195,7 +2207,8 @@ function teacherScreen(){
        <span class="gv-s1-pill ${s1Clues >= 4 ? 'done' : ''}" title="Số mảnh mật thư Chặng 1 đã tìm thấy">📜 ${s1Clues}/4</span>
        <span class="gv-s1-pill ${s1Bridge ? 'done' : ''}" title="Trạng thái giải mã & mở Cầu ánh sáng Chặng 1">🌉 ${s1Bridge ? 'Đã giải mã' : (s1Cipher ? 'Đủ 4/4 mảnh' : 'Tìm mật thư')}</span>
        <span class="gv-s1-pill ${(t.stage > 1 || (t.stage2?.solvedCount ?? 0) >= 6) ? 'done' : ''}" title="Tiến độ Chặng 2 – Mật Trận Vectơ">🏰 Mật trận ${t.stage > 1 ? 6 : (t.stage2?.solvedCount ?? 0)}/6 · 🛡️${t.stage2?.shields ?? 3}</span>
-       <span class="gv-s1-pill" title="Số lần thử sai tại Chặng 1 & 2">❌ ${(s1WrongCount + (t.stage2?.wrongAttempts ?? 0))} sai</span>
+       <span class="gv-s1-pill ${(t.stage > 3 || (t.stage4?.matchedCount ?? 0) >= (t.stage4?.totalPairs || 6)) ? 'done' : ''}" title="Tiến độ Chặng 4 – Lật Thẻ Trung Điểm">🃏 Thẻ ${t.stage > 3 ? (t.stage4?.totalPairs || 6) : (t.stage4?.matchedCount ?? 0)}/${t.stage4?.totalPairs || 6} · 🔄${t.stage4?.flipCount ?? 0}</span>
+       <span class="gv-s1-pill" title="Số lần thử sai tại các chặng">❌ ${(s1WrongCount + (t.stage2?.wrongAttempts ?? 0) + (t.stage4?.wrongMatches ?? 0))} sai</span>
       </div>`;
       return `<div class="gv-rank-row ${rankCls}" data-action="inspectTeamRow" data-team="${t.id}" title="Nhấn để xem chi tiết từng bước của ${esc(t.name)}">
        <span class="gv-col-rank">#${rankNum}</span>
@@ -7544,6 +7557,1032 @@ function renderStage2VectorMatrixGame(m) {
   </div>`;
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   CHẶNG 4: MÊ CUNG TRUNG ĐIỂM – GIẢI MÃ THẺ PHÉP THUẬT (THÔNG HIỂU – 65 GIÂY)
+   Modules theo kiến trúc chuẩn:
+   - MemoryCard & S4_CARD_PAIRS_BANK (6 cặp thẻ chuẩn hóa không trùng nghĩa, ký hiệu vectơ chuẩn)
+   - CardMatchingController (State Machine: READY -> PLAYING -> CHECKING -> MATCHED/UNMATCHED -> COMPLETED/TIMEOUT)
+   - Stage4Progress (Lưu Fisher-Yates deckOrder, đồng bộ nhóm & khôi phục khi F5)
+   - DragonGuide (Rồng Xanh dẫn dắt, giải thích Thông hiểu sau mỗi cặp & nhắc khi còn 15s)
+   - MidpointMemoryGame (Giao diện 25% Trái - 75% Phải bàn thẻ 3x4 / 2x4, Nút Kiến thức, Gợi ý giới hạn)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+const S4_SESSION_KEY = 'mv_s4_midpoint_memory_v1';
+
+const S4_CARD_PAIRS_BANK = [
+  {
+    pairId: 'P1',
+    qId: '4.1',
+    pairNum: 1,
+    badge: 'Cặp 1 · Trung điểm hình học',
+    badgeColor: '#0284c7',
+    title: 'Nhận biết hình học trung điểm',
+    explainSpeech: 'Chính xác! Điểm I nằm chính giữa đoạn AB và chia đoạn thẳng thành hai phần bằng nhau (AI = IB) chính là trung điểm của đoạn AB!',
+    explainFormula: `I \\text{ nằm giữa } A, B \\text{ và } AI = IB \\iff I \\text{ là trung điểm của } AB`,
+    cardA: {
+      id: 'P1_A',
+      pairId: 'P1',
+      role: 'visual',
+      typeLabel: 'Hình minh họa',
+      renderFrontHtml() {
+        return `
+          <div class="s4-card-diagram-wrap">
+            <svg viewBox="0 0 210 74" class="s4-geom-svg" aria-label="Hình đoạn AB có I nằm chính giữa và AI = IB">
+              <!-- Đoạn thẳng AB -->
+              <line x1="26" y1="36" x2="184" y2="36" stroke="#6D28D9" stroke-width="4" stroke-linecap="round"/>
+              <!-- Vạch ký hiệu AI = IB -->
+              <line x1="63" y1="27" x2="63" y2="45" stroke="#DC2626" stroke-width="3" stroke-linecap="round"/>
+              <line x1="69" y1="27" x2="69" y2="45" stroke="#DC2626" stroke-width="3" stroke-linecap="round"/>
+              <line x1="141" y1="27" x2="141" y2="45" stroke="#DC2626" stroke-width="3" stroke-linecap="round"/>
+              <line x1="147" y1="27" x2="147" y2="45" stroke="#DC2626" stroke-width="3" stroke-linecap="round"/>
+              <!-- Điểm A, I, B -->
+              <circle cx="26" cy="36" r="7" fill="#0EA5E9" stroke="#0369A1" stroke-width="2"/>
+              <circle cx="105" cy="36" r="7.5" fill="#EC4899" stroke="#9D174D" stroke-width="2"/>
+              <circle cx="184" cy="36" r="7" fill="#0EA5E9" stroke="#0369A1" stroke-width="2"/>
+              <!-- Nhãn điểm -->
+              <text x="26" y="64" text-anchor="middle" font-size="18" font-weight="900" font-style="italic" fill="#0F172A">A</text>
+              <text x="105" y="64" text-anchor="middle" font-size="18" font-weight="900" font-style="italic" fill="#BE185D">I</text>
+              <text x="184" y="64" text-anchor="middle" font-size="18" font-weight="900" font-style="italic" fill="#0F172A">B</text>
+              <text x="105" y="16" text-anchor="middle" font-size="12.5" font-weight="900" fill="#B91C1C">AI = IB</text>
+            </svg>
+          </div>
+        `;
+      }
+    },
+    cardB: {
+      id: 'P1_B',
+      pairId: 'P1',
+      role: 'statement',
+      typeLabel: 'Định nghĩa trung điểm',
+      renderFrontHtml() {
+        return `
+          <div class="s4-card-text-formula">
+            <div class="s4-card-main-line"><i>I</i> là trung điểm của đoạn <i>AB</i></div>
+            <div class="s4-card-iff-arrow">⇔</div>
+            <div class="s4-card-sub-math"><i>IA</i> = <i>IB</i> <small>(<i>I</i> nằm giữa <i>A, B</i>)</small></div>
+          </div>
+        `;
+      }
+    }
+  },
+  {
+    pairId: 'P2',
+    qId: '4.2',
+    pairNum: 2,
+    badge: 'Cặp 2 · Tổng vectơ trung điểm',
+    badgeColor: '#059669',
+    title: 'Tính chất hai vectơ đối nhau từ trung điểm',
+    explainSpeech: 'Đúng rồi! Hai vectơ IA và IB có cùng độ dài nhưng ngược hướng nên tổng bằng vectơ-không!',
+    explainFormula: `\\overrightarrow{IA} + \\overrightarrow{IB} = \\overrightarrow{0}`,
+    cardA: {
+      id: 'P2_A',
+      pairId: 'P2',
+      role: 'visual',
+      typeLabel: 'Hình hai vectơ ngược hướng',
+      renderFrontHtml() {
+        return `
+          <div class="s4-card-diagram-wrap">
+            <svg viewBox="0 0 210 78" class="s4-geom-svg" aria-label="Hình hai vectơ IA và IB cùng độ dài, ngược hướng">
+              <defs>
+                <marker id="s4ArrLeft" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+                  <path d="M 0 1 L 10 5 L 0 9 z" fill="#0284C7"/>
+                </marker>
+                <marker id="s4ArrRight" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+                  <path d="M 0 1 L 10 5 L 0 9 z" fill="#059669"/>
+                </marker>
+              </defs>
+              <!-- Vectơ IA hướng sang trái -->
+              <line x1="101" y1="38" x2="32" y2="38" stroke="#0284C7" stroke-width="4" marker-end="url(#s4ArrLeft)"/>
+              <!-- Vectơ IB hướng sang phải -->
+              <line x1="109" y1="38" x2="178" y2="38" stroke="#059669" stroke-width="4" marker-end="url(#s4ArrRight)"/>
+              <!-- Điểm A, I, B -->
+              <circle cx="24" cy="38" r="6" fill="#0284C7"/>
+              <circle cx="105" cy="38" r="7" fill="#EC4899" stroke="#fff" stroke-width="1.5"/>
+              <circle cx="186" cy="38" r="6" fill="#059669"/>
+              <text x="64" y="24" text-anchor="middle" font-size="13.5" font-weight="900" fill="#0369A1">← IA⃗</text>
+              <text x="146" y="24" text-anchor="middle" font-size="13.5" font-weight="900" fill="#047857">IB⃗ →</text>
+              <text x="24" y="64" text-anchor="middle" font-size="17" font-weight="900" font-style="italic" fill="#0F172A">A</text>
+              <text x="105" y="64" text-anchor="middle" font-size="17" font-weight="900" font-style="italic" fill="#BE185D">I</text>
+              <text x="186" y="64" text-anchor="middle" font-size="17" font-weight="900" font-style="italic" fill="#0F172A">B</text>
+            </svg>
+          </div>
+        `;
+      }
+    },
+    cardB: {
+      id: 'P2_B',
+      pairId: 'P2',
+      role: 'formula',
+      typeLabel: 'Hệ thức trung điểm',
+      renderFrontHtml() {
+        return `
+          <div class="s4-card-math-equation">
+            ${s2RenderVecArrow('IA', 's4-card-vec')}
+            <span class="s4-math-op">+</span>
+            ${s2RenderVecArrow('IB', 's4-card-vec')}
+            <span class="s4-math-op">=</span>
+            ${s2RenderVecArrow('0', 's4-card-vec zero-vec')}
+          </div>
+        `;
+      }
+    }
+  },
+  {
+    pairId: 'P3',
+    qId: '4.3',
+    pairNum: 3,
+    badge: 'Cặp 3 · Hệ thức điểm M bất kỳ',
+    badgeColor: '#7c3aed',
+    title: 'Hệ thức tổng quát với điểm M bất kỳ',
+    explainSpeech: 'Vì vectơ MA = vectơ MI + vectơ IA và vectơ MB = vectơ MI + vectơ IB, mà vectơ IA + vectơ IB = vectơ 0 nên vectơ MA + vectơ MB = 2 vectơ MI!',
+    explainFormula: `\\overrightarrow{MA} + \\overrightarrow{MB} = 2\\overrightarrow{MI}`,
+    cardA: {
+      id: 'P3_A',
+      pairId: 'P3',
+      role: 'visual',
+      typeLabel: 'Hình điểm M bất kỳ & trung điểm I',
+      renderFrontHtml() {
+        return `
+          <div class="s4-card-diagram-wrap">
+            <svg viewBox="0 0 210 92" class="s4-geom-svg" aria-label="Hình điểm M bất kỳ và I là trung điểm AB">
+              <!-- Cạnh MA, MB và trung tuyến MI -->
+              <line x1="105" y1="18" x2="32" y2="66" stroke="#7C3AED" stroke-width="3.2"/>
+              <line x1="105" y1="18" x2="178" y2="66" stroke="#7C3AED" stroke-width="3.2"/>
+              <line x1="32" y1="66" x2="178" y2="66" stroke="#475569" stroke-width="3"/>
+              <line x1="105" y1="18" x2="105" y2="66" stroke="#D97706" stroke-width="3.2" stroke-dasharray="4 3"/>
+              <!-- Điểm M, A, I, B -->
+              <circle cx="105" cy="18" r="6.5" fill="#0EA5E9" stroke="#0369A1" stroke-width="1.8"/>
+              <circle cx="32" cy="66" r="6.5" fill="#0EA5E9" stroke="#0369A1" stroke-width="1.8"/>
+              <circle cx="105" cy="66" r="7" fill="#EC4899" stroke="#9D174D" stroke-width="1.8"/>
+              <circle cx="178" cy="66" r="6.5" fill="#0EA5E9" stroke="#0369A1" stroke-width="1.8"/>
+              <!-- Nhãn -->
+              <text x="105" y="11" text-anchor="middle" font-size="15.5" font-weight="900" font-style="italic" fill="#0F172A">M</text>
+              <text x="24" y="86" text-anchor="middle" font-size="16" font-weight="900" font-style="italic" fill="#0F172A">A</text>
+              <text x="105" y="86" text-anchor="middle" font-size="16" font-weight="900" font-style="italic" fill="#BE185D">I</text>
+              <text x="184" y="86" text-anchor="middle" font-size="16" font-weight="900" font-style="italic" fill="#0F172A">B</text>
+            </svg>
+          </div>
+        `;
+      }
+    },
+    cardB: {
+      id: 'P3_B',
+      pairId: 'P3',
+      role: 'formula',
+      typeLabel: 'Hệ thức tổng quát',
+      renderFrontHtml() {
+        return `
+          <div class="s4-card-math-equation">
+            ${s2RenderVecArrow('MA', 's4-card-vec')}
+            <span class="s4-math-op">+</span>
+            ${s2RenderVecArrow('MB', 's4-card-vec')}
+            <span class="s4-math-op">=</span>
+            <span class="s4-math-coef">2</span>${s2RenderVecArrow('MI', 's4-card-vec')}
+          </div>
+        `;
+      }
+    }
+  },
+  {
+    pairId: 'P4',
+    qId: '4.4',
+    pairNum: 4,
+    badge: 'Cặp 4 · Phân tích qua điểm I',
+    badgeColor: '#d97706',
+    title: 'Phân tích hai vectơ MA, MB qua trung điểm I',
+    explainSpeech: 'Tuyệt vời! Đây là hai bước chèn điểm trung điểm I vào vectơ MA và vectơ MB. Khi cộng hai vế lại, IA và IB triệt tiêu để tạo thành 2 vectơ MI!',
+    explainFormula: `\\overrightarrow{MA} = \\overrightarrow{MI} + \\overrightarrow{IA} \\quad \\& \\quad \\overrightarrow{MB} = \\overrightarrow{MI} + \\overrightarrow{IB}`,
+    cardA: {
+      id: 'P4_A',
+      pairId: 'P4',
+      role: 'part1',
+      typeLabel: 'Mảnh phân tích 1 (Nhánh A)',
+      renderFrontHtml() {
+        return `
+          <div class="s4-card-text-formula">
+            <div class="s4-card-math-equation compact">
+              ${s2RenderVecArrow('MA', 's4-card-vec')}
+              <span class="s4-math-op">=</span>
+              ${s2RenderVecArrow('MI', 's4-card-vec')}
+              <span class="s4-math-op">+</span>
+              ${s2RenderVecArrow('IA', 's4-card-vec')}
+            </div>
+            <small class="s4-card-note">Chèn trung điểm <i>I</i> vào nhánh <i>MA</i></small>
+          </div>
+        `;
+      }
+    },
+    cardB: {
+      id: 'P4_B',
+      pairId: 'P4',
+      role: 'part2',
+      typeLabel: 'Mảnh phân tích 2 (Nhánh B)',
+      renderFrontHtml() {
+        return `
+          <div class="s4-card-text-formula">
+            <div class="s4-card-math-equation compact">
+              ${s2RenderVecArrow('MB', 's4-card-vec')}
+              <span class="s4-math-op">=</span>
+              ${s2RenderVecArrow('MI', 's4-card-vec')}
+              <span class="s4-math-op">+</span>
+              ${s2RenderVecArrow('IB', 's4-card-vec')}
+            </div>
+            <small class="s4-card-note">Chèn trung điểm <i>I</i> vào nhánh <i>MB</i></small>
+          </div>
+        `;
+      }
+    }
+  },
+  {
+    pairId: 'P5',
+    qId: '4.5',
+    pairNum: 5,
+    badge: 'Cặp 5 · Triệt tiêu vectơ đối',
+    badgeColor: '#db2777',
+    title: 'Điều kiện và tính chất triệt tiêu hai vectơ đối nhau',
+    explainSpeech: 'Chuẩn xác! Vì hai vectơ IA và IB cùng độ dài nhưng ngược hướng (vectơ IA = − vectơ IB) nên chúng là hai vectơ đối nhau và có tổng bằng vectơ-không!',
+    explainFormula: `\\overrightarrow{IA} = -\\overrightarrow{IB} \\implies \\text{Tổng hai vectơ đối nhau bằng } \\overrightarrow{0}`,
+    cardA: {
+      id: 'P5_A',
+      pairId: 'P5',
+      role: 'condition',
+      typeLabel: 'Hai vectơ đối nhau',
+      renderFrontHtml() {
+        return `
+          <div class="s4-card-text-formula">
+            <div class="s4-card-math-equation compact">
+              ${s2RenderVecArrow('IA', 's4-card-vec')}
+              <span class="s4-math-op">=</span>
+              <span class="s4-math-op">−</span>${s2RenderVecArrow('IB', 's4-card-vec')}
+            </div>
+            <div class="s4-card-sub-math">Cùng độ dài, ngược hướng</div>
+          </div>
+        `;
+      }
+    },
+    cardB: {
+      id: 'P5_B',
+      pairId: 'P5',
+      role: 'rule',
+      typeLabel: 'Quy tắc triệt tiêu',
+      renderFrontHtml() {
+        return `
+          <div class="s4-card-text-formula">
+            <div class="s4-card-main-line">Tổng của hai vectơ đối nhau bằng vectơ-không</div>
+            <div class="s4-card-sub-math">(${s2RenderVecArrow('0', 's4-inline-vec')})</div>
+          </div>
+        `;
+      }
+    }
+  },
+  {
+    pairId: 'P6',
+    qId: '4.6',
+    pairNum: 6,
+    badge: 'Cặp 6 · Vectơ nửa đoạn thẳng',
+    badgeColor: '#0d9488',
+    title: 'Hệ thức vectơ cùng hướng trên đoạn AB',
+    explainSpeech: 'Quá giỏi! Vì trung điểm I chia đôi đoạn AB theo chiều từ A tới B nên hai vectơ AI và IB bằng nhau và bằng một nửa vectơ AB!',
+    explainFormula: `\\overrightarrow{AI} = \\overrightarrow{IB} = \\frac{1}{2}\\overrightarrow{AB}`,
+    cardA: {
+      id: 'P6_A',
+      pairId: 'P6',
+      role: 'visual',
+      typeLabel: 'Hai vectơ nối tiếp bằng nhau',
+      renderFrontHtml() {
+        return `
+          <div class="s4-card-diagram-wrap">
+            <svg viewBox="0 0 210 76" class="s4-geom-svg" aria-label="Hai vectơ AI và IB cùng hướng">
+              <defs>
+                <marker id="s4ArrTeal" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+                  <path d="M 0 1 L 10 5 L 0 9 z" fill="#0D9488"/>
+                </marker>
+              </defs>
+              <line x1="26" y1="38" x2="98" y2="38" stroke="#0D9488" stroke-width="4" marker-end="url(#s4ArrTeal)"/>
+              <line x1="108" y1="38" x2="180" y2="38" stroke="#0D9488" stroke-width="4" marker-end="url(#s4ArrTeal)"/>
+              <circle cx="24" cy="38" r="6" fill="#0D9488"/>
+              <circle cx="105" cy="38" r="6.5" fill="#EC4899"/>
+              <circle cx="186" cy="38" r="6" fill="#0D9488"/>
+              <text x="64" y="24" text-anchor="middle" font-size="13" font-weight="900" fill="#0F766E">AI⃗ →</text>
+              <text x="146" y="24" text-anchor="middle" font-size="13" font-weight="900" fill="#0F766E">IB⃗ →</text>
+              <text x="24" y="64" text-anchor="middle" font-size="16" font-weight="900" font-style="italic" fill="#0F172A">A</text>
+              <text x="105" y="64" text-anchor="middle" font-size="16" font-weight="900" font-style="italic" fill="#BE185D">I</text>
+              <text x="186" y="64" text-anchor="middle" font-size="16" font-weight="900" font-style="italic" fill="#0F172A">B</text>
+            </svg>
+          </div>
+        `;
+      }
+    },
+    cardB: {
+      id: 'P6_B',
+      pairId: 'P6',
+      role: 'formula',
+      typeLabel: 'Hệ thức chia đôi',
+      renderFrontHtml() {
+        return `
+          <div class="s4-card-math-equation compact">
+            ${s2RenderVecArrow('AI', 's4-card-vec')}
+            <span class="s4-math-op">=</span>
+            ${s2RenderVecArrow('IB', 's4-card-vec')}
+            <span class="s4-math-op">=</span>
+            <span class="s4-frac"><span>1</span><span>2</span></span>
+            ${s2RenderVecArrow('AB', 's4-card-vec')}
+          </div>
+        `;
+      }
+    }
+  }
+];
+
+const s4State = {
+  initedKey: null,
+  fsm: 'READY', // 'READY' | 'PLAYING' | 'CHECKING' | 'MATCHED' | 'UNMATCHED' | 'COMPLETED' | 'TIMEOUT'
+  modePairs: 6, // 6 cặp (12 thẻ 3x4) mặc định, hoặc 4 cặp (8 thẻ 2x4)
+  deck: [], // [{ uid, pairId, pairNum, badge, badgeColor, role, typeLabel, faceUp, matched, mismatchShake, hintGlow, renderFrontHtml }]
+  deckOrder: [],
+  flippedIndices: [],
+  matchedPairs: [],
+  flipCount: 0,
+  wrongMatches: 0,
+  hintsUsedCount: 0,
+  maxHints: 2,
+  controllerRoleIdx: 0,
+  focusedIndex: 0,
+  knowledgeModalOpen: false,
+  lastMatchedExplain: null,
+  dragonMood: 'idle', // 'idle' | 'cheer' | 'think' | 'warn' | 'runToGate'
+  dragonSpeech: 'Nhiệm vụ: Lật thẻ và ghép đúng cặp kiến thức về trung điểm để mở cổng Mê Cung!',
+  warned15s: false,
+  gateOpened: false,
+  rewardSubmitted: false,
+  checkTimerId: null,
+  hintTimerId: null
+};
+
+const Stage4Progress = {
+  save() {
+    try {
+      if (!session?.room) return;
+      const payload = {
+        room: session.room,
+        team: world?.me?.id || session.team || 'doi-1',
+        modePairs: s4State.modePairs,
+        deckOrder: s4State.deckOrder,
+        matchedPairs: s4State.matchedPairs,
+        flipCount: s4State.flipCount,
+        wrongMatches: s4State.wrongMatches,
+        hintsUsedCount: s4State.hintsUsedCount,
+        controllerRoleIdx: s4State.controllerRoleIdx,
+        gateOpened: s4State.gateOpened,
+        rewardSubmitted: s4State.rewardSubmitted,
+        savedAt: Date.now()
+      };
+      sessionStorage.setItem(S4_SESSION_KEY, JSON.stringify(payload));
+    } catch (e) {}
+  },
+
+  load() {
+    try {
+      const raw = sessionStorage.getItem(S4_SESSION_KEY);
+      if (!raw) return null;
+      const data = JSON.parse(raw);
+      const curTeam = world?.me?.id || session?.team || 'doi-1';
+      if (data && data.room === session?.room && data.team === curTeam) {
+        return data;
+      }
+    } catch (e) {}
+    return null;
+  }
+};
+
+const MemoryCard = {
+  buildDeckFromPairs(modePairs = 6, savedOrder = null, matchedPairIds = []) {
+    const activePairs = S4_CARD_PAIRS_BANK.slice(0, modePairs === 4 ? 4 : 6);
+    const rawCards = [];
+    activePairs.forEach(p => {
+      rawCards.push({
+        uid: p.cardA.id,
+        pairId: p.pairId,
+        qId: p.qId,
+        pairNum: p.pairNum,
+        badge: p.badge,
+        badgeColor: p.badgeColor,
+        title: p.title,
+        explainSpeech: p.explainSpeech,
+        role: p.cardA.role,
+        typeLabel: p.cardA.typeLabel,
+        renderFrontHtml: p.cardA.renderFrontHtml
+      });
+      rawCards.push({
+        uid: p.cardB.id,
+        pairId: p.pairId,
+        qId: p.qId,
+        pairNum: p.pairNum,
+        badge: p.badge,
+        badgeColor: p.badgeColor,
+        title: p.title,
+        explainSpeech: p.explainSpeech,
+        role: p.cardB.role,
+        typeLabel: p.cardB.typeLabel,
+        renderFrontHtml: p.cardB.renderFrontHtml
+      });
+    });
+
+    const mapById = Object.fromEntries(rawCards.map(c => [c.uid, c]));
+    let order = [];
+    if (Array.isArray(savedOrder) && savedOrder.length === rawCards.length && savedOrder.every(id => mapById[id])) {
+      order = [...savedOrder];
+    } else {
+      // Thuật toán xáo trộn Fisher–Yates
+      order = rawCards.map(c => c.uid);
+      for (let i = order.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        const tmp = order[i];
+        order[i] = order[j];
+        order[j] = tmp;
+      }
+    }
+
+    const matchedSet = new Set(matchedPairIds || []);
+    const deck = order.map((uid, idx) => {
+      const base = mapById[uid];
+      const isMatched = matchedSet.has(base.pairId);
+      return {
+        ...base,
+        index: idx,
+        faceUp: isMatched,
+        matched: isMatched,
+        mismatchShake: false,
+        hintGlow: false
+      };
+    });
+
+    return { deck, order };
+  }
+};
+
+const DragonGuide = {
+  setFeedback(mood, speech, explainObj = null) {
+    s4State.dragonMood = mood;
+    s4State.dragonSpeech = speech;
+    if (explainObj) {
+      s4State.lastMatchedExplain = explainObj;
+    }
+  }
+};
+
+const CardMatchingController = {
+  ensureInitialized(m, forceNew = false, customModePairs = null) {
+    const teamId = world?.me?.id || session?.team || 'doi-1';
+    const key = `${session?.room || 'LOCAL'}_${teamId}_stage4`;
+    const srvS4 = world?.me?.stage4;
+
+    if (s4State.initedKey !== key || forceNew || (customModePairs && customModePairs !== s4State.modePairs)) {
+      if (s4State.checkTimerId) clearTimeout(s4State.checkTimerId);
+      if (s4State.hintTimerId) clearTimeout(s4State.hintTimerId);
+      s4State.initedKey = key;
+
+      const saved = !forceNew ? Stage4Progress.load() : null;
+      const modePairs = customModePairs || srvS4?.modePairs || saved?.modePairs || 6;
+      const srvMatched = Array.isArray(srvS4?.matchedPairs) ? srvS4.matchedPairs : [];
+      const savedMatched = Array.isArray(saved?.matchedPairs) ? saved.matchedPairs : [];
+      const mergedMatched = forceNew ? [] : Array.from(new Set([...srvMatched, ...savedMatched]));
+      const savedOrder = !forceNew
+        ? ((srvS4?.deckOrder && srvS4.deckOrder.length === modePairs * 2) ? srvS4.deckOrder : saved?.deckOrder)
+        : null;
+
+      const { deck, order } = MemoryCard.buildDeckFromPairs(modePairs, savedOrder, mergedMatched);
+      s4State.modePairs = modePairs;
+      s4State.deck = deck;
+      s4State.deckOrder = order;
+      s4State.flippedIndices = [];
+      s4State.matchedPairs = mergedMatched;
+      s4State.flipCount = forceNew ? 0 : Math.max(srvS4?.flipCount || 0, saved?.flipCount || 0);
+      s4State.wrongMatches = forceNew ? 0 : Math.max(srvS4?.wrongMatches || 0, saved?.wrongMatches || 0);
+      s4State.hintsUsedCount = forceNew ? 0 : Math.max(srvS4?.hintsUsedCount || 0, saved?.hintsUsedCount || 0);
+      s4State.controllerRoleIdx = srvS4?.controllerRoleIdx ?? saved?.controllerRoleIdx ?? 0;
+      s4State.focusedIndex = 0;
+      s4State.knowledgeModalOpen = false;
+      s4State.lastMatchedExplain = null;
+      s4State.warned15s = false;
+      s4State.gateOpened = mergedMatched.length >= modePairs || Boolean(srvS4?.gateOpened);
+      s4State.rewardSubmitted = Boolean(saved?.rewardSubmitted || (world?.me?.stage ?? 0) > 3);
+      s4State.fsm = s4State.gateOpened ? 'COMPLETED' : 'PLAYING';
+      s4State.dragonMood = s4State.gateOpened ? 'cheer' : 'idle';
+      s4State.dragonSpeech = s4State.gateOpened
+        ? 'Tuyệt vời! Sáu cặp thẻ phép thuật đã hợp nhất mở cổng Mê Cung Trung Điểm!'
+        : 'Nhiệm vụ: Lật thẻ và ghép đúng cặp kiến thức về trung điểm để mở cổng Mê Cung!';
+
+      Stage4Progress.save();
+      if (session?.room && session?.token) {
+        api('/api/stage4Progress', {
+          room: session.room,
+          token: session.token,
+          initDeck: true,
+          modePairs,
+          deckOrder: order,
+          forceNewDeck: Boolean(forceNew)
+        }).catch(() => {});
+      }
+    } else if (srvS4) {
+      // Đồng bộ trạng thái thẻ giữa các thành viên trong cùng đội
+      if (Array.isArray(srvS4.matchedPairs) && srvS4.matchedPairs.length > s4State.matchedPairs.length) {
+        s4State.matchedPairs = [...srvS4.matchedPairs];
+        s4State.deck.forEach(c => {
+          if (s4State.matchedPairs.includes(c.pairId)) {
+            c.faceUp = true;
+            c.matched = true;
+          }
+        });
+      }
+      if (srvS4.controllerRoleIdx !== undefined) {
+        s4State.controllerRoleIdx = srvS4.controllerRoleIdx;
+      }
+    }
+  },
+
+  canFlipCard(idx) {
+    if (s4State.fsm !== 'PLAYING' && s4State.fsm !== 'READY') return false;
+    if (s4State.gateOpened || s4State.flippedIndices.length >= 2) return false;
+    const card = s4State.deck[idx];
+    if (!card || card.matched || card.faceUp) return false;
+    return true;
+  },
+
+  flipCard(idx) {
+    if (!this.canFlipCard(idx)) return;
+    const card = s4State.deck[idx];
+    card.faceUp = true;
+    card.hintGlow = false;
+    s4State.focusedIndex = idx;
+    s4State.flippedIndices.push(idx);
+    sound('step');
+
+    if (s4State.flippedIndices.length === 1) {
+      s4State.fsm = 'PLAYING';
+      render();
+      return;
+    }
+
+    // Đã mở đủ 2 thẻ -> Chuyển sang trạng thái CHECKING (Khóa mở thẻ thứ 3)
+    s4State.fsm = 'CHECKING';
+    s4State.flipCount++;
+    const [idxA, idxB] = s4State.flippedIndices;
+    const cardA = s4State.deck[idxA];
+    const cardB = s4State.deck[idxB];
+    const isMatch = (cardA.pairId === cardB.pairId);
+
+    render();
+
+    if (isMatch) {
+      // GHÉP ĐÚNG CẶP THẺ TOÁN HỌC
+      s4State.checkTimerId = setTimeout(() => {
+        cardA.matched = true;
+        cardB.matched = true;
+        cardA.faceUp = true;
+        cardB.faceUp = true;
+        if (!s4State.matchedPairs.includes(cardA.pairId)) {
+          s4State.matchedPairs.push(cardA.pairId);
+        }
+        s4State.flippedIndices = [];
+        s4State.fsm = 'MATCHED';
+        sound('correct');
+
+        DragonGuide.setFeedback('cheer', cardA.explainSpeech, {
+          badge: cardA.badge,
+          title: cardA.title,
+          speech: cardA.explainSpeech
+        });
+
+        if (window.spawnConfettiParticles) {
+          window.spawnConfettiParticles(window.innerWidth * 0.62, window.innerHeight * 0.48, 40);
+        }
+        if (window.spawnJuiceFloater) {
+          window.spawnJuiceFloater(`✓ Ghép đúng ${cardA.badge}! (+5 XP)`, 'xp');
+        }
+
+        Stage4Progress.save();
+        if (session?.room && session?.token) {
+          api('/api/stage4Progress', {
+            room: session.room,
+            token: session.token,
+            matchedPair: true,
+            pairId: cardA.pairId,
+            qId: cardA.qId,
+            pairLabel: cardA.badge
+          }).catch(() => {});
+        }
+
+        if (s4State.matchedPairs.length >= s4State.modePairs) {
+          s4State.fsm = 'COMPLETED';
+          render();
+          setTimeout(() => {
+            s4TriggerMazeVictory();
+          }, 520);
+        } else {
+          s4State.fsm = 'PLAYING';
+          render();
+        }
+      }, 280);
+    } else {
+      // HAI THẺ KHÔNG TƯƠNG ỨNG -> Rung nhẹ và tự úp lại sau 720ms (không cho mở thẻ thứ 3)
+      s4State.wrongMatches++;
+      cardA.mismatchShake = true;
+      cardB.mismatchShake = true;
+      s4State.fsm = 'UNMATCHED';
+      sound('wrong');
+
+      DragonGuide.setFeedback(
+        'think',
+        `Hai thẻ này thuộc hai tính chất khác nhau (${cardA.badge.split('·')[0].trim()} và ${cardB.badge.split('·')[0].trim()}). Hãy ghi nhớ vị trí để ghép đúng cặp tương ứng nhé!`
+      );
+
+      Stage4Progress.save();
+      if (session?.room && session?.token) {
+        api('/api/stage4Progress', {
+          room: session.room,
+          token: session.token,
+          wrongMatch: true,
+          qId: cardA.qId,
+          pairDesc: `${cardA.uid} ≠ ${cardB.uid}`
+        }).catch(() => {});
+      }
+
+      render();
+
+      s4State.checkTimerId = setTimeout(() => {
+        cardA.faceUp = false;
+        cardB.faceUp = false;
+        cardA.mismatchShake = false;
+        cardB.mismatchShake = false;
+        s4State.flippedIndices = [];
+        s4State.fsm = 'PLAYING';
+        render();
+      }, 720);
+    }
+  },
+
+  triggerHint() {
+    if (s4State.gateOpened || s4State.fsm === 'CHECKING') return;
+    if (s4State.hintsUsedCount >= s4State.maxHints) {
+      sound('bleep');
+      DragonGuide.setFeedback('think', 'Đội đã dùng hết 2/2 lượt gợi ý miễn phí! Hãy bấm nút "📖 Kiến thức" nếu muốn xem lại công thức trung điểm nhé!');
+      render();
+      return;
+    }
+
+    // Tìm một cặp chưa mở để phát sáng gợi ý
+    const unmatchedCard = s4State.deck.find(c => !c.matched);
+    if (!unmatchedCard) return;
+    const targetPairId = unmatchedCard.pairId;
+    s4State.hintsUsedCount++;
+    s4State.deck.forEach(c => {
+      c.hintGlow = (c.pairId === targetPairId);
+    });
+    sound('powerup');
+    DragonGuide.setFeedback(
+      'cheer',
+      `💡 Gợi ý (${s4State.hintsUsedCount}/${s4State.maxHints}): Hai tấm thẻ của [${unmatchedCard.badge}] đang phát sáng viền vàng kim! Hãy lật chúng ngay!`
+    );
+    Stage4Progress.save();
+
+    if (session?.room && session?.token) {
+      api('/api/stage4Progress', {
+        room: session.room,
+        token: session.token,
+        useHint: true
+      }).catch(() => {});
+    }
+
+    render();
+    if (s4State.hintTimerId) clearTimeout(s4State.hintTimerId);
+    s4State.hintTimerId = setTimeout(() => {
+      s4State.deck.forEach(c => { c.hintGlow = false; });
+      render();
+    }, 2200);
+  }
+};
+
+async function s4TriggerMazeVictory() {
+  s4State.gateOpened = true;
+  s4State.fsm = 'COMPLETED';
+  s4State.dragonMood = 'runToGate';
+  s4State.dragonSpeech = 'Tuyệt vời! Sáu cặp thẻ phép thuật đã tạo thành vòng tròn ánh sáng mở cổng Mê Cung Trung Điểm!';
+  Stage4Progress.save();
+  sound('powerup');
+  triggerConfetti(2800);
+  render();
+
+  if (!s4State.rewardSubmitted && session?.room && session?.token && (world?.me?.stage ?? 3) === 3) {
+    s4State.rewardSubmitted = true;
+    Stage4Progress.save();
+    try {
+      const prevStageIdx = 3;
+      const res = await submit('/api/answer', {
+        stage: 3,
+        round: world?.me?.round ?? 0,
+        choice: 0,
+        stage4MemoryCompleted: true
+      });
+      const updated = await api('/api/state', { room: session.room, token: session.token });
+      world = updated;
+      const nextStageIdx = Math.min(5, updated?.me?.stage ?? (prevStageIdx + 1));
+      lastSyncedTeamStage = nextStageIdx;
+
+      setTimeout(() => {
+        if (s4State.gateOpened && !StageTransitionController.isTransitioning()) {
+          StageTransitionController.beginStageTransition(prevStageIdx, nextStageIdx, {
+            sealName: res?.item || 'Ấn Cân Xứng',
+            points: res?.points || 20,
+            goldEarned: res?.goldEarned || 160
+          });
+        }
+      }, 2200);
+    } catch (e) {
+      console.warn('Stage 4 completion sync error:', e);
+    }
+  }
+}
+
+function s4Tick(now, dt) {
+  if (!document.getElementById('s4MazeMemoryShell')) return;
+  const elapsedSec = Math.floor((Date.now() - vaState.stageStartedAt) / 1000);
+  const remSec = Math.max(0, (vaState.stageDurationSec || 65) - elapsedSec);
+  const timerEl = document.getElementById('s4TimerClockText');
+  if (timerEl) {
+    timerEl.textContent = formatMMSS(remSec);
+    timerEl.classList.toggle('urgent', remSec <= 15);
+  }
+
+  // Khi còn 15 giây: Rồng Xanh nhắc nhở ngắn và tự động phát sáng gợi ý 1 cặp nếu đội chưa dùng hết gợi ý
+  if (remSec <= 15 && remSec > 0 && !s4State.warned15s && !s4State.gateOpened) {
+    s4State.warned15s = true;
+    s4State.dragonMood = 'warn';
+    s4State.dragonSpeech = '⏳ Chỉ còn 15 giây! Rồng Xanh vừa làm sáng gợi ý 1 cặp thẻ chưa ghép để hỗ trợ đội bạn!';
+    const unmatched = s4State.deck.find(c => !c.matched);
+    if (unmatched) {
+      s4State.deck.forEach(c => {
+        if (c.pairId === unmatched.pairId) c.hintGlow = true;
+      });
+    }
+    render();
+  }
+}
+
+function renderStage4MidpointMemoryGame(m) {
+  CardMatchingController.ensureInitialized(m);
+  const elapsedSec = Math.floor((Date.now() - vaState.stageStartedAt) / 1000);
+  const remSec = Math.max(0, (vaState.stageDurationSec || 65) - elapsedSec);
+  const matchedCount = s4State.matchedPairs.length;
+  const totalPairs = s4State.modePairs;
+  const hintsLeft = Math.max(0, s4State.maxHints - s4State.hintsUsedCount);
+  const roles = m.teamRoles || [
+    { role: 'Người lật thẻ 1', icon: '🃏' },
+    { role: 'Hoa tiêu ghi nhớ vị trí', icon: '🧭' },
+    { role: 'Chuyên gia hệ thức trung điểm', icon: '📐' },
+    { role: 'Kiểm soát thời gian', icon: '⏱️' }
+  ];
+  const activeRole = roles[s4State.controllerRoleIdx % roles.length] || roles[0];
+
+  return `
+  <div class="s4-memory-shell ${s4State.gateOpened ? 'maze-unlocked' : ''}" id="s4MazeMemoryShell">
+    <!-- BỐI CẢNH MÊ CUNG CÂY XANH HUYỀN BÍ + ĐOM ĐÓM + CỔNG PHÉP THUẬT PHÍA SAU -->
+    <img src="/assets/s4_maze/s4_maze_bg.jpg" alt="Mê Cung Trung Điểm" class="s4-maze-bg-img" draggable="false"/>
+    <div class="s4-fireflies-layer" aria-hidden="true">
+      <span class="s4-firefly f1"></span>
+      <span class="s4-firefly f2"></span>
+      <span class="s4-firefly f3"></span>
+      <span class="s4-firefly f4"></span>
+      <span class="s4-firefly f5"></span>
+      <span class="s4-firefly f6"></span>
+    </div>
+
+    <!-- CỔNG PHÉP THUẬT MÊ CUNG TRUNG ĐIỂM Ở PHÍA SAU GÓC TRÊN PHẢI -->
+    <div class="s4-maze-portal-gate ${s4State.gateOpened ? 'is-open' : ''}" id="s4MazePortalGate" aria-hidden="true">
+      <div class="s4-portal-beam"></div>
+      ${s4State.gateOpened ? `<span class="s4-portal-open-tag">🔓 CỔNG MÊ CUNG ĐÃ MỞ!</span>` : ''}
+    </div>
+
+    <!-- THANH HEADER TRÊN CÙNG GIỐNG ẢNH MẪU -->
+    <header class="s4-top-header">
+      <div class="s4-header-left">
+        <button type="button" class="s4-circle-icon-btn home-btn" data-action="s4ExitToMap" title="Quay về Bản đồ 5 Chặng">
+          🏠
+        </button>
+        <button type="button" class="s4-pill-util-btn" data-action="s4ToggleKnowledgeModal" title="Mở sổ tay Kiến thức Trung điểm (Phím K)">
+          📖 Kiến thức
+        </button>
+      </div>
+
+      <div class="s4-header-center-crest">
+        <div class="s4-brand-ribbon">
+          <span class="laurel-l">🌿</span>
+          <div class="s4-brand-titles">
+            <strong>MATHVERSE <em>OXYZ</em></strong>
+            <small>Hành Trình Giải Cứu Lục Địa OXYZ</small>
+          </div>
+          <span class="laurel-r">🌿</span>
+        </div>
+        <div class="s4-stage-plaque-wrap">
+          <span class="s4-stage-num-badge">CHẶNG 4 · THÔNG HIỂU</span>
+          <h1 class="s4-stage-main-banner">LẬT THẺ TRUNG ĐIỂM</h1>
+        </div>
+      </div>
+
+      <div class="s4-header-right">
+        <div class="s4-mode-switch-group" title="Chuyển chế độ số cặp thẻ (Chuẩn 12 thẻ / Cơ bản 8 thẻ)">
+          <button type="button" class="s4-mode-chip ${totalPairs === 6 ? 'active' : ''}" data-action="s4SwitchPairMode" data-pairs="6">
+            12 thẻ (6 cặp)
+          </button>
+          <button type="button" class="s4-mode-chip ${totalPairs === 4 ? 'active' : ''}" data-action="s4SwitchPairMode" data-pairs="4">
+            8 thẻ (4 cặp)
+          </button>
+        </div>
+        <button type="button" class="s4-circle-icon-btn" data-action="toggleSound" title="${soundEnabled ? 'Âm thanh: Bật' : 'Âm thanh: Tắt'}">
+          ${soundEnabled ? '🔊' : '🔇'}
+        </button>
+        <button type="button" class="s4-circle-icon-btn" data-action="s4ToggleFullscreen" title="Toàn màn hình">
+          ⛶
+        </button>
+      </div>
+    </header>
+
+    <!-- BỐ CỤC MÀN HÌNH CHÍNH: BÊN TRÁI (~25%) RỒNG XANH DẪN DẮT + BÊN PHẢI (~75%) BÀN CHƠI 12 THẺ 3x4 -->
+    <div class="s4-main-workspace">
+      <!-- BÊN TRÁI (~25% CHIỀU RỘNG): RỒNG XANH, TÊN CHẶNG, LỜI THOẠI GIẢI THÍCH THÔNG HIỂU & NÚT GỢI Ý -->
+      <aside class="s4-left-guide-col" aria-label="Rồng Xanh dẫn dắt Chặng 4">
+        <!-- Hộp thoại nhiệm vụ & Phản hồi giải thích Thông hiểu -->
+        <div class="s4-guide-speech-card ${s4State.dragonMood}" id="s4DragonSpeechCard">
+          <div class="s4-speech-header">
+            <span class="s4-speech-tag">
+              ${s4State.lastMatchedExplain ? `✨ Giải thích · ${esc(s4State.lastMatchedExplain.badge)}` : '🎯 Nhiệm vụ Chặng 4'}
+            </span>
+          </div>
+          <div class="s4-speech-body" id="s4DragonSpeech">
+            ${s4State.dragonSpeech}
+          </div>
+        </div>
+
+        <!-- Nhân vật Rồng Xanh đồng hành xuyên suốt hành trình -->
+        <div class="s4-dragon-mascot-stage ${s4State.dragonMood}" id="s4DragonMascotStage">
+          <div class="s4-dragon-aura-ring"></div>
+          <img src="/assets/RongXanh.png" alt="Rồng Xanh dẫn dắt" class="s4-dragon-hero-img" draggable="false"/>
+          <div class="s4-dragon-name-plate">🐉 Rồng Xanh · Mê Cung Trung Điểm</div>
+        </div>
+
+        <!-- Cụm nút Hỗ trợ: Gợi ý có giới hạn, Kiến thức & Đổi người lật thẻ theo nhóm -->
+        <div class="s4-guide-actions-bar">
+          <button type="button"
+                  class="s4-action-btn hint-btn ${hintsLeft <= 0 ? 'disabled' : ''}"
+                  data-action="s4UseHint"
+                  title="Làm sáng gợi ý 1 cặp thẻ chưa mở (Phím H)">
+            <span>💡 Gợi ý cặp thẻ</span>
+            <span class="s4-hint-counter">${hintsLeft}/${s4State.maxHints}</span>
+          </button>
+
+          <button type="button"
+                  class="s4-action-btn know-btn"
+                  data-action="s4ToggleKnowledgeModal"
+                  title="Xem tóm tắt tính chất trung điểm khi cần">
+            <span>📖 Kiến thức trung điểm</span>
+          </button>
+
+          <button type="button"
+                  class="s4-action-btn role-btn"
+                  data-action="s4CycleControllerRole"
+                  title="Khuyến khích 3–5 học sinh trong đội thay phiên lật thẻ">
+            <span>${activeRole.icon || '🎮'} Lượt lật: Thành viên ${(s4State.controllerRoleIdx % 4) + 1}/4 · Đổi</span>
+          </button>
+        </div>
+      </aside>
+
+      <!-- BÊN PHẢI (~75% CHIỀU RỘNG): KHUNG BÀN CHƠI 12 THẺ (3 HÀNG x 4 CỘT) + ĐỒNG HỒ 65 GIÂY + TIẾN ĐỘ -->
+      <section class="s4-right-board-col" aria-label="Bàn chơi Lật Thẻ Trung Điểm">
+        <div class="s4-board-frame ${s4State.gateOpened ? 'board-completed' : ''}">
+          <!-- Thanh thông số trên đỉnh bàn chơi (Thời gian 65s | Đã ghép 0/6 | Tiến độ phong ấn) -->
+          <div class="s4-board-top-hud">
+            <div class="s4-hud-pill timer-pill ${remSec <= 15 ? 'urgent' : ''}">
+              <span class="s4-hud-icon">⏳</span>
+              <span>Thời gian: <strong id="s4TimerClockText">${formatMMSS(remSec)}</strong></span>
+            </div>
+
+            <div class="s4-hud-pill pairs-pill">
+              <span class="s4-hud-icon">🃏</span>
+              <span>Đã ghép: <strong id="s4MatchedCountText">${matchedCount} / ${totalPairs}</strong></span>
+              <small class="s4-flips-sub">(${s4State.flipCount} lượt lật)</small>
+            </div>
+
+            <div class="s4-hud-pill progress-pill">
+              <span>Tiến độ:</span>
+              <div class="s4-seal-orbs-row">
+                ${Array.from({ length: totalPairs }, (_, i) => {
+                  const filled = i < matchedCount;
+                  return `<span class="s4-seal-orb ${filled ? 'filled' : ''}" title="Cặp phong ấn ${i + 1}/${totalPairs}"></span>`;
+                }).join('')}
+              </div>
+            </div>
+          </div>
+
+          <!-- Lưới thẻ bài 3 hàng x 4 cột (12 thẻ) hoặc 2 hàng x 4 cột (8 thẻ) -->
+          <div class="s4-cards-grid ${totalPairs === 4 ? 'grid-8' : 'grid-12'}" id="s4CardsGrid" role="grid" aria-label="Lưới thẻ phép thuật Trung điểm">
+            ${s4State.deck.map((card, idx) => {
+              const isFlipped = card.faceUp || card.matched;
+              const isFocused = s4State.focusedIndex === idx && !s4State.gateOpened;
+              return `
+                <button type="button"
+                        class="s4-memory-card ${isFlipped ? 'is-flipped' : ''} ${card.matched ? 'is-matched' : ''} ${card.mismatchShake ? 'is-mismatch' : ''} ${card.hintGlow ? 'is-hint-glow' : ''} ${isFocused ? 'is-focused' : ''}"
+                        id="s4Card_${idx}"
+                        data-action="s4ClickCard"
+                        data-idx="${idx}"
+                        aria-label="Thẻ phép thuật số ${idx + 1}"
+                        ${card.matched ? ' aria-disabled="true"' : ''}>
+                  <div class="s4-card-inner">
+                    <!-- MẶT SAU: NỀN TÍM HUYỀN BÍ, BIỂU TƯỢNG NGÔI SAO ẤN VECTƠ, VIỀN VÀNG KIM -->
+                    <div class="s4-card-face s4-card-back">
+                      <img src="/assets/s4_maze/s4_card_back.png" alt="" class="s4-card-back-art" draggable="false"/>
+                      <div class="s4-card-back-shimmer"></div>
+                      <span class="s4-card-num-corner">#${idx + 1}</span>
+                    </div>
+
+                    <!-- MẶT TRƯỚC: NỀN GIẤY PHÉP THUẬT SÁNG, CÔNG THỨC VECTOR / HÌNH VẼ SVG SẮC NÉT -->
+                    <div class="s4-card-face s4-card-front">
+                      <div class="s4-card-front-top">
+                        <span class="s4-card-pair-badge" style="--pair-color:${card.badgeColor}">${esc(card.badge)}</span>
+                        ${card.matched ? `<span class="s4-card-matched-check">✓</span>` : `<span class="s4-card-role-tag">${esc(card.typeLabel)}</span>`}
+                      </div>
+                      <div class="s4-card-front-content">
+                        ${card.renderFrontHtml()}
+                      </div>
+                    </div>
+                  </div>
+                </button>
+              `;
+            }).join('')}
+          </div>
+
+          <!-- Thanh hướng dẫn điều khiển chuột & bàn phím nhỏ gọn dưới bàn chơi -->
+          <div class="s4-board-footer-bar">
+            <span>🖱️ <b>Chuột:</b> Nhấn vào thẻ để lật</span>
+            <span>·</span>
+            <span>⌨️ <b>Bàn phím:</b> Phím mũi tên / Tab chọn thẻ, <b>Enter / Space</b> lật thẻ, <b>H</b> Gợi ý, <b>K</b> Kiến thức</span>
+            <span>·</span>
+            <span>🏅 <b>Phần thưởng:</b> ⚖️ Ấn Cân Xứng</span>
+          </div>
+
+          <!-- Hiệu ứng Vòng tròn phép thuật & Nhận Ấn Cân Xứng khi hoàn thành đủ các cặp thẻ -->
+          ${s4State.gateOpened ? `
+            <div class="s4-victory-overlay" id="s4MagicCircleOverlay">
+              <div class="s4-magic-circle-ring" aria-hidden="true"></div>
+              <div class="s4-victory-modal-card">
+                <div class="s4-victory-seal-badge">⚖️✨</div>
+                <span class="s4-victory-kicker">ĐÃ GIẢI MÃ HOÀN TẤT ${totalPairs}/${totalPairs} CẶP THẺ TRUNG ĐIỂM!</span>
+                <h2>Cổng Mê Cung Trung Điểm Đã Mở!</h2>
+                <p>Sáu cặp thẻ phép thuật đã hợp nhất thành vòng tròn ánh sáng! Đội nhận được <b>⚖️ Ấn Cân Xứng</b> (Mảnh mật mã: <b>2</b>). Rồng Xanh đang bay tới <b>Chặng 5 – Thành Trì Lõi Trí Tuệ</b>!</p>
+                <div class="s4-victory-stats-row">
+                  <span>🃏 Đã ghép: <b>${matchedCount}/${totalPairs} cặp</b></span>
+                  <span>🔄 Số lượt lật: <b>${s4State.flipCount} lượt</b></span>
+                  <span>⭐ Thưởng: <b>+20 XP · Ấn Cân Xứng</b></span>
+                </div>
+                <button type="button" class="s4-victory-next-btn" data-action="s4ProceedNextStage">
+                  Bay tới Chặng 5 – Thành Trì Lõi Trí Tuệ →
+                </button>
+              </div>
+            </div>
+          ` : ''}
+        </div>
+      </section>
+    </div>
+
+    <!-- MODAL SỔ TAY KIẾN THỨC TRUNG ĐIỂM (CHỈ MỞ KHI HỌC SINH NHẤN NÚT "KIẾN THỨC") -->
+    ${s4State.knowledgeModalOpen ? `
+      <div class="s4-knowledge-backdrop" data-action="s4CloseKnowledgeModal">
+        <div class="s4-knowledge-modal" role="dialog" aria-modal="true" onclick="event.stopPropagation()">
+          <div class="s4-know-header">
+            <h3>📖 Sổ Tay Kiến Thức: Tính Chất Trung Điểm Đoạn Thẳng</h3>
+            <button type="button" class="s4-know-close-btn" data-action="s4CloseKnowledgeModal">✕ Đóng</button>
+          </div>
+          <div class="s4-know-body">
+            <div class="s4-know-item">
+              <strong>1. Định nghĩa hình học:</strong>
+              <p>Điểm <i>I</i> là trung điểm của đoạn thẳng <i>AB</i> khi và chỉ khi <i>I</i> nằm giữa <i>A, B</i> và <i>IA = IB</i>.</p>
+            </div>
+            <div class="s4-know-item">
+              <strong>2. Hai vectơ đối nhau tại trung điểm:</strong>
+              <p>Vì ${s2RenderVecArrow('IA', 's4-inline-vec')} và ${s2RenderVecArrow('IB', 's4-inline-vec')} có cùng độ dài và ngược hướng (${s2RenderVecArrow('IA', 's4-inline-vec')} = −${s2RenderVecArrow('IB', 's4-inline-vec')}) nên tổng của chúng triệt tiêu bằng vectơ-không:
+              <b>${s2RenderVecArrow('IA', 's4-inline-vec')} + ${s2RenderVecArrow('IB', 's4-inline-vec')} = ${s2RenderVecArrow('0', 's4-inline-vec')}</b>.</p>
+            </div>
+            <div class="s4-know-item">
+              <strong>3. Hệ thức trung điểm với điểm <i>M</i> bất kỳ:</strong>
+              <p>Chèn điểm <i>I</i> theo quy tắc 3 điểm: ${s2RenderVecArrow('MA', 's4-inline-vec')} = ${s2RenderVecArrow('MI', 's4-inline-vec')} + ${s2RenderVecArrow('IA', 's4-inline-vec')} và ${s2RenderVecArrow('MB', 's4-inline-vec')} = ${s2RenderVecArrow('MI', 's4-inline-vec')} + ${s2RenderVecArrow('IB', 's4-inline-vec')}. Cộng vế theo vế ta được:
+              <b>${s2RenderVecArrow('MA', 's4-inline-vec')} + ${s2RenderVecArrow('MB', 's4-inline-vec')} = 2${s2RenderVecArrow('MI', 's4-inline-vec')}</b>.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    ` : ''}
+  </div>`;
+}
+
 function renderVectorAdventureStage(m) {
   ensureVaStateForStage(m);
   if (m.id === 1 || vaState.s1BridgeRestoredOverlay) {
@@ -7554,6 +8593,9 @@ function renderVectorAdventureStage(m) {
   }
   if (m.id === 3) {
     return renderStage3ZombieShooterGame(m);
+  }
+  if (m.id === 4) {
+    return renderStage4MidpointMemoryGame(m);
   }
   const r = m.round || 0;
   const q = m.challenge || {};
@@ -7850,7 +8892,7 @@ function studentScreen(){
  const m = world.current || (world.stages && world.stages[curStageIdx]) || {};
  ensureVaStateForStage(m);
  const dragonText = vaState.dragonMsg || m.dragonIntro || 'Cùng nhau tìm đúng hướng của vectơ nhé!';
- const isS1DedicatedUI = !me.completed && me.stage < 5 && (m.id === 1 || m.id === 2 || m.id === 3 || vaState.s1BridgeRestoredOverlay) && !mvWorldMapOpen && !StageTransitionController.isTransitioning() && !mvShowIntroHub;
+ const isS1DedicatedUI = !me.completed && me.stage < 5 && (m.id === 1 || m.id === 2 || m.id === 3 || m.id === 4 || vaState.s1BridgeRestoredOverlay) && !mvWorldMapOpen && !StageTransitionController.isTransitioning() && !mvShowIntroHub;
 
  return `<div class="hs-screen-shell ${isS1DedicatedUI ? 's1-dedicated-shell' : ''}" style="--stage-bg: url('${stageBgUrl}')">
   ${!isS1DedicatedUI ? mapTrack(me.stage) : ''}
@@ -8803,6 +9845,81 @@ async function handle(action,el){
    });
    return;
   }
+  /* ─── ACTIONS CHO CHẶNG 4: MÊ CUNG TRUNG ĐIỂM – GIẢI MÃ THẺ PHÉP THUẬT ─── */
+  if(action==='s4ClickCard'){
+   const cardIdx = Number(el.dataset.idx);
+   if(!isNaN(cardIdx)){
+    CardMatchingController.flipCard(cardIdx);
+   }
+   return;
+  }
+  if(action==='s4UseHint'){
+   CardMatchingController.triggerHint();
+   return;
+  }
+  if(action==='s4ToggleKnowledgeModal'){
+   s4State.knowledgeModalOpen = !s4State.knowledgeModalOpen;
+   sound('step');
+   render();
+   return;
+  }
+  if(action==='s4CloseKnowledgeModal'){
+   s4State.knowledgeModalOpen = false;
+   render();
+   return;
+  }
+  if(action==='s4SwitchPairMode'){
+   const nextPairs = Number(el.dataset.pairs) === 4 ? 4 : 6;
+   if(s4State.modePairs !== nextPairs && !s4State.gateOpened){
+    CardMatchingController.ensureInitialized(world?.current || { id: 4, timeSeconds: 65 }, true, nextPairs);
+    DragonGuide.say(
+     nextPairs === 4
+       ? 'Đã chuyển sang chế độ <b>8 thẻ (4 cặp trung điểm trọng tâm)</b>. Hãy lật thẻ và tìm 4 cặp tương ứng nhé!'
+       : 'Đã chuyển sang chế độ chuẩn <b>12 thẻ (6 cặp trung điểm đầy đủ)</b>. Hãy giải mã 6 cặp thẻ nhé!',
+     'normal'
+    );
+    sound('powerup');
+    render();
+   }
+   return;
+  }
+  if(action==='s4CycleControllerRole'){
+   const nextIdx = ((s4State.controllerRoleIdx || 0) + 1) % 4;
+   s4State.controllerRoleIdx = nextIdx;
+   if(world?.me?.stage4) world.me.stage4.controllerRoleIdx = nextIdx;
+   Stage4Progress.saveSession();
+   if(window.spawnJuiceFloater) window.spawnJuiceFloater(`🎮 Lượt lật thẻ: Thành viên ${nextIdx + 1}/4`, 'xp');
+   if(session?.room && session?.token){
+    api('/api/stage4Progress',{room:session.room,token:session.token,controllerRoleIdx:nextIdx}).catch(()=>{});
+   }
+   render();
+   return;
+  }
+  if(action==='s4ExitToMap'){
+   mvWorldMapOpen = true;
+   mvShowIntroHub = false;
+   DragonMovementController.snapToStage(world?.me?.stage ?? 3, 'IDLE');
+   render();
+   return;
+  }
+  if(action==='s4ToggleFullscreen'){
+   const shell = document.getElementById('s4MazeMemoryShell') || document.documentElement;
+   if(!document.fullscreenElement){
+    shell.requestFullscreen?.().catch(()=>{});
+   }else{
+    document.exitFullscreen?.().catch(()=>{});
+   }
+   return;
+  }
+  if(action==='s4ProceedNextStage'){
+   s4State.gateOpeningWalk = false;
+   StageTransitionController.beginStageTransition(3, 4, {
+    sealName: 'Ấn Cân Xứng',
+    points: 20,
+    goldEarned: 160
+   });
+   return;
+  }
   if(action==='vaClickPillar'){
    const node=el.dataset.node;
    if(node)vaState.pillars.add(node);
@@ -9071,6 +10188,7 @@ async function handle(action,el){
    cdState.roundId=-1;
    zdState.shooting=false;zdState.hitLane=null;zdState.hintMsg=null;zdState.rewardMsg=null;
    z3State.initedStage=-1;z3State.victoryOverlay=false;
+   s4State.initedStageId=-1;s4State.gateOpened=false;s4State.knowledgeModalOpen=false;
    mazeState.x=0;mazeState.y=0;mazeState.walking=false;mazeState.toastMsg=null;mazeState.hintMsg=null;
    msState.posX=50;msState.posY=82;msState.walking=false;msState.wobble=false;msState.shaking=false;msState.blastX=null;msState.explodedMines=[];msState.hintMsg=null;
    cipherState.open=false;cipherState.slots=[null,null,null,null,null];cipherState.error=null;
@@ -9643,7 +10761,6 @@ window.addEventListener('keydown',e=>{
  if(['1','2','3','4','5'].includes(e.key)){
   const idx = Number(e.key) - 1;
   if(idx < 4 && m.id === 3){ e.preventDefault(); z3ShootColumnLane(null, idx); return; }
-  if(idx < 4 && m.id === 4){ e.preventDefault(); answerMazeQuestion(idx); return; }
   if(idx < 4 && m.id === 5 && !m.isBoss && !world.me?.bossReady){ e.preventDefault(); stepMinesweeperPad(idx); return; }
  }
 
@@ -9683,24 +10800,61 @@ window.addEventListener('keydown',e=>{
   return;
  }
 
- // Điều khiển bàn phím riêng cho Chặng 4 (Mê Cung Tọa Độ Ô Vuông)
- if(m.id === 4){
-  let dir = keyMap[e.code];
-  if(!dir && e.key){
-   const k = e.key.toLowerCase();
-   if(k==='w'||k==='arrowup') dir='up';
-   else if(k==='s'||k==='arrowdown') dir='down';
-   else if(k==='a'||k==='arrowleft') dir='left';
-   else if(k==='d'||k==='arrowright') dir='right';
-  }
-  if(dir){
+ // Điều khiển bàn phím riêng cho Chặng 4 (Mê Cung Trung Điểm – Giải Mã Thẻ Phép Thuật)
+ if(m.id === 4 && document.getElementById('s4MazeMemoryShell')){
+  if(e.key === 'Escape' && s4State.knowledgeModalOpen){
    e.preventDefault();
-   if(dir==='up') moveMazeStep(0, 1);
-   else if(dir==='down') moveMazeStep(0, -1);
-   else if(dir==='left') moveMazeStep(-1, 0);
-   else if(dir==='right') moveMazeStep(1, 0);
+   s4State.knowledgeModalOpen = false;
+   render();
    return;
   }
+  if(e.key === 'k' || e.key === 'K'){
+   e.preventDefault();
+   if(!e.repeat){
+    s4State.knowledgeModalOpen = !s4State.knowledgeModalOpen;
+    sound('step');
+    render();
+   }
+   return;
+  }
+  if(e.key === 'h' || e.key === 'H'){
+   e.preventDefault();
+   if(!e.repeat) CardMatchingController.triggerHint();
+   return;
+  }
+  if(s4State.knowledgeModalOpen) return;
+  const totalCards = s4State.deck.length || 12;
+  const cols = 4;
+  if(e.code === 'ArrowRight' || e.key === 'd' || e.key === 'D'){
+   e.preventDefault();
+   s4State.focusedIndex = (s4State.focusedIndex + 1) % totalCards;
+   document.querySelectorAll('.s4-memory-card').forEach((c, i) => c.classList.toggle('is-focused', i === s4State.focusedIndex));
+   return;
+  }
+  if(e.code === 'ArrowLeft' || e.key === 'a' || e.key === 'A'){
+   e.preventDefault();
+   s4State.focusedIndex = (s4State.focusedIndex - 1 + totalCards) % totalCards;
+   document.querySelectorAll('.s4-memory-card').forEach((c, i) => c.classList.toggle('is-focused', i === s4State.focusedIndex));
+   return;
+  }
+  if(e.code === 'ArrowDown' || e.key === 's' || e.key === 'S'){
+   e.preventDefault();
+   s4State.focusedIndex = (s4State.focusedIndex + cols) % totalCards;
+   document.querySelectorAll('.s4-memory-card').forEach((c, i) => c.classList.toggle('is-focused', i === s4State.focusedIndex));
+   return;
+  }
+  if(e.code === 'ArrowUp' || e.key === 'w' || e.key === 'W'){
+   e.preventDefault();
+   s4State.focusedIndex = (s4State.focusedIndex - cols + totalCards) % totalCards;
+   document.querySelectorAll('.s4-memory-card').forEach((c, i) => c.classList.toggle('is-focused', i === s4State.focusedIndex));
+   return;
+  }
+  if(e.code === 'Enter' || e.code === 'Space' || e.key === 'e' || e.key === 'E'){
+   e.preventDefault();
+   if(!e.repeat) CardMatchingController.flipCard(s4State.focusedIndex);
+   return;
+  }
+  return;
  }
 
  // Điều khiển phím tắt A/B/C/D cho Chặng 5 Dò Mìn
@@ -9845,6 +10999,9 @@ function gameLoop(now){
   }
   if(world?.current?.id === 3 && document.getElementById('z3CourtyardViewport')){
    z3Tick(now, dt);
+  }
+  if(world?.current?.id === 4 && document.getElementById('s4MazeMemoryShell')){
+   s4Tick(now, dt);
   }
  }
 

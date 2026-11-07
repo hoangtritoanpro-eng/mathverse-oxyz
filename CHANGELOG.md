@@ -9,6 +9,32 @@ Tất cả những thay đổi quan trọng của dự án này sẽ được gh
 
 ---
 
+## [5.4.0] - 2026-11-07
+
+### Added & Upgraded (Triển Khai Chặng 4 – Lật Thẻ Trung Điểm: Mê Cung Trung Điểm – Giải Mã Thẻ Phép Thuật)
+- **Xây Dựng Mini-Game Lật & Ghép Thẻ Phép Thuật 3D Mức Độ Thông Hiểu (`renderStage4MidpointMemoryGame`, `MemoryCard`, `CardMatchingController`, `DragonGuide`, `Stage4Progress`, `S4_CARD_PAIRS_BANK` trong `public/app.js`, `public/style.css`, `stages.js`, `server.js`):**
+  1. **Giao Diện & Bối Cảnh Khớp Chuẩn Hình Ảnh Tham Chiếu (`media_1794055265423_31b1c424.jpg`):**
+     - **Bối cảnh Mê Cung Cây Xanh Huyền Bí (`.s4-memory-shell`, `public/assets/s4_maze/s4_maze_bg.jpg`):** Lối đi lát đá cổ, bụi pha lê cyan phát sáng, hạt đom đóm bay lơ lửng (`.s4-firefly`) và Cổng Mê Cung Phép Thuật phát sáng vàng kim - ngọc bích ở góc trên phải (`.s4-maze-portal-glow`).
+     - **Thanh Header Trên Cùng (`.s4-top-header`):** Nút `🏠` quay về Bản đồ 5 Chặng, nút `📖 Kiến thức` mở sổ tay tính chất trung điểm khi cần (thay cho bảng lý thuyết tĩnh bên cạnh bàn chơi để không lộ đáp án và tối ưu diện tích thẻ), huy hiệu trung tâm `MATHVERSE OXYZ` + `CHẶNG 4 · THÔNG HIỂU` + `LẬT THẺ TRUNG ĐIỂM`, bộ chuyển chế độ `12 thẻ (6 cặp)` / `8 thẻ (4 cặp)`, nút bật/tắt âm thanh và toàn màn hình.
+     - **Cột Trái (~25% chiều rộng – `.s4-left-guide-col`):** Nhân vật **Rồng Xanh** (`DragonGuide`), hộp thoại động giải thích **vì sao** hai thẻ vừa ghép tạo thành một cặp toán học, nút `💡 Gợi ý cặp thẻ (2/2)` có giới hạn, nút `📖 Kiến thức trung điểm` và nút đổi lượt thành viên lật thẻ trong nhóm (`1..4`).
+     - **Cột Phải (~75% chiều rộng – `.s4-right-board-col`):** Khung bàn chơi viền vàng kim - ngọc lục bảo với thanh HUD trên đỉnh (`⏳ Thời gian: 01:05` đếm ngược 65 giây, `🃏 Đã ghép: 0 / 6 (X lượt lật)`, `Tiến độ: ○○○○○○` 6 viên ngọc phong ấn) và lưới thẻ `3 hàng × 4 cột` (12 thẻ) hoặc `2 hàng × 4 cột` (8 thẻ).
+     - **Thiết Kế Thẻ Bài 3D (`.s4-memory-card`):** Mặt sau nền tím huyền bí có ngôi sao Ấn Vectơ và viền vàng kim (`public/assets/s4_maze/s4_card_back.png`); mặt trước nền giấy phép thuật sáng hiển thị hình vẽ hình học SVG trực tiếp và công thức vectơ có mũi tên chuẩn trên đầu chữ cái ($\overrightarrow{IA}, \overrightarrow{IB}, \overrightarrow{MA}, \overrightarrow{MB}, \overrightarrow{MI}, \overrightarrow{0}$).
+  2. **Ngân Hàng 6 Cặp Thẻ Toán Học Không Nhập Nhằng (`S4_CARD_PAIRS_BANK` – Mức Độ Thông Hiểu):**
+     - **Cặp 1 (`P1` – `4.1`):** Hình đoạn thẳng $AB$ có $I$ nằm chính giữa ($AI = IB$) $\leftrightarrow$ *"I là trung điểm của đoạn thẳng AB $\iff IA = IB$"*.
+     - **Cặp 2 (`P2` – `4.2`):** Hình hai vectơ đối nhau $\overrightarrow{IA}, \overrightarrow{IB}$ xuất phát từ $I$ $\leftrightarrow$ $\overrightarrow{IA} + \overrightarrow{IB} = \overrightarrow{0}$.
+     - **Cặp 3 (`P3` – `4.3`):** Hình điểm $M$ bất kỳ nối tới $A, B$ và trung điểm $I$ $\leftrightarrow$ $\overrightarrow{MA} + \overrightarrow{MB} = 2\overrightarrow{MI}$.
+     - **Cặp 4 (`P4` – `4.4`):** Nhánh 1 quy tắc chèn điểm $I$: $\overrightarrow{MA} = \overrightarrow{MI} + \overrightarrow{IA}$ $\leftrightarrow$ Nhánh 2 quy tắc chèn điểm $I$: $\overrightarrow{MB} = \overrightarrow{MI} + \overrightarrow{IB}$.
+     - **Cặp 5 (`P5` – `4.5`):** Hệ thức hai vectơ đối nhau $\overrightarrow{IA} = -\overrightarrow{IB}$ (*Cùng độ dài, ngược hướng*) $\leftrightarrow$ *"Tổng của hai vectơ đối nhau bằng vectơ-không ($\overrightarrow{0}$)"*.
+     - **Cặp 6 (`P6` – `4.6`):** Hình hai vectơ cùng hướng $\overrightarrow{AI}$ và $\overrightarrow{IB}$ trên đoạn $AB$ $\leftrightarrow$ $\overrightarrow{AI} = \overrightarrow{IB} = \frac{1}{2}\overrightarrow{AB}$.
+  3. **Máy Trạng Thái Lật Thẻ, Phím Tắt & Đồng Bộ Lớp Học (`/api/stage4Progress`, `/api/answer`):**
+     - Hoạt ảnh lật 3D `300ms`; khóa `checkingLock` trong lúc 2 thẻ sai đang rung nhẹ và chờ tự úp lại (`720ms`) để chống lỗi nhấn liên tục mở thẻ thứ ba; không cho phép tự ghép 1 thẻ với chính nó.
+     - Hỗ trợ đầy đủ cả **Chuột** và **Bàn phím** (`Arrow keys` / `W A S D` di chuyển ô chọn, `Enter` / `Space` lật thẻ, `H` gợi ý, `K` mở sổ tay kiến thức).
+     - Khi còn `<= 15 giây`: đồng hồ nhấp nháy cảnh báo và Rồng Xanh tự động làm sáng gợi ý 1 cặp thẻ chưa mở.
+     - Lưu trạng thái bàn chơi vào `sessionStorage` + `/api/stage4Progress` để khôi phục nguyên vẹn khi học sinh nhấn `F5`; ẩn `deckOrder` trên màn hình trình chiếu (`DISPLAY`) để không làm lộ vị trí thẻ đang úp; đồng bộ tiến độ (`matchedCount/6`, số lượt lật, số lần ghép sai, số lần gợi ý) lên bảng điều khiển Giáo viên và bản chơi thử 1 máy (`CHOI_THU_1_MAY.html`).
+     - Khi ghép đủ `6/6` cặp: các thẻ phát sáng hợp thành vòng tròn phép thuật, mở Cổng Mê Cung Trung Điểm, trao **⚖️ Ấn Cân Xứng** (mảnh mật mã `2`) đúng 1 lần và chuyển tiếp sang **Chặng 5 – Thành Trì Lõi Trí Tuệ**.
+
+---
+
 ## [5.3.0] - 2026-11-07
 
 ### Added & Upgraded (Triển Khai Chặng 2 – Mật Trận Vectơ – Pháo Đài Góc Vuông Theo Đúng Hình Ảnh Tham Chiếu)
