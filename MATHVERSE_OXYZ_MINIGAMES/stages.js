@@ -14,18 +14,18 @@ const TEAM_ROLES_STANDARD = [
 
 const STAGES = [
   /* ═══════════════════════════════════════════════════════════════════════
-     CHẶNG 1. MẬT THƯ CÂY CẦU ĐẢO CHIỀU – RỪNG VECTƠ KHỞI NGUYÊN (NHẬN BIẾT – 60 GIÂY)
+     CHẶNG 1. MẬT THƯ RỪNG VECTƠ – CÂY CẦU ĐẢO CHIỀU (NHẬN BIẾT – 60 GIÂY)
      ═══════════════════════════════════════════════════════════════════════ */
   {
     id: 1,
     isCipherBridgeQuest: true,
     gameType: 'vector_adventure',
     defaultMode: 'hunt',
-    title: 'MẬT THƯ CÂY CẦU ĐẢO CHIỀU',
-    subtitle: 'Rừng Vectơ Khởi Nguyên • Hiệu hai vectơ',
+    title: 'MẬT THƯ RỪNG VECTƠ – CÂY CẦU ĐẢO CHIỀU',
+    subtitle: 'Giải Cứu Cây Cầu Ánh Sáng • Hiệu hai vectơ',
     shortName: 'Hiệu vectơ',
-    place: 'Mật Thư Cây Cầu Đảo Chiều',
-    icon: '🏝️',
+    place: 'Rừng Vectơ',
+    icon: '🌿',
     biomeColor: '#10b981',
     levelBadge: 'NHẬN BIẾT',
     timeSeconds: 60,
@@ -35,16 +35,16 @@ const STAGES = [
     sealIcon: '🧭',
     digit: '3',
     digitRule: 'Khôi phục Cây Cầu Ánh Sáng & nhận Ấn Hướng Đi (Chặng 1 = 3).',
-    story: 'Bóng Lỗi phá hủy cây cầu ánh sáng. Rồng Xanh cần tìm ba mảnh mật thư ở các cột đá A, B, C để khôi phục cầu.',
-    dragonIntro: 'Cây cầu ánh sáng bị Bóng Lỗi phá hủy rồi! Hãy điều khiển Rồng Xanh (WASD hoặc phím mũi tên) đến 3 cột đá A, B, C để thu thập đủ 3 mảnh mật thư!',
-    dragonWin: 'Chính xác! Vectơ AB − vectơ AC = vectơ CB! Cây cầu ánh sáng đã được khôi phục, đội nhận Ấn Hướng Đi!',
-    shadowIntro: 'Bóng Lỗi đã phá hủy Cây cầu ánh sáng và giấu mật thư tại 3 cột đá A, B, C!',
-    groupTask: 'Điều khiển Rồng Xanh tìm 3 mảnh mật thư tại cột đá A, B, C → Kéo thả ghép mật thư → Vẽ mũi tên xác định hướng vectơ hiệu CB để khôi phục cây cầu.',
+    story: 'Cây cầu ánh sáng xuyên qua Rừng Vectơ bị Bóng Lỗi phá hủy. Rồng Xanh xuất phát gần cột đá A, cần tìm 2 mảnh mật thư tại cột B và cột C rồi di chuyển từ C đến B để khôi phục cầu.',
+    dragonIntro: 'Hãy dùng phím WASD (hoặc phím mũi tên) điều khiển Rồng Xanh tìm hai mảnh mật thư tại cột B và cột C, nhấn E để thu thập!',
+    dragonWin: 'Chính xác! Vectơ AB − vectơ AC = vectơ CB! Cây cầu ánh sáng đã hồi sinh, đội nhận Ấn Hướng Đi!',
+    shadowIntro: 'Bóng Lỗi đã phá hủy Cây cầu ánh sáng và giấu hai mảnh mật thư tại cột B và cột C!',
+    groupTask: 'Nhiệm vụ 1: Tìm hai mảnh mật thư tại B, C (0–23s) → Nhiệm vụ 2: Giải mã cuộn giấy AB − AC = ? (23–32s) → Nhiệm vụ 3: Đưa Rồng Xanh từ C đến B bấm E (32–48s) → Nhiệm vụ 4: Khôi phục cầu (48–60s).',
     teamRoles: [
-      '🧭 Thành viên 1 (Thám hiểm): Điều khiển Rồng Xanh chạy đến 3 cột đá A, B, C thu thập mật thư',
-      '📜 Thành viên 2 (Giải mã): Kéo thả ghép 3 mảnh mật thư thành biểu thức vectơ AB − vectơ AC = ?',
-      '🏹 Thành viên 3 (Dựng hình): Nhấn điểm đầu C và kéo mũi tên đến điểm cuối B tạo vectơ CB',
-      '✅ Thành viên 4 (Kiểm chứng): Kiểm tra chiều mũi tên, mở cầu ánh sáng và đưa Rồng Xanh sang Chặng 2'
+      '🎮 Thành viên 1 (Điều khiển): Dùng WASD + Shift + E điều khiển Rồng Xanh tìm 2 mảnh mật thư tại cột B và C',
+      '🧭 Thành viên 2 (Hoa tiêu): Quan sát dấu chân phát sáng, rương bí mật và vị trí các cột A, B, C',
+      '🧩 Thành viên 3 (Giải mã): Phân tích cuộn giấy vectơ AB − vectơ AC = ? để chỉ hướng đi từ C tới B',
+      '✅ Thành viên 4 (Xác nhận): Luân phiên điều khiển đưa Rồng Xanh từ C đến cột B và bấm E mở cầu'
     ],
     visual3D: {
       title: 'Sơ đồ 3 cột mốc A, B, C trong Rừng Vectơ',
@@ -63,31 +63,31 @@ const STAGES = [
     },
     interactiveTask: {
       type: 'cipher_bridge_quest',
-      title: 'Giai đoạn 1 – Điều khiển Rồng Xanh tìm 3 mảnh mật thư tại cột đá A, B, C',
-      instruction: 'Sử dụng phím WASD hoặc phím mũi tên (hoặc chạm vào cột đá) để điều khiển Rồng Xanh chạy trên đường rừng và tương tác với 3 cột đá A, B, C (0/3 → 3/3)!',
-      targets: ['A', 'B', 'C'],
-      rewardText: 'Đã tìm đủ 3/3 mảnh mật thư tại các cột đá A, B, C!'
+      title: 'Nhiệm vụ 1 – Truy tìm hai mảnh mật thư tại cột B và cột C',
+      instruction: 'Rồng Xanh xuất phát gần cột đá A. Dùng WASD/Phím mũi tên (Shift chạy nhanh) đi theo lối mòn tới cột B và cột C, nhấn E để nhận 2 mảnh mật thư (0/2 → 2/2)!',
+      targets: ['B', 'C'],
+      rewardText: 'Đã tìm đủ 2/2 mảnh mật thư tại cột B và cột C!'
     },
     interactiveChallenge: {
       id: '1.0',
       stepType: 'find_pillars',
       isInteractive: true,
       level: 'NHẬN BIẾT',
-      label: 'Giai đoạn 1 · Điều khiển Rồng Xanh tìm mật thư tại 3 cột đá A, B, C',
-      prompt: 'GIAI ĐOẠN 1 – KHÁM PHÁ RỪNG VECTƠ: Điều khiển Rồng Xanh bằng WASD hoặc phím mũi tên chạy tới tương tác với 3 cột đá A, B, C để thu thập 3 mảnh mật thư!',
+      label: 'Nhiệm vụ 1 · Tìm hai mảnh mật thư (0/2 → 2/2)',
+      prompt: 'Tìm hai mảnh mật thư tại cột B và cột C bằng phím WASD và nhấn E để tương tác.',
       options: [
-        'Đã thu thập đủ 3/3 mảnh mật thư tại các cột đá A, B, C',
+        'Đã thu thập đủ 2/2 mảnh mật thư tại cột B và cột C',
         'Chỉ mới tìm thấy 1 mảnh mật thư',
-        'Chưa mở phong ấn cột đá'
+        'Chưa thu thập mật thư'
       ],
       correct: 0,
-      shortAnswer: 'ABC',
+      shortAnswer: 'BC',
       hints: [
-        'Dùng phím W, A, S, D hoặc các phím mũi tên ↑ ↓ ← → để điều khiển Rồng Xanh chạy đến gần từng cột đá A, B, C đang phát sáng xanh ngọc.',
-        'Khi Rồng Xanh đến gần cột đá (hoặc khi bạn nhấp vào cột đá), phong ấn sẽ mở ra và thu thập mảnh mật thư.'
+        'Hãy quan sát điểm đầu và điểm cuối của mỗi vectơ.',
+        'Khi trừ hai vectơ cùng điểm đầu, hãy tìm hướng nối hai điểm cuối.'
       ],
-      explain: 'Tuyệt vời! Rồng Xanh đã thu thập đủ 3/3 mảnh mật thư từ ba cột đá A, B, C!',
-      keyBadge: 'Mật thư 3/3'
+      explain: 'Hai manh mối đã được ghép: vectơ AB − vectơ AC = ?',
+      keyBadge: 'Mật thư 2/2'
     },
     fixedChallenges: [
       {
@@ -95,48 +95,48 @@ const STAGES = [
         stepType: 'find_pillars',
         isInteractive: true,
         level: 'NHẬN BIẾT',
-        label: 'Giai đoạn 1 · Tìm mật thư tại 3 cột đá A, B, C',
-        prompt: 'GIAI ĐOẠN 1 – KHÁM PHÁ RỪNG VECTƠ: Điều khiển Rồng Xanh bằng WASD hoặc phím mũi tên chạy tới tương tác với 3 cột đá A, B, C để thu thập 3 mảnh mật thư!',
-        options: ['Đã thu thập đủ 3/3 mảnh mật thư tại cột đá A, B, C'],
+        label: 'Nhiệm vụ 1 · Tìm hai mảnh mật thư',
+        prompt: 'Tìm hai mảnh mật thư tại cột B và cột C (WASD: Di chuyển · E: Tương tác).',
+        options: ['Đã thu thập đủ 2/2 mảnh mật thư tại cột B và cột C'],
         correct: 0,
-        shortAnswer: 'ABC',
+        shortAnswer: 'BC',
         hints: [
-          'Dùng phím WASD hoặc phím mũi tên (hoặc nhấn trực tiếp vào cột đá A, B, C) để Rồng Xanh chạy tới mở phong ấn.',
-          'Khi thu thập đủ 3/3 mảnh mật thư, bảng ghép mật thư Giai đoạn 2 sẽ tự động mở ra.'
+          'Hãy quan sát điểm đầu và điểm cuối của mỗi vectơ.',
+          'Khi trừ hai vectơ cùng điểm đầu, hãy tìm hướng nối hai điểm cuối.'
         ],
-        explain: 'Đã thu thập đủ 3/3 mảnh mật thư cổ từ các cột đá A, B, C!',
-        keyBadge: 'Mật thư 3/3'
+        explain: 'Đã thu thập đủ 2/2 mảnh mật thư từ cột B (vectơ AB) và cột C (vectơ AC)!',
+        keyBadge: 'Mật thư 2/2'
       },
       {
         id: '1.1',
         stepType: 'assemble_cipher',
         isInteractive: false,
         level: 'NHẬN BIẾT',
-        label: 'Giai đoạn 2 · Ghép mật thư cổ',
-        prompt: 'GIAI ĐOẠN 2 – GHÉP MẬT THƯ: Kéo thả 3 mảnh mật thư vừa thu thập được để tạo thành biểu thức vectơ AB − vectơ AC = ?',
+        label: 'Nhiệm vụ 2 · Giải mã cuộn giấy',
+        prompt: 'Hai manh mối đã được ghép: vectơ AB − vectơ AC = ? Hãy tìm vectơ bí mật để mở cây cầu!',
         options: ['vectơ AB − vectơ AC = ?', 'vectơ AC − vectơ AB = ?', '− vectơ AB vectơ AC = ?'],
         correct: 0,
         shortAnswer: 'AB-AC',
         hints: [
-          'Kéo mảnh [vectơ AB] vào ô thứ nhất, mảnh dấu [−] vào ô thứ hai, và mảnh [vectơ AC] vào ô thứ ba.',
-          'Biểu thức mật thư cần ghép là: vectơ AB − vectơ AC = ?'
+          'Hãy quan sát điểm đầu và điểm cuối của mỗi vectơ.',
+          'Khi trừ hai vectơ cùng điểm đầu, hãy tìm hướng nối hai điểm cuối.'
         ],
-        explain: 'Đã ghép đúng mật thư: vectơ AB − vectơ AC = ? Hãy bước sang Giai đoạn 3 để vẽ mũi tên vectơ hiệu!',
-        keyBadge: 'Giải mã mật thư'
+        explain: 'Cuộn giấy phép thuật đã mở: vectơ AB − vectơ AC = ? Bây giờ hãy điều khiển Rồng Xanh từ cột C đến cột đích!',
+        keyBadge: 'Giải mã cuộn giấy'
       },
       {
         id: '1.2',
         stepType: 'draw_vector_cb',
         isInteractive: false,
         level: 'NHẬN BIẾT',
-        label: 'Giai đoạn 3 · Vẽ mũi tên vectơ hiệu',
-        prompt: 'GIAI ĐOẠN 3 – VẼ MŨI TÊN VECTƠ HIỆU: Trên sơ đồ ba điểm A, B, C, hãy nhấn điểm đầu và kéo mũi tên đến điểm kết thúc để biểu diễn vectơ hiệu AB − AC!',
-        options: ['Vectơ CB (Từ điểm C đến điểm B)', 'Vectơ BC (Từ điểm B đến điểm C)', 'Vectơ BA (Từ điểm B đến điểm A)'],
+        label: 'Nhiệm vụ 3 · Di chuyển để giải mật mã (Từ C đến B)',
+        prompt: 'Từ cột C, điều khiển Rồng Xanh đến đúng cột đích của vectơ AB − vectơ AC rồi bấm E để kích hoạt!',
+        options: ['Vectơ CB (Từ điểm C đến điểm B)', 'Vectơ BC (Từ điểm B đến điểm C)', 'Vectơ CA (Từ điểm C đến điểm A)'],
         correct: 0,
         shortAnswer: 'CB',
         hints: [
-          'Theo quy tắc hiệu hai vectơ chung gốc A: vectơ AB − vectơ AC là vectơ nối từ điểm cuối C của vectơ thứ hai đến điểm cuối B của vectơ thứ nhất.',
-          'Hãy nhấn giữ tại điểm C (điểm đầu) và kéo mũi tên tới điểm B (điểm cuối) để tạo vectơ CB!'
+          'Hãy quan sát điểm đầu và điểm cuối của mỗi vectơ.',
+          'Khi trừ hai vectơ cùng điểm đầu, hãy tìm hướng nối hai điểm cuối.'
         ],
         explain: 'vectơ AB − vectơ AC = vectơ CB (điểm đầu C, điểm cuối B). Cây cầu ánh sáng đã được khôi phục!',
         keyBadge: 'Mở Cầu Ánh Sáng'
@@ -147,30 +147,30 @@ const STAGES = [
         id: '1.1',
         stepType: 'assemble_cipher',
         level: 'NHẬN BIẾT',
-        label: 'Bước 2 · Ghép mật thư cổ (AB − AC = ?)',
-        prompt: 'Ghép 3 mảnh mật thư tại cột đá A, B, C thành biểu thức hiệu hai vectơ xuất phát từ A.',
+        label: 'Nhiệm vụ 2 · Giải mã cuộn giấy (AB − AC = ?)',
+        prompt: 'Hai mảnh mật thư từ cột B và cột C ghép thành biểu thức: vectơ AB − vectơ AC = ?',
         options: ['vectơ AB − vectơ AC = ?', 'vectơ AC − vectơ AB = ?', '− vectơ AB vectơ AC = ?'],
         correct: 0,
         shortAnswer: 'AB-AC',
         hints: [
-          'Đặt mảnh [vectơ AB] ở đầu, dấu [−] ở giữa, và mảnh [vectơ AC] ở cuối.',
-          'Biểu thức mật thư đúng là: vectơ AB − vectơ AC = ?'
+          'Hãy quan sát điểm đầu và điểm cuối của mỗi vectơ.',
+          'Khi trừ hai vectơ cùng điểm đầu, hãy tìm hướng nối hai điểm cuối.'
         ],
-        explain: 'Ghép đúng mật thư: vectơ AB − vectơ AC = ?',
-        keyBadge: 'Giải mã mật thư'
+        explain: 'Hai manh mối đã được ghép: vectơ AB − vectơ AC = ?',
+        keyBadge: 'Giải mã cuộn giấy'
       },
       {
         id: '1.2',
         stepType: 'draw_vector_cb',
         level: 'NHẬN BIẾT',
-        label: 'Bước 3 · Kéo hướng vectơ bí mật (C → B)',
-        prompt: 'Trên sơ đồ tam giác A, B, C: Nhấn điểm bắt đầu và kéo mũi tên đến điểm kết thúc để tạo vectơ bằng vectơ AB − vectơ AC.',
-        options: ['Vectơ CB (Từ C đến B)', 'Vectơ BC (Từ B đến C)', 'Vectơ BA (Từ B đến A)'],
+        label: 'Nhiệm vụ 3 · Di chuyển Rồng Xanh từ C đến B',
+        prompt: 'Điều khiển Rồng Xanh từ cột C đến đúng cột đích của hiệu hai vectơ AB − AC và bấm E.',
+        options: ['Vectơ CB (Từ C đến B)', 'Vectơ BC (Từ B đến C)', 'Vectơ CA (Từ C đến A)'],
         correct: 0,
         shortAnswer: 'CB',
         hints: [
-          'Hai vectơ AB và AC cùng gốc A: hiệu AB − AC xuất phát từ điểm cuối C của AC và kết thúc tại điểm cuối B của AB.',
-          'Nhấn giữ tại C và kéo mũi tên tới B để tạo vectơ CB.'
+          'Hãy quan sát điểm đầu và điểm cuối của mỗi vectơ.',
+          'Khi trừ hai vectơ cùng điểm đầu, hãy tìm hướng nối hai điểm cuối.'
         ],
         explain: 'vectơ AB − vectơ AC = vectơ CB.',
         keyBadge: 'Mở Cầu Ánh Sáng'

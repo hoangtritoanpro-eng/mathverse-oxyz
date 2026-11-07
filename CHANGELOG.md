@@ -9,6 +9,25 @@ Tất cả những thay đổi quan trọng của dự án này sẽ được gh
 
 ---
 
+## [4.6.0] - 2026-11-07
+
+### Added & Upgraded (Nâng Cấp Chặng 1 v4.6: Mini-Game Phiêu Lưu Điều Khiển Bàn Phím "MẬT THƯ RỪNG VECTƠ – GIẢI CỨU CÂY CẦU ÁNH SÁNG")
+- **Cơ Chế Gameplay 4 Nhiệm Vụ Trong 60 Giây – Không Dùng Trắc Nghiệm A/B/C (`stages.js`, `server.js`, `public/app.js`, `public/style.css`):**
+  1. **Nhiệm vụ 1 (0–23s) – Truy tìm hai mảnh mật thư (`📜 0/2 → 1/2 → 2/2`):** Rồng Xanh xuất phát gần **Cột mốc A**. Học sinh điều khiển nhân vật bằng `WASD` / Phím mũi tên, giữ `Shift` để chạy nhanh (`345` vs `235` world-units/s kèm hạt bụi sao), đi theo đường mòn có dấu chân phát sáng (`S1_GLOWING_FOOTPRINTS`) đến gần **Cột B** và **Cột C**, nhấn phím `E` (chống lặp phím `e.repeat`) để thu thập 2 mảnh mật thư mang ký hiệu $\overrightarrow{AB}$ và $\overrightarrow{AC}$ (có 3 biến thể vị trí ngẫu nhiên `spawnVariant` quanh B và C để tăng tính chơi lại).
+  2. **Nhiệm vụ 2 (23–32s) – Giải mã cuộn giấy (`📜 2/2`):** Khi nhặt đủ 2 mảnh, một cuộn giấy cổ mở ra trên màn hình với công thức $\overrightarrow{AB} - \overrightarrow{AC} = \ ?$ cùng lời thoại của Rồng Xanh: *“Hai manh mối đã được ghép! Hãy tìm vectơ bí mật để mở cây cầu!”* (tuyệt đối không lộ đáp án `CB`).
+  3. **Nhiệm vụ 3 (32–48s) – Di chuyển để giải mật mã (`Từ C → B`):** Rồng Xanh đứng tại **Cột C**. Thay vì chọn đáp án trắc nghiệm, học sinh phải trực tiếp điều khiển Rồng Xanh chạy từ **Cột C** đến **Cột B** và nhấn **`E`** để xác nhận hướng của vectơ hiệu $\overrightarrow{CB}$. Nếu đi nhầm sang **Cột A** và nhấn `E`, cột đá phát sáng đỏ (`wrong-flash`), ghi nhận số lần sai (`wrongAttempts`), hiển thị phản hồi và đưa Rồng Xanh quay lại **Cột C** để thử lại.
+  4. **Nhiệm vụ 4 (48–60s) – Khôi phục cây cầu:** Khi nhấn `E` đúng tại **Cột B**, một tia sáng phóng từ **C sang B** ($\overrightarrow{CB}$), hiện thông báo $\overrightarrow{AB} - \overrightarrow{AC} = \overrightarrow{CB}$, khôi phục **Cây Cầu Ánh Sáng**, trao **Ấn Hướng Đi (`🔑 1/1`)**, điều khiển Rồng Xanh chạy qua cây cầu vừa mở và bay sang **Chặng 2** trên Bản đồ Thế giới.
+- **Thế Giới 2D Tương Tác Thật (`1000 × 560`) & Môi Trường Sống Động (`public/app.js`, `public/style.css`):**
+  - Hệ thống va chạm vật cản thật (`S1_WORLD_OBSTACLES` & `s1ResolveWorldMovement`): Rồng Xanh không thể đi xuyên qua cây cổ thụ, tảng đá rêu hay vực thác nước khi cầu chưa mở.
+  - Bổ sung **3 bụi cây phép thuật (`S1_FOREST_BUSHES`)** rung lắc khi Rồng Xanh chạy ngang qua và **1 Rương Bí Mật (`S1_SECRET_CHEST_META`)** mở bằng phím `E` thưởng ngay `+5 XP & +25 Vàng`.
+  - Hỗ trợ 4 trạng thái hoạt ảnh cho Rồng Xanh (`IDLE`, `RUN`, `INTERACT`, `CELEBRATE`) cùng vỗ cánh SVG động.
+- **Giao Diện HUD Fantasy RPG Tối Giản & Đồng Bộ Giáo Viên / Đội Chơi:**
+  - HUD gọn gàng kiểu game phiêu lưu: `🌿 RỪNG VECTƠ` | `⏱️ 00:42` | `NHIỆM VỤ HIỆN TẠI` | `📜 X/2` | `🔑 X/1` | `⌨️ WASD: Di chuyển · E: Tương tác · Shift: Chạy nhanh` | Nút đổi lượt người điều khiển trong đội (`🎮 TV X`).
+  - Hệ thống 2 gợi ý theo thời gian hoặc khi sai: Gợi ý 1 ($\le 30\text{s}$ hoặc sai lần 1): *"Hãy quan sát điểm đầu và điểm cuối của mỗi vectơ."* | Gợi ý 2 ($\le 15\text{s}$ hoặc sai lần 2): *"Khi trừ hai vectơ cùng điểm đầu, hãy tìm hướng nối hai điểm cuối."*
+  - Màn hình Giáo viên cập nhật thời gian thực: Số mảnh mật thư (`📜 X/2`), trạng thái giải mã cầu (`🌉 Đã giải mã / Đang giải mã`), thời gian hoàn thành (`⏱️ Xs`), số lần đi nhầm cột (`❌ X sai`), đồng thời tự động ẩn đáp án trên máy chiếu khi các đội đang thi.
+
+---
+
 ## [4.5.0] - 2026-11-07
 
 ### Added & Upgraded (Thiết Kế Game Chặng 1 – Mini-Game Khám Phá 2D: "MẬT THƯ CÂY CẦU ĐẢO CHIỀU")
