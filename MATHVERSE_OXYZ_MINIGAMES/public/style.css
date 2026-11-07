@@ -7645,6 +7645,20 @@ body {
   font-size: 19px;
   filter: drop-shadow(0 0 8px rgba(250, 204, 21, 0.8));
 }
+.z3-pill-speed {
+  background: linear-gradient(180deg, rgba(76, 29, 149, 0.92) 0%, rgba(46, 16, 101, 0.96) 100%);
+  border-color: #A78BFA;
+  color: #EDE9FE;
+  font-size: 13.5px;
+  font-weight: 900;
+}
+.z3-pill-speed.is-rushing {
+  background: linear-gradient(180deg, rgba(153, 27, 27, 0.95) 0%, rgba(80, 10, 10, 0.98) 100%);
+  border-color: #F87171;
+  color: #FEF2F2;
+  box-shadow: 0 0 18px rgba(239, 68, 68, 0.7);
+  animation: pulseUrgentTimer 0.7s ease-in-out infinite;
+}
 .z3-pill-timer {
   background: linear-gradient(180deg, rgba(120, 53, 15, 0.95) 0%, rgba(69, 26, 3, 0.98) 100%);
   border-color: #FBBF24;
@@ -7672,6 +7686,9 @@ body {
   overflow: hidden;
   background: #1B2436;
 }
+.z3-courtyard-viewport.is-shaking {
+  animation: ms-screenshake 0.48s cubic-bezier(0.36, 0.07, 0.19, 0.97);
+}
 .z3-courtyard-bg {
   width: 100%;
   height: 100%;
@@ -7679,6 +7696,21 @@ body {
   object-position: center 42%;
   display: block;
   pointer-events: none;
+}
+
+/* Hàng rào năng lượng phòng thủ trước mặt Rồng Xanh */
+.z3-defense-barrier {
+  position: absolute;
+  left: 33.2%;
+  top: 29%;
+  bottom: 16%;
+  width: 6px;
+  border-radius: 99px;
+  background: linear-gradient(180deg, transparent 0%, rgba(56, 189, 248, 0.62) 20%, rgba(250, 204, 21, 0.72) 50%, rgba(56, 189, 248, 0.62) 80%, transparent 100%);
+  box-shadow: 0 0 18px rgba(56, 189, 248, 0.65), 0 0 8px rgba(250, 204, 21, 0.55);
+  pointer-events: none;
+  z-index: 5;
+  opacity: 0.72;
 }
 
 /* Vòng xoáy cổng dịch chuyển phía Bắc */
@@ -7814,6 +7846,37 @@ body {
   filter: drop-shadow(0 10px 16px rgba(0, 0, 0, 0.72));
   animation: z3DragonBreath 2.2s ease-in-out infinite;
 }
+.z3-dragon-hero.is-recoil .z3-dragon-shooter-img {
+  animation: zd-recoil 0.22s ease-out;
+}
+.z3-dragon-hero.is-hurt .z3-dragon-shooter-img {
+  animation: zd-hurt 0.85s ease-out;
+}
+.z3-dragon-hero.is-hurt::after {
+  content: '';
+  position: absolute;
+  inset: -12px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 23, 68, 0.58) 0%, transparent 72%);
+  animation: zd-hurt-flash 0.85s ease-out forwards;
+  pointer-events: none;
+}
+.z3-dragon-bite-pop {
+  position: absolute;
+  left: 55%;
+  top: -16px;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  font-weight: 900;
+  font-size: 14px;
+  color: #FFEBEE;
+  background: rgba(127, 0, 0, 0.94);
+  border: 2px solid #FF5252;
+  padding: 5px 12px;
+  border-radius: 10px;
+  box-shadow: 0 0 16px #FF1744;
+  z-index: 40;
+}
 @keyframes z3DragonBreath {
   0%, 100% { transform: translateY(0) scale(1); }
   50% { transform: translateY(-4px) scale(1.02); }
@@ -7919,13 +7982,50 @@ body {
   pointer-events: none;
   transform: translate(-50%, -50%) scale(0.35);
 }
-.z3-zombie-unit.is-wrong-shake {
-  animation: z3WrongShake 0.42s ease;
+.z3-zombie-unit.is-dying {
+  animation: zd-die 0.62s forwards;
+  pointer-events: none;
 }
-@keyframes z3WrongShake {
-  0%, 100% { transform: translate(-50%, -56%); }
-  25% { transform: translate(-58%, -56%) rotate(-5deg); }
-  75% { transform: translate(-42%, -56%) rotate(5deg); }
+.z3-zombie-unit.is-rushing .z3-zombie-sprite {
+  animation: z3ZombieWalkBob 0.32s ease-in-out infinite;
+}
+.z3-zombie-unit.is-charging {
+  z-index: 18;
+}
+.z3-zombie-unit.is-charging .z3-zombie-sprite {
+  filter: drop-shadow(0 0 14px #FF1744) drop-shadow(0 6px 10px rgba(0, 0, 0, 0.65));
+  animation: z3ZombieWalkBob 0.24s ease-in-out infinite;
+}
+.z3-zombie-unit.is-at-fence .z3-zombie-sprite {
+  animation: zd-bash 0.42s ease-in-out infinite;
+}
+.z3-zombie-unit.is-respawn {
+  animation: zd-respawn 0.55s ease-out;
+}
+.z3-unit-pop {
+  position: absolute;
+  left: 50%;
+  top: -18px;
+  transform: translateX(-50%);
+  z-index: 30;
+  pointer-events: none;
+  white-space: nowrap;
+  font-weight: 900;
+  font-size: 13.5px;
+  padding: 4px 10px;
+  border-radius: 8px;
+}
+.z3-unit-pop.hit {
+  color: #B9F6CA;
+  background: rgba(0, 50, 20, 0.92);
+  border: 1.5px solid #00E676;
+  box-shadow: 0 0 12px #00E676;
+}
+.z3-unit-pop.miss {
+  color: #FF8A80;
+  background: rgba(80, 0, 0, 0.92);
+  border: 1.5px solid #FF1744;
+  box-shadow: 0 0 12px #FF1744;
 }
 
 .z3-zombie-sprite {
@@ -7935,14 +8035,22 @@ body {
   position: relative;
   z-index: 2;
   filter: drop-shadow(0 10px 14px rgba(0, 0, 0, 0.72));
-  animation: z3ZombieBob 1.9s ease-in-out infinite;
+  animation: z3ZombieWalkBob 0.95s ease-in-out infinite;
 }
-@keyframes z3ZombieBob {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-4px); }
+@keyframes z3ZombieWalkBob {
+  0%, 100% { transform: translateY(0) rotate(-1.2deg); }
+  50% { transform: translateY(-5px) rotate(1.2deg); }
 }
 
 /* Hào quang vàng rực rỡ quanh Zombie mục tiêu đang ngắm */
+.z3-target-aura,
+.z3-target-ring {
+  display: none;
+}
+.z3-zombie-unit.is-targeted .z3-target-aura,
+.z3-zombie-unit.is-targeted .z3-target-ring {
+  display: block;
+}
 .z3-target-aura {
   position: absolute;
   inset: -16% -20% -10% -20%;

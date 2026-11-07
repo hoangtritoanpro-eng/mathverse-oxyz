@@ -9,6 +9,23 @@ Tất cả những thay đổi quan trọng của dự án này sẽ được gh
 
 ---
 
+## [4.9.0] - 2026-11-07
+
+### Added & Upgraded (Tích Hợp Cơ Chế Gameplay "Chặn Zombie" `zombie-defense` Vào Giao Diện Đấu Trường Chặng 3)
+- **Giữ Nguyên 100% Giao Diện Chặng 3 Vừa Thiết Lập & Nâng Cấp Toàn Diện Cơ Chế Chặn Zombie (`z3Tick`, `z3StartCharge`, `z3ImpactDragon`, `z3HandleZombieHit`, `playZ3Sfx` trong `public/app.js`, `public/style.css`):**
+  1. **Cơ Chế Zombie Tiến Công Liên Tục Về Hàng Rào Phòng Thủ (`Z3_BASE_MARCH_SPEED`, `Z3_DEFENSE_LINE_X`):**
+     - Các zombie cầm bảng gỗ ($\overrightarrow{BA}$, $\overrightarrow{CB}$, $\overrightarrow{AC}$, $\overrightarrow{AC}$, $\overrightarrow{AB}$) bước đi liên tục từ phía Đông sân đá tiến về vạch năng lượng phòng thủ (`.z3-defense-barrier`) trước mặt Rồng Xanh.
+  2. **Cơ Chế Bắn Trúng Mục Tiêu Đúng ($\overrightarrow{AC}$):**
+     - Phát âm thanh `/sounds/correct.mp3` + hiệu ứng nổ sáng (`.is-dying` + nhãn nổi `💥 CHÍNH XÁC! +50 XP`).
+     - Tạo sóng xung kích đẩy lùi nhẹ các zombie còn lại trên sân, tăng tiến độ **`🎯 Tiêu diệt đúng vectơ: X/5`** (`0/5 → 5/5`) và triệu hồi đợt zombie mới cho đến khi hoàn thành đủ `5/5`.
+  3. **Cơ Chế Bắn Trượt / Chạm Rào: Tăng Tốc Cả Bầy & Lao Tới Cắn Rồng Xanh (`z3StartCharge`, `z3ImpactDragon` chuẩn `giaoviendoimoi.com/zombie-defense`):**
+     - Khi bắn nhầm zombie mang vectơ sai (`BA`, `CB`, `AB`) hoặc để zombie chạm vạch phòng thủ quá lâu:
+       - Tốc độ toàn đội hình zombie tăng thêm `+60%` mỗi lần (`🧟 Tốc độ x1.6`, `x2.2`...) và cả bầy chạy nước rút (`Z3_RUSH_MULT = 6.5x`) trong `1.5s`.
+       - Zombie bị bắn nhầm phát sáng đỏ rực (`.is-charging`), hiện cảnh báo `❌ TRƯỢT! ZOMBIE LAO TỚI!` và lao thẳng qua vạch phòng thủ theo gia tốc bậc hai (`t * t`) tới cắn Rồng Xanh.
+       - Khi va chạm: phát âm thanh `/sounds/explosion.mp3` & `/sounds/zombie-lose.mp3`, rung lắc toàn sân đấu (`.is-shaking`), Rồng Xanh chớp đỏ (`.is-hurt`) kèm thông báo `🧟 ZOMBIE ĐÃ LAO TỚI CẮN! −1 ❤️`, trừ 1 tim và đẩy lùi zombie về điểm xuất phát để đội tiếp tục phòng thủ.
+
+---
+
 ## [4.8.0] - 2026-11-07
 
 ### Added & Upgraded (Triển Khai Chặng 3 – Trò Chơi Bắn Zombie Vectơ "PHÁO ĐÀI GÓC VUÔNG" Chuẩn Giao Diện Ảnh Tham Chiếu)
