@@ -6360,8 +6360,6 @@ function z3SyncDOM() {
   }
 }
 
-function renderStage3ZombieShooterGame(m) {
-
 function z3RenderLeftParchmentsHtml() {
   const curQ = z3GetActiveQuestion();
   return `
@@ -6419,6 +6417,8 @@ function z3RenderLeftParchmentsHtml() {
     </div>
   `;
 }
+
+function renderStage3ZombieShooterGame(m) {
   ensureVaStateForStage(m);
   ensureZ3State(m);
   z3UpdateAimedZombie();
