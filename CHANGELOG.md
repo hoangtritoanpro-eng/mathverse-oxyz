@@ -9,6 +9,23 @@ Tất cả những thay đổi quan trọng của dự án này sẽ được gh
 
 ---
 
+## [5.1.0] - 2026-11-07
+
+### Added & Upgraded (Thiết Kế Logic Chặng 3 Theo Kiểu 4 Làn A/B/C/D & Cột Zombie `ZombieDefensePlayer` Nhưng Giữ Nguyên 100% Hình Ảnh Đấu Trường)
+- **Tích Hợp Logic Cột Câu Hỏi 4 Làn (`A`, `B`, `C`, `D`) Chuẩn "Chặn Zombie" Trên Nền Hình Ảnh Đấu Trường Rồng Xanh (`z3CreateColumn`, `z3ShootColumnLane`, `z3ResolveBulletHit`, `z3TogglePause`, `z3RenderColumnsLayerHtml` trong `public/app.js`, `public/style.css`):**
+  1. **Giữ Nguyên 100% Hình Ảnh Chặng 3:**
+     - Sân đá pháo đài isometric (`s3_courtyard_clean.jpg`), 2 cuộn giấy da dê bên trái (`🎯 Nhiệm vụ` & `💡 Gợi ý`), nhân vật **Rồng Xanh** (`s3_dragon_shooter.png`), sprite **Zombie cầm bảng gỗ** (`s3_zombie_blank_sign.png`) và Rồng Xanh đồng hành ở góc phải dưới.
+  2. **Hệ Thống 4 Làn Ngang (`A`, `B`, `C`, `D`) & Cột 4 Zombie Mang Thẻ Câu Hỏi (`CÂU 1`, `CÂU 2`, `CÂU 3`):**
+     - Sân đấu chia thành 4 làn ngang có ký hiệu **`A`**, **`B`**, **`C`**, **`D`** dọc theo hàng rào phòng thủ trước mặt Rồng Xanh.
+     - Mỗi câu hỏi sinh ra **1 cột gồm 4 zombie** (mỗi con đi trên 1 làn `A`, `B`, `C`, `D`, cầm bảng gỗ gắn nhãn `A · BA⃗`, `B · CB⃗`, `C · AC⃗`, `D · AB⃗`) cùng tiến về hàng rào, phía trên cột có **Thẻ câu hỏi (`CÂU 1`, `CÂU 2`, `CÂU 3`)** di chuyển đồng bộ theo cột.
+  3. **Logic Bắn Đúng Diệt Cả Cột & Bắn Sai Cả Đàn Bứt Tốc (`z3ResolveBulletHit`):**
+     - **Bắn trúng zombie mang đáp án đúng:** Tiêu diệt đồng loạt **cả cột 4 zombie** của câu hỏi đó (`col.cleared = true`), hiện chữ nổi `✓ Chính xác!`, cộng điểm XP và tự động triệu hồi cột câu hỏi tiếp theo.
+     - **Bắn nhầm zombie mang đáp án sai:** Chỉ zombie sai đó bị loại, **cả đàn zombie còn lại bứt tốc `x3.0`** trong `2.0s` kèm cảnh báo `✗ Sai! Zombie tăng tốc`.
+  4. **Modal Tạm Dừng (`⏸ Tạm dừng | ▶ Chơi tiếp | ← Thoát`) & Phím Tắt (`A/B/C/D`, `1–4`, `Space`):**
+     - Bổ sung nút **`⏸ Tạm dừng` / `▶ Chơi tiếp`** trên thanh trạng thái và phím **`Space`** mở hộp thoại **Tạm dừng** ở chính giữa sân đấu y hệt ảnh tham chiếu.
+
+---
+
 ## [5.0.0] - 2026-11-07
 
 ### Added & Upgraded (Bổ Sung 2 Câu Hỏi Nâng Tổng Số Lên 3 Câu Hỏi Trong Thẻ `🎯 Nhiệm vụ` & `💡 Gợi ý` Của Chặng 3 – Chặn Zombie Vectơ)
