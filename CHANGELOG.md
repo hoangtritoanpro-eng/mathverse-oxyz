@@ -9,6 +9,31 @@ Tất cả những thay đổi quan trọng của dự án này sẽ được gh
 
 ---
 
+## [4.7.0] - 2026-11-07
+
+### Added & Upgraded (Tái Tạo Chặng 1 "CHẶNG 1 – MẬT THƯ RỪNG VECTƠ" Chuẩn Giao Diện Ảnh Mẫu & Cơ Chế Hunt-Preview + Kịch Bản Slide Báo Cáo PPTX)
+- **Tái Tạo Giao Diện & Gameplay Chặng 1 (`CHẶNG 1 – MẬT THƯ RỪNG VECTƠ`) Khớp 100% Hình Mẫu Và `hunt-preview/__demo__` (`stages.js`, `server.js`, `public/app.js`, `public/style.css`):**
+  1. **Top Header Banner (`renderStage1TopBanner`):**
+     - Góc trái: Logo tinh thể `MATHVERSE OXYZ` (`public/assets/s1_hunt/mathverse_logo_s1.png`).
+     - Chính giữa: Cuộn tiêu đề **`CHẶNG 1 – MẬT THƯ RỪNG VECTƠ`** kèm phụ đề `✦ Thử thách khám phá – săn lùng mảnh mật thư trong rừng phép! ✦`, đồng hồ đếm ngược 60s và nút đổi thành viên điều khiển (`🎮 TV X`).
+  2. **Khung Bản Đồ Rừng Phép Isometric 2D & Nhân Vật Rồng Xanh Thám Hiểm (`#s1ForestViewport`):**
+     - Tích hợp bản đồ rừng phép isometric sắc nét (`public/assets/s1_hunt/s1_forest_map_clean.jpg`) đã tách sạch nhân vật tĩnh và icon tĩnh để hiển thị đối tượng tương tác thời gian thực.
+     - Nhân vật **Rồng Xanh Thám Hiểm (`public/assets/s1_hunt/s1_dragon_explorer.png`)** đeo kính phi công, khăn quàng đỏ và ba lô da, di chuyển mượt bằng `WASD` / Phím mũi tên / `Shift` hoặc Click chuột trên bản đồ (kèm hiệu ứng gợn sóng vàng `.s1-click-ripple` chuẩn `hunt-preview/__demo__`).
+     - **4 Bệ Đá Mật Thư Phát Sáng (`S1_PEDESTAL_IDS`: `'1'`, `'2'`, `'3'`, `'4'`)** đặt khớp chính xác 4 bệ đá tròn trên bản đồ (Đền Cổ Tây Bắc, Thành Cổ Đông Bắc, Suối Pha Lê Tây Nam, Nhà Gỗ Đông Nam). Khi Rồng Xanh bước vào vòng sáng bệ đá hoặc người chơi nhấn vào bệ đá / bấm phím `E`, bảng câu hỏi da dê đinh tán (`.hw-frame-question`) hiện lên để thu thập từng mảnh mật thư (`0/4 → 1/4 → 2/4 → 3/4 → 4/4`).
+  3. **Sidebar Phải (`s1-hunt-sidebar`) Khớp 100% Ảnh Tham Chiếu:**
+     - Tiêu đề `↗ Nhiệm vụ Chặng 1: Mật thư Rừng Vectơ`.
+     - Cuộn giấy nhiệm vụ: **`Tìm 4 mảnh mật thư để mở khóa Cầu Ánh Sáng.`** (`public/assets/s1_hunt/mission_scroll_art.png`).
+     - Thanh tiến độ thu thập: `📜 Mảnh mật thư đã thu thập` (`0/4 → 4/4`).
+     - Thẻ `Phần thưởng` với Rương kho báu đính ngọc lam (`public/assets/s1_hunt/reward_chest.png`) + `Mở khóa Cầu Ánh Sáng và nhận phần thưởng!` (nhấp nháy vàng `.ready` khi đủ `4/4` mảnh để mở khóa **Cầu Ánh Sáng** $\overrightarrow{AB} - \overrightarrow{AC} = \overrightarrow{CB}$ và nhận **Ấn Hướng Đi**).
+     - Cụm 3 nút tiện ích cuối Sidebar: `[🔊]`, `[⛶]`, `[↪ Thoát]`.
+  4. **Thanh Đáy (`s1-hunt-bottombar`) Khớp 100% Ảnh Tham Chiếu:**
+     - Hộp gợi ý góc trái: `💡 Gợi ý: Manh mối về các vectơ ` $\overrightarrow{AB}, \overrightarrow{AC}, \overrightarrow{CB}.$
+     - Khay 4 mảnh mật thư chính giữa: 4 ô tấm da dê `[ ? ] [ ? ] [ ? ] [ ? ]` lật mở công thức khi thu thập kèm bộ đếm `📜 X/4 mảnh mật thư`.
+- **Biên Soạn Kịch Bản Nội Dung Báo Cáo PPTX 37 Slide (`Kich_Ban_Slide_Bao_Cao_Bien_Phap_PPTX.md`):**
+  - Đồng bộ hóa cấu trúc 37 slide từ `BAO CAO BIEN PHAP NEW_LE THANH DUNG.pptx` với nội dung `Bien phap gop phan nang cao chat luong DH.docx` cho đề tài game tương tác Toán 12 `MATHVERSE OXYZ`.
+
+---
+
 ## [4.6.0] - 2026-11-07
 
 ### Added & Upgraded (Nâng Cấp Chặng 1 v4.6: Mini-Game Phiêu Lưu Điều Khiển Bàn Phím "MẬT THƯ RỪNG VECTƠ – GIẢI CỨU CÂY CẦU ÁNH SÁNG")

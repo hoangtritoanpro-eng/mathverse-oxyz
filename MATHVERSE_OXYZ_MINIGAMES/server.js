@@ -95,24 +95,24 @@ function ensureTeamFields(t){
   t.stagePicks=rollStagePicks();
  }
  if(!t.stage1||typeof t.stage1!=='object'){
-  t.stage1={pillars:[],cluesFound:0,maxClues:2,cipherSolved:false,bridgeOpened:false,wrongAttempts:0,completedTimeSec:null,chestOpened:false,controllerRoleIdx:0,spawnVariant:0};
+  t.stage1={pillars:[],cluesFound:0,maxClues:4,cipherSolved:false,bridgeOpened:false,wrongAttempts:0,completedTimeSec:null,chestOpened:false,controllerRoleIdx:0,spawnVariant:0};
  }
  if(!Array.isArray(t.stage1.pillars))t.stage1.pillars=[];
- if(t.stage1.maxClues===undefined)t.stage1.maxClues=2;
+ t.stage1.maxClues=4;
  if(t.stage1.wrongAttempts===undefined)t.stage1.wrongAttempts=0;
  if(t.stage1.completedTimeSec===undefined)t.stage1.completedTimeSec=null;
  if(t.stage1.chestOpened===undefined)t.stage1.chestOpened=false;
  if(t.stage1.controllerRoleIdx===undefined)t.stage1.controllerRoleIdx=0;
  if(t.stage1.spawnVariant===undefined)t.stage1.spawnVariant=0;
  if(t.stage>=1||t.completed){
-  t.stage1.pillars=['B','C'];
-  t.stage1.cluesFound=2;
+  t.stage1.pillars=['1','2','3','4'];
+  t.stage1.cluesFound=4;
   t.stage1.cipherSolved=true;
   t.stage1.bridgeOpened=true;
  }else if(t.stage===0){
   if(t.round>=1){
-   t.stage1.pillars=['B','C'];
-   t.stage1.cluesFound=2;
+   t.stage1.pillars=['1','2','3','4'];
+   t.stage1.cluesFound=4;
   }
   if(t.round>=2){
    t.stage1.cipherSolved=true;
@@ -268,7 +268,7 @@ function processAction(endpoint,d){
   const now=Date.now();
   const r={id:roomId,teacherToken:rnd(),createdAt:new Date().toISOString(),paused:false,ended:false,
     clock:{minutes:6,remainingMs:6*60*1000,running:false,startedAt:0},
-    teams:TEAM_POOL.slice(0,size).map((t,i)=>({...t,id:'doi-'+(i+1),code:String(1000+crypto.randomInt(9000)),token:rnd(16),stage:0,round:0,health:3,wrong:0,score:0,bonus:0,gold:120,heroLevel:1,upgrades:{damage:1,speed:1,hp:1,regen:1},completed:false,finishedAt:null,attempts:[0,0,0,0,0],hintsUsed:[false,false,false,false,false],digits:[],stagePicks:rollStagePicks(),correctCount:0,answerLog:[],stage1:{pillars:[],cluesFound:0,maxClues:2,cipherSolved:false,bridgeOpened:false,wrongAttempts:0,completedTimeSec:null,chestOpened:false,controllerRoleIdx:0,spawnVariant:crypto.randomInt(3)},lastActiveAt:now,stageEnteredAt:now})),events:[]};
+    teams:TEAM_POOL.slice(0,size).map((t,i)=>({...t,id:'doi-'+(i+1),code:String(1000+crypto.randomInt(9000)),token:rnd(16),stage:0,round:0,health:3,wrong:0,score:0,bonus:0,gold:120,heroLevel:1,upgrades:{damage:1,speed:1,hp:1,regen:1},completed:false,finishedAt:null,attempts:[0,0,0,0,0],hintsUsed:[false,false,false,false,false],digits:[],stagePicks:rollStagePicks(),correctCount:0,answerLog:[],stage1:{pillars:[],cluesFound:0,maxClues:4,cipherSolved:false,bridgeOpened:false,wrongAttempts:0,completedTimeSec:null,chestOpened:false,controllerRoleIdx:0,spawnVariant:crypto.randomInt(3)},lastActiveAt:now,stageEnteredAt:now})),events:[]};
   emit(r,'Rồng Xanh đã tạo phòng '+roomId+' (6 phút) với '+size+' đội.');ROOMS[roomId]=r;persist();return{room:roomId,teacherToken:r.teacherToken};
  }
  const r=getRoom(d);
@@ -297,12 +297,11 @@ function processAction(endpoint,d){
    persist();
   }
   const pillar=String(d.pillar||'').trim().toUpperCase();
-  if(['B','C'].includes(pillar)){
+  if(['1','2','3','4','A','B','C'].includes(pillar)){
    if(!t.stage1.pillars.includes(pillar)){
     t.stage1.pillars.push(pillar);
-    t.stage1.cluesFound=Math.min(2,t.stage1.pillars.filter(x=>x==='B'||x==='C').length);
-    const clueSym=pillar==='B'?'vectơ AB':'vectơ AC';
-    emit(r,`📜 ${t.avatar} ${t.name} thu thập mảnh mật thư [${clueSym}] tại Cột ${pillar} (${t.stage1.cluesFound}/2)!`);
+    t.stage1.cluesFound=Math.min(4,t.stage1.pillars.length);
+    emit(r,`📜 ${t.avatar} ${t.name} đã thu thập mảnh mật thư #${pillar} (${t.stage1.cluesFound}/4)!`);
     persist();
    }
   }
@@ -332,7 +331,7 @@ function processAction(endpoint,d){
   t.stage=stg;t.round=0;t.health=3;t.completed=false;
   t.cipherReady=false;t.bossReady=false;
   t.stageEnteredAt=Date.now();
-  t.stage1=stg>=1?{pillars:['B','C'],cluesFound:2,maxClues:2,cipherSolved:true,bridgeOpened:true,wrongAttempts:0,completedTimeSec:35,chestOpened:false,controllerRoleIdx:0,spawnVariant:0}:{pillars:[],cluesFound:0,maxClues:2,cipherSolved:false,bridgeOpened:false,wrongAttempts:0,completedTimeSec:null,chestOpened:false,controllerRoleIdx:0,spawnVariant:crypto.randomInt(3)};
+  t.stage1=stg>=1?{pillars:['1','2','3','4'],cluesFound:4,maxClues:4,cipherSolved:true,bridgeOpened:true,wrongAttempts:0,completedTimeSec:35,chestOpened:false,controllerRoleIdx:0,spawnVariant:0}:{pillars:[],cluesFound:0,maxClues:4,cipherSolved:false,bridgeOpened:false,wrongAttempts:0,completedTimeSec:null,chestOpened:false,controllerRoleIdx:0,spawnVariant:crypto.randomInt(3)};
   t.digits=STAGES.slice(0,stg).map((s,idx)=>({stage:idx+1,digit:s.digit,rule:s.digitRule,item:s.item}));
   t.score=stg*20;
   const nextPos=Math.min(5,stg);
@@ -385,29 +384,29 @@ function processAction(endpoint,d){
   if(idx===0 && q.stepType==='find_pillars'){
    isCorrect=Boolean(d.interactiveDone || (Array.isArray(d.pillars)&&d.pillars.length>=2) || d.choice===0);
    if(isCorrect){
-    t.stage1.pillars=['B','C'];
-    t.stage1.cluesFound=2;
+    t.stage1.pillars=['1','2','3','4'];
+    t.stage1.cluesFound=4;
    }
   }else if(idx===0 && q.stepType==='assemble_cipher'){
    if(d.cipherOrder!==undefined){
     const rawOrder=Array.isArray(d.cipherOrder)?d.cipherOrder.join(''):d.cipherOrder;
     const ord=normAns(rawOrder);
-    isCorrect=(ord==='AB-AC'||ord==='VECTƠAB-VECTƠAC'||ord==='AB-AC=?'||ord==='BC');
+    isCorrect=(ord==='AB-AC'||ord==='VECTƠAB-VECTƠAC'||ord==='AB-AC=?'||ord==='BC'||ord==='CB');
     chosenLogText=`Mở cuộn giấy mật mã: ${d.cipherOrder}`;
     if(!isCorrect){
      customWrongHint='Hãy quan sát điểm đầu và điểm cuối của mỗi vectơ: vectơ AB − vectơ AC = ?';
     }
    }else if(d.shortText!==undefined&&String(d.shortText).trim()!==''){
     const ord=normAns(d.shortText);
-    isCorrect=(ord==='AB-AC'||ord==='A'||ord==='BC');
+    isCorrect=(ord==='AB-AC'||ord==='A'||ord==='BC'||ord==='CB');
     chosenLogText=`Mở cuộn giấy mật mã: ${d.shortText}`;
    }else{
     isCorrect=(Number(d.choice)===0 || Boolean(d.interactiveDone));
     chosenLogText=isCorrect?'Mở cuộn giấy: AB − AC = ?':'Chưa mở cuộn giấy';
    }
    if(isCorrect){
-    t.stage1.pillars=['B','C'];
-    t.stage1.cluesFound=2;
+    t.stage1.pillars=['1','2','3','4'];
+    t.stage1.cluesFound=4;
     t.stage1.cipherSolved=true;
    }
   }else if(idx===0 && q.stepType==='draw_vector_cb'){
@@ -415,13 +414,13 @@ function processAction(endpoint,d){
     const fromPt=String(d.vectorFrom||'C').trim().toUpperCase();
     const toPt=String(d.vectorTo||'').trim().toUpperCase();
     isCorrect=(fromPt==='C'&&toPt==='B');
-    chosenLogText=`Di chuyển Rồng Xanh từ ${fromPt||'C'} → cột ${toPt||'?'} (vectơ ${fromPt}${toPt})`;
+    chosenLogText=`Mở khóa Cầu Ánh Sáng: Vectơ ${fromPt}${toPt} (từ ${fromPt} → ${toPt})`;
     if(!isCorrect){
      t.stage1.wrongAttempts=(t.stage1.wrongAttempts||0)+1;
      if(t.stage1.wrongAttempts===1){
-      customWrongHint='Hãy quan sát điểm đầu và điểm cuối của mỗi vectơ. Rồng Xanh đã được đưa về cột C để thử lại!';
+      customWrongHint='Hãy quan sát điểm đầu và điểm cuối của mỗi vectơ: vectơ AB − vectơ AC có điểm đầu là C, điểm cuối là B.';
      }else{
-      customWrongHint='Khi trừ hai vectơ cùng điểm đầu, hãy tìm hướng nối hai điểm cuối (từ C đến B). Rồng Xanh đã quay về cột C!';
+      customWrongHint='Khi trừ hai vectơ cùng điểm đầu A, vectơ hiệu nối từ C đến B: vectơ CB!';
      }
     }
    }else if(d.shortText!==undefined&&String(d.shortText).trim()!==''){
@@ -431,12 +430,12 @@ function processAction(endpoint,d){
     if(!isCorrect)t.stage1.wrongAttempts=(t.stage1.wrongAttempts||0)+1;
    }else{
     isCorrect=(Number(d.choice)===0);
-    chosenLogText=isCorrect?'Di chuyển C → B (vectơ CB)':'Chọn sai cột đích';
+    chosenLogText=isCorrect?'Mở khóa Cầu Ánh Sáng (vectơ CB)':'Chọn sai mật mã';
     if(!isCorrect)t.stage1.wrongAttempts=(t.stage1.wrongAttempts||0)+1;
    }
    if(isCorrect){
-    t.stage1.pillars=['B','C'];
-    t.stage1.cluesFound=2;
+    t.stage1.pillars=['1','2','3','4'];
+    t.stage1.cluesFound=4;
     t.stage1.cipherSolved=true;
     t.stage1.bridgeOpened=true;
     if(!t.stage1.completedTimeSec){
