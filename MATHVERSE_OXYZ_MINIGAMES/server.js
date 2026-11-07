@@ -112,6 +112,22 @@ function ensureTeamFields(t){
    t.stage1.cipherSolved=true;
   }
  }
+ const curStgPos=t.completed?5:Math.min(5,t.stage||0);
+ if(!t.dragon||typeof t.dragon!=='object'){
+  t.dragon={state:'PLAYING',fromStage:curStgPos,toStage:curStgPos,moveMode:'IDLE',transitionId:0,startedAt:Date.now(),durationMs:3400};
+ }
+ if(t.dragon.state!=='PLAYING'&&t.dragon.state!=='IDLE'){
+  const elapsedMove=Date.now()-(t.dragon.startedAt||0);
+  if(elapsedMove>(t.dragon.durationMs||3800)+1200){
+   t.dragon.state='PLAYING';
+   t.dragon.fromStage=curStgPos;
+   t.dragon.toStage=curStgPos;
+   t.dragon.moveMode='IDLE';
+  }
+ }else{
+  t.dragon.fromStage=curStgPos;
+  t.dragon.toStage=curStgPos;
+ }
  return t;
 }
 
@@ -202,6 +218,7 @@ function roomState(room,token){
   cipherReady:Boolean(t.cipherReady),bossReady:Boolean(t.bossReady),
   completed:t.completed,finishedAt:t.finishedAt,
   stage1:t.stage1||{pillars:[],cluesFound:0,cipherSolved:false,bridgeOpened:false},
+  dragon:t.dragon||{state:'PLAYING',fromStage:t.stage,toStage:t.stage,moveMode:'IDLE',transitionId:0},
   online:Boolean((now-(t.lastActiveAt||0))<15*60*1000),
   stuckSec:Math.floor((now-(t.stageEnteredAt||now))/1000),
   attempts:teacher?t.attempts:undefined,
@@ -225,6 +242,7 @@ function roomState(room,token){
   gold:team.gold,heroLevel:team.heroLevel,streak:team.streak||0,correctCount:team.correctCount||0,upgrades:team.upgrades,
   cipherReady:Boolean(team.cipherReady),bossReady:Boolean(team.bossReady),
   stage1:team.stage1||{pillars:[],cluesFound:0,cipherSolved:false,bridgeOpened:false},
+  dragon:team.dragon||{state:'PLAYING',fromStage:team.stage,toStage:team.stage,moveMode:'IDLE',transitionId:0},
   completed:team.completed,attempts:team.attempts,hintsUsed:team.hintsUsed,digits:team.digits,finishedAt:team.finishedAt},
   current:cur?publicStage(cur,team.round,team):null,cipherWords:team.stage>=5?TOKEN_WORDS:null};
 }
@@ -272,27 +290,65 @@ function processAction(endpoint,d){
   }
   return{ok:true,stage1:t.stage1};
  }
+ if(endpoint==='/api/dragonState'){
+  const t=requireTeam(r,d.token);
+  t.lastActiveAt=Date.now();
+  const validStates=['IDLE','PLAYING','STAGE_COMPLETED','REWARD','CELEBRATING','MOVING','ARRIVING','STAGE_UNLOCKED'];
+  const validModes=['IDLE','RUN','FLY','LAND','CELEBRATE','TALK'];
+  if(d.state && validStates.includes(d.state)) t.dragon.state=d.state;
+  if(d.moveMode && validModes.includes(d.moveMode)) t.dragon.moveMode=d.moveMode;
+  if(d.fromStage!==undefined) t.dragon.fromStage=Number(d.fromStage);
+  if(d.toStage!==undefined) t.dragon.toStage=Number(d.toStage);
+  if(d.state==='PLAYING'||d.state==='IDLE'){
+   const curPos=t.completed?5:Math.min(5,t.stage||0);
+   t.dragon.fromStage=curPos;
+   t.dragon.toStage=curPos;
+  }
+  persist();
+  return{ok:true,dragon:t.dragon};
+ }
  if(endpoint==='/api/demoJump'){
   const t=requireTeam(r,d.token);
   const stg=Math.max(0,Math.min(5,Number(d.stage)||0));
+  const prevPos=Math.min(5,t.stage||0);
   t.stage=stg;t.round=0;t.health=3;t.completed=false;
   t.cipherReady=false;t.bossReady=false;
   t.stageEnteredAt=Date.now();
   t.stage1=stg>=1?{pillars:['A','B','C'],cluesFound:3,cipherSolved:true,bridgeOpened:true}:{pillars:[],cluesFound:0,cipherSolved:false,bridgeOpened:false};
   t.digits=STAGES.slice(0,stg).map((s,idx)=>({stage:idx+1,digit:s.digit,rule:s.digitRule,item:s.item}));
   t.score=stg*20;
-  persist();return{ok:true};
+  const nextPos=Math.min(5,stg);
+  t.dragon={
+   state:prevPos!==nextPos?'MOVING':'PLAYING',
+   fromStage:prevPos,
+   toStage:nextPos,
+   moveMode:prevPos!==nextPos?'RUN':'IDLE',
+   transitionId:(t.dragon?.transitionId||0)+1,
+   startedAt:Date.now(),
+   durationMs:prevPos!==nextPos?3200:0
+  };
+  persist();return{ok:true,dragon:t.dragon};
  }
  if(endpoint==='/api/stageTimeout'){
   const t=requireTeam(r,d.token);
   if(t.stage<5&&!r.paused&&!r.ended){
+   const prevStageIdx=t.stage;
    const s=STAGES[t.stage];
-   emit(r,`⏱️ ${t.avatar} ${t.name} đã hết thời gian tại Chặng ${t.stage+1} (${s.place}), tự động chuyển sang chặng tiếp theo.`);
+   emit(r,`⏱️ ${t.avatar} ${t.name} đã hết thời gian tại Chặng ${t.stage+1} (${s.place}), Rồng Xanh đưa đội di chuyển sang chặng tiếp theo.`);
    t.stage++;t.round=0;t.health=3;t.stageEnteredAt=Date.now();
    if(t.stage>=5)t.completed=true;
+   t.dragon={
+    state:'MOVING',
+    fromStage:prevStageIdx,
+    toStage:Math.min(5,t.stage),
+    moveMode:'FLY',
+    transitionId:(t.dragon?.transitionId||0)+1,
+    startedAt:Date.now(),
+    durationMs:3400
+   };
    persist();
   }
-  return{ok:true,nextStage:t.stage};
+  return{ok:true,nextStage:t.stage,dragon:t.dragon};
  }
  if(endpoint==='/api/answer'){
   const t=requireTeam(r,d.token);
@@ -316,7 +372,8 @@ function processAction(endpoint,d){
    }
   }else if(idx===0 && q.stepType==='assemble_cipher'){
    if(d.cipherOrder!==undefined){
-    const ord=normAns(d.cipherOrder);
+    const rawOrder=Array.isArray(d.cipherOrder)?d.cipherOrder.join(''):d.cipherOrder;
+    const ord=normAns(rawOrder);
     isCorrect=(ord==='AB-AC'||ord==='VECTƠAB-VECTƠAC'||ord==='AB-AC=?');
     chosenLogText=`Ghép mật thư: ${d.cipherOrder}`;
     if(!isCorrect){
@@ -397,18 +454,35 @@ function processAction(endpoint,d){
    t.gold=(t.gold||120)+goldEarned;
    t.score+=pts;
    if(t.round>=chList.length){
-    const stageBonus=t.attempts[idx]===0&&!t.hintsUsed[idx]?20:10;
+    const alreadyRewarded=t.digits.some(dg=>dg.stage===idx+1);
+    const stageBonus=alreadyRewarded?0:(t.attempts[idx]===0&&!t.hintsUsed[idx]?20:10);
     pts+=stageBonus;
     t.score+=stageBonus;
-    t.stage++;t.round=0;t.health=3;t.gold+=100;
+    const prevStageIdx=idx;
+    t.stage++;t.round=0;t.health=3;
+    if(!alreadyRewarded) t.gold+=100;
     t.stageEnteredAt=Date.now();
     t.heroLevel=Math.min(6,(t.heroLevel||1)+1);
     digit=s.digit;
-    t.digits.push({stage:idx+1,digit:s.digit,rule:s.digitRule,item:s.item});
+    if(!alreadyRewarded){
+     t.digits.push({stage:idx+1,digit:s.digit,rule:s.digitRule,item:s.item});
+    }
+    const nextStageIdx=Math.min(5,t.stage);
+    t.dragon={
+     state:'CELEBRATING',
+     fromStage:prevStageIdx,
+     toStage:nextStageIdx,
+     moveMode:'CELEBRATE',
+     transitionId:(t.dragon?.transitionId||0)+1,
+     startedAt:Date.now(),
+     durationMs:3800
+    };
     if(idx===0){
-     emit(r,`🌉 ${t.avatar} ${t.name} đã giải mã vectơ CB, khôi phục Cây Cầu Ánh Sáng và thu hồi [${s.item}]! (+${pts} XP)`);
+     emit(r,`🌉 ${t.avatar} ${t.name} đã giải mã vectơ CB, khôi phục Cây Cầu Ánh Sáng, nhận [${s.item}] và cùng Rồng Xanh di chuyển sang Chặng 2! (+${pts} XP)`);
+    }else if(t.stage>=5){
+     emit(r,`👑 ${t.avatar} ${t.name} đã thu hồi đủ 5 Ấn Vectơ tại ${s.place} và đang bay tới Tâm Thạch Vectơ! (+${pts} XP)`);
     }else{
-     emit(r,`🏅 ${t.avatar} ${t.name} đã thu hồi [${s.item}] tại ${s.place}! (+${pts} XP)`);
+     emit(r,`🏅 ${t.avatar} ${t.name} đã thu hồi [${s.item}] tại ${s.place} và đang cùng Rồng Xanh di chuyển sang Chặng ${t.stage+1}! (+${pts} XP)`);
     }
    }else{
     if(idx===0 && t.round===1){
@@ -427,7 +501,7 @@ function processAction(endpoint,d){
     roundFinished:true,stageFinished:digit!==null,
     digit,digitRule:digit!==null?s.digitRule:undefined,item:digit!==null?s.item:undefined,
     nextRound:t.round,nextStage:t.stage,health:t.health,score:t.score,
-    stage1:t.stage1
+    stage1:t.stage1,dragon:t.dragon
    };
   }
   t.streak=0;

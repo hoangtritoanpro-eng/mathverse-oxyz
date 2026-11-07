@@ -4880,3 +4880,837 @@ body {
   border: 1.5px solid #36DEF4;
   color: #A5F3FC;
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   HỆ THỐNG RỒNG XANH DI CHUYỂN QUA 5 CHẶNG TRÊN BẢN ĐỒ LỤC ĐỊA OXYZ (v4.4)
+   - AdventureMap: Bản đồ 5 vùng đất tương tác thật + Đường nối Bézier
+   - DragonCharacter: IDLE, RUN, FLY, LAND, CELEBRATE, TALK + Cánh vỗ + Bóng + Hạt sáng
+   - Top-Left HUD Card & Bottom Action Dock chuẩn bố cục ảnh tham chiếu
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.hs-map-bar-substrip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 6px;
+  padding: 5px 10px;
+  border-radius: 10px;
+  background: rgba(8, 18, 38, 0.78);
+  border: 1px solid rgba(54, 222, 244, 0.28);
+}
+.hs-map-dragon-live {
+  font-size: 12px;
+  font-weight: 800;
+  color: #A7F3D0;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.hs-map-dragon-live.moving {
+  color: #FFC953;
+  animation: advPulseText 0.9s ease-in-out infinite alternate;
+}
+@keyframes advPulseText {
+  from { opacity: 0.82; transform: translateX(0); }
+  to { opacity: 1; transform: translateX(3px); }
+}
+
+.hs-stage-card.dragon-present {
+  border-color: #10B981 !important;
+  box-shadow: 0 0 18px rgba(16, 185, 129, 0.45), inset 0 0 12px rgba(255, 201, 83, 0.22);
+}
+.hs-stage-mini-dragon {
+  width: 34px;
+  height: 34px;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 6px rgba(16, 185, 129, 0.8));
+  animation: dragonMiniBob 1.4s ease-in-out infinite;
+}
+.hs-stage-mini-dragon.flying {
+  animation: dragonMiniFly 0.45s ease-in-out infinite alternate;
+}
+@keyframes dragonMiniBob {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-3px) scale(1.06); }
+}
+@keyframes dragonMiniFly {
+  from { transform: translateY(-2px) rotate(-6deg) scale(1.08); }
+  to { transform: translateY(-6px) rotate(6deg) scale(1.15); }
+}
+
+.gv-s1-pill.moving {
+  background: rgba(255, 201, 83, 0.24);
+  border-color: #FFC953;
+  color: #FEF08A;
+}
+
+/* ─── KHUNG BẢN ĐỒ THẾ GIỚI 5 VÙNG ĐẤT LIÊN KẾT (ADVENTURE MAP) ─── */
+.adv-world-map-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+.adv-world-map-viewport {
+  position: relative;
+  width: 100%;
+  height: 410px;
+  min-height: 380px;
+  border-radius: 16px;
+  overflow: hidden;
+  background-size: cover;
+  background-position: center;
+  border: 2px solid rgba(54, 222, 244, 0.55);
+  box-shadow: 0 12px 34px rgba(0, 0, 0, 0.65), inset 0 0 32px rgba(54, 222, 244, 0.18);
+  user-select: none;
+}
+
+/* Lớp SVG Đường nối Bézier giữa 5 đảo */
+.adv-routes-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 2;
+}
+.adv-route-dots {
+  animation: advRouteFlow 1.8s linear infinite;
+}
+@keyframes advRouteFlow {
+  from { stroke-dashoffset: 36; }
+  to { stroke-dashoffset: 0; }
+}
+
+/* Lớp Hạt bụi sáng & Hạt sao trên đường di chuyển */
+.adv-trail-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 4;
+}
+.adv-trail-particle {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  font-weight: 900;
+  animation: advTrailFade 0.9s ease-out forwards;
+}
+.adv-trail-particle.dust {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #FEF08A 0%, #F59E0B 70%, transparent 100%);
+  color: transparent;
+  box-shadow: 0 0 10px #FACC15;
+}
+.adv-trail-particle.star {
+  font-size: 15px;
+  color: #67E8F9;
+  text-shadow: 0 0 10px #36DEF4, 0 0 16px #FFC953;
+}
+@keyframes advTrailFade {
+  0% { opacity: 1; transform: translate(-50%, -50%) scale(1.15); }
+  100% { opacity: 0; transform: translate(-50%, -120%) scale(0.35); }
+}
+
+/* Thẻ HUD Góc Trên Trái trên Bản đồ (Chuẩn bố cục tham chiếu) */
+.adv-top-left-hud {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 8;
+  width: 290px;
+  max-width: calc(100% - 24px);
+  padding: 10px 14px;
+  border-radius: 14px;
+  background: linear-gradient(180deg, rgba(8, 22, 48, 0.92) 0%, rgba(6, 15, 34, 0.95) 100%);
+  border: 1.8px solid rgba(54, 222, 244, 0.65);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6), 0 0 18px rgba(54, 222, 244, 0.25);
+  backdrop-filter: blur(8px);
+}
+.adv-hud-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 6px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid rgba(54, 222, 244, 0.25);
+}
+.adv-hud-scroll-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: rgba(255, 201, 83, 0.18);
+  border: 1.5px solid #FFC953;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+}
+.adv-hud-kicker {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: #94A3B8;
+}
+.adv-hud-stage-name {
+  font-size: 16px;
+  font-weight: 900;
+  color: #FFC953;
+}
+.adv-hud-row {
+  font-size: 11.5px;
+  color: #E2E8F0;
+  line-height: 1.4;
+  margin-top: 3px;
+}
+.adv-hud-live-state {
+  margin-top: 6px;
+  padding: 4px 8px;
+  border-radius: 8px;
+  background: rgba(16, 185, 129, 0.18);
+  border: 1px solid rgba(53, 201, 146, 0.45);
+  color: #A7F3D0;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+/* Nút Góc Trên Phải Bản Đồ */
+.adv-top-right-controls {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 8;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.adv-mini-action-btn {
+  padding: 7px 13px;
+  border-radius: 99px;
+  background: rgba(8, 22, 48, 0.9);
+  border: 1.5px solid rgba(54, 222, 244, 0.65);
+  color: #E0F2FE;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
+  transition: transform 0.15s ease, border-color 0.15s ease;
+}
+.adv-mini-action-btn:hover {
+  transform: translateY(-2px);
+  border-color: #FFC953;
+  color: #FEF08A;
+}
+.adv-mini-action-btn.primary {
+  background: linear-gradient(180deg, #FBBF24 0%, #D97706 100%);
+  border-color: #FEF08A;
+  color: #0B1227;
+  font-weight: 900;
+}
+
+/* ─── 5 VÙNG ĐẤT NỔI TƯƠNG TÁC (ISLAND NODES) ─── */
+.adv-islands-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+}
+.adv-island-node {
+  position: absolute;
+  transform: translate(-50%, -62%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  pointer-events: auto;
+  transition: transform 0.2s ease, filter 0.2s ease;
+}
+.adv-island-node:hover {
+  transform: translate(-50%, -66%) scale(1.06);
+  z-index: 12;
+}
+.adv-island-node:hover .mv-island-tooltip {
+  opacity: 1;
+  visibility: visible;
+  transform: translate(-50%, -6px);
+}
+.adv-island-node.locked {
+  filter: saturate(0.7) brightness(0.88);
+}
+.adv-island-node.just-unlocked {
+  animation: advIslandUnlockPop 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+@keyframes advIslandUnlockPop {
+  0% { transform: translate(-50%, -62%) scale(0.85); filter: brightness(1.8); }
+  60% { transform: translate(-50%, -68%) scale(1.16); filter: brightness(1.4); }
+  100% { transform: translate(-50%, -62%) scale(1); filter: brightness(1); }
+}
+
+.adv-island-art-wrap {
+  position: relative;
+  width: 66px;
+  height: 46px;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 2px solid #36DEF4;
+  background: #0F172A;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.65);
+  margin-bottom: -6px;
+  z-index: 1;
+}
+.adv-island-node.done .adv-island-art-wrap {
+  border-color: #10B981;
+  box-shadow: 0 0 16px rgba(16, 185, 129, 0.55);
+}
+.adv-island-node.current .adv-island-art-wrap {
+  border-color: #FFC953;
+  box-shadow: 0 0 22px rgba(255, 201, 83, 0.75);
+}
+.adv-island-art-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.adv-island-seal-gem {
+  position: absolute;
+  top: 2px;
+  right: 3px;
+  font-size: 11px;
+  filter: drop-shadow(0 1px 3px #000);
+}
+
+.adv-island-banner {
+  position: relative;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 11px 3px 4px;
+  border-radius: 99px;
+  background: linear-gradient(180deg, rgba(11, 24, 52, 0.96) 0%, rgba(7, 14, 32, 0.98) 100%);
+  border: 1.8px solid #FFC953;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.7);
+  white-space: nowrap;
+}
+.adv-island-num {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: linear-gradient(180deg, #FDE047 0%, #D97706 100%);
+  color: #0B1227;
+  font-size: 12.5px;
+  font-weight: 900;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.adv-island-title {
+  font-size: 12.5px;
+  font-weight: 900;
+  color: #FFFFFF;
+}
+
+.adv-island-level {
+  margin-top: 2px;
+  padding: 1px 8px;
+  border-radius: 6px;
+  font-size: 9.5px;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.adv-island-level.nb {
+  background: rgba(16, 185, 129, 0.88);
+  border: 1px solid #6EE7B7;
+  color: #FFFFFF;
+}
+.adv-island-level.th {
+  background: rgba(217, 119, 6, 0.92);
+  border: 1px solid #FDE047;
+  color: #FFFFFF;
+}
+
+/* Bệ cổng dịch chuyển dưới mỗi đảo */
+.adv-portal-pad {
+  margin-top: 4px;
+  width: 38px;
+  height: 18px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 900;
+  box-shadow: 0 0 14px rgba(0, 0, 0, 0.65);
+}
+.adv-portal-pad.done {
+  background: radial-gradient(circle, #10B981 0%, #059669 75%);
+  border: 2px solid #A7F3D0;
+  color: #FFFFFF;
+  box-shadow: 0 0 16px #10B981;
+}
+.adv-portal-pad.current {
+  background: radial-gradient(circle, #FEF08A 0%, #F59E0B 72%);
+  border: 2px solid #FFFFFF;
+  box-shadow: 0 0 20px #FFC953, 0 0 30px #36DEF4;
+  animation: advPortalPulse 1.3s ease-in-out infinite;
+}
+.adv-portal-pad.locked {
+  background: rgba(30, 41, 59, 0.88);
+  border: 1.5px solid #64748B;
+  color: #94A3B8;
+}
+.adv-portal-beacon {
+  width: 12px;
+  height: 6px;
+  border-radius: 50%;
+  background: #FFFFFF;
+  box-shadow: 0 0 8px #36DEF4;
+}
+@keyframes advPortalPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.16); }
+}
+
+/* Đỉnh Tâm Thạch Vectơ (Heart Stone Node) */
+.adv-heartstone-node {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  pointer-events: auto;
+  z-index: 6;
+}
+.adv-heartstone-orb {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #E0F2FE 0%, #36DEF4 55%, #0284C7 100%);
+  border: 2px solid #FEF08A;
+  box-shadow: 0 0 22px #36DEF4, 0 0 36px rgba(255, 201, 83, 0.65);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  animation: advHeartFloat 2s ease-in-out infinite;
+}
+.adv-heartstone-tag {
+  margin-top: 2px;
+  padding: 1px 7px;
+  border-radius: 99px;
+  background: rgba(8, 22, 48, 0.92);
+  border: 1px solid #36DEF4;
+  color: #A5F3FC;
+  font-size: 9px;
+  font-weight: 900;
+  white-space: nowrap;
+}
+@keyframes advHeartFloat {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-4px) scale(1.08); }
+}
+
+/* ─── NHÂN VẬT RỒNG XANH DI CHUYỂN THỰC SỰ (DRAGON CHARACTER) ─── */
+.dragon-actor {
+  position: absolute;
+  transform: translate(-50%, -84%);
+  width: 86px;
+  height: 86px;
+  z-index: 15;
+  pointer-events: none;
+  will-change: left, top, transform;
+}
+.dragon-body-rig {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform-origin: center bottom;
+}
+.dragon-actor.dragon-facing-left .dragon-body-rig {
+  transform: scaleX(-1);
+}
+.dragon-actor-img {
+  position: relative;
+  z-index: 3;
+  width: 76px;
+  height: 76px;
+  object-fit: contain;
+  filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.65)) drop-shadow(0 0 12px rgba(16, 185, 129, 0.55));
+}
+
+/* Cánh Rồng Xanh SVG vỗ động */
+.dragon-wings-svg {
+  position: absolute;
+  top: 6px;
+  left: -14px;
+  width: 114px;
+  height: 68px;
+  z-index: 2;
+  overflow: visible;
+  filter: drop-shadow(0 0 8px rgba(52, 211, 153, 0.65));
+}
+.dragon-wing-left {
+  transform-origin: 54px 44px;
+}
+.dragon-wing-right {
+  transform-origin: 66px 44px;
+}
+
+/* Bóng đổ dưới chân Rồng Xanh */
+.dragon-ground-shadow {
+  position: absolute;
+  bottom: 2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 52px;
+  height: 14px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(0, 0, 0, 0.62) 0%, rgba(0, 0, 0, 0) 75%);
+  z-index: 1;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+/* Vòng sóng ánh sáng khi hạ cánh (LAND) */
+.dragon-landing-ring {
+  position: absolute;
+  bottom: -2px;
+  left: 50%;
+  transform: translateX(-50%) scale(0.3);
+  width: 78px;
+  height: 28px;
+  border-radius: 50%;
+  border: 3px solid #FFC953;
+  box-shadow: 0 0 18px #36DEF4, inset 0 0 12px #FFC953;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Hạt bụi sáng & dấu chân khi chạy (RUN) */
+.dragon-run-dust {
+  position: absolute;
+  bottom: 4px;
+  left: 6px;
+  width: 45px;
+  height: 24px;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 2;
+}
+.dragon-run-dust .dust-p {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #FEF08A;
+  box-shadow: 0 0 8px #F59E0B;
+}
+.dragon-run-dust .dust-paw {
+  position: absolute;
+  left: -8px;
+  bottom: 0;
+  font-size: 13px;
+  filter: drop-shadow(0 0 6px #FFC953);
+}
+
+/* Hạt sao lấp lánh khi bay (FLY / CELEBRATE) */
+.dragon-fly-stars {
+  position: absolute;
+  inset: -8px;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 4;
+}
+.dragon-fly-stars .star-p {
+  position: absolute;
+  color: #FEF08A;
+  text-shadow: 0 0 10px #36DEF4;
+  font-size: 13px;
+}
+.dragon-fly-stars .s1 { top: 4px; left: -4px; }
+.dragon-fly-stars .s2 { top: -6px; right: 2px; color: #67E8F9; }
+.dragon-fly-stars .s3 { bottom: 14px; left: -10px; color: #67E8F9; }
+.dragon-fly-stars .s4 { bottom: 18px; right: -8px; }
+
+/* ─── 6 TRẠNG THÁI HOẠT ẢNH CỦA RỒNG XANH ─── */
+
+/* 1. IDLE: Thở nhẹ, vẫy cánh chậm tại điểm dừng */
+.dragon-actor.dragon-state-IDLE .dragon-actor-img {
+  animation: dragonIdleBob 2s ease-in-out infinite;
+}
+.dragon-actor.dragon-state-IDLE .dragon-wing-left {
+  animation: wingFlapLeftSlow 2s ease-in-out infinite;
+}
+.dragon-actor.dragon-state-IDLE .dragon-wing-right {
+  animation: wingFlapRightSlow 2s ease-in-out infinite;
+}
+
+/* 2. RUN: Chạy nhanh trên đường sáng, có bóng dưới chân & bụi vàng */
+.dragon-actor.dragon-state-RUN .dragon-actor-img {
+  animation: dragonRunStride 0.28s ease-in-out infinite alternate;
+}
+.dragon-actor.dragon-state-RUN .dragon-ground-shadow {
+  animation: shadowRunBounce 0.28s ease-in-out infinite alternate;
+}
+.dragon-actor.dragon-state-RUN .dragon-run-dust {
+  opacity: 1;
+  animation: dustBurstLoop 0.35s linear infinite;
+}
+.dragon-actor.dragon-state-RUN .dragon-wing-left {
+  animation: wingFlapLeftFast 0.32s ease-in-out infinite alternate;
+}
+.dragon-actor.dragon-state-RUN .dragon-wing-right {
+  animation: wingFlapRightFast 0.32s ease-in-out infinite alternate;
+}
+
+/* 3. FLY: Bay qua khoảng không giữa các đảo nổi, vỗ cánh mạnh & tỏa hạt sao */
+.dragon-actor.dragon-state-FLY .dragon-actor-img {
+  animation: dragonFlySoar 0.36s ease-in-out infinite alternate;
+  filter: drop-shadow(0 14px 20px rgba(0, 0, 0, 0.55)) drop-shadow(0 0 18px #36DEF4);
+}
+.dragon-actor.dragon-state-FLY .dragon-ground-shadow {
+  transform: translateX(-50%) scale(0.52);
+  opacity: 0.32;
+}
+.dragon-actor.dragon-state-FLY .dragon-fly-stars {
+  opacity: 1;
+  animation: starsTwinkleLoop 0.45s ease-in-out infinite alternate;
+}
+.dragon-actor.dragon-state-FLY .dragon-wing-left {
+  animation: wingFlapLeftFast 0.16s ease-in-out infinite alternate;
+}
+.dragon-actor.dragon-state-FLY .dragon-wing-right {
+  animation: wingFlapRightFast 0.16s ease-in-out infinite alternate;
+}
+
+/* 4. LAND: Hạ cánh tại cổng chặng mới kèm vòng sáng lan tỏa */
+.dragon-actor.dragon-state-LAND .dragon-actor-img {
+  animation: dragonLandSquash 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.dragon-actor.dragon-state-LAND .dragon-landing-ring {
+  animation: landingRingExpand 0.65s ease-out forwards;
+}
+
+/* 5. CELEBRATE: Nhảy vui mừng khi hoàn thành chặng & nhận Ấn Vectơ */
+.dragon-actor.dragon-state-CELEBRATE .dragon-actor-img {
+  animation: dragonCelebrateJump 0.42s ease-in-out infinite alternate;
+}
+.dragon-actor.dragon-state-CELEBRATE .dragon-fly-stars {
+  opacity: 1;
+  animation: starsTwinkleLoop 0.35s ease-in-out infinite alternate;
+}
+.dragon-actor.dragon-state-CELEBRATE .dragon-wing-left {
+  animation: wingFlapLeftFast 0.2s ease-in-out infinite alternate;
+}
+.dragon-actor.dragon-state-CELEBRATE .dragon-wing-right {
+  animation: wingFlapRightFast 0.2s ease-in-out infinite alternate;
+}
+
+/* 6. TALK: Trò chuyện & giao nhiệm vụ tại cổng chặng mới */
+.dragon-actor.dragon-state-TALK .dragon-actor-img {
+  animation: dragonTalkPulse 0.6s ease-in-out infinite alternate;
+}
+
+@keyframes dragonIdleBob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+@keyframes dragonRunStride {
+  0% { transform: translateY(0) rotate(-6deg) scale(1.02, 0.97); }
+  100% { transform: translateY(-9px) rotate(8deg) scale(0.98, 1.05); }
+}
+@keyframes dragonFlySoar {
+  0% { transform: translateY(-12px) rotate(-5deg) scale(1.06); }
+  100% { transform: translateY(-22px) rotate(5deg) scale(1.12); }
+}
+@keyframes dragonLandSquash {
+  0% { transform: translateY(-18px) scale(1.08); }
+  55% { transform: translateY(4px) scale(1.12, 0.88); }
+  100% { transform: translateY(0) scale(1); }
+}
+@keyframes dragonCelebrateJump {
+  0% { transform: translateY(0) scale(1) rotate(-5deg); }
+  100% { transform: translateY(-16px) scale(1.12) rotate(6deg); }
+}
+@keyframes dragonTalkPulse {
+  0% { transform: translateY(0) scale(1); }
+  100% { transform: translateY(-4px) scale(1.05); }
+}
+@keyframes wingFlapLeftSlow {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(-14deg); }
+}
+@keyframes wingFlapRightSlow {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(14deg); }
+}
+@keyframes wingFlapLeftFast {
+  0% { transform: rotate(18deg) scaleY(0.85); }
+  100% { transform: rotate(-32deg) scaleY(1.12); }
+}
+@keyframes wingFlapRightFast {
+  0% { transform: rotate(-18deg) scaleY(0.85); }
+  100% { transform: rotate(32deg) scaleY(1.12); }
+}
+@keyframes shadowRunBounce {
+  0% { transform: translateX(-50%) scale(1); opacity: 0.65; }
+  100% { transform: translateX(-50%) scale(0.76); opacity: 0.42; }
+}
+@keyframes landingRingExpand {
+  0% { opacity: 1; transform: translateX(-50%) scale(0.35); }
+  100% { opacity: 0; transform: translateX(-50%) scale(1.65); }
+}
+@keyframes dustBurstLoop {
+  0% { transform: translateX(0) scale(0.85); opacity: 0.95; }
+  100% { transform: translateX(-16px) scale(1.25); opacity: 0.15; }
+}
+@keyframes starsTwinkleLoop {
+  0% { transform: scale(0.88) rotate(-4deg); opacity: 0.75; }
+  100% { transform: scale(1.15) rotate(6deg); opacity: 1; }
+}
+
+/* Bong bóng thoại & Huy hiệu thưởng trên đầu Rồng Xanh */
+.dragon-reward-floater {
+  position: absolute;
+  bottom: 102%;
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  padding: 3px 10px;
+  border-radius: 99px;
+  background: linear-gradient(90deg, #F59E0B, #10B981);
+  border: 1.5px solid #FEF08A;
+  color: #FFFFFF;
+  font-size: 11px;
+  font-weight: 900;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.65);
+  z-index: 20;
+}
+.dragon-speech-cloud {
+  position: absolute;
+  bottom: 86px;
+  left: 50%;
+  transform: translateX(-50%) scale(0.92);
+  min-width: 210px;
+  max-width: 270px;
+  padding: 7px 12px;
+  border-radius: 12px;
+  background: rgba(8, 22, 48, 0.95);
+  border: 1.8px solid #36DEF4;
+  color: #F8FAFF;
+  font-size: 11.5px;
+  font-weight: 800;
+  line-height: 1.35;
+  text-align: center;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.7), 0 0 14px rgba(54, 222, 244, 0.35);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  z-index: 19;
+}
+.dragon-speech-cloud.visible {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) scale(1);
+}
+.dragon-speech-cloud::after {
+  content: '';
+  position: absolute;
+  bottom: -7px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 7px 7px 0;
+  border-style: solid;
+  border-color: #36DEF4 transparent transparent;
+}
+
+/* ─── THANH DOCK 4 NÚT DƯỚI CÙNG (BOTTOM ACTION DOCK) ─── */
+.adv-bottom-dock {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1.25fr 1fr;
+  gap: 10px;
+  align-items: center;
+  padding: 8px 12px;
+  border-radius: 14px;
+  background: linear-gradient(180deg, rgba(10, 24, 52, 0.94) 0%, rgba(6, 15, 34, 0.98) 100%);
+  border: 1.5px solid rgba(54, 222, 244, 0.45);
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.55);
+}
+.adv-dock-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 42px;
+  padding: 0 14px;
+  border-radius: 99px;
+  background: linear-gradient(180deg, rgba(18, 42, 82, 0.92) 0%, rgba(10, 24, 52, 0.96) 100%);
+  border: 1.5px solid rgba(54, 222, 244, 0.55);
+  color: #F8FAFF;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.adv-dock-btn:hover,
+.adv-dock-btn.active {
+  transform: translateY(-2px);
+  border-color: #FFC953;
+  box-shadow: 0 0 16px rgba(54, 222, 244, 0.35);
+}
+.adv-dock-btn.start-cta {
+  height: 46px;
+  background: linear-gradient(180deg, #FDE047 0%, #F59E0B 55%, #D97706 100%);
+  border: 2px solid #FEF9C3;
+  color: #1E1B4B;
+  font-size: 15px;
+  font-weight: 900;
+  box-shadow: 0 6px 20px rgba(245, 158, 11, 0.55), inset 0 1px 2px #FFFFFF;
+}
+.adv-dock-btn.start-cta:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 8px 26px rgba(250, 204, 21, 0.75);
+}
+.adv-dock-badge {
+  position: absolute;
+  top: -4px;
+  right: 10px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #EF4444;
+  border: 1.5px solid #FFFFFF;
+  color: #FFFFFF;
+  font-style: normal;
+  font-size: 10px;
+  font-weight: 900;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@media (max-width: 1400px) {
+  .adv-world-map-viewport {
+    height: 375px;
+    min-height: 350px;
+  }
+  .adv-top-left-hud {
+    width: 260px;
+    padding: 8px 12px;
+  }
+}
+@media (max-width: 960px) {
+  .adv-bottom-dock {
+    grid-template-columns: 1fr 1fr;
+  }
+}

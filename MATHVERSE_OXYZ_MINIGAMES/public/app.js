@@ -1109,7 +1109,751 @@ function getStageFormulaSafe(stageIdx, currentTeamStage) {
  return STAGE_FORMULAS_SHORT[stageIdx] || '';
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   HỆ THỐNG RỒNG XANH DI CHUYỂN QUA 5 CHẶNG TRÊN BẢN ĐỒ LỤC ĐỊA OXYZ
+   Modules:
+   1. WORLD_STAGE_NODES & WORLD_ROUTES (Tọa độ chuẩn hóa 1000x560 & Đường cong Bézier)
+   2. DragonCharacter (IDLE, RUN, FLY, LAND, CELEBRATE, TALK + Cánh vỗ + Bóng + Hạt sáng)
+   3. DragonMovementController (Nội suy Bézier mượt 60fps, tự xoay hướng, vệt sáng)
+   4. StageTransitionController (PLAYING -> STAGE_COMPLETED -> REWARD -> CELEBRATING -> MOVING -> ARRIVING -> STAGE_UNLOCKED -> PLAYING)
+   5. AdventureMap (Bản đồ 5 vùng đất tương tác thật + Thẻ HUD góc trái + Thanh Dock 4 nút)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+const WORLD_STAGE_NODES = [
+ {
+  idx: 0,
+  id: 1,
+  key: 'stage1',
+  numStr: '01',
+  shortTitle: 'Hiệu vectơ',
+  fullTitle: 'Rừng Vectơ Khởi Nguyên',
+  topic: 'Hiệu hai vectơ',
+  level: 'NHẬN BIẾT',
+  levelCls: 'nb',
+  taskSummary: 'Tìm 3 mảnh mật thư & giải mã vectơ còn thiếu.',
+  rewardText: '+250 XP  +50 Vàng',
+  sealName: 'Ấn Hướng Đi',
+  img: '/assets/Stage_01_Rung_Vecto.png',
+  position: { x: 148, y: 420 }
+ },
+ {
+  idx: 1,
+  id: 2,
+  key: 'stage2',
+  numStr: '02',
+  shortTitle: 'Tổng vectơ',
+  fullTitle: 'Pháo Đài Góc Vuông',
+  topic: 'Tổng hai vectơ',
+  level: 'NHẬN BIẾT',
+  levelCls: 'nb',
+  taskSummary: 'Nối thông hai đoạn vectơ liên tiếp AB và BC.',
+  rewardText: '+250 XP  +50 Vàng',
+  sealName: 'Ấn Kết Nối',
+  img: '/assets/Stage_02_Phao_Dai.png',
+  position: { x: 308, y: 292 }
+ },
+ {
+  idx: 2,
+  id: 3,
+  key: 'stage3',
+  numStr: '03',
+  shortTitle: 'Hình bình hành',
+  fullTitle: 'Tháp Pha Lê',
+  topic: 'Quy tắc hình bình hành',
+  level: 'NHẬN BIẾT',
+  levelCls: 'nb',
+  taskSummary: 'Khôi phục đường chéo hình bình hành ABCD.',
+  rewardText: '+300 XP  +60 Vàng',
+  sealName: 'Ấn Cân Bằng',
+  img: '/assets/Stage_03_Thap_Pha_Le.png',
+  position: { x: 468, y: 208 }
+ },
+ {
+  idx: 3,
+  id: 4,
+  key: 'stage4',
+  numStr: '04',
+  shortTitle: 'Trung điểm',
+  fullTitle: 'Mê Cung Trung Điểm',
+  topic: 'Tính chất trung điểm',
+  level: 'THÔNG HIỂU',
+  levelCls: 'th',
+  taskSummary: 'Đặt pha lê I tại trung điểm AB để cân bằng hai vectơ.',
+  rewardText: '+350 XP  +75 Vàng',
+  sealName: 'Ấn Cân Xứng',
+  img: '/assets/Stage_04_Me_Cung.png',
+  position: { x: 618, y: 365 }
+ },
+ {
+  idx: 4,
+  id: 5,
+  key: 'stage5',
+  numStr: '05',
+  shortTitle: 'Trọng tâm',
+  fullTitle: 'Thành Trì Lõi Trí Tuệ',
+  topic: 'Tính chất trọng tâm',
+  level: 'THÔNG HIỂU',
+  levelCls: 'th',
+  taskSummary: 'Hợp nhất 3 luồng năng lượng tại trọng tâm G.',
+  rewardText: '+400 XP  +100 Vàng',
+  sealName: 'Ấn Trí Tuệ',
+  img: '/assets/Stage_05_Thanh_Tri.png',
+  position: { x: 758, y: 205 }
+ },
+ {
+  idx: 5,
+  id: 6,
+  key: 'heartStone',
+  numStr: '💎',
+  shortTitle: 'Tâm Thạch Vectơ',
+  fullTitle: 'Đỉnh Thành Trì · Tâm Thạch Vectơ',
+  topic: 'Khôi phục Tâm Thạch Lục Địa OXYZ',
+  level: 'TÂM THẠCH',
+  levelCls: 'core',
+  taskSummary: 'Hợp nhất đủ 5 Ấn Vectơ để khôi phục Tâm Thạch!',
+  rewardText: '+500 XP  Vinh Danh',
+  sealName: 'Tâm Thạch Vectơ',
+  img: '/assets/Stage_05_Thanh_Tri.png',
+  position: { x: 758, y: 88 }
+ }
+];
+
+const WORLD_ROUTES = {
+ '0->1': {
+  fromStage: 0,
+  toStage: 1,
+  p0: { x: 148, y: 420 },
+  p1: { x: 215, y: 405 },
+  p2: { x: 255, y: 342 },
+  p3: { x: 308, y: 292 },
+  runUntil: 0.42,
+  flyUntil: 0.88
+ },
+ '1->2': {
+  fromStage: 1,
+  toStage: 2,
+  p0: { x: 308, y: 292 },
+  p1: { x: 362, y: 262 },
+  p2: { x: 412, y: 220 },
+  p3: { x: 468, y: 208 },
+  runUntil: 0.38,
+  flyUntil: 0.88
+ },
+ '2->3': {
+  fromStage: 2,
+  toStage: 3,
+  p0: { x: 468, y: 208 },
+  p1: { x: 525, y: 238 },
+  p2: { x: 562, y: 332 },
+  p3: { x: 618, y: 365 },
+  runUntil: 0.36,
+  flyUntil: 0.88
+ },
+ '3->4': {
+  fromStage: 3,
+  toStage: 4,
+  p0: { x: 618, y: 365 },
+  p1: { x: 678, y: 342 },
+  p2: { x: 712, y: 255 },
+  p3: { x: 758, y: 205 },
+  runUntil: 0.40,
+  flyUntil: 0.88
+ },
+ '4->5': {
+  fromStage: 4,
+  toStage: 5,
+  p0: { x: 758, y: 205 },
+  p1: { x: 738, y: 165 },
+  p2: { x: 778, y: 125 },
+  p3: { x: 758, y: 88 },
+  runUntil: 0.26,
+  flyUntil: 0.88
+ }
+};
+
+// Mục 8: Lời thoại Rồng Xanh chuẩn kịch bản khi di chuyển giữa các chặng
+const STAGE_TRANSITION_DIALOGUES = {
+ '0->1': 'Giỏi lắm! Cây cầu đã hồi sinh! Cùng đến Pháo Đài Góc Vuông thôi!',
+ '1->2': 'Cánh cổng đã mở! Tháp Pha Lê đang đợi chúng ta!',
+ '2->3': 'Ba Ấn Vectơ đã được thu hồi! Hãy tìm điểm cân bằng!',
+ '3->4': 'Chỉ còn một thử thách! Cả đội cùng tiến đến Thành Trì Trí Tuệ!',
+ '4->5': 'Đủ 5 Ấn Vectơ rồi! Hãy bay lên đỉnh Thành Trì khôi phục Tâm Thạch Vectơ!'
+};
+
+const STAGE_ARRIVAL_DIALOGUES = {
+ 0: 'Cây cầu bị đảo chiều rồi! Hãy tìm 3 mảnh mật thư tại cột đá A, B, C để mở đường!',
+ 1: 'Đã tới cổng Pháo Đài Góc Vuông! Hai đoạn đường năng lượng đang rời nhau, hãy nối chúng lại!',
+ 2: 'Đã hạ cánh tại Tháp Pha Lê! Hai luồng sáng từ cùng một điểm sẽ tạo nên đường chéo chính!',
+ 3: 'Chào mừng tới Mê Cung Trung Điểm! Hãy đặt viên pha lê đúng chính giữa để hai vectơ cân bằng!',
+ 4: 'Thành Trì Lõi Trí Tuệ đây rồi! Hãy tìm Trọng tâm G để hợp nhất 3 luồng năng lượng!',
+ 5: 'Tâm Thạch Vectơ đã ở ngay trước mắt! Hãy kích hoạt đủ 5 Ấn Vectơ để giải cứu Lục địa OXYZ!'
+};
+
+// Trạng thái mở Bản đồ Thế giới 5 vùng đất (Mặc định hiển thị khi chuyển chặng hoặc khi bấm nút Bản đồ)
+let mvWorldMapOpen = false;
+let lastSyncedTeamStage = null;
+
+const DragonCharacter = {
+ STATES: ['IDLE', 'RUN', 'FLY', 'LAND', 'CELEBRATE', 'TALK'],
+
+ getStatusLabel(animState, machineState) {
+  if (machineState === 'REWARD' || animState === 'CELEBRATE') return '🎉 Nhận Ấn Vectơ & Ăn mừng!';
+  if (animState === 'RUN') return '🏃 Rồng Xanh đang chạy trên đường ánh sáng...';
+  if (animState === 'FLY') return '🪽 Rồng Xanh đang bay qua khoảng không đảo nổi...';
+  if (animState === 'LAND') return '🛬 Rồng Xanh hạ cánh tại cổng chặng mới!';
+  if (animState === 'TALK') return '💬 Rồng Xanh giao nhiệm vụ chặng mới!';
+  return '🐉 Rồng Xanh sẵn sàng đồng hành';
+ },
+
+ render(opts = {}) {
+  const xPct = (opts.x ?? 148) / 10;
+  const yPct = ((opts.y ?? 420) / 560) * 100;
+  const animState = this.STATES.includes(opts.animState) ? opts.animState : 'IDLE';
+  const facing = opts.facing === 'left' ? 'left' : 'right';
+  const speech = opts.speech || '';
+  const showBubble = Boolean(speech && (opts.showBubble || animState !== 'IDLE'));
+  const rewardTag = opts.rewardTag || '';
+
+  return `<div id="mvWorldDragonActor"
+    class="dragon-actor dragon-state-${animState} dragon-facing-${facing}"
+    data-dragon-state="${animState}"
+    style="left:${xPct.toFixed(2)}%;top:${yPct.toFixed(2)}%">
+    <!-- Bóng đổ dưới chân (co giãn khi chạy / thu nhỏ khi bay) -->
+    <div class="dragon-ground-shadow"></div>
+    <!-- Vòng sóng ánh sáng khi hạ cánh (LAND) hoặc mở cổng -->
+    <div class="dragon-landing-ring"></div>
+    <!-- Hạt bụi vàng & dấu chân năng lượng khi chạy (RUN) -->
+    <div class="dragon-run-dust" aria-hidden="true">
+     <span class="dust-p p1"></span>
+     <span class="dust-p p2"></span>
+     <span class="dust-p p3"></span>
+     <span class="dust-paw">🐾</span>
+    </div>
+    <!-- Hạt sao lấp lánh & luồng gió khi bay (FLY / CELEBRATE) -->
+    <div class="dragon-fly-stars" aria-hidden="true">
+     <span class="star-p s1">✦</span>
+     <span class="star-p s2">★</span>
+     <span class="star-p s3">✧</span>
+     <span class="star-p s4">✨</span>
+    </div>
+    <!-- Khung nhân vật Rồng Xanh có cánh vỗ SVG + Sprite động -->
+    <div class="dragon-body-rig">
+     <svg class="dragon-wings-svg" viewBox="0 0 120 76" aria-hidden="true">
+      <defs>
+       <linearGradient id="drgWingGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#34D399"/>
+        <stop offset="55%" stop-color="#10B981"/>
+        <stop offset="100%" stop-color="#059669"/>
+       </linearGradient>
+      </defs>
+      <path class="dragon-wing-left" d="M 54 44 C 34 12, 10 8, 4 28 C 12 36, 24 44, 14 58 C 28 54, 42 50, 54 46 Z" fill="url(#drgWingGrad)" stroke="#A7F3D0" stroke-width="1.8"/>
+      <path class="dragon-wing-right" d="M 66 44 C 86 12, 110 8, 116 28 C 108 36, 96 44, 106 58 C 92 54, 78 50, 66 46 Z" fill="url(#drgWingGrad)" stroke="#A7F3D0" stroke-width="1.8"/>
+     </svg>
+     <img src="/assets/RongXanh.png" alt="Rồng Xanh" class="dragon-actor-img" draggable="false"/>
+    </div>
+    ${rewardTag ? `<div class="dragon-reward-floater" id="mvDragonRewardFloater">${esc(rewardTag)}</div>` : `<div class="dragon-reward-floater" id="mvDragonRewardFloater" style="display:none"></div>`}
+    <div class="dragon-speech-cloud ${showBubble ? 'visible' : ''}" id="mvWorldDragonBubble">
+     <span id="mvWorldDragonBubbleText">${formatMath(speech)}</span>
+    </div>
+   </div>`;
+ }
+};
+
+const DragonMovementController = {
+ x: 148,
+ y: 420,
+ facing: 'right',
+ animState: 'IDLE',
+ activeRouteKey: null,
+ routeProgress: 0,
+ rafId: null,
+ trailParticles: [],
+
+ evalCubicBezier(p0, p1, p2, p3, t) {
+  const u = 1 - t;
+  const tt = t * t;
+  const uu = u * u;
+  const uuu = uu * u;
+  const ttt = tt * t;
+  const x = uuu * p0.x + 3 * uu * t * p1.x + 3 * u * tt * p2.x + ttt * p3.x;
+  const y = uuu * p0.y + 3 * uu * t * p1.y + 3 * u * tt * p2.y + ttt * p3.y;
+  // Đạo hàm bậc 1 để xác định hướng di chuyển (tangent vector)
+  const tx = 3 * uu * (p1.x - p0.x) + 6 * u * t * (p2.x - p1.x) + 3 * tt * (p3.x - p2.x);
+  const ty = 3 * uu * (p1.y - p0.y) + 6 * u * t * (p2.y - p1.y) + 3 * tt * (p3.y - p2.y);
+  return { x, y, tx, ty };
+ },
+
+ snapToStage(stageIdx, animState = 'IDLE') {
+  const safeIdx = Math.max(0, Math.min(WORLD_STAGE_NODES.length - 1, Number(stageIdx) || 0));
+  const node = WORLD_STAGE_NODES[safeIdx] || WORLD_STAGE_NODES[0];
+  this.x = node.position.x;
+  this.y = node.position.y;
+  this.animState = animState;
+  this.facing = 'right';
+  this.activeRouteKey = null;
+  this.routeProgress = 0;
+  this.syncActorDOM();
+ },
+
+ syncActorDOM(extra = {}) {
+  const actor = document.getElementById('mvWorldDragonActor');
+  if (actor) {
+   const xPct = (this.x / 10).toFixed(2);
+   const yPct = ((this.y / 560) * 100).toFixed(2);
+   actor.style.left = xPct + '%';
+   actor.style.top = yPct + '%';
+   actor.dataset.dragonState = this.animState;
+   DragonCharacter.STATES.forEach(st => actor.classList.toggle('dragon-state-' + st, st === this.animState));
+   actor.classList.toggle('dragon-facing-left', this.facing === 'left');
+   actor.classList.toggle('dragon-facing-right', this.facing !== 'left');
+  }
+
+  // Cập nhật bong bóng thoại trên đầu Rồng Xanh
+  const bubble = document.getElementById('mvWorldDragonBubble');
+  const bubbleText = document.getElementById('mvWorldDragonBubbleText');
+  if (bubble && bubbleText && extra.speech !== undefined) {
+   if (extra.speech) {
+    bubbleText.innerHTML = formatMath(extra.speech);
+    bubble.classList.add('visible');
+   } else {
+    bubble.classList.remove('visible');
+   }
+  }
+
+  // Cập nhật huy hiệu phần thưởng bay lên
+  const rwEl = document.getElementById('mvDragonRewardFloater');
+  if (rwEl && extra.rewardTag !== undefined) {
+   if (extra.rewardTag) {
+    rwEl.textContent = extra.rewardTag;
+    rwEl.style.display = 'inline-flex';
+   } else {
+    rwEl.style.display = 'none';
+   }
+  }
+
+  // Cập nhật đường nối Bézier phát sáng theo tiến độ di chuyển
+  if (this.activeRouteKey) {
+   const progPath = document.getElementById('mvRouteActiveGlow-' + this.activeRouteKey);
+   if (progPath) {
+    const pct = Math.max(0, Math.min(100, Math.round(this.routeProgress * 100)));
+    progPath.style.strokeDasharray = `${pct} 100`;
+    progPath.style.opacity = '1';
+   }
+  }
+
+  // Cập nhật thanh trạng thái trên thẻ góc trái
+  const hudStateEl = document.getElementById('mvAdvHudStatusText');
+  if (hudStateEl) {
+   hudStateEl.textContent = DragonCharacter.getStatusLabel(this.animState, StageTransitionController.state);
+  }
+ },
+
+ spawnStepParticle(x, y, mode) {
+  const layer = document.getElementById('mvDragonTrailLayer');
+  if (!layer) return;
+  const dot = document.createElement('span');
+  dot.className = mode === 'FLY' ? 'adv-trail-particle star' : 'adv-trail-particle dust';
+  dot.style.left = (x / 10).toFixed(2) + '%';
+  dot.style.top = ((y / 560) * 100).toFixed(2) + '%';
+  dot.textContent = mode === 'FLY' ? '✦' : '•';
+  layer.appendChild(dot);
+  setTimeout(() => dot.remove(), 950);
+ }
+};
+
+const StageTransitionController = {
+ // Máy trạng thái chuẩn Mục 5:
+ // PLAYING -> STAGE_COMPLETED -> REWARD -> CELEBRATING -> MOVING -> ARRIVING -> STAGE_UNLOCKED -> PLAYING
+ state: 'PLAYING',
+ fromStage: 0,
+ toStage: 0,
+ speech: '',
+ rewardTag: '',
+ transitionId: null,
+ timers: [],
+ lastParticleAt: 0,
+
+ isTransitioning() {
+  return this.state !== 'PLAYING';
+ },
+
+ clearAllTimers() {
+  this.timers.forEach(t => clearTimeout(t));
+  this.timers = [];
+  if (DragonMovementController.rafId) {
+   cancelAnimationFrame(DragonMovementController.rafId);
+   DragonMovementController.rafId = null;
+  }
+ },
+
+ syncServerDragonState(state, moveMode, fromStage, toStage) {
+  if (!session?.room || !session?.token || session?.role !== 'student') return;
+  api('/api/dragonState', {
+   room: session.room,
+   token: session.token,
+   state,
+   moveMode,
+   fromStage,
+   toStage,
+   transitionId: this.transitionId
+  }).catch(() => {});
+ },
+
+ /**
+  * Kích hoạt chuỗi hoạt cảnh Rồng Xanh di chuyển thực sự trên bản đồ từ fromStage -> toStage
+  * Thời lượng tổng cộng ~3.4 giây (nằm gọn trong 2–4 giây theo Mục 6, không cộng thêm giờ tổng)
+  */
+ beginStageTransition(fromStageIdx, toStageIdx, rewardData = {}, options = {}) {
+  const fromIdx = Math.max(0, Math.min(4, Number(fromStageIdx) || 0));
+  const toIdx = Math.max(1, Math.min(5, Number(toStageIdx) || (fromIdx + 1)));
+  const routeKey = `${fromIdx}->${toIdx}`;
+  const route = WORLD_ROUTES[routeKey] || WORLD_ROUTES['0->1'];
+
+  this.clearAllTimers();
+  this.fromStage = fromIdx;
+  this.toStage = toIdx;
+  this.transitionId = `tr_${fromIdx}_${toIdx}_${Date.now()}`;
+  lastSyncedTeamStage = toIdx;
+
+  // Mở ngay Bản đồ Thế giới 5 vùng đất để người chơi thấy Rồng Xanh di chuyển thật
+  mvWorldMapOpen = true;
+  mvShowIntroHub = false;
+
+  const sealName = rewardData.sealName || WORLD_STAGE_NODES[fromIdx]?.sealName || ('Ấn Chặng ' + (fromIdx + 1));
+  const pts = rewardData.points || 10;
+  const gold = rewardData.goldEarned || 50;
+  const moveSpeech = STAGE_TRANSITION_DIALOGUES[routeKey] || 'Cùng tiến sang vùng đất tiếp theo thôi!';
+  const arrivalSpeech = STAGE_ARRIVAL_DIALOGUES[toIdx] || 'Chặng mới đã mở khóa! Hãy bắt đầu nhiệm vụ!';
+
+  // 1. STAGE_COMPLETED & 2. REWARD (0ms -> 400ms): Xuất hiện tại vị trí chặng vừa hoàn thành & Nhận thưởng
+  this.state = 'STAGE_COMPLETED';
+  this.rewardTag = `🏅 +${pts} XP · +${gold} Vàng · ${sealName}`;
+  this.speech = moveSpeech;
+  DragonMovementController.snapToStage(fromIdx, 'CELEBRATE');
+  render();
+
+  this.timers.push(setTimeout(() => {
+   this.state = 'REWARD';
+   sound('coin');
+   DragonMovementController.syncActorDOM({
+    speech: this.speech,
+    rewardTag: this.rewardTag
+   });
+  }, 160));
+
+  // 3. CELEBRATING (400ms -> 950ms): Thực hiện hoạt ảnh vui mừng tại chặng vừa qua
+  this.timers.push(setTimeout(() => {
+   this.state = 'CELEBRATING';
+   DragonMovementController.animState = 'CELEBRATE';
+   this.syncServerDragonState('CELEBRATING', 'CELEBRATE', fromIdx + 1, toIdx + 1);
+   DragonMovementController.syncActorDOM({
+    speech: this.speech,
+    rewardTag: this.rewardTag
+   });
+   if (vaState) vaState.dragonMsg = this.speech;
+   const sideBubble = document.getElementById('vaDragonSpeech');
+   if (sideBubble) sideBubble.innerHTML = '“' + formatMath(this.speech) + '”';
+  }, 400));
+
+  // 4, 5, 6. MOVING (950ms -> 2650ms, 1700ms nội suy mượt):
+  // - Chạy (RUN) theo con đường ánh sáng trên đảo
+  // - Tới vực đứt đoạn giữa các đảo chuyển sang bay (FLY)
+  // - Bay theo đường cong Bézier tới cổng chặng tiếp theo
+  this.timers.push(setTimeout(() => {
+   this.state = 'MOVING';
+   this.rewardTag = '';
+   DragonMovementController.activeRouteKey = routeKey;
+   DragonMovementController.routeProgress = 0;
+   const moveStart = performance.now();
+   const moveDuration = 1700; // 1.7s di chuyển mượt trên bản đồ
+   let sentFlySync = false;
+
+   this.syncServerDragonState('MOVING', 'RUN', fromIdx + 1, toIdx + 1);
+   sound('boost');
+
+   const stepFrame = (now) => {
+    const rawT = Math.min(1, Math.max(0, (now - moveStart) / moveDuration));
+    // Ease-in-out mượt mà
+    const easedT = rawT < 0.5
+     ? 2 * rawT * rawT
+     : 1 - Math.pow(-2 * rawT + 2, 2) / 2;
+
+    const pt = DragonMovementController.evalCubicBezier(route.p0, route.p1, route.p2, route.p3, easedT);
+    DragonMovementController.x = pt.x;
+    DragonMovementController.y = pt.y;
+    DragonMovementController.routeProgress = easedT;
+    DragonMovementController.facing = pt.tx < -2 ? 'left' : 'right';
+
+    if (easedT < route.runUntil) {
+     DragonMovementController.animState = 'RUN';
+    } else if (easedT < route.flyUntil) {
+     DragonMovementController.animState = 'FLY';
+     if (!sentFlySync) {
+      sentFlySync = true;
+      this.syncServerDragonState('MOVING', 'FLY', fromIdx + 1, toIdx + 1);
+      sound('portal');
+     }
+    } else {
+     DragonMovementController.animState = 'LAND';
+    }
+
+    if (now - this.lastParticleAt > 85) {
+     this.lastParticleAt = now;
+     DragonMovementController.spawnStepParticle(pt.x, pt.y, DragonMovementController.animState);
+    }
+
+    DragonMovementController.syncActorDOM({
+     speech: this.speech,
+     rewardTag: ''
+    });
+
+    if (rawT < 1) {
+     DragonMovementController.rafId = requestAnimationFrame(stepFrame);
+    } else {
+     DragonMovementController.rafId = null;
+     this.onArriveAtDestination(fromIdx, toIdx, arrivalSpeech, options);
+    }
+   };
+
+   DragonMovementController.rafId = requestAnimationFrame(stepFrame);
+  }, 950));
+ },
+
+ // 7. ARRIVING -> 8. TALK -> 9. STAGE_UNLOCKED -> 10. PLAYING
+ onArriveAtDestination(fromIdx, toIdx, arrivalSpeech, options = {}) {
+  this.state = 'ARRIVING';
+  DragonMovementController.snapToStage(toIdx, 'LAND');
+  this.speech = arrivalSpeech;
+  this.syncServerDragonState('ARRIVING', 'LAND', fromIdx + 1, toIdx + 1);
+  sound('powerup');
+
+  // Hiệu ứng mở khóa đảo đích
+  const targetIsland = document.getElementById('advIslandNode-' + toIdx);
+  if (targetIsland) {
+   targetIsland.classList.remove('locked');
+   targetIsland.classList.add('current', 'just-unlocked');
+  }
+
+  DragonMovementController.syncActorDOM({
+   speech: arrivalSpeech,
+   rewardTag: toIdx === 5 ? '💎 Khôi phục Tâm Thạch!' : `🔓 Mở khóa Chặng ${toIdx + 1}!`
+  });
+
+  // 8 & 9. STAGE_UNLOCKED + TALK (sau 380ms hạ cánh)
+  this.timers.push(setTimeout(() => {
+   this.state = 'STAGE_UNLOCKED';
+   DragonMovementController.animState = 'TALK';
+   if (vaState) vaState.dragonMsg = arrivalSpeech;
+   const sideBubble = document.getElementById('vaDragonSpeech');
+   if (sideBubble) sideBubble.innerHTML = '“' + formatMath(arrivalSpeech) + '”';
+   DragonMovementController.syncActorDOM({
+    speech: arrivalSpeech,
+    rewardTag: toIdx === 5 ? '💎 Tâm Thạch Vectơ đã mở!' : `✨ Chặng ${toIdx + 1} sẵn sàng!`
+   });
+  }, 380));
+
+  // 10. Chuyển sang PLAYING và bắt đầu nhiệm vụ chặng mới (sau 1150ms kể từ lúc hạ cánh -> tổng ~3.4s)
+  this.timers.push(setTimeout(() => {
+   this.state = 'PLAYING';
+   this.rewardTag = '';
+   DragonMovementController.animState = 'IDLE';
+   this.syncServerDragonState('PLAYING', 'IDLE', toIdx + 1, toIdx + 1);
+   if (!options.stayOnMap) {
+    mvWorldMapOpen = false;
+   }
+   updateAfterAction();
+  }, 1150));
+ }
+};
+
+const AdventureMap = {
+ render(currentStageIdx = 0) {
+  const me = world?.me || {};
+  const stageVal = Math.max(0, Math.min(5, Number(currentStageIdx) ?? 0));
+  const isMoving = StageTransitionController.isTransitioning();
+
+  // Nếu không trong quá trình di chuyển, đặt Rồng Xanh đứng tại đúng chặng hiện tại
+  if (!isMoving) {
+   const targetNode = WORLD_STAGE_NODES[stageVal] || WORLD_STAGE_NODES[0];
+   DragonMovementController.x = targetNode.position.x;
+   DragonMovementController.y = targetNode.position.y;
+   DragonMovementController.animState = 'IDLE';
+   DragonMovementController.facing = 'right';
+  }
+
+  const activeNodeIdx = isMoving ? StageTransitionController.toStage : stageVal;
+  const hudNode = WORLD_STAGE_NODES[Math.min(5, activeNodeIdx)] || WORLD_STAGE_NODES[0];
+  const defaultSpeech = isMoving
+   ? StageTransitionController.speech
+   : (STAGE_ARRIVAL_DIALOGUES[stageVal] || 'Hãy nhấn Bắt đầu để thực hiện nhiệm vụ tại vùng đất này!');
+
+  // Vẽ các đường nối Bézier phát sáng giữa 5 đảo và Tâm Thạch
+  const routesSvgHtml = Object.entries(WORLD_ROUTES).map(([rKey, r]) => {
+   const dPath = `M ${r.p0.x} ${r.p0.y} C ${r.p1.x} ${r.p1.y}, ${r.p2.x} ${r.p2.y}, ${r.p3.x} ${r.p3.y}`;
+   const isPassed = (!isMoving && r.toStage <= stageVal) || (isMoving && r.toStage <= StageTransitionController.fromStage);
+   const isCurrentMove = isMoving && DragonMovementController.activeRouteKey === rKey;
+   return `<g class="adv-route-group ${isPassed ? 'passed' : ''} ${isCurrentMove ? 'moving' : ''}">
+    <!-- Hào quang nền đường bay / cầu ánh sáng -->
+    <path d="${dPath}" fill="none" stroke="rgba(14, 165, 233, 0.28)" stroke-width="18" stroke-linecap="round"/>
+    <!-- Đường đá / cầu năng lượng chính -->
+    <path d="${dPath}" fill="none" stroke="${isPassed ? 'rgba(250, 204, 21, 0.88)' : 'rgba(148, 163, 184, 0.42)'}" stroke-width="9" stroke-linecap="round"/>
+    <!-- Vạch chấm sáng dẫn đường như ảnh tham chiếu -->
+    <path d="${dPath}" fill="none" stroke="${isPassed ? '#FEF08A' : '#E2E8F0'}" stroke-width="4" stroke-linecap="round" stroke-dasharray="2 16" class="adv-route-dots"/>
+    <!-- Luồng sáng tiến trình khi Rồng Xanh đang chạy/bay qua -->
+    <path id="mvRouteActiveGlow-${rKey}" d="${dPath}" pathLength="100" fill="none" stroke="#36DEF4" stroke-width="10" stroke-linecap="round" style="stroke-dasharray:${isPassed ? '100 100' : '0 100'};opacity:${isPassed || isCurrentMove ? '1' : '0'};filter:drop-shadow(0 0 8px #36DEF4)"/>
+   </g>`;
+  }).join('');
+
+  // Vẽ 5 vùng đất (Đảo nổi 1..5) + Đỉnh Tâm Thạch Vectơ
+  const islandsHtml = WORLD_STAGE_NODES.map((nd, idx) => {
+   if (idx === 5) {
+    // Tâm Thạch Vectơ trên đỉnh Thành Trì
+    const heartUnlocked = stageVal >= 5 || Boolean(me.completed);
+    return `<div id="advIslandNode-5"
+      class="adv-heartstone-node ${heartUnlocked ? 'unlocked' : 'locked'}"
+      style="left:${(nd.position.x / 10).toFixed(2)}%;top:${((nd.position.y / 560) * 100).toFixed(2)}%"
+      data-action="advClickIsland" data-stage="5"
+      title="Tâm Thạch Vectơ — Khôi phục khi thu hồi đủ 5 Ấn Vectơ">
+      <div class="adv-heartstone-orb">💎</div>
+      <span class="adv-heartstone-tag">TÂM THẠCH VECTƠ</span>
+     </div>`;
+   }
+
+   const isDone = isMoving
+    ? (idx <= StageTransitionController.fromStage)
+    : (idx < stageVal || Boolean(me.completed));
+   const isCurrent = isMoving
+    ? (idx === StageTransitionController.toStage)
+    : (idx === stageVal && !me.completed);
+   const stateCls = isDone ? 'done' : isCurrent ? 'current' : 'locked';
+   const xPct = (nd.position.x / 10).toFixed(2);
+   const yPct = ((nd.position.y / 560) * 100).toFixed(2);
+   const safeFormula = getStageFormulaSafe(idx, stageVal);
+
+   return `<div id="advIslandNode-${idx}"
+     class="adv-island-node ${stateCls}"
+     style="left:${xPct}%;top:${yPct}%"
+     data-action="advClickIsland"
+     data-stage="${idx}"
+     title="Chặng ${nd.id}: ${esc(nd.fullTitle)} (${esc(nd.topic)})">
+     <!-- Tooltip chi tiết khi hover -->
+     <div class="mv-island-tooltip">
+      <b style="color:#FFC953">Chặng ${nd.id}: ${esc(nd.fullTitle)}</b><br/>
+      <span style="color:#A5F3FC">📐 ${formatMath(safeFormula)}</span><br/>
+      <small style="color:#CBD5E1">🏅 Ấn: ${esc(nd.sealName)} · ${esc(nd.rewardText)}</small>
+     </div>
+
+     <!-- Hình thu nhỏ hòn đảo & công trình đặc trưng từng chặng -->
+     <div class="adv-island-art-wrap">
+      <img src="${nd.img}" alt="Chặng ${nd.id}" class="adv-island-art-img" draggable="false"/>
+      <span class="adv-island-seal-gem">${isDone ? '✨' : isCurrent ? '🔮' : '🔒'}</span>
+     </div>
+
+     <!-- Bảng tên rút gọn: Số chặng + Tên rút gọn (1. Hiệu vectơ .. 5. Trọng tâm) -->
+     <div class="adv-island-banner">
+      <span class="adv-island-num">${nd.id}</span>
+      <strong class="adv-island-title">${esc(nd.shortTitle)}</strong>
+     </div>
+
+     <!-- Nhãn mức độ: NHẬN BIẾT / THÔNG HIỂU -->
+     <div class="adv-island-level ${nd.levelCls}">${nd.level}</div>
+
+     <!-- Bệ cổng dịch chuyển dưới chân đảo (Dấu ✓ xanh lá khi hoàn thành, vòng sáng vàng khi đang mở) -->
+     <div class="adv-portal-pad ${stateCls}">
+      ${isDone ? '<span class="adv-portal-check">✓</span>' : isCurrent ? '<span class="adv-portal-beacon"></span>' : '<span class="adv-portal-lock">🔒</span>'}
+     </div>
+    </div>`;
+  }).join('');
+
+  return `<div class="adv-world-map-container" id="mvAdventureWorldMap">
+   <div class="adv-world-map-viewport" style="background-image: linear-gradient(180deg, rgba(6, 18, 38, 0.18), rgba(6, 18, 38, 0.42)), url('/assets/World_Map_Oxyz.jpg')">
+    <!-- Thẻ HUD Góc Trên Trái giống hệt ảnh tham chiếu -->
+    <div class="adv-top-left-hud">
+     <div class="adv-hud-head">
+      <div class="adv-hud-scroll-icon">📜</div>
+      <div>
+       <div class="adv-hud-kicker">CHẶNG HIỆN TẠI</div>
+       <div class="adv-hud-stage-name">${esc(hudNode.numStr)}. ${esc(hudNode.shortTitle)}</div>
+      </div>
+     </div>
+     <div class="adv-hud-row">
+      <span>🎯 <b>Nhiệm vụ:</b> ${esc(hudNode.taskSummary)}</span>
+     </div>
+     <div class="adv-hud-row">
+      <span>🎁 <b>Thưởng:</b> <b style="color:#35C992">${esc(hudNode.rewardText)}</b> · <b style="color:#FFC953">${esc(hudNode.sealName)}</b></span>
+     </div>
+     <div class="adv-hud-live-state" id="mvAdvHudStatusText">
+      ${esc(DragonCharacter.getStatusLabel(DragonMovementController.animState, StageTransitionController.state))}
+     </div>
+    </div>
+
+    <!-- Nút điều khiển nhanh Góc Trên Phải bản đồ -->
+    <div class="adv-top-right-controls">
+     <button type="button" class="adv-mini-action-btn" data-action="advTriggerDragonMove" title="Xem hoạt cảnh Rồng Xanh chạy & bay qua các đảo">
+      🐉 Di chuyển Rồng Xanh
+     </button>
+     <button type="button" class="adv-mini-action-btn primary" data-action="advStartCurrentMission" title="Mở màn chơi nhiệm vụ của chặng hiện tại">
+      ▶ Vào Nhiệm Vụ Chặng ${Math.min(5, stageVal + 1)}
+     </button>
+    </div>
+
+    <!-- Lớp SVG Đường đi ánh sáng, Cầu năng lượng & Đường bay qua các đảo nổi (viewBox 1000x560) -->
+    <svg id="mvWorldRoutesSvg" class="adv-routes-svg" viewBox="0 0 1000 560" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+     ${routesSvgHtml}
+    </svg>
+
+    <!-- Lớp Hạt bụi sáng & Hạt sao trên đường di chuyển -->
+    <div id="mvDragonTrailLayer" class="adv-trail-layer" aria-hidden="true"></div>
+
+    <!-- 5 Vùng Đất Liên Kết + Tâm Thạch Vectơ -->
+    <div class="adv-islands-layer">
+     ${islandsHtml}
+    </div>
+
+    <!-- Nhân Vật Rồng Xanh Di Chuyển Thực Sự Trên Bản Đồ -->
+    ${DragonCharacter.render({
+     x: DragonMovementController.x,
+     y: DragonMovementController.y,
+     animState: DragonMovementController.animState,
+     facing: DragonMovementController.facing,
+     speech: defaultSpeech,
+     showBubble: true,
+     rewardTag: StageTransitionController.rewardTag
+    })}
+   </div>
+
+   <!-- Thanh Dock 4 Nút Dưới Cùng Chuẩn Bố Cục Ảnh Tham Chiếu -->
+   <div class="adv-bottom-dock">
+    <button type="button" class="adv-dock-btn ${mvWorldMapOpen ? 'active' : ''}" data-action="toggleWorldMap">
+     <span class="adv-dock-icon">🗺️</span>
+     <span>Bản đồ Lục địa OXYZ</span>
+    </button>
+    <button type="button" class="adv-dock-btn ${!mvBriefingCollapsed ? 'active' : ''}" data-action="toggleBriefing">
+     <span class="adv-dock-icon">📜</span>
+     <span>Nhiệm vụ</span>
+     <i class="adv-dock-badge">!</i>
+    </button>
+    <button type="button" class="adv-dock-btn start-cta" data-action="advStartCurrentMission">
+     <span class="adv-dock-play-icon">▶</span>
+     <span>Bắt đầu</span>
+    </button>
+    <button type="button" class="adv-dock-btn" data-action="advTriggerDragonMove" title="Kích hoạt Rồng Xanh di chuyển tới chặng tiếp theo">
+     <span class="adv-dock-icon">≫</span>
+     <span>Di chuyển tới chặng</span>
+    </button>
+   </div>
+  </div>`;
+ }
+};
+
 function mapTrack(stage){
+ const isStudent = session?.role === 'student';
+ const curStageIdx = stage === -1 ? 0 : Math.max(0, Math.min(4, Number(stage) || 0));
+ const isMoving = StageTransitionController.isTransitioning();
+ const moveBadge = isMoving
+  ? `<span class="hs-map-dragon-live moving">🐉 Rồng Xanh đang bay: Chặng ${StageTransitionController.fromStage + 1} → ${Math.min(5, StageTransitionController.toStage + 1)} (${DragonMovementController.animState})</span>`
+  : `<span class="hs-map-dragon-live">🐉 Rồng Xanh tại cổng Chặng ${curStageIdx + 1}/5</span>`;
+
  return `<div class="hs-stage-map-bar">
   <div class="hs-stage-cards-grid">
    ${missionMeta.map((m, i) => {
@@ -1119,21 +1863,23 @@ function mapTrack(stage){
     const isNhanBiet = i < 3;
     const levelLabel = isNhanBiet ? 'NHẬN BIẾT' : 'THÔNG HIỂU';
     const levelCls = isNhanBiet ? 'level-nb' : 'level-th';
-    const statusLabel = state === 'done' ? 'ĐÃ XONG' : state === 'current' ? 'ĐANG MỞ' : 'KHÓA';
-    const clickAttr = session?.role === 'student'
-     ? `data-action="demoJumpStage" data-stage="${i}"`
+    const statusLabel = state === 'done' ? '✓ ĐÃ XONG' : state === 'current' ? '🐉 ĐANG Ở ĐÂY' : '🔒 KHÓA';
+    const clickAttr = isStudent
+     ? `data-action="advClickTopStageCard" data-stage="${i}"`
      : `data-action="preview3DStage" data-stage="${i}"`;
     const safeFormula = getStageFormulaSafe(i, stage);
-    return `<div class="hs-stage-card ${state}" ${clickAttr}>
+    const hasDragonHere = (stage !== -1) && ((isMoving && StageTransitionController.toStage === i) || (!isMoving && curStageIdx === i));
+
+    return `<div class="hs-stage-card ${state} ${hasDragonHere ? 'dragon-present' : ''}" ${clickAttr}>
      <div class="mv-island-tooltip">
       <b style="color:#FFC953">Chặng ${i + 1}: ${esc(m.place)}</b><br/>
       <span style="color:#A5F3FC">📐 ${formatMath(safeFormula || m.sub)}</span><br/>
-      <small style="color:#CBD5E1">🏅 Vật phẩm: ${esc(m.mode)}</small>
+      <small style="color:#CBD5E1">🏅 Vật phẩm: ${esc(m.mode)} · Nhấn để di chuyển trên Bản đồ</small>
      </div>
      <div class="hs-stage-card-top">
       <span class="hs-stage-num-pill">${numStr}</span>
       <strong class="hs-stage-short-name">${esc(shortName)}</strong>
-      <img src="${STAGE_BG_ASSETS[i] || STAGE_BG_ASSETS[0]}" alt="" class="hs-stage-mini-thumb" draggable="false"/>
+      ${hasDragonHere ? `<img src="/assets/RongXanh.png" alt="Rồng Xanh" class="hs-stage-mini-dragon ${isMoving ? 'flying' : ''}" draggable="false"/>` : `<img src="${STAGE_BG_ASSETS[i] || STAGE_BG_ASSETS[0]}" alt="" class="hs-stage-mini-thumb" draggable="false"/>`}
      </div>
      <div class="hs-stage-card-bottom">
       <span class="hs-stage-level ${levelCls}">${levelLabel}</span>
@@ -1142,6 +1888,17 @@ function mapTrack(stage){
     </div>`;
    }).join('')}
   </div>
+  ${isStudent ? `<div class="hs-map-bar-substrip">
+   ${moveBadge}
+   <div style="display:flex;gap:8px;align-items:center">
+    <button type="button" class="mv-chip-btn ${mvWorldMapOpen ? 'active' : ''}" data-action="toggleWorldMap">
+     🗺️ ${mvWorldMapOpen ? 'Đang mở Bản đồ 5 Chặng (Nhấn để vào Màn chơi)' : 'Mở Bản đồ Hành trình 5 Chặng'}
+    </button>
+    <button type="button" class="mv-chip-btn" data-action="advTriggerDragonMove" title="Xem hoạt cảnh Rồng Xanh chạy & bay qua các đảo">
+     🐉 Di chuyển Rồng Xanh
+    </button>
+   </div>
+  </div>` : ''}
  </div>`;
 }
 
@@ -1214,6 +1971,7 @@ function renderTeacherTeamModal() {
     <span style="font-size:12.5px;color:#F8FAFF">📜 Mật thư: <b style="color:#FFC953">${t.stage > 0 ? 3 : (t.stage1?.cluesFound ?? (t.round >= 1 ? 3 : 0))}/3</b></span>
     <span style="font-size:12.5px;color:#F8FAFF">🧩 Ghép mật thư: <b style="color:${(t.stage > 0 || t.stage1?.cipherSolved || t.round >= 2) ? '#35C992' : '#94A3B8'}">${(t.stage > 0 || t.stage1?.cipherSolved || t.round >= 2) ? '✓ Đã hoàn thành' : 'Chưa xong'}</b></span>
     <span style="font-size:12.5px;color:#F8FAFF">🌉 Cầu ánh sáng: <b style="color:${(t.stage > 0 || t.stage1?.bridgeOpened) ? '#35C992' : '#94A3B8'}">${(t.stage > 0 || t.stage1?.bridgeOpened) ? '✓ Đã mở cầu (Ấn Hướng Đi)' : 'Chưa mở'}</b></span>
+    <span style="font-size:12.5px;color:#F8FAFF">🐉 Rồng Xanh: <b style="color:#FFC953">${(t.dragon?.state && t.dragon.state !== 'PLAYING') ? `Đang di chuyển Chặng ${(t.dragon.fromStage ?? 0) + 1} → ${(t.dragon.toStage ?? 0) >= 5 ? 'Tâm Thạch' : ((t.dragon.toStage ?? 0) + 1)} (${t.dragon.moveMode || 'FLY'})` : (t.completed ? 'Đã khôi phục Tâm Thạch' : `Tại cổng Chặng ${Math.min(5, (t.stage || 0) + 1)}`)}</b></span>
    </div>
 
    <h3 style="color:#36DEF4;font-size:13.5px;margin:12px 0 8px">📋 Lịch sử câu trả lời & thời gian từng chặng (${logs.length} lượt):</h3>
@@ -1406,7 +2164,14 @@ function teacherScreen(){
       const pct = t.completed ? 100 : Math.max(8, Math.round((((t.stage || 0) * 3 + (t.round || 0) + (t.stage === 0 && t.round === 0 ? (s1Clues / 3) : 0)) / 15) * 100));
       const barColor = barColors[idx % barColors.length];
       const correctVal = t.correctCount ?? ((t.digits || []).length * 2);
+      const drgMoving = Boolean(t.dragon?.state && t.dragon.state !== 'PLAYING');
+      const drgPillText = t.completed
+       ? '🐉 Đỉnh Tâm Thạch'
+       : drgMoving
+         ? `🐉 Bay ${(t.dragon.fromStage ?? 0) + 1}→${(t.dragon.toStage ?? 0) >= 5 ? 'Tâm Thạch' : ((t.dragon.toStage ?? 0) + 1)}`
+         : `🐉 Chặng ${Math.min(5, (t.stage || 0) + 1)}`;
       const s1LiveBadge = `<div class="gv-s1-inline-badges">
+       <span class="gv-s1-pill ${drgMoving ? 'moving' : 'done'}" title="Vị trí & Trạng thái di chuyển của Rồng Xanh">${esc(drgPillText)}</span>
        <span class="gv-s1-pill ${s1Clues >= 3 ? 'done' : ''}" title="Số mảnh mật thư Chặng 1 đã tìm thấy">📜 ${s1Clues}/3</span>
        <span class="gv-s1-pill ${s1Cipher ? 'done' : ''}" title="Trạng thái ghép mật thư Chặng 1">🧩 ${s1Cipher ? 'Đã ghép' : 'Chưa'}</span>
        <span class="gv-s1-pill ${s1Bridge ? 'done' : ''}" title="Trạng thái mở Cầu ánh sáng Chặng 1">🌉 ${s1Bridge ? 'Đã mở cầu' : 'Chưa mở'}</span>
@@ -1568,9 +2333,15 @@ function displayScreen(){
      const pct = t.completed ? 100 : Math.max(8, Math.round((((t.stage || 0) * 3 + (t.round || 0) + (t.stage === 0 && t.round === 0 ? (s1Clues / 3) : 0)) / 15) * 100));
      const barColor = barColors[idx % barColors.length];
      const seals = (t.digits || []).length;
+     const drgMoving = Boolean(t.dragon?.state && t.dragon.state !== 'PLAYING');
+     const drgPillText = t.completed
+      ? '🐉 Đỉnh Tâm Thạch'
+      : drgMoving
+        ? `🐉 Bay ${(t.dragon.fromStage ?? 0) + 1}→${(t.dragon.toStage ?? 0) >= 5 ? 'Tâm Thạch' : ((t.dragon.toStage ?? 0) + 1)}`
+        : `🐉 Chặng ${Math.min(5, (t.stage || 0) + 1)}`;
      return `<div class="gv-rank-row ${rankCls}">
       <span class="gv-col-rank">#${rankNum}</span>
-      <span class="gv-col-team"><strong>${t.avatar} ${esc(t.name)}</strong><div class="gv-s1-inline-badges"><span class="gv-s1-pill ${s1Clues >= 3 ? 'done' : ''}">📜 ${s1Clues}/3</span><span class="gv-s1-pill ${s1Cipher ? 'done' : ''}">🧩 ${s1Cipher ? 'Đã ghép' : 'Chưa'}</span><span class="gv-s1-pill ${s1Bridge ? 'done' : ''}">🌉 ${s1Bridge ? 'Đã mở cầu' : 'Chưa'}</span></div></span>
+      <span class="gv-col-team"><strong>${t.avatar} ${esc(t.name)}</strong><div class="gv-s1-inline-badges"><span class="gv-s1-pill ${drgMoving ? 'moving' : 'done'}">${esc(drgPillText)}</span><span class="gv-s1-pill ${s1Clues >= 3 ? 'done' : ''}">📜 ${s1Clues}/3</span><span class="gv-s1-pill ${s1Cipher ? 'done' : ''}">🧩 ${s1Cipher ? 'Đã ghép' : 'Chưa'}</span><span class="gv-s1-pill ${s1Bridge ? 'done' : ''}">🌉 ${s1Bridge ? 'Đã mở cầu' : 'Chưa'}</span></div></span>
       <span class="gv-col-stage">${t.completed ? 'Đích 🏆' : `${Math.min(5, (t.stage||0)+1)}/5`}</span>
       <div class="gv-col-progress">
        <div class="gv-prog-track"><div class="gv-prog-fill" style="width:${pct}%;background:${barColor}"></div></div>
@@ -4369,9 +5140,13 @@ function stageContent(m){
   ${drawerQuestHtml}
   ${drawerKnowledgeHtml}
 
-  <!-- KHU VỰC TƯƠNG TÁC CHÍNH -->
+  <!-- KHU VỰC TƯƠNG TÁC CHÍNH (BẢN ĐỒ THẾ GIỚI 5 CHẶNG HOẶC MÀN CHƠI NHIỆM VỤ) -->
   <div id="mvActiveGameCanvas">
-   ${mvShowIntroHub ? renderIntroHubBanner(true) : renderVectorAdventureStage(m)}
+   ${(mvWorldMapOpen || StageTransitionController.isTransitioning())
+    ? AdventureMap.render(world.me?.stage ?? ((m.id || 1) - 1))
+    : mvShowIntroHub
+      ? renderIntroHubBanner(true)
+      : renderVectorAdventureStage(m)}
   </div>
 
   <!-- THANH TIẾN TRÌNH DƯỚI CÙNG TRONG KHUNG CHÍNH -->
@@ -4408,6 +5183,13 @@ function stageContent(m){
 
 function finalContent(){
  const me = world.me || {};
+ if (mvWorldMapOpen || StageTransitionController.isTransitioning()) {
+  return `<div class="hs-main-frame">
+   <div id="mvActiveGameCanvas">
+    ${AdventureMap.render(5)}
+   </div>
+  </div>`;
+ }
  const sealsCount = (me.digits || []).length;
  const rank = [...(world.teams || [])].sort((a,b)=>b.score-a.score);
  const mineRank = Math.max(1, rank.findIndex(t=>t.id===me.id)+1);
@@ -4419,12 +5201,22 @@ function finalContent(){
     ${DIAMOND_ICON_SVG}
     <div>
      <h1 class="hs-stage-title">KHÔI PHỤC TÂM THẠCH VECTƠ · TỔNG KẾT HÀNH TRÌNH</h1>
-     <p class="hs-stage-subtitle"> Đã hoàn thành 5 vùng đất · Thu hồi ${sealsCount}/5 Ấn Vectơ</p>
+     <p class="hs-stage-subtitle">🐉 Rồng Xanh đã bay lên đỉnh Thành Trì · Thu hồi ${sealsCount}/5 Ấn Vectơ</p>
     </div>
    </div>
-   <div class="hs-stage-timer-box"><span>${sealsCount}/5 ẤN</span></div>
+   <div style="display:flex;gap:8px;align-items:center">
+    <button type="button" class="mv-chip-btn" data-action="toggleWorldMap">🗺️ Xem Bản Đồ 5 Chặng</button>
+    <div class="hs-stage-timer-box"><span>${sealsCount}/5 ẤN</span></div>
+   </div>
   </div>
   <div style="padding:18px;background:rgba(11,18,39,0.75);border-radius:14px;border:1px solid rgba(54,222,244,0.3)">
+   <div style="display:flex;align-items:center;gap:14px;padding:12px 16px;margin-bottom:14px;background:rgba(16,185,129,0.14);border:1px solid rgba(53,201,146,0.45);border-radius:12px">
+    <img src="/assets/RongXanh.png" alt="Rồng Xanh" style="width:58px;height:58px;object-fit:contain;filter:drop-shadow(0 4px 10px rgba(0,0,0,0.5))" draggable="false"/>
+    <div>
+     <strong style="color:#FFC953;font-size:14px">💎 TÂM THẠCH VECTƠ ĐÃ SẴN SÀNG KHÔI PHỤC!</strong>
+     <p style="color:#E2E8F0;font-size:12.5px;margin:3px 0 0">Rồng Xanh đã hoàn thành hành trình qua 5 vùng đất và mang các Ấn Vectơ lên đỉnh Thành Trì Trí Tuệ. Hãy nhấn nút bên dưới để kích hoạt Tâm Thạch!</p>
+    </div>
+   </div>
    <div class="mv-stats-3grid" style="margin:10px 0 18px">
     <div class="mv-stat-card"><b>${sealsCount}/5</b><small>Ấn Vectơ thu hồi</small></div>
     <div class="mv-stat-card"><b>${correctAns}/10</b><small>Câu giải mã đúng</small></div>
@@ -4977,10 +5769,29 @@ function updateClock(){
 }
 
 async function refresh(force=false){
- if(!session||busy||vaState.s1BridgeRestoredOverlay)return;
+ if(!session||busy||vaState.s1BridgeRestoredOverlay||StageTransitionController.isTransitioning())return;
  try{
   const d=await api('/api/state',{room:session.room,token:session.token});
   world=d;setClock();
+  // Đồng bộ vị trí Rồng Xanh cho tất cả thành viên cùng đội & khi tải lại trang (F5)
+  if(session.role==='student'&&d.me){
+   const curSrvStage = Math.max(0, Math.min(5, d.me.stage ?? 0));
+   if(lastSyncedTeamStage === null){
+    lastSyncedTeamStage = curSrvStage;
+    DragonMovementController.snapToStage(curSrvStage, 'IDLE');
+   }else if(curSrvStage > lastSyncedTeamStage && !StageTransitionController.isTransitioning()){
+    const prevStg = lastSyncedTeamStage;
+    lastSyncedTeamStage = curSrvStage;
+    StageTransitionController.beginStageTransition(prevStg, curSrvStage, {
+     sealName: WORLD_STAGE_NODES[prevStg]?.sealName || ('Ấn Chặng ' + (prevStg + 1)),
+     points: 10,
+     goldEarned: 50
+    });
+    return;
+   }else{
+    lastSyncedTeamStage = curSrvStage;
+   }
+  }
   if(session.role==='student'&&!force){
    const me=d.me||{};
    const studentKey=`${me.stage}_${me.round}_${me.completed}_${d.paused}`;
@@ -5021,6 +5832,7 @@ function updateAfterAction(){lastSignature='';lastStudentKey='';setTimeout(()=>r
 async function submitStageAnswer(payload){
  if(world.paused)return notice('Tạm dừng','Giáo viên đang tạm dừng nhiệm vụ.',false);
  const m = world.current;
+ const prevStageIdx = Math.max(0, Math.min(4, world.me?.stage ?? ((m?.id || 1) - 1)));
  const result = await submit('/api/answer',{stage:world.me.stage,round:world.me.round,...payload});
  if(!result) return null;
 
@@ -5035,20 +5847,17 @@ async function submitStageAnswer(payload){
    if(window.spawnConfettiParticles){
     window.spawnConfettiParticles(window.innerWidth / 2, window.innerHeight * 0.35, 60);
    }
-   notice(
-    '🏅 KHÔI PHỤC ' + (result.item || m?.item || 'ẤN VECTƠ').toUpperCase() + ' THÀNH CÔNG!',
-    '🐉 Rồng Xanh: “' + (m?.dragonWin || 'Tuyệt vời! Đội đã vượt qua thử thách!') + '”',
-    true,
-    {
-     explain: result.explain,
-     digit: result.item || ('Ấn Chặng ' + m?.id),
-     points: result.points,
-     goldEarned: result.goldEarned,
-     streak: result.streak,
-     button: result.nextStage === 5 ? 'Tiến tới Khôi phục Tâm Thạch Vectơ →' : 'Bước sang Chặng tiếp theo →'
-    }
-   );
-   updateAfterAction();
+   const nextStageIdx = Math.max(1, Math.min(5, result.nextStage ?? (prevStageIdx + 1)));
+   if(world.me){
+    world.me.stage = nextStageIdx;
+    world.me.round = 0;
+   }
+   // Kích hoạt Rồng Xanh di chuyển thực sự trên bản đồ 5 chặng (CELEBRATE -> RUN -> FLY -> LAND -> TALK -> UNLOCK)
+   StageTransitionController.beginStageTransition(prevStageIdx, nextStageIdx, {
+    sealName: result.item || m?.item || ('Ấn Chặng ' + (prevStageIdx + 1)),
+    points: result.points || 10,
+    goldEarned: result.goldEarned || 50
+   });
    return result;
   }
   sound('correct');
@@ -5263,6 +6072,11 @@ async function handle(action,el){
      window.spawnJuiceFloater('+' + (res.points || 10) + ' XP ⭐', 'xp');
      window.spawnJuiceFloater('🧭 Nhận Ấn Hướng Đi!', 'gold');
     }
+    if(world?.me){
+     world.me.stage = 1;
+     world.me.round = 0;
+    }
+    lastSyncedTeamStage = 1;
     vaState.s1Feedback=null;
     vaState.s1BridgeRestoredOverlay=true;
     vaState.dragonMsg='Tuyệt vời! Ba cột đá A, B, C và mũi tên CB đã phát sáng! Cây cầu năng lượng qua Rừng Vectơ đã khôi phục, đội nhận Ấn Hướng Đi!';
@@ -5272,9 +6086,13 @@ async function handle(action,el){
     vaState.s1BridgeTimer=setTimeout(()=>{
      if(vaState.s1BridgeRestoredOverlay){
       vaState.s1BridgeRestoredOverlay=false;
-      updateAfterAction();
+      StageTransitionController.beginStageTransition(0, 1, {
+       sealName: 'Ấn Hướng Đi',
+       points: res.points || 10,
+       goldEarned: res.goldEarned || 140
+      });
      }
-    }, 4200);
+    }, 1500);
    }else{
     sound('wrong');
     const errText=res?.hint||'Hướng vectơ chưa đúng! Quy tắc hiệu hai vectơ chung gốc A: mũi tên phải đi từ điểm cuối của vectơ thứ hai đến điểm cuối của vectơ thứ nhất. Hãy thử lại!';
@@ -5290,7 +6108,11 @@ async function handle(action,el){
   if(action==='s1ProceedToStage2'){
    if(vaState.s1BridgeTimer) clearTimeout(vaState.s1BridgeTimer);
    vaState.s1BridgeRestoredOverlay=false;
-   updateAfterAction();
+   StageTransitionController.beginStageTransition(0, 1, {
+    sealName: 'Ấn Hướng Đi',
+    points: 10,
+    goldEarned: 140
+   });
    return;
   }
   if(action==='vaClickPillar'){
@@ -5385,16 +6207,89 @@ async function handle(action,el){
    }
    return;
   }
-  if(action==='toggleIntroHub'){mvShowIntroHub=!mvShowIntroHub;render();return;}
-  if(action==='hubStartCurrentStage'){mvShowIntroHub=false;render();return;}
-  if(action==='hubOpenKnowledge'){mvShowIntroHub=false;oxyz3D.open=true;render();return;}
-  if(action==='hubEnterStage'){
-   const stg=Number(el.dataset.stage||0);
+  if(action==='toggleWorldMap'){
+   mvWorldMapOpen=!mvWorldMapOpen;
+   mvShowIntroHub=false;
+   if(!StageTransitionController.isTransitioning()){
+    DragonMovementController.snapToStage(world?.me?.stage ?? 0, 'IDLE');
+   }
+   render();
+   return;
+  }
+  if(action==='advStartCurrentMission'){
+   StageTransitionController.clearAllTimers();
+   StageTransitionController.state='PLAYING';
+   StageTransitionController.rewardTag='';
+   mvWorldMapOpen=false;
+   mvShowIntroHub=false;
+   DragonMovementController.snapToStage(world?.me?.stage ?? 0, 'IDLE');
+   await refresh(true);
+   return;
+  }
+  if(action==='advTriggerDragonMove'){
+   const curStg = Math.max(0, Math.min(5, world?.me?.stage ?? 0));
+   const fromIdx = curStg > 0 ? (curStg - 1) : 0;
+   const toIdx = curStg > 0 ? curStg : 1;
+   StageTransitionController.beginStageTransition(fromIdx, toIdx, {
+    sealName: WORLD_STAGE_NODES[fromIdx]?.sealName || ('Ấn Chặng ' + (fromIdx + 1)),
+    points: 10,
+    goldEarned: 50
+   }, { stayOnMap: curStg === 0 });
+   return;
+  }
+  if(action==='advClickIsland'||action==='advClickTopStageCard'){
+   const targetStg = Math.max(0, Math.min(5, Number(el.dataset.stage || 0)));
+   const curStg = Math.max(0, Math.min(5, world?.me?.stage ?? 0));
    mvShowIntroHub=false;
    if(vaState.s1BridgeTimer) clearTimeout(vaState.s1BridgeTimer);
    vaState.s1BridgeRestoredOverlay=false;
    vaState.stageId=-1;
+   if(targetStg === curStg){
+    mvWorldMapOpen = !mvWorldMapOpen;
+    DragonMovementController.snapToStage(curStg, 'IDLE');
+    render();
+    return;
+   }
+   await submit('/api/demoJump',{stage:Math.min(4, targetStg)});
+   lastSyncedTeamStage = Math.min(4, targetStg);
+   const fromStg = Math.max(0, Math.min(4, targetStg > 0 ? targetStg - 1 : 0));
+   const toStg = Math.max(1, Math.min(5, targetStg > 0 ? targetStg : 1));
+   if(targetStg > 0){
+    StageTransitionController.beginStageTransition(fromStg, toStg, {
+     sealName: WORLD_STAGE_NODES[fromStg]?.sealName || ('Ấn Chặng ' + (fromStg + 1)),
+     points: 10,
+     goldEarned: 50
+    });
+   }else{
+    StageTransitionController.clearAllTimers();
+    StageTransitionController.state='PLAYING';
+    mvWorldMapOpen=false;
+    DragonMovementController.snapToStage(0, 'IDLE');
+    await refresh(true);
+   }
+   return;
+  }
+  if(action==='toggleIntroHub'){
+   mvWorldMapOpen=!mvWorldMapOpen;
+   mvShowIntroHub=false;
+   if(!StageTransitionController.isTransitioning()){
+    DragonMovementController.snapToStage(world?.me?.stage ?? 0, 'IDLE');
+   }
+   render();
+   return;
+  }
+  if(action==='hubStartCurrentStage'){mvWorldMapOpen=false;mvShowIntroHub=false;render();return;}
+  if(action==='hubOpenKnowledge'){mvWorldMapOpen=false;mvShowIntroHub=false;oxyz3D.open=true;render();return;}
+  if(action==='hubEnterStage'){
+   const stg=Number(el.dataset.stage||0);
+   mvShowIntroHub=false;
+   mvWorldMapOpen=false;
+   if(vaState.s1BridgeTimer) clearTimeout(vaState.s1BridgeTimer);
+   vaState.s1BridgeRestoredOverlay=false;
+   vaState.stageId=-1;
    await submit('/api/demoJump',{stage:stg});
+   lastSyncedTeamStage = stg;
+   DragonMovementController.snapToStage(stg, 'IDLE');
    await refresh(true);
    return;
   }
@@ -5471,10 +6366,15 @@ async function handle(action,el){
   if(action==='demoTeacher'){saveSession({role:'teacher',room:'123456',token:'DEMO_GV'});await refresh(true);return;}
   if(action==='demoJumpStage'){
    mvShowIntroHub=false;
+   mvWorldMapOpen=false;
+   StageTransitionController.clearAllTimers();
+   StageTransitionController.state='PLAYING';
    if(vaState.s1BridgeTimer) clearTimeout(vaState.s1BridgeTimer);
    vaState.s1BridgeRestoredOverlay=false;
    vaState.stageId=-1;
    const stg=Number(el.dataset.stage);
+   lastSyncedTeamStage=stg;
+   DragonMovementController.snapToStage(stg, 'IDLE');
    await submit('/api/demoJump',{stage:stg});
    activePlayMode=null;
    huntState.battleOpen=false;

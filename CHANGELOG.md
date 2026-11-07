@@ -9,6 +9,25 @@ Tất cả những thay đổi quan trọng của dự án này sẽ được gh
 
 ---
 
+## [4.4.0] - 2026-11-07
+
+### Added & Upgraded (Nâng Cấp Hệ Thống Rồng Xanh Di Chuyển Thực Sự Qua 5 Chặng Trên Bản Đồ Thế Giới 2D)
+- **Tích hợp Bản Đồ Thế Giới 5 Vùng Đất Liên Kết (`public/assets/World_Map_Oxyz.jpg`, `public/app.js`, `public/style.css`):**
+  - Thiết kế component `AdventureMap` tương tác thực sự trong hệ tọa độ chuẩn hóa `1000 × 560` (tương thích `1920×1080` và `1366×768`, không lệch vị trí nhân vật khi co giãn màn hình).
+  - Kết nối 5 vùng đất (**Chặng 1: Rừng Vectơ Khởi Nguyên – Hiệu vectơ – Nhận biết**, **Chặng 2: Pháo Đài Góc Vuông – Tổng vectơ – Nhận biết**, **Chặng 3: Tháp Pha Lê – Hình bình hành – Nhận biết**, **Chặng 4: Mê Cung Trung Điểm – Trung điểm – Thông hiểu**, **Chặng 5: Thành Trì Lõi Trí Tuệ – Trọng tâm – Thông hiểu**) và **Đỉnh Thành Trì – Tâm Thạch Vectơ** bằng hệ thống đường đi cong Bézier bậc 3 SVG phát sáng động (`WORLD_ROUTES`).
+  - Hiển thị thẻ HUD `CHẶNG HIỆN TẠI` ở góc trái trên, cột phải gồm 3 thẻ (`ẤN VECTƠ`, `TIẾN TRÌNH ĐỘI`, `RỒNG XANH ĐỒNG HÀNH`) và thanh công cụ đáy (`🗺️ Bản đồ Lục địa OXYZ`, `📜 Nhiệm vụ`, `▶ Bắt đầu`, `≫ Di chuyển tới chặng`).
+- **Xây dựng Hệ Thống Nhân Vật & Di Chuyển Rồng Xanh (`DragonCharacter` & `DragonMovementController`):**
+  - Hỗ trợ đầy đủ 6 trạng thái hoạt ảnh thời gian thực: `IDLE` (đứng thở nhẹ tại cổng chặng), `CELEBRATE` (nhận thưởng XP/Vàng/Ấn Vectơ và nhảy vui mừng), `RUN` (chạy trên con đường ánh sáng có bóng đổ dưới chân và hạt bụi sáng), `FLY` (vỗ cánh SVG động kèm hào quang sao sáng khi vượt qua khoảng không giữa các đảo nổi), `LAND` (hạ cánh phát sóng ánh sáng tại cổng chặng mới), và `TALK` (hiển thị bong bóng lời thoại giao nhiệm vụ mới).
+  - Nội suy tọa độ mượt 60fps bằng đường cong Bézier bậc 3 (`evalCubicBezier`) qua các điểm mốc `stage1.position` → `stage2.position` → `stage3.position` → `stage4.position` → `stage5.position` → `heartStone.position`, tự động xoay hướng mặt theo đạo hàm tiếp tuyến (`tx`).
+- **Máy Trạng Thái Chuyển Chặng (`StageTransitionController`) & Kịch Bản Thoại 5 Chặng:**
+  - Chu trình tự động khi hoàn thành mỗi chặng: `PLAYING` → `STAGE_COMPLETED` → `REWARD` → `CELEBRATING` → `MOVING` (`RUN` → `FLY`) → `ARRIVING` (`LAND`) → `STAGE_UNLOCKED` (`TALK`) → `PLAYING`.
+  - Lời thoại Rồng Xanh chuẩn kịch bản cho từng chặng (`1 → 2`: *"Giỏi lắm! Cây cầu đã hồi sinh! Cùng đến Pháo Đài Góc Vuông thôi!"*, `2 → 3`: *"Cánh cổng đã mở! Tháp Pha Lê đang đợi chúng ta!"*, `3 → 4`: *"Ba Ấn Vectơ đã được thu hồi! Hãy tìm điểm cân bằng!"*, `4 → 5`: *"Chỉ còn một thử thách! Cả đội cùng tiến đến Thành Trì Trí Tuệ!"*, `5 → Tâm Thạch`: *"Đủ 5 Ấn Vectơ rồi! Hãy bay lên đỉnh Thành Trì khôi phục Tâm Thạch Vectơ!"*).
+- **Đồng Bộ Đội Chơi, Màn Hình Giáo Viên & Chống Cộng Trùng Điểm (`server.js`, `CHOI_THU_1_MAY.html`):**
+  - Bổ sung endpoint `/api/dragonState` và trường `t.dragon` đồng bộ vị trí/trạng thái di chuyển của Rồng Xanh giữa tất cả thành viên cùng đội và hiển thị trực tiếp trên bảng xếp hạng Giáo viên (`🐉 Bay X→Y` / `🐉 Chặng X`).
+  - Khóa chống cộng trùng (`alreadyRewarded`) đảm bảo tải lại trang (`F5`) giữ nguyên vị trí Rồng Xanh tại chặng hiện tại và không bao giờ cộng lặp XP, Vàng hay Ấn Vectơ.
+
+---
+
 ## [4.3.0] - 2026-11-06
 
 ### Added & Upgraded (Nâng Cấp Chặng 1 – Game Truy Tìm Mật Thư: "BÍ MẬT CÂY CẦU ĐẢO CHIỀU")
