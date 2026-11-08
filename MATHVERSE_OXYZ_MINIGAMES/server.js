@@ -133,11 +133,11 @@ function ensureTeamFields(t){
   t.stage2.gateOpened=true;
  }
  if(!t.stage4||typeof t.stage4!=='object'){
-  t.stage4={modePairs:6,matchedPairs:[],matchedCount:0,totalPairs:6,flipCount:0,wrongMatches:0,hintsUsedCount:0,controllerRoleIdx:0,deckOrder:[],gateOpened:false,completedTimeSec:null};
+  t.stage4={modePairs:4,matchedPairs:[],matchedCount:0,totalPairs:4,flipCount:0,wrongMatches:0,hintsUsedCount:0,controllerRoleIdx:0,deckOrder:[],gateOpened:false,completedTimeSec:null};
  }
  if(!Array.isArray(t.stage4.matchedPairs))t.stage4.matchedPairs=[];
  if(!Array.isArray(t.stage4.deckOrder))t.stage4.deckOrder=[];
- if(t.stage4.modePairs!==4&&t.stage4.modePairs!==6)t.stage4.modePairs=6;
+ if(t.stage4.modePairs!==4&&t.stage4.modePairs!==6)t.stage4.modePairs=4;
  t.stage4.totalPairs=t.stage4.modePairs;
  if(t.stage4.matchedCount===undefined)t.stage4.matchedCount=t.stage4.matchedPairs.length;
  if(t.stage4.flipCount===undefined)t.stage4.flipCount=0;
@@ -282,9 +282,9 @@ function roomState(room,token){
   stage1:t.stage1||{pillars:[],cluesFound:0,cipherSolved:false,bridgeOpened:false},
   stage2:t.stage2||{solvedCount:0,totalCount:6,shields:3,wrongAttempts:0,controllerRoleIdx:0,gateOpened:false,completedTimeSec:null},
   stage4:{
-   modePairs:t.stage4?.modePairs||6,
+   modePairs:t.stage4?.modePairs||4,
    matchedCount:t.stage4?.matchedCount||0,
-   totalPairs:t.stage4?.totalPairs||6,
+   totalPairs:t.stage4?.totalPairs||4,
    flipCount:t.stage4?.flipCount||0,
    wrongMatches:t.stage4?.wrongMatches||0,
    hintsUsedCount:t.stage4?.hintsUsedCount||0,
@@ -334,7 +334,7 @@ function roomState(room,token){
   cipherReady:Boolean(team.cipherReady),bossReady:Boolean(team.bossReady),
   stage1:team.stage1||{pillars:[],cluesFound:0,cipherSolved:false,bridgeOpened:false},
   stage2:team.stage2||{solvedCount:0,totalCount:6,shields:3,wrongAttempts:0,controllerRoleIdx:0,gateOpened:false,completedTimeSec:null},
-  stage4:team.stage4||{modePairs:6,matchedPairs:[],matchedCount:0,totalPairs:6,flipCount:0,wrongMatches:0,hintsUsedCount:0,controllerRoleIdx:0,deckOrder:[],gateOpened:false,completedTimeSec:null},
+  stage4:team.stage4||{modePairs:4,matchedPairs:[],matchedCount:0,totalPairs:4,flipCount:0,wrongMatches:0,hintsUsedCount:0,controllerRoleIdx:0,deckOrder:[],gateOpened:false,completedTimeSec:null},
   stage5:team.stage5||{phase:1,mpBC:false,mpAC:false,midpointsFound:0,medA:false,medB:false,mediansConnected:0,crystalPlaced:false,quizSolvedCount:0,vectorsActivated:false,wrongAttempts:0,hintsUsedCount:0,controllerRoleIdx:0,completedTimeSec:null,timedOut:false},
   dragon:team.dragon||{state:'PLAYING',fromStage:team.stage,toStage:team.stage,moveMode:'IDLE',transitionId:0},
   completed:team.completed,attempts:team.attempts,hintsUsed:team.hintsUsed,digits:team.digits,finishedAt:team.finishedAt},

@@ -9,6 +9,17 @@ Tất cả những thay đổi quan trọng của dự án này sẽ được gh
 
 ---
 
+## [5.5.2] - 2026-11-08
+
+### Changed & Improved (Tinh Chỉnh Chặng 4 – Lật Thẻ Trung Điểm Dễ Chơi & Trực Quan Hơn Cho Học Sinh)
+- **Tối Ưu Độ Khó & Trải Nghiệm Lật Thẻ Chặng 4 (`S4_CARD_PAIRS_BANK`, `s4State`, `CardMatchingController`, `renderStage4MidpointMemoryGame` trong `public/app.js`, `public/style.css`, `server.js`):**
+  1. **Mặc định chế độ 8 thẻ (4 cặp cốt lõi `Hình vẽ ⇔ Công thức`):** Bàn chơi mặc định mở **8 thẻ (4 cặp – 2 hàng × 4 cột)** khớp với chỉ báo `Đã ghép: 0 / 4` trong ảnh mẫu, mỗi cặp đều là **1 thẻ Hình vẽ trực quan $\leftrightarrow$ 1 thẻ Công thức ngắn gọn** (`IA = IB`, $\overrightarrow{IA}+\overrightarrow{IB}=\overrightarrow{0}$, $\overrightarrow{MA}+\overrightarrow{MB}=2\overrightarrow{MI}$, $\overrightarrow{AI}=\overrightarrow{IB}=\frac{1}{2}\overrightarrow{AB}$). Giáo viên và học sinh vẫn có thể chuyển sang `12 thẻ (6 cặp)` bất kỳ lúc nào.
+  2. **Xem trước tự động (`Auto-Peek 2.2s`) & Nút `👁️ Mở xem 2.5s (2/2)`:** Khi mới vào ván (hoặc khi bấm nút `👁️ Mở xem 2.5s`), toàn bộ thẻ lật ngửa để học sinh quan sát vị trí trước khi úp xuống.
+  3. **Nhãn ghi nhớ thông minh trên mặt sau thẻ đã lật (`.s4-card-seen-tag`) & Tự động sáng viền thẻ cùng cặp:** Thẻ nào đã từng được học sinh mở xem 1 lần sẽ lưu nhãn gợi nhớ trên mặt sau (`👁️ Cặp 1 · Hình vẽ`, `👁️ Cặp 1 · Công thức`...). Khi mở thẻ đầu tiên mà thẻ cùng cặp đã từng được mở trước đó, thẻ cùng cặp tự động sáng viền vàng kim giúp học sinh ghép đúng ngay mà không bị rối trí nhớ.
+  4. **Bảng tóm tắt nhanh `📜 Kiến thức: Trung điểm I của AB` (`.s4-quick-theory-parchment`):** Hiển thị ngay ở cột trái phía trên hộp thoại Rồng Xanh để học sinh đối chiếu công thức trực tiếp trên màn hình, kết hợp tăng lượt `💡 Gợi ý cặp thẻ` lên `3/3` và cho phép bấm sang thẻ tiếp theo ngay lập tức mà không bị khóa chờ.
+
+---
+
 ## [5.5.1] - 2026-11-07
 
 ### Added & Upgraded (Bổ Sung Chuỗi 3 Câu Hỏi Hiểu Sâu Sau Khi Nối & Đặt Trọng Tâm G Ở Chặng 5)

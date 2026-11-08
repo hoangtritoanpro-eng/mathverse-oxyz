@@ -12139,3 +12139,60 @@ body {
     grid-template-columns: repeat(2, 1fr);
   }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   CHẶNG 4 HỖ TRỢ DỄ CHƠI: BẢNG TÓM TẮT NHANH & NHÃN GỢI NHỚ TRÊN MẶT SAU THẺ
+   ═══════════════════════════════════════════════════════════════════════════ */
+.s4-quick-theory-parchment {
+  width: 100%;
+  background: linear-gradient(180deg, #FEF9C3 0%, #FDE68A 100%);
+  border: 2.5px solid #D97706;
+  border-radius: 14px;
+  padding: 8px 11px;
+  color: #451A03;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.48), inset 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+.s4-qtp-title {
+  font-size: 12.5px;
+  font-weight: 900;
+  color: #92400E;
+  padding-bottom: 4px;
+  margin-bottom: 5px;
+  border-bottom: 1.5px dashed rgba(180, 83, 9, 0.38);
+}
+.s4-qtp-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #1E293B;
+}
+.s4-qtp-list li b {
+  color: #B45309;
+}
+
+.s4-memory-card.is-seen .s4-card-back {
+  border-color: #38BDF8;
+  box-shadow: 0 0 14px rgba(56, 189, 248, 0.45);
+}
+
+.s4-card-seen-tag {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 4;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.94);
+  border: 1.8px solid var(--pair-color, #FACC15);
+  color: #FEF08A;
+  font-size: 11px;
+  font-weight: 900;
+  white-space: nowrap;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.65);
+}

@@ -7760,27 +7760,36 @@ const S4_CARD_PAIRS_BANK = [
     pairId: 'P4',
     qId: '4.4',
     pairNum: 4,
-    badge: 'Cặp 4 · Phân tích qua điểm I',
-    badgeColor: '#d97706',
-    title: 'Phân tích hai vectơ MA, MB qua trung điểm I',
-    explainSpeech: 'Tuyệt vời! Đây là hai bước chèn điểm trung điểm I vào vectơ MA và vectơ MB. Khi cộng hai vế lại, IA và IB triệt tiêu để tạo thành 2 vectơ MI!',
-    explainFormula: `\\overrightarrow{MA} = \\overrightarrow{MI} + \\overrightarrow{IA} \\quad \\& \\quad \\overrightarrow{MB} = \\overrightarrow{MI} + \\overrightarrow{IB}`,
+    badge: 'Cặp 4 · Vectơ nửa đoạn thẳng',
+    badgeColor: '#0d9488',
+    title: 'Hệ thức vectơ cùng hướng trên đoạn AB',
+    explainSpeech: 'Quá giỏi! Vì trung điểm I chia đôi đoạn AB theo chiều từ A tới B nên hai vectơ AI và IB bằng nhau và bằng một nửa vectơ AB!',
+    explainFormula: `\\overrightarrow{AI} = \\overrightarrow{IB} = \\frac{1}{2}\\overrightarrow{AB}`,
     cardA: {
       id: 'P4_A',
       pairId: 'P4',
-      role: 'part1',
-      typeLabel: 'Mảnh phân tích 1 (Nhánh A)',
+      role: 'visual',
+      typeLabel: 'Hình 2 vectơ cùng hướng',
       renderFrontHtml() {
         return `
-          <div class="s4-card-text-formula">
-            <div class="s4-card-math-equation compact">
-              ${s2RenderVecArrow('MA', 's4-card-vec')}
-              <span class="s4-math-op">=</span>
-              ${s2RenderVecArrow('MI', 's4-card-vec')}
-              <span class="s4-math-op">+</span>
-              ${s2RenderVecArrow('IA', 's4-card-vec')}
-            </div>
-            <small class="s4-card-note">Chèn trung điểm <i>I</i> vào nhánh <i>MA</i></small>
+          <div class="s4-card-diagram-wrap">
+            <svg viewBox="0 0 210 76" class="s4-geom-svg" aria-label="Hai vectơ AI và IB cùng hướng">
+              <defs>
+                <marker id="s4ArrTeal" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+                  <path d="M 0 1 L 10 5 L 0 9 z" fill="#0D9488"/>
+                </marker>
+              </defs>
+              <line x1="26" y1="38" x2="98" y2="38" stroke="#0D9488" stroke-width="4" marker-end="url(#s4ArrTeal)"/>
+              <line x1="108" y1="38" x2="180" y2="38" stroke="#0D9488" stroke-width="4" marker-end="url(#s4ArrTeal)"/>
+              <circle cx="24" cy="38" r="6" fill="#0D9488"/>
+              <circle cx="105" cy="38" r="6.5" fill="#EC4899"/>
+              <circle cx="186" cy="38" r="6" fill="#0D9488"/>
+              <text x="64" y="24" text-anchor="middle" font-size="13" font-weight="900" fill="#0F766E">AI⃗ →</text>
+              <text x="146" y="24" text-anchor="middle" font-size="13" font-weight="900" fill="#0F766E">IB⃗ →</text>
+              <text x="24" y="64" text-anchor="middle" font-size="16" font-weight="900" font-style="italic" fill="#0F172A">A</text>
+              <text x="105" y="64" text-anchor="middle" font-size="16" font-weight="900" font-style="italic" fill="#BE185D">I</text>
+              <text x="186" y="64" text-anchor="middle" font-size="16" font-weight="900" font-style="italic" fill="#0F172A">B</text>
+            </svg>
           </div>
         `;
       }
@@ -7788,19 +7797,17 @@ const S4_CARD_PAIRS_BANK = [
     cardB: {
       id: 'P4_B',
       pairId: 'P4',
-      role: 'part2',
-      typeLabel: 'Mảnh phân tích 2 (Nhánh B)',
+      role: 'formula',
+      typeLabel: 'Hệ thức chia đôi',
       renderFrontHtml() {
         return `
-          <div class="s4-card-text-formula">
-            <div class="s4-card-math-equation compact">
-              ${s2RenderVecArrow('MB', 's4-card-vec')}
-              <span class="s4-math-op">=</span>
-              ${s2RenderVecArrow('MI', 's4-card-vec')}
-              <span class="s4-math-op">+</span>
-              ${s2RenderVecArrow('IB', 's4-card-vec')}
-            </div>
-            <small class="s4-card-note">Chèn trung điểm <i>I</i> vào nhánh <i>MB</i></small>
+          <div class="s4-card-math-equation compact">
+            ${s2RenderVecArrow('AI', 's4-card-vec')}
+            <span class="s4-math-op">=</span>
+            ${s2RenderVecArrow('IB', 's4-card-vec')}
+            <span class="s4-math-op">=</span>
+            <span class="s4-frac"><span>1</span><span>2</span></span>
+            ${s2RenderVecArrow('AB', 's4-card-vec')}
           </div>
         `;
       }
@@ -7852,36 +7859,27 @@ const S4_CARD_PAIRS_BANK = [
     pairId: 'P6',
     qId: '4.6',
     pairNum: 6,
-    badge: 'Cặp 6 · Vectơ nửa đoạn thẳng',
-    badgeColor: '#0d9488',
-    title: 'Hệ thức vectơ cùng hướng trên đoạn AB',
-    explainSpeech: 'Quá giỏi! Vì trung điểm I chia đôi đoạn AB theo chiều từ A tới B nên hai vectơ AI và IB bằng nhau và bằng một nửa vectơ AB!',
-    explainFormula: `\\overrightarrow{AI} = \\overrightarrow{IB} = \\frac{1}{2}\\overrightarrow{AB}`,
+    badge: 'Cặp 6 · Phân tích qua điểm I',
+    badgeColor: '#d97706',
+    title: 'Phân tích hai vectơ MA, MB qua trung điểm I',
+    explainSpeech: 'Tuyệt vời! Đây là hai bước chèn điểm trung điểm I vào vectơ MA và vectơ MB. Khi cộng hai vế lại, IA và IB triệt tiêu để tạo thành 2 vectơ MI!',
+    explainFormula: `\\overrightarrow{MA} = \\overrightarrow{MI} + \\overrightarrow{IA} \\quad \\& \\quad \\overrightarrow{MB} = \\overrightarrow{MI} + \\overrightarrow{IB}`,
     cardA: {
       id: 'P6_A',
       pairId: 'P6',
-      role: 'visual',
-      typeLabel: 'Hai vectơ nối tiếp bằng nhau',
+      role: 'part1',
+      typeLabel: 'Mảnh phân tích 1 (Nhánh A)',
       renderFrontHtml() {
         return `
-          <div class="s4-card-diagram-wrap">
-            <svg viewBox="0 0 210 76" class="s4-geom-svg" aria-label="Hai vectơ AI và IB cùng hướng">
-              <defs>
-                <marker id="s4ArrTeal" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto">
-                  <path d="M 0 1 L 10 5 L 0 9 z" fill="#0D9488"/>
-                </marker>
-              </defs>
-              <line x1="26" y1="38" x2="98" y2="38" stroke="#0D9488" stroke-width="4" marker-end="url(#s4ArrTeal)"/>
-              <line x1="108" y1="38" x2="180" y2="38" stroke="#0D9488" stroke-width="4" marker-end="url(#s4ArrTeal)"/>
-              <circle cx="24" cy="38" r="6" fill="#0D9488"/>
-              <circle cx="105" cy="38" r="6.5" fill="#EC4899"/>
-              <circle cx="186" cy="38" r="6" fill="#0D9488"/>
-              <text x="64" y="24" text-anchor="middle" font-size="13" font-weight="900" fill="#0F766E">AI⃗ →</text>
-              <text x="146" y="24" text-anchor="middle" font-size="13" font-weight="900" fill="#0F766E">IB⃗ →</text>
-              <text x="24" y="64" text-anchor="middle" font-size="16" font-weight="900" font-style="italic" fill="#0F172A">A</text>
-              <text x="105" y="64" text-anchor="middle" font-size="16" font-weight="900" font-style="italic" fill="#BE185D">I</text>
-              <text x="186" y="64" text-anchor="middle" font-size="16" font-weight="900" font-style="italic" fill="#0F172A">B</text>
-            </svg>
+          <div class="s4-card-text-formula">
+            <div class="s4-card-math-equation compact">
+              ${s2RenderVecArrow('MA', 's4-card-vec')}
+              <span class="s4-math-op">=</span>
+              ${s2RenderVecArrow('MI', 's4-card-vec')}
+              <span class="s4-math-op">+</span>
+              ${s2RenderVecArrow('IA', 's4-card-vec')}
+            </div>
+            <small class="s4-card-note">Chèn trung điểm <i>I</i> vào nhánh <i>MA</i></small>
           </div>
         `;
       }
@@ -7889,17 +7887,19 @@ const S4_CARD_PAIRS_BANK = [
     cardB: {
       id: 'P6_B',
       pairId: 'P6',
-      role: 'formula',
-      typeLabel: 'Hệ thức chia đôi',
+      role: 'part2',
+      typeLabel: 'Mảnh phân tích 2 (Nhánh B)',
       renderFrontHtml() {
         return `
-          <div class="s4-card-math-equation compact">
-            ${s2RenderVecArrow('AI', 's4-card-vec')}
-            <span class="s4-math-op">=</span>
-            ${s2RenderVecArrow('IB', 's4-card-vec')}
-            <span class="s4-math-op">=</span>
-            <span class="s4-frac"><span>1</span><span>2</span></span>
-            ${s2RenderVecArrow('AB', 's4-card-vec')}
+          <div class="s4-card-text-formula">
+            <div class="s4-card-math-equation compact">
+              ${s2RenderVecArrow('MB', 's4-card-vec')}
+              <span class="s4-math-op">=</span>
+              ${s2RenderVecArrow('MI', 's4-card-vec')}
+              <span class="s4-math-op">+</span>
+              ${s2RenderVecArrow('IB', 's4-card-vec')}
+            </div>
+            <small class="s4-card-note">Chèn trung điểm <i>I</i> vào nhánh <i>MB</i></small>
           </div>
         `;
       }
@@ -7910,21 +7910,24 @@ const S4_CARD_PAIRS_BANK = [
 const s4State = {
   initedKey: null,
   fsm: 'READY', // 'READY' | 'PLAYING' | 'CHECKING' | 'MATCHED' | 'UNMATCHED' | 'COMPLETED' | 'TIMEOUT'
-  modePairs: 6, // 6 cặp (12 thẻ 3x4) mặc định, hoặc 4 cặp (8 thẻ 2x4)
-  deck: [], // [{ uid, pairId, pairNum, badge, badgeColor, role, typeLabel, faceUp, matched, mismatchShake, hintGlow, renderFrontHtml }]
+  modePairs: 4, // Mặc định 4 cặp (8 thẻ 2x4 – dễ nhớ, trực quan khớp ảnh mẫu), có thể chuyển sang 6 cặp (12 thẻ 3x4)
+  deck: [], // [{ uid, pairId, pairNum, badge, badgeColor, role, typeLabel, faceUp, matched, seen, mismatchShake, hintGlow, renderFrontHtml }]
   deckOrder: [],
   flippedIndices: [],
   matchedPairs: [],
   flipCount: 0,
   wrongMatches: 0,
   hintsUsedCount: 0,
-  maxHints: 2,
+  maxHints: 3, // Tăng lên 3 lượt gợi ý miễn phí
+  peekRemaining: 2, // 2 lượt "Mở xem nhanh 2.5 giây" miễn phí
+  isPeeking: false,
+  peekTimerId: null,
   controllerRoleIdx: 0,
   focusedIndex: 0,
   knowledgeModalOpen: false,
   lastMatchedExplain: null,
   dragonMood: 'idle', // 'idle' | 'cheer' | 'think' | 'warn' | 'runToGate'
-  dragonSpeech: 'Nhiệm vụ: Lật thẻ và ghép đúng cặp kiến thức về trung điểm để mở cổng Mê Cung!',
+  dragonSpeech: 'Nhiệm vụ: Lật thẻ và ghép đúng 4 cặp kiến thức về trung điểm (các thẻ đã mở sẽ lưu dấu gợi nhớ trên mặt sau)!',
   warned15s: false,
   gateOpened: false,
   rewardSubmitted: false,
@@ -8025,6 +8028,7 @@ const MemoryCard = {
         index: idx,
         faceUp: isMatched,
         matched: isMatched,
+        seen: isMatched,
         mismatchShake: false,
         hintGlow: false
       };
@@ -8041,6 +8045,9 @@ const DragonGuide = {
     if (explainObj) {
       s4State.lastMatchedExplain = explainObj;
     }
+  },
+  say(speech, mood = 'idle') {
+    this.setFeedback(mood, speech);
   }
 };
 
@@ -8053,15 +8060,20 @@ const CardMatchingController = {
     if (s4State.initedKey !== key || forceNew || (customModePairs && customModePairs !== s4State.modePairs)) {
       if (s4State.checkTimerId) clearTimeout(s4State.checkTimerId);
       if (s4State.hintTimerId) clearTimeout(s4State.hintTimerId);
+      if (s4State.peekTimerId) clearTimeout(s4State.peekTimerId);
       s4State.initedKey = key;
 
       const saved = !forceNew ? Stage4Progress.load() : null;
-      const modePairs = customModePairs || srvS4?.modePairs || saved?.modePairs || 6;
+      const modePairs = customModePairs || saved?.modePairs || (srvS4?.matchedCount > 0 ? srvS4?.modePairs : 4) || 4;
       const srvMatched = Array.isArray(srvS4?.matchedPairs) ? srvS4.matchedPairs : [];
       const savedMatched = Array.isArray(saved?.matchedPairs) ? saved.matchedPairs : [];
-      const mergedMatched = forceNew ? [] : Array.from(new Set([...srvMatched, ...savedMatched]));
+      const mergedMatched = forceNew ? [] : Array.from(new Set([...srvMatched, ...savedMatched])).filter(pid =>
+        modePairs === 4 ? ['P1', 'P2', 'P3', 'P4'].includes(pid) : true
+      );
       const savedOrder = !forceNew
-        ? ((srvS4?.deckOrder && srvS4.deckOrder.length === modePairs * 2) ? srvS4.deckOrder : saved?.deckOrder)
+        ? ((srvS4?.deckOrder && srvS4.deckOrder.length === modePairs * 2)
+            ? srvS4.deckOrder
+            : (saved?.deckOrder && saved.deckOrder.length === modePairs * 2 ? saved.deckOrder : null))
         : null;
 
       const { deck, order } = MemoryCard.buildDeckFromPairs(modePairs, savedOrder, mergedMatched);
@@ -8073,18 +8085,29 @@ const CardMatchingController = {
       s4State.flipCount = forceNew ? 0 : Math.max(srvS4?.flipCount || 0, saved?.flipCount || 0);
       s4State.wrongMatches = forceNew ? 0 : Math.max(srvS4?.wrongMatches || 0, saved?.wrongMatches || 0);
       s4State.hintsUsedCount = forceNew ? 0 : Math.max(srvS4?.hintsUsedCount || 0, saved?.hintsUsedCount || 0);
+      s4State.peekRemaining = 2;
+      s4State.isPeeking = false;
       s4State.controllerRoleIdx = srvS4?.controllerRoleIdx ?? saved?.controllerRoleIdx ?? 0;
       s4State.focusedIndex = 0;
       s4State.knowledgeModalOpen = false;
       s4State.lastMatchedExplain = null;
       s4State.warned15s = false;
-      s4State.gateOpened = mergedMatched.length >= modePairs || Boolean(srvS4?.gateOpened);
+      s4State.gateOpened = mergedMatched.length >= modePairs || Boolean(srvS4?.gateOpened && mergedMatched.length >= modePairs);
       s4State.rewardSubmitted = Boolean(saved?.rewardSubmitted || (world?.me?.stage ?? 0) > 3);
       s4State.fsm = s4State.gateOpened ? 'COMPLETED' : 'PLAYING';
       s4State.dragonMood = s4State.gateOpened ? 'cheer' : 'idle';
       s4State.dragonSpeech = s4State.gateOpened
-        ? 'Tuyệt vời! Sáu cặp thẻ phép thuật đã hợp nhất mở cổng Mê Cung Trung Điểm!'
-        : 'Nhiệm vụ: Lật thẻ và ghép đúng cặp kiến thức về trung điểm để mở cổng Mê Cung!';
+        ? `Tuyệt vời! Đã ghép đủ ${modePairs}/${modePairs} cặp thẻ phép thuật để mở cổng Mê Cung Trung Điểm!`
+        : `👀 Mẹo dễ nhớ: Các thẻ đang mở 2 giây đầu để bạn quan sát! Mỗi thẻ đã lật sẽ hiện nhãn màu cặp ở mặt sau để ghép cực nhanh!`;
+
+      // Tự động mở xem trước 2.2 giây khi bắt đầu ván mới để học sinh dễ dàng ghi nhớ vị trí
+      if (!s4State.gateOpened && mergedMatched.length === 0) {
+        s4State.isPeeking = true;
+        s4State.peekTimerId = setTimeout(() => {
+          s4State.isPeeking = false;
+          render();
+        }, 2200);
+      }
 
       Stage4Progress.save();
       if (session?.room && session?.token) {
@@ -8105,6 +8128,7 @@ const CardMatchingController = {
           if (s4State.matchedPairs.includes(c.pairId)) {
             c.faceUp = true;
             c.matched = true;
+            c.seen = true;
           }
         });
       }
@@ -8114,11 +8138,46 @@ const CardMatchingController = {
     }
   },
 
+  triggerPeekBoard() {
+    if (s4State.gateOpened || s4State.isPeeking) return;
+    if (s4State.peekRemaining <= 0) {
+      sound('bleep');
+      DragonGuide.setFeedback('think', 'Đội đã dùng hết lượt Mở xem nhanh! Hãy dựa vào nhãn màu cặp trên mặt sau các thẻ đã mở hoặc bấm 💡 Gợi ý nhé!');
+      render();
+      return;
+    }
+    s4State.peekRemaining--;
+    s4State.isPeeking = true;
+    sound('powerup');
+    DragonGuide.setFeedback('cheer', `👁️ Đang mở xem toàn bộ bàn thẻ trong 2.5 giây! Hãy quan sát các thẻ cùng màu Cặp 1, Cặp 2, Cặp 3, Cặp 4 nhé!`);
+    render();
+    if (s4State.peekTimerId) clearTimeout(s4State.peekTimerId);
+    s4State.peekTimerId = setTimeout(() => {
+      s4State.isPeeking = false;
+      render();
+    }, 2500);
+  },
+
   canFlipCard(idx) {
-    if (s4State.fsm !== 'PLAYING' && s4State.fsm !== 'READY') return false;
-    if (s4State.gateOpened || s4State.flippedIndices.length >= 2) return false;
+    if (s4State.gateOpened || s4State.isPeeking) return false;
     const card = s4State.deck[idx];
     if (!card || card.matched || card.faceUp) return false;
+    // Nếu đang có 2 thẻ lệch nhau đang chờ úp mà học sinh bấm sang thẻ thứ 3 -> tự động úp ngay 2 thẻ cũ để mở thẻ mới mượt mà!
+    if (s4State.fsm === 'UNMATCHED' && s4State.flippedIndices.length >= 2) {
+      if (s4State.checkTimerId) clearTimeout(s4State.checkTimerId);
+      s4State.flippedIndices.forEach(oldIdx => {
+        const oldC = s4State.deck[oldIdx];
+        if (oldC && !oldC.matched) {
+          oldC.faceUp = false;
+          oldC.mismatchShake = false;
+        }
+      });
+      s4State.flippedIndices = [];
+      s4State.fsm = 'PLAYING';
+      return true;
+    }
+    if (s4State.fsm !== 'PLAYING' && s4State.fsm !== 'READY') return false;
+    if (s4State.flippedIndices.length >= 2) return false;
     return true;
   },
 
@@ -8126,6 +8185,7 @@ const CardMatchingController = {
     if (!this.canFlipCard(idx)) return;
     const card = s4State.deck[idx];
     card.faceUp = true;
+    card.seen = true;
     card.hintGlow = false;
     s4State.focusedIndex = idx;
     s4State.flippedIndices.push(idx);
@@ -8133,17 +8193,26 @@ const CardMatchingController = {
 
     if (s4State.flippedIndices.length === 1) {
       s4State.fsm = 'PLAYING';
+      // Hỗ trợ thông minh: Nếu thẻ còn lại của cặp này đã từng được lật (seen = true), làm sáng nhẹ thẻ đó để học sinh ghép ngay!
+      const partner = s4State.deck.find(c => c.pairId === card.pairId && c.index !== card.index && !c.matched);
+      if (partner && partner.seen) {
+        partner.hintGlow = true;
+        DragonGuide.setFeedback('cheer', `💡 Gợi nhớ nhanh: Bạn đã từng mở thẻ còn lại của <b>${card.badge}</b> ở ô số <b>#${partner.index + 1}</b> (đang phát sáng)!`);
+      } else {
+        DragonGuide.setFeedback('idle', `Đang mở <b>${card.badge}</b> (${card.typeLabel}). Hãy tìm thẻ có nội dung toán học tương ứng thuộc <b>Cặp ${card.pairNum}</b>!`);
+      }
       render();
       return;
     }
 
-    // Đã mở đủ 2 thẻ -> Chuyển sang trạng thái CHECKING (Khóa mở thẻ thứ 3)
+    // Đã mở đủ 2 thẻ -> Chuyển sang trạng thái CHECKING
     s4State.fsm = 'CHECKING';
     s4State.flipCount++;
     const [idxA, idxB] = s4State.flippedIndices;
     const cardA = s4State.deck[idxA];
     const cardB = s4State.deck[idxB];
     const isMatch = (cardA.pairId === cardB.pairId);
+    s4State.deck.forEach(c => { c.hintGlow = false; });
 
     render();
 
@@ -8154,6 +8223,8 @@ const CardMatchingController = {
         cardB.matched = true;
         cardA.faceUp = true;
         cardB.faceUp = true;
+        cardA.seen = true;
+        cardB.seen = true;
         if (!s4State.matchedPairs.includes(cardA.pairId)) {
           s4State.matchedPairs.push(cardA.pairId);
         }
@@ -8196,9 +8267,9 @@ const CardMatchingController = {
           s4State.fsm = 'PLAYING';
           render();
         }
-      }, 280);
+      }, 260);
     } else {
-      // HAI THẺ KHÔNG TƯƠNG ỨNG -> Rung nhẹ và tự úp lại sau 720ms (không cho mở thẻ thứ 3)
+      // HAI THẺ KHÔNG TƯƠNG ỨNG -> Hiển thị 1100ms để học sinh kịp đọc, sau đó úp lại nhưng lưu nhãn "Đã xem · Cặp X" trên mặt sau!
       s4State.wrongMatches++;
       cardA.mismatchShake = true;
       cardB.mismatchShake = true;
@@ -8207,7 +8278,7 @@ const CardMatchingController = {
 
       DragonGuide.setFeedback(
         'think',
-        `Hai thẻ này thuộc hai tính chất khác nhau (${cardA.badge.split('·')[0].trim()} và ${cardB.badge.split('·')[0].trim()}). Hãy ghi nhớ vị trí để ghép đúng cặp tương ứng nhé!`
+        `Hai thẻ này thuộc <b>Cặp ${cardA.pairNum}</b> và <b>Cặp ${cardB.pairNum}</b>. Đừng lo, mặt sau của chúng đã được gắn nhãn <b>Cặp ${cardA.pairNum}</b> & <b>Cặp ${cardB.pairNum}</b> để bạn dễ ghép ở lượt sau!`
       );
 
       Stage4Progress.save();
@@ -8231,7 +8302,7 @@ const CardMatchingController = {
         s4State.flippedIndices = [];
         s4State.fsm = 'PLAYING';
         render();
-      }, 720);
+      }, 1100);
     }
   },
 
@@ -8239,7 +8310,7 @@ const CardMatchingController = {
     if (s4State.gateOpened || s4State.fsm === 'CHECKING') return;
     if (s4State.hintsUsedCount >= s4State.maxHints) {
       sound('bleep');
-      DragonGuide.setFeedback('think', 'Đội đã dùng hết 2/2 lượt gợi ý miễn phí! Hãy bấm nút "📖 Kiến thức" nếu muốn xem lại công thức trung điểm nhé!');
+      DragonGuide.setFeedback('think', `Đội đã dùng hết ${s4State.maxHints}/${s4State.maxHints} lượt gợi ý! Hãy nhìn nhãn "Cặp 1..4" trên mặt sau các thẻ đã mở hoặc bấm 👁️ Mở xem 2.5s nhé!`);
       render();
       return;
     }
@@ -8250,12 +8321,19 @@ const CardMatchingController = {
     const targetPairId = unmatchedCard.pairId;
     s4State.hintsUsedCount++;
     s4State.deck.forEach(c => {
-      c.hintGlow = (c.pairId === targetPairId);
+      if (c.pairId === targetPairId) {
+        c.hintGlow = true;
+        c.seen = true;
+      } else {
+        c.hintGlow = false;
+      }
     });
     sound('powerup');
+    const pairCards = s4State.deck.filter(c => c.pairId === targetPairId);
+    const posText = pairCards.map(c => `#${c.index + 1}`).join(' và ');
     DragonGuide.setFeedback(
       'cheer',
-      `💡 Gợi ý (${s4State.hintsUsedCount}/${s4State.maxHints}): Hai tấm thẻ của [${unmatchedCard.badge}] đang phát sáng viền vàng kim! Hãy lật chúng ngay!`
+      `💡 Gợi ý (${s4State.hintsUsedCount}/${s4State.maxHints}): Hai tấm thẻ của <b>${unmatchedCard.badge}</b> nằm ở ô <b>${posText}</b> đang phát sáng viền vàng kim! Hãy bấm lật 2 ô đó ngay!`
     );
     Stage4Progress.save();
 
@@ -8272,7 +8350,7 @@ const CardMatchingController = {
     s4State.hintTimerId = setTimeout(() => {
       s4State.deck.forEach(c => { c.hintGlow = false; });
       render();
-    }, 2200);
+    }, 3500);
   }
 };
 
@@ -8403,12 +8481,12 @@ function renderStage4MidpointMemoryGame(m) {
       </div>
 
       <div class="s4-header-right">
-        <div class="s4-mode-switch-group" title="Chuyển chế độ số cặp thẻ (Chuẩn 12 thẻ / Cơ bản 8 thẻ)">
+        <div class="s4-mode-switch-group" title="Chuyển chế độ số cặp thẻ (Cơ bản 8 thẻ dễ nhớ / Nâng cao 12 thẻ)">
+          <button type="button" class="s4-mode-chip ${totalPairs === 4 ? 'active' : ''}" data-action="s4SwitchPairMode" data-pairs="4">
+            8 thẻ (4 cặp · Dễ)
+          </button>
           <button type="button" class="s4-mode-chip ${totalPairs === 6 ? 'active' : ''}" data-action="s4SwitchPairMode" data-pairs="6">
             12 thẻ (6 cặp)
-          </button>
-          <button type="button" class="s4-mode-chip ${totalPairs === 4 ? 'active' : ''}" data-action="s4SwitchPairMode" data-pairs="4">
-            8 thẻ (4 cặp)
           </button>
         </div>
         <button type="button" class="s4-circle-icon-btn" data-action="toggleSound" title="${soundEnabled ? 'Âm thanh: Bật' : 'Âm thanh: Tắt'}">
@@ -8420,10 +8498,21 @@ function renderStage4MidpointMemoryGame(m) {
       </div>
     </header>
 
-    <!-- BỐ CỤC MÀN HÌNH CHÍNH: BÊN TRÁI (~25%) RỒNG XANH DẪN DẮT + BÊN PHẢI (~75%) BÀN CHƠI 12 THẺ 3x4 -->
+    <!-- BỐ CỤC MÀN HÌNH CHÍNH: BÊN TRÁI (~25%) RỒNG XANH DẪN DẮT + BÊN PHẢI (~75%) BÀN CHƠI -->
     <div class="s4-main-workspace">
-      <!-- BÊN TRÁI (~25% CHIỀU RỘNG): RỒNG XANH, TÊN CHẶNG, LỜI THOẠI GIẢI THÍCH THÔNG HIỂU & NÚT GỢI Ý -->
+      <!-- BÊN TRÁI (~25% CHIỀU RỘNG): BẢNG TÓM TẮT NHANH + RỒNG XANH + LỜI THOẠI + NÚT HỖ TRỢ -->
       <aside class="s4-left-guide-col" aria-label="Rồng Xanh dẫn dắt Chặng 4">
+        <!-- Bảng tóm tắt nhanh Kiến thức Trung điểm ngay trên màn hình (giống ảnh mẫu, giúp học sinh đối chiếu dễ dàng) -->
+        <div class="s4-quick-theory-parchment">
+          <div class="s4-qtp-title">📜 Kiến thức: Trung điểm <i>I</i> của <i>AB</i></div>
+          <ul class="s4-qtp-list">
+            <li><b>Cặp 1:</b> <i>I</i> giữa <i>A, B</i> ⇔ <b><i>IA = IB</i></b></li>
+            <li><b>Cặp 2:</b> ${s2RenderVecArrow('IA', 's4-inline-vec')} + ${s2RenderVecArrow('IB', 's4-inline-vec')} = ${s2RenderVecArrow('0', 's4-inline-vec')}</li>
+            <li><b>Cặp 3:</b> ${s2RenderVecArrow('MA', 's4-inline-vec')} + ${s2RenderVecArrow('MB', 's4-inline-vec')} = 2${s2RenderVecArrow('MI', 's4-inline-vec')}</li>
+            <li><b>Cặp 4:</b> ${s2RenderVecArrow('AI', 's4-inline-vec')} = ${s2RenderVecArrow('IB', 's4-inline-vec')} = ½${s2RenderVecArrow('AB', 's4-inline-vec')}</li>
+          </ul>
+        </div>
+
         <!-- Hộp thoại nhiệm vụ & Phản hồi giải thích Thông hiểu -->
         <div class="s4-guide-speech-card ${s4State.dragonMood}" id="s4DragonSpeechCard">
           <div class="s4-speech-header">
@@ -8443,7 +8532,7 @@ function renderStage4MidpointMemoryGame(m) {
           <div class="s4-dragon-name-plate">🐉 Rồng Xanh · Mê Cung Trung Điểm</div>
         </div>
 
-        <!-- Cụm nút Hỗ trợ: Gợi ý có giới hạn, Kiến thức & Đổi người lật thẻ theo nhóm -->
+        <!-- Cụm nút Hỗ trợ: Gợi ý 3 lần, Mở xem nhanh 2.5s & Đổi người lật thẻ -->
         <div class="s4-guide-actions-bar">
           <button type="button"
                   class="s4-action-btn hint-btn ${hintsLeft <= 0 ? 'disabled' : ''}"
@@ -8454,10 +8543,10 @@ function renderStage4MidpointMemoryGame(m) {
           </button>
 
           <button type="button"
-                  class="s4-action-btn know-btn"
-                  data-action="s4ToggleKnowledgeModal"
-                  title="Xem tóm tắt tính chất trung điểm khi cần">
-            <span>📖 Kiến thức trung điểm</span>
+                  class="s4-action-btn know-btn ${s4State.peekRemaining <= 0 || s4State.isPeeking ? 'disabled' : ''}"
+                  data-action="s4PeekBoard"
+                  title="Lật ngửa toàn bộ thẻ trong 2.5 giây để dễ nhớ vị trí">
+            <span>👁️ Mở xem 2.5s (${s4State.peekRemaining}/2)</span>
           </button>
 
           <button type="button"
@@ -8469,10 +8558,10 @@ function renderStage4MidpointMemoryGame(m) {
         </div>
       </aside>
 
-      <!-- BÊN PHẢI (~75% CHIỀU RỘNG): KHUNG BÀN CHƠI 12 THẺ (3 HÀNG x 4 CỘT) + ĐỒNG HỒ 65 GIÂY + TIẾN ĐỘ -->
+      <!-- BÊN PHẢI (~75% CHIỀU RỘNG): KHUNG BÀN CHƠI + ĐỒNG HỒ 65 GIÂY + TIẾN ĐỘ -->
       <section class="s4-right-board-col" aria-label="Bàn chơi Lật Thẻ Trung Điểm">
         <div class="s4-board-frame ${s4State.gateOpened ? 'board-completed' : ''}">
-          <!-- Thanh thông số trên đỉnh bàn chơi (Thời gian 65s | Đã ghép 0/6 | Tiến độ phong ấn) -->
+          <!-- Thanh thông số trên đỉnh bàn chơi (Thời gian 65s | Đã ghép 0/4 | Tiến độ phong ấn) -->
           <div class="s4-board-top-hud">
             <div class="s4-hud-pill timer-pill ${remSec <= 15 ? 'urgent' : ''}">
               <span class="s4-hud-icon">⏳</span>
@@ -8496,25 +8585,30 @@ function renderStage4MidpointMemoryGame(m) {
             </div>
           </div>
 
-          <!-- Lưới thẻ bài 3 hàng x 4 cột (12 thẻ) hoặc 2 hàng x 4 cột (8 thẻ) -->
+          <!-- Lưới thẻ bài 2 hàng x 4 cột (8 thẻ mặc định) hoặc 3 hàng x 4 cột (12 thẻ) -->
           <div class="s4-cards-grid ${totalPairs === 4 ? 'grid-8' : 'grid-12'}" id="s4CardsGrid" role="grid" aria-label="Lưới thẻ phép thuật Trung điểm">
             ${s4State.deck.map((card, idx) => {
-              const isFlipped = card.faceUp || card.matched;
+              const isFlipped = card.faceUp || card.matched || s4State.isPeeking;
               const isFocused = s4State.focusedIndex === idx && !s4State.gateOpened;
               return `
                 <button type="button"
-                        class="s4-memory-card ${isFlipped ? 'is-flipped' : ''} ${card.matched ? 'is-matched' : ''} ${card.mismatchShake ? 'is-mismatch' : ''} ${card.hintGlow ? 'is-hint-glow' : ''} ${isFocused ? 'is-focused' : ''}"
+                        class="s4-memory-card ${isFlipped ? 'is-flipped' : ''} ${card.matched ? 'is-matched' : ''} ${card.seen && !card.matched ? 'is-seen' : ''} ${card.mismatchShake ? 'is-mismatch' : ''} ${card.hintGlow ? 'is-hint-glow' : ''} ${isFocused ? 'is-focused' : ''}"
                         id="s4Card_${idx}"
                         data-action="s4ClickCard"
                         data-idx="${idx}"
                         aria-label="Thẻ phép thuật số ${idx + 1}"
                         ${card.matched ? ' aria-disabled="true"' : ''}>
                   <div class="s4-card-inner">
-                    <!-- MẶT SAU: NỀN TÍM HUYỀN BÍ, BIỂU TƯỢNG NGÔI SAO ẤN VECTƠ, VIỀN VÀNG KIM -->
+                    <!-- MẶT SAU: NỀN TÍM HUYỀN BÍ + NHÃN GỢI NHỚ CẶP KHI ĐÃ TỪNG MỞ -->
                     <div class="s4-card-face s4-card-back">
                       <img src="/assets/s4_maze/s4_card_back.png" alt="" class="s4-card-back-art" draggable="false"/>
                       <div class="s4-card-back-shimmer"></div>
                       <span class="s4-card-num-corner">#${idx + 1}</span>
+                      ${card.seen && !card.matched ? `
+                        <span class="s4-card-seen-tag" style="--pair-color:${card.badgeColor}">
+                          👁️ Cặp ${card.pairNum} · ${card.role === 'visual' ? 'Hình vẽ' : 'Công thức'}
+                        </span>
+                      ` : ''}
                     </div>
 
                     <!-- MẶT TRƯỚC: NỀN GIẤY PHÉP THUẬT SÁNG, CÔNG THỨC VECTOR / HÌNH VẼ SVG SẮC NÉT -->
@@ -11354,6 +11448,10 @@ async function handle(action,el){
    CardMatchingController.triggerHint();
    return;
   }
+  if(action==='s4PeekBoard'){
+   CardMatchingController.triggerPeekBoard();
+   return;
+  }
   if(action==='s4ToggleKnowledgeModal'){
    s4State.knowledgeModalOpen = !s4State.knowledgeModalOpen;
    sound('step');
@@ -11369,11 +11467,11 @@ async function handle(action,el){
    const nextPairs = Number(el.dataset.pairs) === 4 ? 4 : 6;
    if(s4State.modePairs !== nextPairs && !s4State.gateOpened){
     CardMatchingController.ensureInitialized(world?.current || { id: 4, timeSeconds: 65 }, true, nextPairs);
-    DragonGuide.say(
+    DragonGuide.setFeedback(
+     'idle',
      nextPairs === 4
-       ? 'Đã chuyển sang chế độ <b>8 thẻ (4 cặp trung điểm trọng tâm)</b>. Hãy lật thẻ và tìm 4 cặp tương ứng nhé!'
-       : 'Đã chuyển sang chế độ chuẩn <b>12 thẻ (6 cặp trung điểm đầy đủ)</b>. Hãy giải mã 6 cặp thẻ nhé!',
-     'normal'
+       ? 'Đã chuyển sang chế độ <b>8 thẻ (4 cặp trung điểm trọng tâm)</b>. Các thẻ đang mở 2 giây đầu để bạn dễ nhớ vị trí!'
+       : 'Đã chuyển sang chế độ chuẩn <b>12 thẻ (6 cặp trung điểm đầy đủ)</b>. Hãy giải mã 6 cặp thẻ nhé!'
     );
     sound('powerup');
     render();
@@ -11384,7 +11482,7 @@ async function handle(action,el){
    const nextIdx = ((s4State.controllerRoleIdx || 0) + 1) % 4;
    s4State.controllerRoleIdx = nextIdx;
    if(world?.me?.stage4) world.me.stage4.controllerRoleIdx = nextIdx;
-   Stage4Progress.saveSession();
+   Stage4Progress.save();
    if(window.spawnJuiceFloater) window.spawnJuiceFloater(`🎮 Lượt lật thẻ: Thành viên ${nextIdx + 1}/4`, 'xp');
    if(session?.room && session?.token){
     api('/api/stage4Progress',{room:session.room,token:session.token,controllerRoleIdx:nextIdx}).catch(()=>{});
