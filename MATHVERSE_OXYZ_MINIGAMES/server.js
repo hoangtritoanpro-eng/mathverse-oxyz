@@ -6,8 +6,9 @@ const path=require('node:path');
 const crypto=require('node:crypto');
 const os=require('node:os');
 const PORT=Number(process.env.PORT||3000);
+const IS_VERCEL=Boolean(process.env.VERCEL||process.env.NOW_REGION);
 const LAN_IP=Object.values(os.networkInterfaces()).flat().find(x=>x&&x.family==='IPv4'&&!x.internal)?.address||'localhost';
-const ROOT=__dirname, PUBLIC=path.join(ROOT,'public'), DATA=path.join(ROOT,'data','rooms.json');
+const ROOT=__dirname, PUBLIC=path.join(ROOT,'public'), DATA=IS_VERCEL?path.join(os.tmpdir(),'mathverse_oxyz_rooms.json'):path.join(ROOT,'data','rooms.json');
 const TEAM_POOL=[
  {name:'Rồng Xanh',avatar:'🐉',color:'#36C6E8'},
  {name:'Tia Chớp',avatar:'⚡',color:'#FFC857'},
@@ -21,7 +22,7 @@ const TEAM_POOL=[
 const {STAGES,TOKEN_WORDS,MESSAGE_OPTIONS}=require('./stages');
 let ROOMS={};
 try{if(fs.existsSync(DATA)){ROOMS=JSON.parse(fs.readFileSync(DATA,'utf8')); console.log('Đã nạp',Object.keys(ROOMS).length,'phòng học');}}catch(e){console.error('Không thể nạp dữ liệu phòng:',e.message);}
-function persist(){fs.mkdirSync(path.dirname(DATA),{recursive:true});const temp=DATA+'.tmp';fs.writeFileSync(temp,JSON.stringify(ROOMS,null,2));fs.renameSync(temp,DATA);}
+function persist(){try{fs.mkdirSync(path.dirname(DATA),{recursive:true});const temp=DATA+'.tmp';fs.writeFileSync(temp,JSON.stringify(ROOMS,null,2));fs.renameSync(temp,DATA);}catch(e){}}
 function rnd(n=24){return crypto.randomBytes(n).toString('hex');}
 
 function rollStagePicks(){
@@ -1053,12 +1054,21 @@ function send(res,status,data,type='application/json; charset=utf-8'){
  res.writeHead(status,{'Content-Type':type,'Cache-Control':'no-store','X-Content-Type-Options':'nosniff','X-Frame-Options':'DENY'});
  res.end(typeof data==='string'||Buffer.isBuffer(data)?data:JSON.stringify(data));
 }
-const server=http.createServer((req,res)=>{
+function requestHandler(req,res){
  let pathname;
  try{pathname=new URL(req.url,'http://localhost').pathname;}catch(e){return send(res,400,{error:'Địa chỉ không hợp lệ.'});}
  if(pathname==='/health')return send(res,200,{ok:true,rooms:Object.keys(ROOMS).length});
  if(pathname.startsWith('/api/')){
   if(req.method!=='POST')return send(res,405,{error:'Chỉ hỗ trợ POST.'});
+  if(req.body!==undefined && req.body!==null){
+   try{
+    const d=typeof req.body==='string'?JSON.parse(req.body||'{}'):req.body;
+    const result=processAction(pathname,d);
+    return send(res,200,result);
+   }catch(e){
+    return send(res,e.status||400,{error:e.message||'Đã có lỗi xảy ra.'});
+   }
+  }
   let content='';req.on('data',b=>{content+=b;if(content.length>32000)req.destroy();});
   req.on('end',()=>{try{const d=JSON.parse(content||'{}');const result=processAction(pathname,d);send(res,200,result);}catch(e){send(res,e.status||400,{error:e.message||'Đã có lỗi xảy ra.'});}});return;
  }
@@ -1076,11 +1086,17 @@ const server=http.createServer((req,res)=>{
  const name=allowed[pathname];if(!name)return send(res,404,'Không tìm thấy','text/plain; charset=utf-8');
  const file=path.join(PUBLIC,name);
  fs.readFile(file,(err,buf)=>{if(err)return send(res,404,'Không tìm thấy','text/plain; charset=utf-8');send(res,200,buf,MIME[path.extname(file)]);});
-});
-server.listen(PORT,'0.0.0.0',()=>{
- console.log('\n================ MATHVERSE OXYZ ================');
- console.log(`Giáo viên mở: http://localhost:${PORT}`);
- for(const iface of Object.values(os.networkInterfaces()).flat())if(iface&&iface.family==='IPv4'&&!iface.internal)console.log(`Học sinh cùng Wi-Fi mở: http://${iface.address}:${PORT}`);
- console.log('Giữ cửa sổ này mở trong khi chơi. Nhấn Ctrl+C để kết thúc.');
- console.log('Phòng học sẽ được lưu tại data/rooms.json\n');
-});
+}
+const server=http.createServer(requestHandler);
+if(require.main===module){
+ server.listen(PORT,'0.0.0.0',()=>{
+  console.log('\n================ MATHVERSE OXYZ ================');
+  console.log(`Giáo viên mở: http://localhost:${PORT}`);
+  for(const iface of Object.values(os.networkInterfaces()).flat())if(iface&&iface.family==='IPv4'&&!iface.internal)console.log(`Học sinh cùng Wi-Fi mở: http://${iface.address}:${PORT}`);
+  console.log('Giữ cửa sổ này mở trong khi chơi. Nhấn Ctrl+C để kết thúc.');
+  console.log('Phòng học sẽ được lưu tại data/rooms.json\n');
+ });
+}
+module.exports=requestHandler;
+module.exports.processAction=processAction;
+module.exports.server=server;

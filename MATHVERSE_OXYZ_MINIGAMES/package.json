@@ -1,0 +1,12 @@
+{
+  "name": "mathverse-oxyz-minigames",
+  "version": "5.5.4",
+  "description": "MATHVERSE OXYZ - 5 Mini-game Tương Tác Toán 12 (Hành Trình Giải Cứu Lục Địa OXYZ)",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

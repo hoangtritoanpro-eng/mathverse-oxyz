@@ -11,11 +11,12 @@ Tất cả những thay đổi quan trọng của dự án này sẽ được gh
 
 ## [5.5.4] - 2026-11-08
 
-### Packaged & Deployed (Đóng Gói Độc Lập 100% Tài Nguyên 5 Chặng & Triển Khai Máy Chủ Lớp Học)
-- **Đóng Gói Bản Độc Lập 1 File (`MATHVERSE_OXYZ_CHOI_NGAY_1_FILE.html` & `MATHVERSE_OXYZ_MINIGAMES/CHOI_THU_1_MAY.html`) và Gói Triển Khai (`MATHVERSE_OXYZ_FULL_DEPLOY_2026.zip`):**
+### Packaged & Deployed (Đóng Gói Độc Lập 100% Tài Nguyên 5 Chặng & Triển Khai Lên GitHub / Vercel)
+- **Đóng Gói Bản Độc Lập 1 File (`MATHVERSE_OXYZ_CHOI_NGAY_1_FILE.html` & `MATHVERSE_OXYZ_MINIGAMES/CHOI_THU_1_MAY.html`), Cấu Hình Vercel (`vercel.json`, `api/index.js`, `package.json`) & Đẩy Lên GitHub (`https://github.com/hoangtritoanpro-eng/mathverse-oxyz`):**
   1. **Nhúng Base64 toàn bộ 43 tài nguyên đồ họa của cả 5 chặng (`scratch/build_standalone.js`):** Tự động quét và đóng gói toàn bộ hình nền, nhân vật Rồng Xanh, bệ đá, zombie, mặt sau thẻ bài và biểu tượng Ấn Vectơ của cả 5 chặng vào 1 file HTML duy nhất để mở trực tiếp trên bất kỳ máy tính/máy chiếu nào không cần cài đặt Node.js hay mạng Internet.
-  2. **Bộ khởi động nhanh 1-Click (`KHOI_DONG_GAME_MATHVERSE_OXYZ.bat` & `CHAY_GAME_WINDOWS.bat`):** Tự động khởi chạy máy chủ Node.js cổng `3000` (hỗ trợ LAN/Wi-Fi nội bộ) và mở sẵn trình duyệt tại `http://localhost:3000`.
-  3. **Gói nén triển khai đầy đủ (`MATHVERSE_OXYZ_FULL_DEPLOY_2026.zip` & `MATHVERSE_OXYZ_5_CHANG_VECTO.zip`):** Đóng gói trọn bộ mã nguồn server, tài nguyên `public/`, bản chơi độc lập 1 file và hướng dẫn sử dụng (`README_BAT_DAU.txt`).
+  2. **Tích hợp Serverless Function cho Vercel (`vercel.json`, `api/index.js`, `package.json` & cập nhật `server.js`):** Hỗ trợ tự động lưu trữ trạng thái phòng học trên `/tmp` khi chạy trên môi trường Serverless của Vercel và định tuyến toàn bộ API `/api/*` cùng tài nguyên tĩnh `public/`.
+  3. **Triển khai mã nguồn lên GitHub (`https://github.com/hoangtritoanpro-eng/mathverse-oxyz`):** Khởi tạo kho lưu trữ công khai và đồng bộ toàn bộ mã nguồn dự án để kết nối trực tiếp 1-Click với Vercel.
+  4. **Bộ khởi động nhanh 1-Click (`KHOI_DONG_GAME_MATHVERSE_OXYZ.bat` & `CHAY_GAME_WINDOWS.bat`) và Gói nén (`MATHVERSE_OXYZ_FULL_DEPLOY_2026.zip`).**
 
 ---
 
