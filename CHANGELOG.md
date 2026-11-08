@@ -9,6 +9,20 @@ Tất cả những thay đổi quan trọng của dự án này sẽ được gh
 
 ---
 
+## [5.5.3] - 2026-11-08
+
+### Added & Upgraded (Cơ Chế Trừ Điểm Trực Tiếp Khi Trả Lời Sai Xuyên Suốt 5 Chặng)
+- **Hệ Thống Điểm Năng Lượng Tăng/Giảm Thời Gian Thực (`applyWrongAnswerPenalty`, `applyCorrectScoreReward`, `syncLiveScoreBadges` trong `public/app.js`, `public/style.css`, `server.js`, `CHOI_THU_1_MAY.html`):**
+  1. **Khởi tạo điểm năng lượng & Huy hiệu Điểm XP trực tiếp (`.mv-live-score-pill`) trên cả 5 chặng:** Mỗi đội khởi đầu với **20 XP** năng lượng nền và hiển thị huy hiệu `⭐ XX XP` trực tiếp trên thanh HUD của cả 5 chặng (`#s1TopScoreBadge`, `#s2TopScoreBadge`, `#z3ScorePill`, `#s4ScorePill`, `#s5ScoreBadge`).
+  2. **Trừ điểm ngay lập tức kèm hiệu ứng cảnh báo đỏ (`.score-penalty-flash`) khi trả lời sai:**
+     - **Chặng 1 (Mật Thư Rừng Vectơ):** Chọn sai đáp án tại bệ đá mật thư hoặc chọn sai chiều vectơ trừ **`−2 XP` đến `−3 XP`** (`/api/stage1Progress` & `/api/answer`), thu thập đúng mảnh mật thư cộng **`+5 XP`**.
+     - **Chặng 2 (Mật Trận Vectơ):** Dẫm phải bẫy phép thuật trừ **`−3 XP`** và mất `1 Khiên` (`/api/stage2Progress`), hóa giải đúng bệ đá an toàn cộng **`+5 XP`**.
+     - **Chặng 3 (Phòng Thủ Zombie):** Bắn nhầm zombie mang vectơ sai trừ **`−3 XP`** (và để zombie chạm hàng rào trừ **`−4 XP`**) qua `/api/stage3Progress`, bắn đúng cột zombie cộng **`+5 XP` đến `+10 XP`**.
+     - **Chặng 4 (Lật Thẻ Trung Điểm):** Lật 2 thẻ không khớp trừ **`−2 XP`** (`/api/stage4Progress`), ghép đúng cặp thẻ cộng **`+5 XP`**.
+     - **Chặng 5 (Giải Cứu Tâm Thạch):** Kéo lệch trung điểm, nối sai trung tuyến hoặc đặt lệch Tâm Thạch trừ **`−2 XP`**, chọn sai câu hỏi hiểu sâu (`5.Q1..5.Q3`) trừ **`−3 XP`** (`/api/stage5Progress`). Mọi mức trừ đều giới hạn không âm (`Math.max(0, score - penalty)`) và đồng bộ tức thì lên bảng xếp hạng Giáo viên.
+
+---
+
 ## [5.5.2] - 2026-11-08
 
 ### Changed & Improved (Tinh Chỉnh Chặng 4 – Lật Thẻ Trung Điểm Dễ Chơi & Trực Quan Hơn Cho Học Sinh)

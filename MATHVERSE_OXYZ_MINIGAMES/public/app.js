@@ -4869,10 +4869,16 @@ async function s1CollectClueAtPillar(rawPid) {
   };
 
   if (window.spawnJuiceFloater) {
-    window.spawnJuiceFloater(`📜 +1 Mảnh Mật Thư (${count}/4)`, 'gold');
+    window.spawnJuiceFloater(`📜 +1 Mảnh Mật Thư (${count}/4) (+5 XP)`, 'gold');
   }
+  applyCorrectScoreReward(5);
   if (session?.room && session?.token) {
-    api('/api/stage1Progress', { room: session.room, token: session.token, pillar: pid }).catch(() => {});
+    api('/api/stage1Progress', { room: session.room, token: session.token, pillar: pid }).then(res => {
+      if (res && typeof res.score === 'number' && world?.me) {
+        world.me.score = res.score;
+        syncLiveScoreBadges();
+      }
+    }).catch(() => {});
   }
 
   if (count >= 4) {
@@ -4915,9 +4921,18 @@ async function s1ActivateDestinationPillar(targetPid = 'B') {
 
   // Nếu chọn sai hướng (ví dụ A hoặc C thay vì B cho điểm cuối của vectơ CB)
   if (targetPid === 'C') {
-    sound('bleep');
+    sound('wrong');
+    applyWrongAnswerPenalty(2, 'Chọn sai chiều vectơ');
+    if (session?.room && session?.token) {
+      api('/api/stage1Progress', { room: session.room, token: session.token, wrongAttempt: true, reason: 'Chọn sai chiều vectơ tại Cầu Ánh Sáng' }).then(res => {
+        if (res && typeof res.score === 'number' && world?.me) {
+          world.me.score = res.score;
+          syncLiveScoreBadges();
+        }
+      }).catch(() => {});
+    }
     vaState.s1Feedback = {
-      text: 'Điểm C là điểm đầu của vectơ hiệu! Với vectơ AB − vectơ AC = vectơ CB, mũi tên phải hướng từ điểm đầu C tới điểm cuối B!',
+      text: 'Điểm C là điểm đầu của vectơ hiệu (−2 XP)! Với vectơ AB − vectơ AC = vectơ CB, mũi tên phải hướng từ điểm đầu C tới điểm cuối B!',
       good: false
     };
     vaState.dragonMsg = vaState.s1Feedback.text;
@@ -4987,9 +5002,13 @@ async function s1ActivateDestinationPillar(targetPid = 'B') {
     }, 2600);
   } else {
     sound('wrong');
+    applyWrongAnswerPenalty(res?.penalty || 3, 'Chọn sai chiều vectơ');
+    if (res && typeof res.score === 'number' && world?.me) {
+      world.me.score = res.score;
+    }
     s1Explorer.wrongFlashPillar = targetPid;
     s1Explorer.wrongFlashUntil = Date.now() + 1400;
-    const hintText = 'Chưa đúng chiều vectơ! Gợi ý: Với hiệu hai vectơ cùng gốc A (vectơ AB − vectơ AC), mũi tên nối từ điểm C tới điểm B tạo thành vectơ CB!';
+    const hintText = `Chưa đúng chiều vectơ (−${res?.penalty || 3} XP)! Gợi ý: Với hiệu hai vectơ cùng gốc A (vectơ AB − vectơ AC), mũi tên nối từ điểm C tới điểm B tạo thành vectơ CB!`;
     vaState.s1Feedback = { text: hintText, good: false };
     vaState.dragonMsg = hintText;
     vaState.dragonMood = 'hint';
@@ -5279,8 +5298,11 @@ function renderStage1TopBanner(cluesCount) {
       <span class="s1-banner-leaves right" aria-hidden="true">🌿</span>
     </div>
 
-    <!-- GÓC PHẢI: ĐỒNG HỒ ĐẾM NGƯỢC 60 GIÂY & ĐỔI NGƯỜI ĐIỀU KHIỂN -->
+    <!-- GÓC PHẢI: ĐIỂM XP, ĐỒNG HỒ ĐẾM NGƯỢC 60 GIÂY & ĐỔI NGƯỜI ĐIỀU KHIỂN -->
     <div class="s1-topbar-right-status">
+      <div class="s1-score-badge mv-live-score-pill" id="s1TopScoreBadge" title="Điểm năng lượng của đội (Trả lời đúng tăng điểm, trả lời sai bị trừ điểm)">
+        ⭐ <b class="mv-live-score-val">${Math.max(0, world?.me?.score ?? 20)} XP</b>
+      </div>
       <div class="s1-timer-badge ${remSec <= 15 ? 'urgent' : ''}" id="vaStageTimerPill" title="Thời gian còn lại của Chặng 1">
         ⏱️ <b id="vaStageSecText">${mmss}</b>
       </div>
@@ -5984,7 +6006,8 @@ function z3ResolveBulletHit(bullet) {
     const fullPts = Math.round(100 / Z3_QUESTIONS.length);
     const earnedScore = col.wrongShots === 0 ? fullPts : Math.round(fullPts / 2);
     z3State.score = Math.min(100, z3State.score + earnedScore);
-    z3State.xpBonus += col.wrongShots === 0 ? 90 : 50;
+    z3State.xpBonus += col.wrongShots === 0 ? 10 : 5;
+    applyCorrectScoreReward(col.wrongShots === 0 ? 10 : 5);
     if (res) {
       res.cleared = true;
       res.wrongShots = col.wrongShots;
@@ -5996,7 +6019,7 @@ function z3ResolveBulletHit(bullet) {
       kind: 'hit',
       lane: bullet.lane,
       at: z3State.simTime,
-      text: `✓ Chính xác! Cột ${q.shortLabel} bị tiêu diệt!`
+      text: `✓ Chính xác! Cột ${q.shortLabel} bị tiêu diệt! (+${col.wrongShots === 0 ? 10 : 5} XP)`
     });
 
     // Spawn đợt câu hỏi tiếp theo ngay nếu trên sân không còn cột nào đang sống
@@ -6018,7 +6041,7 @@ function z3ResolveBulletHit(bullet) {
       z3SyncServerProgress();
     }
   } else {
-    // ⚡ BẮN SAI: Chỉ con zombie sai đó bị hạ, cả đàn zombie bứt tốc lao nhanh hơn!
+    // ⚡ BẮN SAI: Trừ điểm XP ngay lập tức, chỉ con zombie sai đó bị hạ, cả đàn zombie bứt tốc lao nhanh hơn!
     playZ3Sfx('miss');
     z.alive = false;
     z.dyingAt = z3State.simTime;
@@ -6029,6 +6052,26 @@ function z3ResolveBulletHit(bullet) {
       res.wrongShots = col.wrongShots;
     }
 
+    z3State.score = Math.max(0, (z3State.score || 0) - 5);
+    z3State.xpBonus = (z3State.xpBonus || 0) - 3;
+    applyWrongAnswerPenalty(3, `Bắn sai (${z.key}: ${z.vec})`);
+
+    if (session?.room && session?.token) {
+      api('/api/stage3Progress', {
+        room: session.room,
+        token: session.token,
+        wrongShot: true,
+        qIdx: col.qIdx,
+        qId: q.id,
+        chosenVec: z.vec
+      }).then(srv => {
+        if (srv && typeof srv.score === 'number' && world?.me) {
+          world.me.score = srv.score;
+          syncLiveScoreBadges();
+        }
+      }).catch(() => {});
+    }
+
     z3State.speedLevel++;
     z3State.sprintUntil = Math.max(z3State.sprintUntil || 0, z3State.simTime) + Z3_SPRINT_MS;
 
@@ -6037,11 +6080,11 @@ function z3ResolveBulletHit(bullet) {
       kind: 'miss',
       lane: bullet.lane,
       at: z3State.simTime,
-      text: '✗ Sai! Zombie tăng tốc'
+      text: '✗ Sai! −3 XP · Zombie tăng tốc'
     });
 
     z3State.mascotMood = 'hint';
-    z3State.mascotMsg = `⚡ <b>Bắn sai (${z.key}: ${z.vec}) – Cả đàn zombie bứt tốc!</b> Gợi ý ${q.shortLabel}: ${q.hintText}`;
+    z3State.mascotMsg = `⚡ <b>Bắn sai (${z.key}: ${z.vec}) · −3 XP – Cả đàn zombie bứt tốc!</b> Gợi ý ${q.shortLabel}: ${q.hintText}`;
   }
 
   z3SyncDOM();
@@ -6103,10 +6146,23 @@ function z3TriggerFenceBreach(breachedCol) {
   z3State.hearts = Math.max(1, z3State.hearts - 1);
   z3State.dragonHp = Math.max(25, z3State.dragonHp - 30);
   z3State.playerHitUntil = performance.now() + 1000;
-  z3State.biteMsg = '🧟 ZOMBIE ĐÃ VƯỢT HÀNG RÀO! −1 ❤️';
+  z3State.biteMsg = '🧟 ZOMBIE ĐÃ VƯỢT HÀNG RÀO! −1 ❤️ · −4 XP';
   z3State.status = 'lost';
   z3State.mascotMood = 'hint';
-  z3State.mascotMsg = '🚧 Zombie đã chạm hàng rào phòng thủ! Hãy nhấn <b>Tiếp tục chặn đợt này</b> hoặc <b>Chơi lại</b> để bảo vệ Pháo Đài!';
+  z3State.mascotMsg = '🚧 Zombie đã chạm hàng rào phòng thủ (−4 XP)! Hãy nhấn <b>Tiếp tục chặn đợt này</b> hoặc <b>Chơi lại</b> để bảo vệ Pháo Đài!';
+  applyWrongAnswerPenalty(4, 'Zombie vượt hàng rào');
+  if (session?.room && session?.token) {
+    api('/api/stage3Progress', {
+      room: session.room,
+      token: session.token,
+      fenceBreach: true
+    }).then(srv => {
+      if (srv && typeof srv.score === 'number' && world?.me) {
+        world.me.score = srv.score;
+        syncLiveScoreBadges();
+      }
+    }).catch(() => {});
+  }
   render();
 }
 
@@ -6367,8 +6423,8 @@ function z3SyncDOM() {
 
   const xpEl = document.getElementById('z3XpText');
   if (xpEl) {
-    const baseXp = Math.max(240, (world?.me?.score || 20) * 10);
-    xpEl.textContent = `XP ${baseXp + z3State.xpBonus}`;
+    const liveXp = Math.max(0, (world?.me?.score ?? 20));
+    xpEl.textContent = `${liveXp} XP`;
   }
 
   const heartsEl = document.getElementById('z3HeartsPill');
@@ -6454,8 +6510,7 @@ function renderStage3ZombieShooterGame(m) {
   const elapsedSec = Math.floor((Date.now() - vaState.stageStartedAt) / 1000);
   const remSec = Math.max(0, vaState.stageDurationSec - elapsedSec);
   const mmss = formatMMSS(remSec);
-  const baseXp = Math.max(240, (world?.me?.score || 20) * 10);
-  const totalXp = baseXp + z3State.xpBonus;
+  const totalXp = Math.max(0, (world?.me?.score ?? 20));
   const curStageIdx = world?.me?.stage ?? ((m?.id || 3) - 1);
   const isPaused = z3State.status === 'paused';
   const perfectCount = z3State.results.filter(r => r.cleared && r.wrongShots === 0).length;
@@ -6526,9 +6581,9 @@ function renderStage3ZombieShooterGame(m) {
         <div class="z3-pill z3-pill-hearts" id="z3HeartsPill" title="Mạng năng lượng của đội">
           ${[1, 2, 3].map(h => `<span class="z3-heart-icon ${h <= z3State.hearts ? 'full' : 'lost'}">❤️</span>`).join('')}
         </div>
-        <div class="z3-pill z3-pill-xp" title="Điểm kinh nghiệm tích lũy">
+        <div class="z3-pill z3-pill-xp" id="z3ScorePill" title="Điểm kinh nghiệm tích lũy (Trả lời sai bị trừ điểm)">
           <span class="z3-star-icon">⭐</span>
-          <strong id="z3XpText">XP ${totalXp}</strong>
+          <strong id="z3XpText" class="mv-live-score-val">${totalXp} XP</strong>
         </div>
         <div class="z3-pill z3-pill-timer ${remSec <= 15 ? 'urgent' : ''}" id="vaStageTimerPill" title="Thời gian còn lại của chặng">
           <span class="z3-clock-icon">🕒</span>
@@ -7128,6 +7183,7 @@ async function s2ConfirmCurrentZone() {
     if (window.spawnJuiceFloater) {
       window.spawnJuiceFloater(`✓ Chính xác! Vectơ ${zone.vec} (+5 XP)`, 'xp');
     }
+    applyCorrectScoreReward(5);
 
     if (session?.room && session?.token) {
       api('/api/stage2Progress', {
@@ -7137,6 +7193,11 @@ async function s2ConfirmCurrentZone() {
         questionIdx: s2State.questionIdx,
         qId: curQ.id,
         chosenVec: zone.vec
+      }).then(srv => {
+        if (srv && typeof srv.score === 'number' && world?.me) {
+          world.me.score = srv.score;
+          syncLiveScoreBadges();
+        }
       }).catch(() => {});
     }
 
@@ -7157,7 +7218,7 @@ async function s2ConfirmCurrentZone() {
       }, 560);
     }
   } else {
-    // ĐÁP ÁN SAI -> Kích hoạt bẫy pha lê tím, mất 1 khiên, phản hồi nhẹ nhàng và đưa Rồng Xanh về giữa sân
+    // ĐÁP ÁN SAI -> Kích hoạt bẫy pha lê tím, mất 1 khiên, trừ 3 XP, phản hồi nhẹ nhàng và đưa Rồng Xanh về giữa sân
     zone.status = 'trap';
     sound('wrong');
     s2State.shields = Math.max(0, s2State.shields - 1);
@@ -7167,15 +7228,13 @@ async function s2ConfirmCurrentZone() {
     s2State.lockedUntil = now + 640;
 
     if (s2State.wrongAttempts >= 2) {
-      s2State.companionMsg = `Ôi! Bẫy phép thuật! 💡 Gợi ý: ${curQ.hint}`;
+      s2State.companionMsg = `Ôi! Bẫy phép thuật (−3 XP)! 💡 Gợi ý: ${curQ.hint}`;
     } else {
-      s2State.companionMsg = 'Ôi! Bẫy phép thuật! Hãy thử hướng khác!';
+      s2State.companionMsg = 'Ôi! Bẫy phép thuật (−3 XP)! Hãy thử hướng khác!';
     }
     s2SaveSessionState();
 
-    if (window.spawnJuiceFloater) {
-      window.spawnJuiceFloater('⚠️ Bẫy phép thuật! -1 Khiên năng lượng', 'damage');
-    }
+    applyWrongAnswerPenalty(3, 'Bẫy phép thuật (−1 Khiên)');
 
     if (session?.room && session?.token) {
       api('/api/stage2Progress', {
@@ -7185,6 +7244,11 @@ async function s2ConfirmCurrentZone() {
         questionIdx: s2State.questionIdx,
         qId: curQ.id,
         chosenVec: zone.vec
+      }).then(srv => {
+        if (srv && typeof srv.score === 'number' && world?.me) {
+          world.me.score = srv.score;
+          syncLiveScoreBadges();
+        }
       }).catch(() => {});
     }
 
@@ -7278,6 +7342,10 @@ function renderStage2VectorMatrixGame(m) {
       </div>
 
       <div class="s2-topbar-right">
+        <div class="s2-top-btn mv-live-score-pill" id="s2TopScoreBadge" title="Điểm năng lượng của đội (Dẫm bẫy bị trừ 3 XP)">
+          <span>⭐</span>
+          <strong class="mv-live-score-val">${Math.max(0, world?.me?.score ?? 40)} XP</strong>
+        </div>
         <button type="button" class="s2-top-btn" data-action="toggleSound" title="Bật/Tắt nhạc nền & hiệu ứng âm thanh">
           <span>${soundEnabled ? '🎵' : '🔇'}</span>
           <span>Nhạc nền</span>
@@ -8264,6 +8332,7 @@ const CardMatchingController = {
         if (window.spawnJuiceFloater) {
           window.spawnJuiceFloater(`✓ Ghép đúng ${cardA.badge}! (+5 XP)`, 'xp');
         }
+        applyCorrectScoreReward(5);
 
         Stage4Progress.save();
         if (session?.room && session?.token) {
@@ -8274,6 +8343,11 @@ const CardMatchingController = {
             pairId: cardA.pairId,
             qId: cardA.qId,
             pairLabel: cardA.badge
+          }).then(srv => {
+            if (srv && typeof srv.score === 'number' && world?.me) {
+              world.me.score = srv.score;
+              syncLiveScoreBadges();
+            }
           }).catch(() => {});
         }
 
@@ -8289,16 +8363,17 @@ const CardMatchingController = {
         }
       }, 260);
     } else {
-      // HAI THẺ KHÔNG TƯƠNG ỨNG -> Hiển thị 1100ms để học sinh kịp đọc, sau đó úp lại nhưng lưu nhãn "Đã xem · Cặp X" trên mặt sau!
+      // HAI THẺ KHÔNG TƯƠNG ỨNG -> Trừ 2 XP, hiển thị 1100ms để học sinh kịp đọc, sau đó úp lại nhưng lưu nhãn "Đã xem · Cặp X" trên mặt sau!
       s4State.wrongMatches++;
       cardA.mismatchShake = true;
       cardB.mismatchShake = true;
       s4State.fsm = 'UNMATCHED';
       sound('wrong');
+      applyWrongAnswerPenalty(2, 'Lật 2 thẻ chưa khớp');
 
       DragonGuide.setFeedback(
         'think',
-        `Hai thẻ này thuộc <b>Cặp ${cardA.pairNum}</b> và <b>Cặp ${cardB.pairNum}</b>. Đừng lo, mặt sau của chúng đã được gắn nhãn <b>Cặp ${cardA.pairNum}</b> & <b>Cặp ${cardB.pairNum}</b> để bạn dễ ghép ở lượt sau!`
+        `Chưa khớp (<b>−2 XP</b>)! Hai thẻ này thuộc <b>Cặp ${cardA.pairNum}</b> và <b>Cặp ${cardB.pairNum}</b>. Mặt sau của chúng đã được gắn nhãn <b>Cặp ${cardA.pairNum}</b> & <b>Cặp ${cardB.pairNum}</b> để bạn dễ ghép ở lượt sau!`
       );
 
       Stage4Progress.save();
@@ -8309,6 +8384,11 @@ const CardMatchingController = {
           wrongMatch: true,
           qId: cardA.qId,
           pairDesc: `${cardA.uid} ≠ ${cardB.uid}`
+        }).then(srv => {
+          if (srv && typeof srv.score === 'number' && world?.me) {
+            world.me.score = srv.score;
+            syncLiveScoreBadges();
+          }
         }).catch(() => {});
       }
 
@@ -8592,6 +8672,11 @@ function renderStage4MidpointMemoryGame(m) {
               <span class="s4-hud-icon">🃏</span>
               <span>Đã ghép: <strong id="s4MatchedCountText">${matchedCount} / ${totalPairs}</strong></span>
               <small class="s4-flips-sub">(${s4State.flipCount} lượt lật)</small>
+            </div>
+
+            <div class="s4-hud-pill score-pill mv-live-score-pill" id="s4ScorePill" title="Điểm năng lượng của đội (Ghép đúng +5 XP, lật sai −2 XP)">
+              <span class="s4-hud-icon">⭐</span>
+              <span>Điểm: <strong id="s4ScoreText" class="mv-live-score-val">${Math.max(0, world?.me?.score ?? 80)} XP</strong></span>
             </div>
 
             <div class="s4-hud-pill progress-pill">
@@ -9072,12 +9157,18 @@ const MidpointDragController = {
       if (window.spawnJuiceFloater) {
         window.spawnJuiceFloater(`✓ Đã xác định trung điểm cạnh ${isBC ? 'BC' : 'AC'}! (+5 XP)`, 'xp');
       }
+      applyCorrectScoreReward(5);
       if (session?.room && session?.token) {
         api('/api/stage5Progress', {
           room: session.room,
           token: session.token,
           midpointFound: true,
           edge: isBC ? 'BC' : 'AC'
+        }).then(srv => {
+          if (srv && typeof srv.score === 'number' && world?.me) {
+            world.me.score = srv.score;
+            syncLiveScoreBadges();
+          }
         }).catch(() => {});
       }
 
@@ -9098,14 +9189,20 @@ const MidpointDragController = {
       else s5State.mpAC_wrong = true;
       s5State.wrongAttempts++;
       s5State.dragonMood = 'warn';
-      s5State.dragonSpeech = 'Hãy tìm vị trí chia cạnh thành hai phần bằng nhau!';
+      s5State.dragonSpeech = 'Chưa chính xác (<b>−2 XP</b>)! Hãy tìm vị trí chia cạnh thành hai phần bằng nhau!';
       sound('wrong');
+      applyWrongAnswerPenalty(2, `Kéo lệch trung điểm ${isBC ? 'BC' : 'AC'}`);
       if (session?.room && session?.token) {
         api('/api/stage5Progress', {
           room: session.room,
           token: session.token,
           wrongAttempt: true,
           reason: `Kéo trung điểm cạnh ${isBC ? 'BC' : 'AC'} lệch vị trí chính giữa`
+        }).then(srv => {
+          if (srv && typeof srv.score === 'number' && world?.me) {
+            world.me.score = srv.score;
+            syncLiveScoreBadges();
+          }
         }).catch(() => {});
       }
       Stage5GameState.saveSession();
@@ -9171,12 +9268,18 @@ const MedianConnectionController = {
       if (window.spawnJuiceFloater) {
         window.spawnJuiceFloater(`⚡ Đã kích hoạt trung tuyến từ đỉnh ${fromVtx}! (+5 XP)`, 'xp');
       }
+      applyCorrectScoreReward(5);
       if (session?.room && session?.token) {
         api('/api/stage5Progress', {
           room: session.room,
           token: session.token,
           medianConnected: true,
           vertex: fromVtx
+        }).then(srv => {
+          if (srv && typeof srv.score === 'number' && world?.me) {
+            world.me.score = srv.score;
+            syncLiveScoreBadges();
+          }
         }).catch(() => {});
       }
 
@@ -9195,14 +9298,20 @@ const MedianConnectionController = {
     } else if (isWrongAttempt) {
       s5State.wrongAttempts++;
       s5State.dragonMood = 'warn';
-      s5State.dragonSpeech = 'Trung tuyến phải nối một đỉnh với trung điểm của cạnh đối diện! Hãy thử nối lại nhé!';
+      s5State.dragonSpeech = 'Chưa chính xác (<b>−2 XP</b>)! Trung tuyến phải nối một đỉnh với trung điểm của cạnh đối diện! Hãy thử nối lại nhé!';
       sound('wrong');
+      applyWrongAnswerPenalty(2, `Nối sai trung tuyến từ ${fromVtx}`);
       if (session?.room && session?.token) {
         api('/api/stage5Progress', {
           room: session.room,
           token: session.token,
           wrongAttempt: true,
           reason: `Nối trung tuyến từ đỉnh ${fromVtx} sai điểm đích`
+        }).then(srv => {
+          if (srv && typeof srv.score === 'number' && world?.me) {
+            world.me.score = srv.score;
+            syncLiveScoreBadges();
+          }
         }).catch(() => {});
       }
       Stage5GameState.saveSession();
@@ -9258,11 +9367,17 @@ const CrystalDragController = {
       if (window.spawnJuiceFloater) {
         window.spawnJuiceFloater('💎 Đã đặt Tâm Thạch đúng Trọng tâm G = (A+B+C)/3! (+10 XP)', 'xp');
       }
+      applyCorrectScoreReward(10);
       if (session?.room && session?.token) {
         api('/api/stage5Progress', {
           room: session.room,
           token: session.token,
           crystalPlaced: true
+        }).then(srv => {
+          if (srv && typeof srv.score === 'number' && world?.me) {
+            world.me.score = srv.score;
+            syncLiveScoreBadges();
+          }
         }).catch(() => {});
       }
       Stage5GameState.saveSession();
@@ -9274,14 +9389,20 @@ const CrystalDragController = {
       s5State.crystalWrongShake = true;
       s5State.wrongAttempts++;
       s5State.dragonMood = 'warn';
-      s5State.dragonSpeech = 'Vị trí đó chưa phải trọng tâm! Hãy kéo Tâm Thạch vào đúng giao điểm của hai đường trung tuyến!';
+      s5State.dragonSpeech = 'Chưa chính xác (<b>−2 XP</b>)! Vị trí đó chưa phải trọng tâm! Hãy kéo Tâm Thạch vào đúng giao điểm của hai đường trung tuyến!';
       sound('wrong');
+      applyWrongAnswerPenalty(2, 'Đặt lệch Trọng tâm G');
       if (session?.room && session?.token) {
         api('/api/stage5Progress', {
           room: session.room,
           token: session.token,
           wrongAttempt: true,
           reason: 'Đặt Tâm Thạch lệch khỏi giao điểm G của hai trung tuyến'
+        }).then(srv => {
+          if (srv && typeof srv.score === 'number' && world?.me) {
+            world.me.score = srv.score;
+            syncLiveScoreBadges();
+          }
         }).catch(() => {});
       }
       Stage5GameState.saveSession();
@@ -9423,6 +9544,7 @@ const CentroidStage5 = {
       if (window.spawnJuiceFloater) {
         window.spawnJuiceFloater(`✨ Giải mã đúng Câu ${s5State.quizSolvedCount}/3! (+5 XP)`, 'xp');
       }
+      applyCorrectScoreReward(5);
       if (session?.room && session?.token) {
         api('/api/stage5Progress', {
           room: session.room,
@@ -9431,6 +9553,11 @@ const CentroidStage5 = {
           quizSolvedCount: s5State.quizSolvedCount,
           qId: curQ.id,
           chosenText: `Câu ${s5State.quizSolvedCount}/3 (${curQ.tag}): ${curQ.plainOptions[chosen]}`
+        }).then(srv => {
+          if (srv && typeof srv.score === 'number' && world?.me) {
+            world.me.score = srv.score;
+            syncLiveScoreBadges();
+          }
         }).catch(() => {});
       }
       if (s5State.quizSolvedCount < 3) {
@@ -9442,14 +9569,21 @@ const CentroidStage5 = {
       s5State.quizWrongChoice = chosen;
       s5State.wrongAttempts++;
       s5State.dragonMood = 'warn';
-      s5State.dragonSpeech = curQ.hintHtml;
+      s5State.dragonSpeech = `<b>Chưa chính xác (−3 XP)!</b> ${curQ.hintHtml}`;
       sound('wrong');
+      applyWrongAnswerPenalty(3, `Trả lời sai Câu ${s5State.quizIdx + 1}/3`);
       if (session?.room && session?.token) {
         api('/api/stage5Progress', {
           room: session.room,
           token: session.token,
           wrongAttempt: true,
+          isQuiz: true,
           reason: `Chọn sai Câu ${s5State.quizIdx + 1}/3 (${curQ.plainOptions[chosen] || 'Đáp án ' + (chosen + 1)})`
+        }).then(srv => {
+          if (srv && typeof srv.score === 'number' && world?.me) {
+            world.me.score = srv.score;
+            syncLiveScoreBadges();
+          }
         }).catch(() => {});
       }
       Stage5GameState.saveSession();
@@ -9647,6 +9781,10 @@ function renderStage5CentroidRescueGame(m) {
       </div>
 
       <div class="s5-header-right">
+        <div class="s5-score-badge mv-live-score-pill" id="s5ScoreBadge" title="Điểm năng lượng của đội (Trả lời đúng tăng điểm, trả lời sai bị trừ điểm)">
+          <span>⭐</span>
+          <strong class="mv-live-score-val">${Math.max(0, world?.me?.score ?? 100)} XP</strong>
+        </div>
         <button type="button" class="s5-circle-btn" data-action="toggleSound" title="${soundEnabled ? 'Âm thanh: Bật' : 'Âm thanh: Tắt'}">
           ${soundEnabled ? '🔊' : '🔇'}
         </button>
@@ -11097,6 +11235,39 @@ async function submit(route,payload){
 }
 function updateAfterAction(){lastSignature='';lastStudentKey='';setTimeout(()=>refresh(true),150);}
 
+function syncLiveScoreBadges() {
+  const curScore = Math.max(0, world?.me?.score ?? 20);
+  document.querySelectorAll('.mv-live-score-val').forEach(el => {
+    el.textContent = `${curScore} XP`;
+  });
+}
+
+function applyCorrectScoreReward(rewardPts = 5) {
+  const pts = Math.max(1, Number(rewardPts) || 5);
+  if (world?.me) {
+    world.me.score = Math.max(0, (world.me.score ?? 20) + pts);
+  }
+  syncLiveScoreBadges();
+}
+
+function applyWrongAnswerPenalty(penaltyPts = 2, reasonText = 'Trả lời sai') {
+  const pen = Math.max(1, Number(penaltyPts) || 2);
+  if (world?.me) {
+    world.me.score = Math.max(0, (world.me.score ?? 20) - pen);
+    world.me.wrong = (world.me.wrong || 0) + 1;
+    world.me.streak = 0;
+  }
+  syncLiveScoreBadges();
+  if (window.spawnJuiceFloater) {
+    window.spawnJuiceFloater(`−${pen} XP · ${reasonText}`, 'hurt');
+  }
+  document.querySelectorAll('.mv-live-score-pill, #z3ScorePill').forEach(el => {
+    el.classList.remove('score-penalty-flash');
+    void el.offsetWidth;
+    el.classList.add('score-penalty-flash');
+  });
+}
+
 async function submitStageAnswer(payload){
  if(world.paused)return notice('Tạm dừng','Giáo viên đang tạm dừng nhiệm vụ.',false);
  const m = world.current;
@@ -11105,6 +11276,10 @@ async function submitStageAnswer(payload){
  if(!result) return null;
 
  if(result.correct){
+  if(typeof result.score === 'number' && world?.me){
+   world.me.score = result.score;
+   syncLiveScoreBadges();
+  }
   if(window.spawnJuiceFloater){
    window.spawnJuiceFloater('+' + (result.points || 10) + ' XP ⭐', 'xp');
    if(result.keyBadge) window.spawnJuiceFloater('🔑 ' + result.keyBadge, 'gold');
@@ -11133,6 +11308,12 @@ async function submitStageAnswer(payload){
   return result;
  }else{
   sound('wrong');
+  const pen = result.penalty || 3;
+  applyWrongAnswerPenalty(pen, 'Trả lời chưa đúng');
+  if(typeof result.score === 'number' && world?.me){
+   world.me.score = result.score;
+   syncLiveScoreBadges();
+  }
   updateAfterAction();
   return result;
  }
@@ -11254,12 +11435,18 @@ async function handle(action,el){
     await s1CollectClueAtPillar(pid);
    } else {
     sound('wrong');
+    applyWrongAnswerPenalty(2, `Chọn sai tại Bệ đá #${pid}`);
     vaState.s1Feedback = {
-     text: `Chưa chính xác! Hãy xem gợi ý ở góc dưới bên trái: Manh mối về các vectơ ${s2RenderVecArrow('AB', 's4-inline-vec')}, ${s2RenderVecArrow('AC', 's4-inline-vec')}, ${s2RenderVecArrow('CB', 's4-inline-vec')} (${s2RenderVecArrow('AB', 's4-inline-vec')} − ${s2RenderVecArrow('AC', 's4-inline-vec')} = ${s2RenderVecArrow('CB', 's4-inline-vec')}).`,
+     text: `Chưa chính xác (<b>−2 XP</b>)! Hãy xem gợi ý ở góc dưới bên trái: Manh mối về các vectơ ${s2RenderVecArrow('AB', 's4-inline-vec')}, ${s2RenderVecArrow('AC', 's4-inline-vec')}, ${s2RenderVecArrow('CB', 's4-inline-vec')} (${s2RenderVecArrow('AB', 's4-inline-vec')} − ${s2RenderVecArrow('AC', 's4-inline-vec')} = ${s2RenderVecArrow('CB', 's4-inline-vec')}).`,
      good: false
     };
     if(session?.room && session?.token){
-     api('/api/stage1Progress',{room:session.room,token:session.token,wrongAttempt:true}).catch(()=>{});
+     api('/api/stage1Progress',{room:session.room,token:session.token,wrongAttempt:true,pillar:pid}).then(srv=>{
+      if(srv && typeof srv.score === 'number' && world?.me){
+       world.me.score = srv.score;
+       syncLiveScoreBadges();
+      }
+     }).catch(()=>{});
     }
     render();
    }
