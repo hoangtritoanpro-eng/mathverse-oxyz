@@ -9,6 +9,20 @@ Tất cả những thay đổi quan trọng của dự án này sẽ được gh
 
 ---
 
+## [5.5.8] - 2026-11-08
+
+### Added (Tiếng Chuông Báo Đồng Hồ Khi Còn 10 Giây Cuối Của Mỗi Chặng)
+- **Tích Hợp Hệ Thống Chuông Báo Đồng Hồ & Hiệu Ứng Rung Chuông 10 Giây Cuối Cho Cả 5 Chặng (`MATHVERSE_OXYZ_MINIGAMES/public/app.js`, `MATHVERSE_OXYZ_MINIGAMES/public/style.css`):**
+  1. **Âm thanh Web Audio API tổng hợp 3 cấp độ (`sound()` trong `public/app.js`):**
+     - `clock_bell_10s`: Tiếng chuông kim loại kép ngân vang 3 nhịp (`Ding-Ding-Ding!`) vang lên ngay thời điểm đồng hồ bước vào mốc `10 giây` cuối kèm thông báo nổi `🔔 CÒN 10 GIÂY CUỐI! NHANH LÊN!`.
+     - `clock_countdown_chime`: Tiếng tích tắc đồng hồ kết hợp chuông ngân nhẹ phát mỗi giây từ `9s` đến `6s`.
+     - `clock_urgent_bell`: Tiếng chuông báo thức kép dồn dập phát mỗi giây trong `5 giây` cuối (`5s` $\rightarrow$ `1s`).
+  2. **Đồng bộ trên cả 5 chặng & tự động ngắt khi hoàn thành (`triggerStage10sClockAlarm`, `isActiveStageCountdownRunning`):**
+     - Kích hoạt đồng nhất cho Chặng 1, Chặng 2, Chặng 3, Chặng 4 và Chặng 5; tự động ngắt chuông ngay khi đội chơi vừa mở khóa cổng/hoàn thành chặng hoặc đang tạm dừng.
+     - Bổ sung hiệu ứng `.ringing-10s` (`@keyframes mvClockAlarmRing10s` trong `public/style.css`) làm huy hiệu đồng hồ phát sáng đỏ và rung nhẹ như chuông báo thức trong 10 giây cuối.
+
+---
+
 ## [5.5.7] - 2026-11-08
 
 ### Changed & Fixed (Chặng 1: Bắt Buộc Trả Lời Đúng Mới Thu Thập Mật Thư, Trả Lời Sai Trừ Điểm & Bỏ Thu Thập Nhanh)

@@ -12299,6 +12299,21 @@ body {
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.65);
 }
 
+/* ─── HIỆU ỨNG CHUÔNG BÁO ĐỒNG HỒ 10 GIÂY CUỐI MỖI CHẶNG ─── */
+.ringing-10s {
+  border-color: #EF4444 !important;
+  box-shadow: 0 0 18px rgba(239, 68, 68, 0.78), inset 0 0 8px rgba(239, 68, 68, 0.35) !important;
+  animation: mvClockAlarmRing10s 0.48s ease-in-out infinite !important;
+}
+
+@keyframes mvClockAlarmRing10s {
+  0%, 100% { transform: scale(1) rotate(0deg); }
+  20% { transform: scale(1.06) rotate(-4deg); }
+  40% { transform: scale(1.06) rotate(4deg); }
+  60% { transform: scale(1.05) rotate(-3deg); }
+  80% { transform: scale(1.05) rotate(3deg); }
+}
+
 </style>
 </head>
 <body>
@@ -16980,7 +16995,9 @@ const vaState = {
   dragonMood: 'normal',     // 'normal' | 'shadow' | 'hint' | 'win'
   stageDurationSec: 60,
   stageStartedAt: Date.now(),
-  stageTimeoutTriggered: false
+  stageTimeoutTriggered: false,
+  lastCountdownBellSec: null,
+  warned10sBell: false
 };
 
 function ensureVaStateForStage(m) {
@@ -17012,6 +17029,8 @@ function ensureVaStateForStage(m) {
     vaState.stageDurationSec = dur;
     vaState.stageStartedAt = Date.now();
     vaState.stageTimeoutTriggered = false;
+    vaState.lastCountdownBellSec = null;
+    vaState.warned10sBell = false;
   } else if (vaState.roundId !== m.round) {
     vaState.roundId = m.round;
     vaState.selectedChoice = null;
@@ -23973,6 +23992,66 @@ function sound(type){
    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.25);
    osc.connect(gain).connect(actx.destination);
    osc.start(now); osc.stop(now + 0.26);
+  }else if(type==='clock_bell_10s'){
+   // Tiếng chuông báo đồng hồ khi bắt đầu còn 10 giây cuối của mỗi chặng (Chuông kim loại kép ngân vang Ding-Ding-Ding!)
+   [
+    { delay: 0,    f1: 1046.50, f2: 2093.00, dur: 0.34, vol: 0.14 },
+    { delay: 0.13, f1: 1318.51, f2: 2637.02, dur: 0.36, vol: 0.15 },
+    { delay: 0.26, f1: 1567.98, f2: 3135.96, dur: 0.48, vol: 0.16 }
+   ].forEach(({ delay, f1, f2, dur, vol }) => {
+    const osc1 = actx.createOscillator(), osc2 = actx.createOscillator();
+    const gain1 = actx.createGain(), gain2 = actx.createGain();
+    osc1.type = 'sine'; osc1.frequency.setValueAtTime(f1, now + delay);
+    osc2.type = 'triangle'; osc2.frequency.setValueAtTime(f2, now + delay);
+    gain1.gain.setValueAtTime(0.0001, now + delay);
+    gain1.gain.exponentialRampToValueAtTime(vol, now + delay + 0.012);
+    gain1.gain.exponentialRampToValueAtTime(0.0001, now + delay + dur);
+    gain2.gain.setValueAtTime(0.0001, now + delay);
+    gain2.gain.exponentialRampToValueAtTime(vol * 0.45, now + delay + 0.01);
+    gain2.gain.exponentialRampToValueAtTime(0.0001, now + delay + dur * 0.75);
+    osc1.connect(gain1).connect(actx.destination);
+    osc2.connect(gain2).connect(actx.destination);
+    osc1.start(now + delay); osc1.stop(now + delay + dur + 0.02);
+    osc2.start(now + delay); osc2.stop(now + delay + dur + 0.02);
+   });
+  }else if(type==='clock_countdown_chime'){
+   // Tiếng tích tắc + chuông đồng hồ nhẹ mỗi giây khi còn 9..6 giây
+   const tickOsc = actx.createOscillator(), tickGain = actx.createGain();
+   tickOsc.type = 'triangle';
+   tickOsc.frequency.setValueAtTime(980, now);
+   tickOsc.frequency.exponentialRampToValueAtTime(490, now + 0.045);
+   tickGain.gain.setValueAtTime(0.06, now);
+   tickGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.05);
+   tickOsc.connect(tickGain).connect(actx.destination);
+   tickOsc.start(now); tickOsc.stop(now + 0.055);
+
+   const bellOsc = actx.createOscillator(), bellGain = actx.createGain();
+   bellOsc.type = 'sine';
+   bellOsc.frequency.setValueAtTime(1174.66, now + 0.02);
+   bellGain.gain.setValueAtTime(0.0001, now + 0.02);
+   bellGain.gain.exponentialRampToValueAtTime(0.09, now + 0.032);
+   bellGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.24);
+   bellOsc.connect(bellGain).connect(actx.destination);
+   bellOsc.start(now + 0.02); bellOsc.stop(now + 0.25);
+  }else if(type==='clock_urgent_bell'){
+   // Tiếng chuông đồng hồ dồn dập khi còn 5..1 giây cuối
+   [0, 0.09].forEach((delay, idx) => {
+    const osc = actx.createOscillator(), over = actx.createOscillator();
+    const gain = actx.createGain(), overGain = actx.createGain();
+    const baseFreq = idx === 0 ? 1396.91 : 1760.00;
+    osc.type = 'sine'; osc.frequency.setValueAtTime(baseFreq, now + delay);
+    over.type = 'triangle'; over.frequency.setValueAtTime(baseFreq * 2, now + delay);
+    gain.gain.setValueAtTime(0.0001, now + delay);
+    gain.gain.exponentialRampToValueAtTime(0.12, now + delay + 0.01);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + delay + 0.22);
+    overGain.gain.setValueAtTime(0.0001, now + delay);
+    overGain.gain.exponentialRampToValueAtTime(0.05, now + delay + 0.008);
+    overGain.gain.exponentialRampToValueAtTime(0.0001, now + delay + 0.16);
+    osc.connect(gain).connect(actx.destination);
+    over.connect(overGain).connect(actx.destination);
+    osc.start(now + delay); osc.stop(now + delay + 0.23);
+    over.start(now + delay); over.stop(now + delay + 0.18);
+   });
   }else{
    [220, 180].forEach((freq, i)=>{
     const osc=actx.createOscillator(), gain=actx.createGain();
@@ -23985,6 +24064,49 @@ function sound(type){
   }
   setTimeout(()=>actx.close(), 1200);
  }catch(e){}
+}
+
+// Kiểm tra xem chặng hiện tại đã hoàn thành/mở cổng hay đang tạm dừng chưa (để ngắt chuông đồng hồ 10s cuối hợp lý)
+function isActiveStageCountdownRunning(stageId){
+ if(mvWorldMapOpen || mvShowIntroHub || StageTransitionController.isTransitioning()) return false;
+ if(stageId === 1) return !vaState.s1BridgeRestoredOverlay;
+ if(stageId === 2) return !s2State.gateOpened;
+ if(stageId === 3) return z3State.status !== 'victory' && z3State.status !== 'paused' && !z3State.victoryOverlay;
+ if(stageId === 4) return !s4State.gateOpened;
+ if(stageId === 5) return s5State.phase < 5 && !s5State.vectorsActivated && !s5State.timedOut;
+ return true;
+}
+
+// Chuông báo đồng hồ khi còn 10 giây cuối của mỗi chặng (Chặng 1, 2, 3, 4, 5)
+function triggerStage10sClockAlarm(remSec, stageId){
+ const isLast10s = (remSec <= 10 && remSec >= 1) && isActiveStageCountdownRunning(stageId);
+
+ // Bật/tắt hiệu ứng rung chuông đỏ trên huy hiệu đồng hồ của tất cả các chặng
+ ['#vaStageTimerPill', '#s2TimerClockText', '#s4TimerClockText', '#s5TimerClockText', '.s4-hud-pill.timer-pill', '.s5-timer-box'].forEach(sel => {
+  const el = document.querySelector(sel);
+  if(el){
+   el.classList.toggle('ringing-10s', isLast10s);
+   if(isLast10s) el.classList.add('urgent');
+  }
+ });
+
+ if(!isLast10s) return;
+
+ // Chỉ đổ chuông đúng 1 lần cho mỗi giây đếm ngược (10, 9, 8, 7, 6, 5, 4, 3, 2, 1)
+ if(vaState.lastCountdownBellSec === remSec) return;
+ vaState.lastCountdownBellSec = remSec;
+
+ if(!vaState.warned10sBell){
+  vaState.warned10sBell = true;
+  sound('clock_bell_10s');
+  if(window.spawnJuiceFloater){
+   window.spawnJuiceFloater(`🔔 CÒN ${remSec} GIÂY CUỐI! NHANH LÊN!`, 'warn');
+  }
+ }else if(remSec <= 5){
+  sound('clock_urgent_bell');
+ }else{
+  sound('clock_countdown_chime');
+ }
 }
 
 function setClock(){clockBase=world?.clock||null;tickBase=Date.now();updateClock();}
@@ -24007,6 +24129,8 @@ function updateClock(){
   const pillNode = $('#vaStageTimerPill');
   if(stNode) stNode.textContent = formatMMSS(remSec);
   if(pillNode) pillNode.classList.toggle('urgent', remSec <= 15);
+  // Kích hoạt tiếng chuông báo đồng hồ khi còn 10 giây cuối của mỗi chặng (Chặng 1..5)
+  triggerStage10sClockAlarm(remSec, world.current.id);
   // Hệ thống 2 mức Gợi ý tự động cho Chặng 1 khi người chơi mất nhiều thời gian (Không lộ đáp án CB)
   if(world.current.id === 1 && !vaState.s1BridgeRestoredOverlay){
    if(remSec <= 30 && s1Explorer.hintStageShown < 1){
