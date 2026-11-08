@@ -9,6 +9,16 @@ Tất cả những thay đổi quan trọng của dự án này sẽ được gh
 
 ---
 
+## [5.5.4] - 2026-11-08
+
+### Packaged & Deployed (Đóng Gói Độc Lập 100% Tài Nguyên 5 Chặng & Triển Khai Máy Chủ Lớp Học)
+- **Đóng Gói Bản Độc Lập 1 File (`MATHVERSE_OXYZ_CHOI_NGAY_1_FILE.html` & `MATHVERSE_OXYZ_MINIGAMES/CHOI_THU_1_MAY.html`) và Gói Triển Khai (`MATHVERSE_OXYZ_FULL_DEPLOY_2026.zip`):**
+  1. **Nhúng Base64 toàn bộ 43 tài nguyên đồ họa của cả 5 chặng (`scratch/build_standalone.js`):** Tự động quét và đóng gói toàn bộ hình nền, nhân vật Rồng Xanh, bệ đá, zombie, mặt sau thẻ bài và biểu tượng Ấn Vectơ của cả 5 chặng vào 1 file HTML duy nhất để mở trực tiếp trên bất kỳ máy tính/máy chiếu nào không cần cài đặt Node.js hay mạng Internet.
+  2. **Bộ khởi động nhanh 1-Click (`KHOI_DONG_GAME_MATHVERSE_OXYZ.bat` & `CHAY_GAME_WINDOWS.bat`):** Tự động khởi chạy máy chủ Node.js cổng `3000` (hỗ trợ LAN/Wi-Fi nội bộ) và mở sẵn trình duyệt tại `http://localhost:3000`.
+  3. **Gói nén triển khai đầy đủ (`MATHVERSE_OXYZ_FULL_DEPLOY_2026.zip` & `MATHVERSE_OXYZ_5_CHANG_VECTO.zip`):** Đóng gói trọn bộ mã nguồn server, tài nguyên `public/`, bản chơi độc lập 1 file và hướng dẫn sử dụng (`README_BAT_DAU.txt`).
+
+---
+
 ## [5.5.3] - 2026-11-08
 
 ### Added & Upgraded (Cơ Chế Trừ Điểm Trực Tiếp Khi Trả Lời Sai Xuyên Suốt 5 Chặng)

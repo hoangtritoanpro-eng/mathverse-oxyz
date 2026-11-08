@@ -1,29 +1,25 @@
-MATHVERSE OXYZ – 5 MINI-GAME TOÁN 12 (BẢN NÂNG CẤP)
-=================================================
-1. XEM THỬ NGAY, KHÔNG CẦN CÀI ĐẶT:
-   Nhấn đúp CHOI_THU_1_MAY.html bằng Chrome hoặc Edge.
-   Bấm 'VÀO ĐỘI RỒNG XANH' để chơi thử hoặc 'XEM MÀN HÌNH GIÁO VIÊN'.
-   Bản HTML là mô phỏng một máy, không đồng bộ điện thoại.
+MATHVERSE OXYZ – HÀNH TRÌNH GIẢI CỨU LỤC ĐỊA OXYZ (5 CHẶNG TOÁN 12)
+Trường THPT số 1 Phan Chu Trinh – Giáo viên: Đinh Thị Thảo Nguyên
+====================================================================
 
-2. CHƠI THẬT CÙNG 4-8 NHÓM TRÊN ĐIỆN THOẠI:
-   Cài Node.js LTS nếu máy chưa có.
-   Windows: nhấp đúp CHAY_GAME_WINDOWS.bat.
-   Mac/Linux: mở Terminal trong thư mục này, gõ node server.js.
-   Giáo viên mở http://localhost:3000.
-   Sau khi tạo phòng, học sinh dùng điện thoại cùng Wi-Fi mở IP máy GV.
-   Mỗi nhóm dùng mã riêng do GV cấp.
-   Nhớ để máy chủ luôn chạy trong suốt giờ học.
+1. CHƠI THỬ NGAY TRÊN 1 MÁY (KHÔNG CẦN CÀI ĐẶT NODE.JS, KHÔNG CẦN MẠNG):
+   - Nhấp đúp mở file `CHOI_THU_1_MAY.html` (hoặc `MATHVERSE_OXYZ_CHOI_NGAY_1_FILE.html`) bằng Chrome hoặc Edge.
+   - Toàn bộ hình ảnh, đồ họa 5 chặng, âm thanh và công thức toán học đã được đóng gói độc lập 100% trong 1 file duy nhất.
 
-3. NĂM MINI-GAME KHÁC NHAU:
-   1. Săn kho báu tọa độ (3 đảo)
-   2. Thủ thành trực giao (3 đợt quái)
-   3. Lò rèn pha lê (3 ổ pha lê)
-   4. Mê cung trung điểm (3 cánh cửa)
-   5. Đại chiến Boss (3 lớp giáp)
-   Mỗi chặng hoàn thành cho một chữ số. Mật mã cuối: 30524.
+2. TRIỂN KHAI LỚP HỌC (ĐỒNG BỘ THỜI GIAN THỰC 4–8 ĐỘI QUA WI-FI/LAN):
+   - Nhấp đúp chạy `CHAY_GAME_WINDOWS.bat` (hoặc `KHOI_DONG_GAME_MATHVERSE_OXYZ.bat`).
+   - Trình duyệt sẽ tự động mở `http://localhost:3000`.
+   - Mã phòng mặc định mở sẵn: `123456` (Mã PIN Đội 1 -> Đội 6: `1111`, `2222`, `3333`, `4444`, `5555`, `6666`).
+   - Học sinh dùng điện thoại/laptop cùng mạng Wi-Fi truy cập địa chỉ IP hiển thị trên cửa sổ máy chủ để thi đấu theo nhóm.
 
-4. XEM ĐÁP ÁN, GỢI Ý, KỊCH BẢN VÀ CÁCH TÍNH ĐIỂM:
-   Mở HUONG_DAN_GIAO_VIEN.md trong thư mục này.
+3. HÀNH TRÌNH 5 CHẶNG KHÁM PHÁ VECTƠ (MẬT MÃ CUỐI: 30524):
+   - Chặng 1 (60s – Nhận biết): Mật Thư Rừng Vectơ – Cây Cầu Đảo Chiều (Hiệu hai vectơ AB - AC = CB, Ấn Hướng Đi: 3).
+   - Chặng 2 (60s – Nhận biết): Mật Trận Vectơ – Pháo Đài Góc Vuông (Quy tắc cộng hai vectơ, Ấn Kết Nối: 0).
+   - Chặng 3 (65s – Nhận biết): Đấu Trường Phòng Thủ Zombie – Tháp Pha Lê (Tổng hai vectơ & Quy tắc hình bình hành, Ấn Cân Bằng: 5).
+   - Chặng 4 (65s – Thông hiểu): Mê Cung Trung Điểm – Lật Thẻ Phép Thuật (8 thẻ / 4 cặp hoặc 12 thẻ / 6 cặp về trung điểm đoạn thẳng, Ấn Cân Xứng: 2).
+   - Chặng 5 (70s – Thông hiểu): Giải Cứu Tâm Thạch – Bí Mật Trọng Tâm Tam Giác (Xác định trung điểm, nối trung tuyến, đặt Tâm Thạch vào G = (A+B+C)/3 và giải 3 câu hỏi hiểu sâu, Ấn Trí Tuệ: 4).
 
-LƯU Ý: Game mới được thiết kế độc lập, không sao chép/nhúng trò chơi
-của các trang web mẫu. Không cần Internet lúc chơi nếu có LAN nội bộ.
+4. QUY TẮC TÍNH ĐIỂM NĂNG LƯỢNG (XP):
+   - Mỗi đội khởi đầu với 20 XP năng lượng nền.
+   - Giải đúng mỗi bước/câu hỏi được cộng +5 XP đến +20 XP.
+   - Trả lời sai hoặc dẫm bẫy/bắn nhầm bị trừ trực tiếp -2 XP đến -4 XP (giới hạn không âm >= 0 XP) kèm cảnh báo trực quan trên thanh HUD.
