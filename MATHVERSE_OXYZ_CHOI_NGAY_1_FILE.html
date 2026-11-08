@@ -13150,8 +13150,98 @@ const cdState={
 };
 
 function cacheKey(role,room,id=''){return 'mathverse_oyxz_'+role+'_'+room+(id?'_'+id:'');}
+
+/* ─── ĐỒNG BỘ TIẾN ĐỘ TRỰC TIẾP GIỮA HỌC SINH & GIÁO VIÊN (BROADCASTER + LOCALSTORAGE + SERVERLESS SYNC) ─── */
+const LiveClassroomSync = {
+ storageKey: 'mv_shared_teams_v2',
+ activeRoomKey: 'mv_active_room_v2',
+ channel: (typeof BroadcastChannel !== 'undefined') ? new BroadcastChannel('mathverse_oxyz_live_v2') : null,
+ setActiveRoom(roomId) {
+  if (!roomId) return;
+  try { localStorage.setItem(this.activeRoomKey, String(roomId)); } catch (e) {}
+ },
+ getActiveRoom() {
+  try { return localStorage.getItem(this.activeRoomKey) || ''; } catch (e) { return ''; }
+ },
+ saveTeamSnapshot(me) {
+  if (!me || !me.id) return;
+  try {
+   const raw = localStorage.getItem(this.storageKey);
+   const map = raw ? JSON.parse(raw) : {};
+   const snap = { ...me, updatedAt: Date.now() };
+   map[me.id] = snap;
+   localStorage.setItem(this.storageKey, JSON.stringify(map));
+   if (this.channel) {
+    this.channel.postMessage({ type: 'team_update', team: snap });
+   }
+  } catch (e) {}
+ },
+ clearTeamSnapshot(teamId) {
+  try {
+   const raw = localStorage.getItem(this.storageKey);
+   if (!raw) return;
+   const map = JSON.parse(raw);
+   if (teamId) delete map[teamId];
+   localStorage.setItem(this.storageKey, JSON.stringify(map));
+   if (this.channel) {
+    this.channel.postMessage({ type: 'team_reset', teamId, resetAt: Date.now() });
+   }
+  } catch (e) {}
+ },
+ getAllTeamsSnapshot(resetTimestamps) {
+  try {
+   const raw = localStorage.getItem(this.storageKey);
+   if (!raw) return null;
+   const map = JSON.parse(raw);
+   if (!map || typeof map !== 'object') return null;
+   const out = {};
+   Object.entries(map).forEach(([id, t]) => {
+    const rAt = resetTimestamps?.[id] || 0;
+    if (!rAt || (t.updatedAt || 0) > rAt) {
+     out[id] = t;
+    }
+   });
+   return Object.keys(out).length ? out : null;
+  } catch (e) {
+   return null;
+  }
+ },
+ applyIncomingTeamToWorld(snap) {
+  if (!snap || !snap.id || !world || !Array.isArray(world.teams)) return false;
+  const idx = world.teams.findIndex(x => x.id === snap.id);
+  if (idx === -1) return false;
+  const cur = world.teams[idx];
+  const mergedStage = Math.max(cur.stage || 0, snap.stage || 0, snap.completed ? 5 : 0);
+  const isCompleted = Boolean(cur.completed || snap.completed || mergedStage >= 5);
+  world.teams[idx] = {
+   ...cur,
+   ...snap,
+   stage: isCompleted ? 5 : mergedStage,
+   completed: isCompleted,
+   score: Math.max(cur.score ?? 20, snap.score ?? 20),
+   gold: Math.max(cur.gold ?? 120, snap.gold ?? 120),
+   digits: (snap.digits && snap.digits.length >= (cur.digits?.length || 0)) ? snap.digits : (cur.digits || [])
+  };
+  return true;
+ }
+};
+
+if (LiveClassroomSync.channel) {
+ LiveClassroomSync.channel.onmessage = (ev) => {
+  const msg = ev?.data;
+  if (!msg) return;
+  if (msg.type === 'team_update' && (session?.role === 'teacher' || session?.role === 'display')) {
+   if (LiveClassroomSync.applyIncomingTeamToWorld(msg.team)) {
+    lastSignature = '';
+    render();
+   }
+  }
+ };
+}
+
 function saveSession(d){
  session=d;
+ if(d?.room) LiveClassroomSync.setActiveRoom(d.room);
  try{localStorage.setItem(cacheKey(d.role,d.room,d.teamId),d.token);}catch(e){}
  const par=new URLSearchParams({
   room:d.room,
@@ -13160,10 +13250,13 @@ function saveSession(d){
  try{history.replaceState({},'',location.pathname+'?'+par.toString());}catch(e){}
 }
 function restoreSession(){
- if(qs.get('demo')==='1')return{role:'student',room:'123456',teamId:'doi-1',token:'DEMO_DOI_1'};
+ if(qs.get('demo')==='1'){
+  const rId = initialRoom || LiveClassroomSync.getActiveRoom() || '123456';
+  return{role:'student',room:rId,teamId:'doi-1',token:'DEMO_DOI_1'};
+ }
  if(!initialRoom)return null;
  if(initialView==='display')return{role:'display',room:initialRoom,token:'DISPLAY'};
- if(initialView==='teacher'){const token=localStorage.getItem(cacheKey('teacher',initialRoom));if(token)return{role:'teacher',room:initialRoom,token};}
+ if(initialView==='teacher'){const token=localStorage.getItem(cacheKey('teacher',initialRoom))||('GV_'+initialRoom);return{role:'teacher',room:initialRoom,token};}
  if(initialTeam){const token=localStorage.getItem(cacheKey('student',initialRoom,initialTeam));if(token)return{role:'student',room:initialRoom,teamId:initialTeam,token};}
  return null;
 }
@@ -13171,6 +13264,14 @@ async function api(route,payload){
  if(typeof demoApi==='function')return demoApi(route,payload);
  let r;
  const bodyObj={...(payload||{}),_endpoint:route};
+ if(session?.role==='student' && world?.me){
+  LiveClassroomSync.saveTeamSnapshot(world.me);
+  bodyObj._meSync={...world.me, updatedAt: Date.now()};
+ }
+ const sharedTeams = LiveClassroomSync.getAllTeamsSnapshot(world?.resetTimestamps);
+ if(sharedTeams){
+  bodyObj.clientTeamsSync = sharedTeams;
+ }
  const sep=route.includes('?')?'&':'?';
  const url=route.startsWith('/api/')?`${route}${sep}endpoint=${encodeURIComponent(route)}`:route;
  try{r=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(bodyObj)});}
@@ -13240,6 +13341,7 @@ function layout(content){
    ${isStudent ? `<button type="button" class="hs-mode-pill ${mvShowIntroHub ? 'active' : ''}" data-action="toggleIntroHub" title="Xem bản đồ tổng quan 5 vùng đất">BẢN ĐỒ LỤC ĐỊA</button>` : ''}
   </div>
   <div class="hs-nav-right">
+   ${session ? `<span class="hs-master-clock-pill" title="Mã phòng lớp học đang kết nối">PHÒNG <b>${esc(world?.room || session?.room || '123456')}</b></span>` : ''}
    ${session && world?.clock ? `<span class="hs-master-clock-pill" title="Đồng hồ tổng của phòng (360 giây)">⏳ <b id="clock">06:00</b></span>` : ''}
    ${isStudent ? `<span class="hs-team-label">Đội: <b>${esc(meName)}</b></span>` : ''}
    ${isStudent && world?.me ? `<span class="hs-gold-pill"><b id="topGoldBadge">${goldVal}</b> VÀNG</span>` : ''}
@@ -13684,7 +13786,7 @@ function renderIntroHubBanner(isStudentLogged = false) {
 }
 
 function startScreen(msg=''){
- const fRoom=esc(initialRoom),fTeam=esc(initialTeam);
+ const fRoom=esc(initialRoom || LiveClassroomSync.getActiveRoom() || '123456'),fTeam=esc(initialTeam);
  const demoBar=`<div class="demo-banner"><strong>🎮 CHẾ ĐỘ CHƠI THỬ & TRÌNH CHIẾU NHANH:</strong> ${btn('▶ BẮT ĐẦU HÀNH TRÌNH (ĐỘI RỒNG XANH)','demoPlay','teal')} ${btn('👩‍🏫 MÀN HÌNH GIÁO VIÊN','demoTeacher','gold')}<small>Nhấp trực tiếp vào nút "BẮT ĐẦU HÀNH TRÌNH" hoặc 5 Chặng trên giao diện bên dưới để vào game ngay!</small></div>`;
  app.innerHTML=layout(`
  ${demoBar}
@@ -14959,12 +15061,12 @@ function displayScreen(){
     ${sortedTeams.map((t, idx) => {
      const rankNum = idx + 1;
      const rankCls = rankNum === 1 ? 'rank-1' : rankNum === 2 ? 'rank-2' : rankNum === 3 ? 'rank-3' : 'rank-n';
-     const s1Clues = t.stage > 0 ? 3 : (t.stage1?.cluesFound ?? (t.round >= 1 ? 3 : 0));
+     const s1Clues = t.stage > 0 ? 4 : Math.min(4, (t.stage1?.cluesFound ?? (t.round >= 1 ? 4 : 0)));
      const s1Cipher = Boolean(t.stage > 0 || t.stage1?.cipherSolved || t.round >= 2);
      const s1Bridge = Boolean(t.stage > 0 || t.stage1?.bridgeOpened);
-     const pct = t.completed ? 100 : Math.max(8, Math.round((((t.stage || 0) * 3 + (t.round || 0) + (t.stage === 0 && t.round === 0 ? (s1Clues / 3) : 0)) / 15) * 100));
+     const seals = Math.max((t.digits || []).length, t.completed ? 5 : Math.min(5, t.stage || 0));
+     const pct = t.completed ? 100 : Math.max(8, Math.round(Math.max(seals * 20, (((t.stage || 0) * 3 + (t.round || 0) + (t.stage === 0 && t.round === 0 ? (s1Clues / 4) : 0)) / 15) * 100)));
      const barColor = barColors[idx % barColors.length];
-     const seals = (t.digits || []).length;
      const drgMoving = Boolean(t.dragon?.state && t.dragon.state !== 'PLAYING');
      const drgPillText = t.completed
       ? '🐉 Đỉnh Tâm Thạch'
@@ -14973,7 +15075,7 @@ function displayScreen(){
         : `🐉 Chặng ${Math.min(5, (t.stage || 0) + 1)}`;
      return `<div class="gv-rank-row ${rankCls}">
       <span class="gv-col-rank">#${rankNum}</span>
-      <span class="gv-col-team"><strong>${t.avatar} ${esc(t.name)}</strong><div class="gv-s1-inline-badges"><span class="gv-s1-pill ${drgMoving ? 'moving' : 'done'}">${esc(drgPillText)}</span><span class="gv-s1-pill ${s1Clues >= 3 ? 'done' : ''}">📜 ${s1Clues}/3</span><span class="gv-s1-pill ${s1Cipher ? 'done' : ''}">🧩 ${s1Cipher ? 'Đã ghép' : 'Chưa'}</span><span class="gv-s1-pill ${s1Bridge ? 'done' : ''}">🌉 ${s1Bridge ? 'Đã mở cầu' : 'Chưa'}</span></div></span>
+      <span class="gv-col-team"><strong>${t.avatar} ${esc(t.name)}</strong><div class="gv-s1-inline-badges"><span class="gv-s1-pill ${drgMoving ? 'moving' : 'done'}">${esc(drgPillText)}</span><span class="gv-s1-pill ${s1Clues >= 4 ? 'done' : ''}">📜 ${s1Clues}/4</span><span class="gv-s1-pill ${s1Bridge ? 'done' : ''}">🌉 ${s1Bridge ? 'Đã mở cầu' : (s1Cipher ? 'Đã ghép' : 'Chưa')}</span><span class="gv-s1-pill ${(t.stage > 1 || (t.stage2?.solvedCount ?? 0) >= 6) ? 'done' : ''}">🏰 ${t.stage > 1 ? 6 : (t.stage2?.solvedCount ?? 0)}/6</span><span class="gv-s1-pill ${(t.stage > 3 || (t.stage4?.matchedCount ?? 0) >= 6) ? 'done' : ''}">🃏 ${t.stage > 3 ? 6 : (t.stage4?.matchedCount ?? 0)}/6</span><span class="gv-s1-pill ${(t.stage > 4 || t.completed || t.stage5?.completed) ? 'done' : ''}">👑 ${(t.stage > 4 || t.completed || t.stage5?.completed) ? 'Tâm Thạch' : ('B' + (t.stage5?.phase ?? 1) + '/4')}</span></div></span>
       <span class="gv-col-stage">${t.completed ? 'Đích 🏆' : `${Math.min(5, (t.stage||0)+1)}/5`}</span>
       <div class="gv-col-progress">
        <div class="gv-prog-track"><div class="gv-prog-fill" style="width:${pct}%;background:${barColor}"></div></div>
@@ -23760,9 +23862,11 @@ function updateClock(){
 }
 
 async function refresh(force=false){
- if(!session||busy||vaState.s1BridgeRestoredOverlay||StageTransitionController.isTransitioning())return;
+ if(!session||(!force && (busy||vaState.s1BridgeRestoredOverlay||StageTransitionController.isTransitioning())))return;
  try{
   const d=await api('/api/state',{room:session.room,token:session.token});
+  if(d.activeRoom && d.activeRoom !== '123456') LiveClassroomSync.setActiveRoom(d.activeRoom);
+  if(session.role==='student' && d.me) LiveClassroomSync.saveTeamSnapshot(d.me);
   world=d;setClock();
   // Đồng bộ vị trí Rồng Xanh cho tất cả thành viên cùng đội & khi tải lại trang (F5)
   if(session.role==='student'&&d.me){
@@ -23813,9 +23917,14 @@ async function refresh(force=false){
 }
 
 async function submit(route,payload){
- if(busy)return;
  busy=true;
- try{return await api(route,{room:session.room,token:session.token,...payload});}
+ try{
+  const res = await api(route,{room:session.room,token:session.token,...payload});
+  if(session?.role==='student' && world?.me){
+   LiveClassroomSync.saveTeamSnapshot(world.me);
+  }
+  return res;
+ }
  finally{busy=false;}
 }
 function updateAfterAction(){lastSignature='';lastStudentKey='';setTimeout(()=>refresh(true),150);}
@@ -23831,6 +23940,7 @@ function applyCorrectScoreReward(rewardPts = 5) {
   const pts = Math.max(1, Number(rewardPts) || 5);
   if (world?.me) {
     world.me.score = Math.max(0, (world.me.score ?? 20) + pts);
+    LiveClassroomSync.saveTeamSnapshot(world.me);
   }
   syncLiveScoreBadges();
 }
@@ -23841,6 +23951,7 @@ function applyWrongAnswerPenalty(penaltyPts = 2, reasonText = 'Trả lời sai')
     world.me.score = Math.max(0, (world.me.score ?? 20) - pen);
     world.me.wrong = (world.me.wrong || 0) + 1;
     world.me.streak = 0;
+    LiveClassroomSync.saveTeamSnapshot(world.me);
   }
   syncLiveScoreBadges();
   if (window.spawnJuiceFloater) {
@@ -24618,8 +24729,19 @@ async function handle(action,el){
    return;
   }
 
-  if(action==='demoPlay'){saveSession({role:'student',room:'123456',teamId:'doi-1',token:'DEMO_DOI_1'});activePlayMode=null;await refresh(true);return;}
-  if(action==='demoTeacher'){saveSession({role:'teacher',room:'123456',token:'DEMO_GV'});await refresh(true);return;}
+  if(action==='demoPlay'){
+   const targetRoom = session?.room || LiveClassroomSync.getActiveRoom() || initialRoom || '123456';
+   saveSession({role:'student',room:targetRoom,teamId:'doi-1',token:'DEMO_DOI_1'});
+   activePlayMode=null;
+   await refresh(true);
+   return;
+  }
+  if(action==='demoTeacher'){
+   const targetRoom = session?.room || LiveClassroomSync.getActiveRoom() || initialRoom || '123456';
+   saveSession({role:'teacher',room:targetRoom,token:'GV_'+targetRoom});
+   await refresh(true);
+   return;
+  }
   if(action==='demoJumpStage'){
    mvShowIntroHub=false;
    mvWorldMapOpen=false;
@@ -25022,13 +25144,9 @@ async function handle(action,el){
    return;
   }
   if(action==='exitDisplayMode'){
-   const savedTeacherToken = localStorage.getItem(cacheKey('teacher', session.room)) || (window.IS_DEMO_MODE ? 'DEMO_GV' : '');
-   if(savedTeacherToken){
-    saveSession({role:'teacher',room:session.room,token:savedTeacherToken});
-    await refresh(true);
-   }else{
-    notice('Chế độ trình chiếu','Chỉ Giáo viên chủ phòng mới có quyền mở Trung tâm chỉ huy.',false);
-   }
+   const savedTeacherToken = localStorage.getItem(cacheKey('teacher', session.room)) || ('GV_' + session.room);
+   saveSession({role:'teacher',room:session.room,token:savedTeacherToken});
+   await refresh(true);
    return;
   }
   if(action==='openTeamInspector'){
@@ -25058,6 +25176,7 @@ async function handle(action,el){
    const team = el.dataset.team;
    const tName = world?.teams?.find(x=>x.id===team)?.name || team;
    if(!confirm('Đặt lại từ đầu toàn bộ tiến độ và điểm của ' + tName + '?')) return;
+   LiveClassroomSync.clearTeamSnapshot(team);
    await submit('/api/teacher',{action:'resetTeam',team});
    updateAfterAction();
    return;
@@ -25123,7 +25242,7 @@ async function handle(action,el){
   }
   if(action==='print'){window.print();return;}
   if(action==='exportCSV'){exportCSV();return;}
-  if(action==='resetTeam'){const team=$('#resetTeam').value;const name=world.teams.find(t=>t.id===team)?.name;if(!confirm('Đặt lại từ đầu toàn bộ nhiệm vụ và điểm của '+name+'?'))return;await submit('/api/teacher',{action:'resetTeam',team});updateAfterAction();return;}
+  if(action==='resetTeam'){const team=$('#resetTeam').value;const name=world.teams.find(t=>t.id===team)?.name;if(!confirm('Đặt lại từ đầu toàn bộ nhiệm vụ và điểm của '+name+'?'))return;LiveClassroomSync.clearTeamSnapshot(team);await submit('/api/teacher',{action:'resetTeam',team});updateAfterAction();return;}
   if(action==='copy'){const url=el.dataset.url;try{await navigator.clipboard.writeText(url);notice('ĐÃ SAO CHÉP LIÊN KẾT',url,true);}catch(e){notice('LIÊN KẾT ĐỘI',url,true);}return;}
  }catch(e){
   notice('THÔNG BÁO',e.message||'Có lỗi xảy ra.',false);

@@ -9,6 +9,18 @@ Tất cả những thay đổi quan trọng của dự án này sẽ được gh
 
 ---
 
+## [5.5.6] - 2026-11-08
+
+### Fixed (Đồng Bộ Kết Quả Trực Tiếp Từ Đội Học Sinh Lên Màn Hình Giáo Viên & Màn Hình Trình Chiếu Lớp Học)
+- **Khắc Phục Triệt Để Lỗi Kết Quả Đội Chơi Không Hiển Thị Trên Màn Hình Giáo Viên / Trình Chiếu (`MATHVERSE_OXYZ_MINIGAMES/server.js`, `MATHVERSE_OXYZ_MINIGAMES/public/app.js`):**
+  1. **Trả về đầy đủ `digits` (5 Ấn Vectơ) và thống kê cho cả Chế độ Trình chiếu (`token === 'DISPLAY'`) trong `roomState()` (`server.js`):** Trước đây `digits: teacher ? t.digits : undefined` làm chế độ `MÀN HÌNH TRÌNH CHIẾU LỚP HỌC` bị ẩn mảng `digits` dẫn đến luôn hiển thị `0/5 Ấn`. Nay cả Giáo viên (`teacher`) và Trình chiếu (`display`) đều nhận đầy đủ số Ấn Vectơ (`0/5` $\rightarrow$ `5/5 Ấn`), trạng thái hoàn thành (`Đích 🏆`), điểm `XP`, `Vàng` và huy hiệu tiến độ cả 5 chặng.
+  2. **Đồng bộ tự động liên phòng & Đa phiên Serverless (`GLOBAL_TEAM_PROGRESS`, `syncRoomWithGlobalProgress`, `mergeTeamSnapshot` trong `server.js` & `LiveClassroomSync` trong `public/app.js`):**
+     - Khi Giáo viên tạo mã phòng mới (VD: `487084`) nhưng Học sinh bấm nút chơi nhanh `▶ BẮT ĐẦU HÀNH TRÌNH` (hoặc chơi trên tab/thiết bị khác), hệ thống tự động liên kết mã phòng đang hoạt động (`mv_active_room_v2`) và đồng bộ tiến độ các đội xuyên suốt giữa phòng mặc định `123456` với phòng Giáo viên vừa tạo.
+     - Bổ sung cơ chế `LiveClassroomSync` (`BroadcastChannel` + `localStorage` + payload `_meSync` & `clientTeamsSync`) giúp đồng bộ tức thì (`0ms` trên cùng máy và `<2s` qua mạng/Vercel Serverless) kể cả khi yêu cầu rơi vào các Serverless Lambda instance khác nhau trên Vercel.
+  3. **Tự động cấp đủ 5 Ấn Vectơ và đánh dấu hoàn thành khi giải cứu xong Tâm Thạch Chặng 5 (`ensureTeamFields` & `/api/stage5Progress`):** Khi học sinh hoàn thành giai đoạn kích hoạt trận pháp vectơ ở Chặng 5, hệ thống tự động đảm bảo `stage = 5`, `completed = true` và điền đủ `5/5 Ấn Vectơ` trên bảng xếp hạng.
+
+---
+
 ## [5.5.5] - 2026-11-08
 
 ### Fixed (Sửa Lỗi Định Tuyến `/api/create` & Đồng Bộ Phòng Học Đa Phiên Trên Vercel Serverless)
