@@ -9,6 +9,21 @@ Tất cả những thay đổi quan trọng của dự án này sẽ được gh
 
 ---
 
+## [5.5.7] - 2026-11-08
+
+### Changed & Fixed (Chặng 1: Bắt Buộc Trả Lời Đúng Mới Thu Thập Mật Thư, Trả Lời Sai Trừ Điểm & Bỏ Thu Thập Nhanh)
+- **Nâng Cấp Cơ Chế Giải Mã Mật Thư Chặng 1 (`MATHVERSE_OXYZ_MINIGAMES/public/app.js`, `MATHVERSE_OXYZ_MINIGAMES/public/style.css`, `MATHVERSE_OXYZ_MINIGAMES/server.js`):**
+  1. **Loại bỏ hoàn toàn tính năng Thu thập nhanh ở Chặng 1:**
+     - Xóa nút `"✨ Thu thập nhanh mảnh #X [E]"` trong `renderStage1PedestalModal()` và xóa nhánh xử lý `s1QuickCollectPedestal` trong `handle()`.
+     - Cập nhật phím tắt `[E]` (`s1TriggerInteractE()`): Bấm `E` chỉ dẫn đường tới bệ đá và mở bảng câu hỏi giải mã (`[E] Mở câu hỏi`), tuyệt đối không tự động thu thập mảnh mật thư khi chưa trả lời đúng câu hỏi.
+  2. **Bắt buộc trả lời ĐÚNG mới thu thập được mảnh mật thư & mở khóa Cầu Ánh Sáng (`s1SubmitPedestalAnswer`, `s1ActivateDestinationPillar`):**
+     - Đa dạng hóa 4 phương án lựa chọn `A, B, C, D` tại 4 Bệ đá cổ (`S1_PILLAR_META`) với vị trí đáp án đúng phân bố ở `B`, `C`, `A`, `D` (thay vì mặc định ở đáp án `A`).
+     - Bảng mở khóa Cầu Ánh Sáng (`renderStage1UnlockBridgeModal()`) yêu cầu học sinh chọn đúng vectơ kết quả $\vec{AB} - \vec{AC} = \vec{CB}$ trong 3 phương án ($\vec{BC}, \vec{CB}, \vec{AC}$) mới khôi phục được cầu.
+  3. **Trả lời SAI bị trừ `-2 XP` trực tiếp & hiển thị cảnh báo sư phạm ngay trong bảng câu hỏi:**
+     - Mỗi lần chọn sai phương án tại Bệ đá hoặc tại Cầu Ánh Sáng, đội bị trừ ngay **`2 XP`** (`applyWrongAnswerPenalty(2, ...)` và đồng bộ `/api/stage1Progress`), hiển thị huy hiệu điểm trực tiếp `⭐ XX XP` trên thanh tiêu đề bảng câu hỏi, tô đỏ đáp án vừa chọn sai (`✗ Sai (−2 XP)`) kèm khung gợi ý sư phạm `.s1-modal-wrong-alert` và giữ bảng câu hỏi mở để học sinh suy nghĩ chọn lại.
+
+---
+
 ## [5.5.6] - 2026-11-08
 
 ### Fixed (Đồng Bộ Kết Quả Trực Tiếp Từ Đội Học Sinh Lên Màn Hình Giáo Viên & Màn Hình Trình Chiếu Lớp Học)

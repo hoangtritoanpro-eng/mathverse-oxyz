@@ -522,7 +522,7 @@ function inferEndpointFromPayload(d){
  if(d.teamCount!==undefined)return '/api/create';
  if(d.team!==undefined && d.code!==undefined && d.action===undefined)return '/api/join';
  if(d.action!==undefined)return '/api/teacher';
- if(d.pillar!==undefined || d.secretChest!==undefined)return '/api/stage1Progress';
+ if(d.pillar!==undefined || d.secretChest!==undefined || d.wrongAttempt!==undefined)return '/api/stage1Progress';
  if(d.correctZone!==undefined || d.wrongZone!==undefined || d.resetShields!==undefined)return '/api/stage2Progress';
  if(d.wrongShot!==undefined || d.fenceBreach!==undefined)return '/api/stage3Progress';
  if(d.initDeck!==undefined || d.matchedPair!==undefined || d.wrongMatch!==undefined)return '/api/stage4Progress';
@@ -597,7 +597,20 @@ function processAction(endpoint,d){
     t.stage1.cluesFound=Math.min(4,t.stage1.pillars.length);
     t.score=(t.score||0)+5;
     t.gold=(t.gold||120)+20;
-    emit(r,`📜 ${t.avatar} ${t.name} đã thu thập mảnh mật thư #${pillar} (${t.stage1.cluesFound}/4) (+5 XP)!`);
+    t.correctCount=(t.correctCount||0)+1;
+    t.streak=(t.streak||0)+1;
+    t.answerLog.push({
+     stage:1,
+     qId:`1.P${pillar}`,
+     questionId:`1.P${pillar}`,
+     isQuiz:true,
+     level:'NHẬN BIẾT',
+     choice:0,
+     chosenText:String(d.chosenText||`Giải mã đúng Mảnh mật thư #${pillar}`),
+     correct:true,
+     at:new Date().toISOString()
+    });
+    emit(r,`📜 ${t.avatar} ${t.name} trả lời đúng và thu thập mảnh mật thư #${pillar} (${t.stage1.cluesFound}/4) (+5 XP)!`);
     persist();
    }
   }

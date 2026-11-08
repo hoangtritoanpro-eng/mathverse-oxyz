@@ -4712,10 +4712,12 @@ const S1_PILLAR_META = {
     footWy: 192,
     hitRadius: 82,
     question: 'Hai vectơ \\vec{AB} và \\vec{AC} trong Rừng Vectơ cùng xuất phát từ điểm gốc nào?',
+    wrongHint: 'Gợi ý: Kí hiệu \\vec{AB} và \\vec{AC} đều có chữ cái đầu tiên là A — đó chính là điểm gốc chung!',
     options: [
-      { text: 'Cùng xuất phát từ điểm gốc A (vectơ \\vec{AB} và \\vec{AC})', correct: true },
       { text: 'Cùng xuất phát từ điểm B', correct: false },
-      { text: 'Cùng xuất phát từ điểm C', correct: false }
+      { text: 'Cùng xuất phát từ điểm gốc A (vectơ \\vec{AB} và \\vec{AC})', correct: true },
+      { text: 'Cùng xuất phát từ điểm C', correct: false },
+      { text: 'Một vectơ xuất phát từ B, một vectơ xuất phát từ C', correct: false }
     ]
   },
   '2': {
@@ -4732,10 +4734,12 @@ const S1_PILLAR_META = {
     footWy: 215,
     hitRadius: 84,
     question: 'Để giải mã Cầu Ánh Sáng bằng quy tắc hiệu hai vectơ xuất phát từ A, ta lập biểu thức nào?',
+    wrongHint: 'Gợi ý: Ta đang xét phép trừ (hiệu) của hai vectơ cùng xuất phát từ điểm gốc A là \\vec{AB} và \\vec{AC}.',
     options: [
-      { text: '\\vec{AB} - \\vec{AC}', correct: true },
       { text: '\\vec{AB} + \\vec{BC}', correct: false },
-      { text: '\\vec{AC} + \\vec{CB}', correct: false }
+      { text: '\\vec{AC} + \\vec{CB}', correct: false },
+      { text: '\\vec{AB} - \\vec{AC}', correct: true },
+      { text: '\\vec{BA} - \\vec{CA}', correct: false }
     ]
   },
   '3': {
@@ -4752,10 +4756,12 @@ const S1_PILLAR_META = {
     footWy: 432,
     hitRadius: 84,
     question: 'Trong hiệu hai vectơ cùng gốc A là \\vec{AB} - \\vec{AC}, mũi tên kết quả nối từ điểm nào tới điểm nào?',
+    wrongHint: 'Gợi ý: Quy tắc hiệu hai vectơ cùng gốc A ("ngược chiều"): mũi tên nối từ điểm ngọn C của vectơ trừ tới điểm ngọn B của vectơ bị trừ!',
     options: [
       { text: 'Điểm đầu C nối tới điểm cuối B (hướng C → B)', correct: true },
       { text: 'Điểm đầu B nối tới điểm cuối C (hướng B → C)', correct: false },
-      { text: 'Điểm đầu A nối tới điểm cuối B (hướng A → B)', correct: false }
+      { text: 'Điểm đầu A nối tới điểm cuối B (hướng A → B)', correct: false },
+      { text: 'Điểm đầu A nối tới điểm cuối C (hướng A → C)', correct: false }
     ]
   },
   '4': {
@@ -4772,10 +4778,12 @@ const S1_PILLAR_META = {
     footWy: 432,
     hitRadius: 84,
     question: 'Ghép trọn vẹn mật thư Rừng Vectơ: Với ba điểm A, B, C bất kì, ta luôn có \\vec{AB} - \\vec{AC} bằng vectơ nào?',
+    wrongHint: 'Gợi ý: Theo quy tắc hiệu hai vectơ cùng gốc A, ta có \\vec{AB} - \\vec{AC} = \\vec{CB} (chiều từ C sang B)!',
     options: [
-      { text: '\\vec{CB}', correct: true },
       { text: '\\vec{BC}', correct: false },
-      { text: '\\vec{AC}', correct: false }
+      { text: '\\vec{AC}', correct: false },
+      { text: '\\vec{AB}', correct: false },
+      { text: '\\vec{CB}', correct: true }
     ]
   },
   // Bí danh tương thích ngược (A, B, C) cho các script kiểm thử tự động
@@ -4824,7 +4832,11 @@ const s1Explorer = {
   nearObject: null,  // { type: 'pedestal'|'altar', id: '1'|'2'|'3'|'4'|'altar', label, prompt }
   activeModalPedestal: null, // '1' | '2' | '3' | '4' khi đang mở bảng câu hỏi mảnh mật thư
   lastAutoModalPedestal: null,
+  modalWrongChoices: new Set(), // Các phương án đã chọn sai trong modal hiện tại
+  modalWrongFeedback: null,     // Thông báo lỗi hiển thị trực tiếp bên trong modal câu hỏi
   unlockBridgeModalOpen: false, // Modal ghép 4 mảnh & mở khóa Cầu Ánh Sáng
+  unlockBridgeWrongChoices: new Set(),
+  unlockBridgeWrongFeedback: null,
   selectedUnlockVector: 'CB',
   rustlingBushId: null,
   scrollBannerOpen: false,
@@ -4874,7 +4886,11 @@ function resetS1ExplorerPosition(roundIdx = 0) {
   s1Explorer.nearObject = null;
   s1Explorer.activeModalPedestal = null;
   s1Explorer.lastAutoModalPedestal = null;
+  s1Explorer.modalWrongChoices.clear();
+  s1Explorer.modalWrongFeedback = null;
   s1Explorer.unlockBridgeModalOpen = (roundIdx >= 1);
+  s1Explorer.unlockBridgeWrongChoices.clear();
+  s1Explorer.unlockBridgeWrongFeedback = null;
   s1Explorer.scrollBannerOpen = false;
   s1Explorer.wrongFlashPillar = null;
   s1Explorer.floatingScrollPopup = null;
@@ -4946,7 +4962,7 @@ function s1SpawnClickRipple(clientX, clientY) {
   setTimeout(() => ripple.remove(), 650);
 }
 
-// Thu thập mảnh mật thư tại Bệ đá 1, 2, 3, 4
+// Thu thập mảnh mật thư tại Bệ đá 1, 2, 3, 4 (chỉ được gọi sau khi học sinh trả lời ĐÚNG câu hỏi tại bệ đá)
 async function s1CollectClueAtPillar(rawPid) {
   const pid = s1NormalizePedestalId(rawPid);
   const meta = S1_PILLAR_META[pid];
@@ -4954,6 +4970,8 @@ async function s1CollectClueAtPillar(rawPid) {
 
   if (vaState.pillars.has(pid)) {
     s1Explorer.activeModalPedestal = null;
+    s1Explorer.modalWrongChoices.clear();
+    s1Explorer.modalWrongFeedback = null;
     vaState.dragonMsg = `Mảnh mật thư tại ${meta.label} đã được thu thập! Hãy khám phá các bệ đá còn lại!`;
     render();
     return;
@@ -4961,6 +4979,8 @@ async function s1CollectClueAtPillar(rawPid) {
 
   vaState.pillars.add(pid);
   s1Explorer.activeModalPedestal = null;
+  s1Explorer.modalWrongChoices.clear();
+  s1Explorer.modalWrongFeedback = null;
   s1Explorer.animState = 'INTERACT';
   s1Explorer.interactUntil = performance.now() + 600;
   sound('crystal');
@@ -4969,8 +4989,13 @@ async function s1CollectClueAtPillar(rawPid) {
   s1Explorer.floatingScrollPopup = {
     pid,
     token: meta.token,
-    text: `🎉 Đã thu thập Mảnh Mật Thư #${pid} (${count}/4)!`,
+    text: `🎉 Chính xác! Đã thu thập Mảnh Mật Thư #${pid} (${count}/4)!`,
     at: Date.now()
+  };
+
+  vaState.s1Feedback = {
+    text: `🎉 Chính xác (+5 XP)! Đã thu thập Mảnh Mật Thư #${pid} tại ${meta.label} (${count}/4)!`,
+    good: true
   };
 
   if (window.spawnJuiceFloater) {
@@ -4988,9 +5013,11 @@ async function s1CollectClueAtPillar(rawPid) {
 
   if (count >= 4) {
     // Đã thu thập đủ 4/4 mảnh mật thư -> Mở khóa Rương Phần Thưởng & Cầu Ánh Sáng!
-    vaState.dragonMsg = 'Tuyệt vời! Đã thu thập đủ 4/4 mảnh mật thư! Hãy mở khóa Cầu Ánh Sáng và nhận phần thưởng!';
+    vaState.dragonMsg = 'Tuyệt vời! Đã thu thập đủ 4/4 mảnh mật thư! Hãy chọn đúng vectơ kết quả để mở khóa Cầu Ánh Sáng!';
     vaState.dragonMood = 'win';
     s1Explorer.unlockBridgeModalOpen = true;
+    s1Explorer.unlockBridgeWrongChoices.clear();
+    s1Explorer.unlockBridgeWrongFeedback = null;
     render();
 
     if (!s1Explorer.autoAdvancing) {
@@ -5019,25 +5046,77 @@ async function s1CollectClueAtPillar(rawPid) {
   }
 }
 
-// Mở khóa Cầu Ánh Sáng sau khi thu thập đủ 4/4 mảnh mật thư (hoặc kiểm tra hướng vectơ C -> B)
+// Kiểm tra đáp án tại Bệ đá #1..#4: Trả lời đúng mới thu thập được mảnh mật thư, trả lời sai bị trừ 2 XP và giữ nguyên modal
+async function s1SubmitPedestalAnswer(rawPid, optIdx) {
+  const pid = s1NormalizePedestalId(rawPid);
+  const meta = S1_PILLAR_META[pid];
+  if (!meta) return;
+
+  const idx = Number(optIdx);
+  const opt = meta.options?.[idx];
+  const isCorrect = Boolean(opt && opt.correct);
+
+  if (isCorrect) {
+    vaState.s1Feedback = null;
+    s1Explorer.modalWrongChoices.clear();
+    s1Explorer.modalWrongFeedback = null;
+    await s1CollectClueAtPillar(pid);
+    return;
+  }
+
+  // Trả lời SAI: Không thu thập mảnh mật thư, trừ 2 XP ngay lập tức và hiển thị cảnh báo đỏ trong modal
+  sound('wrong');
+  s1Explorer.modalWrongChoices.add(idx);
+  const letter = ['A', 'B', 'C', 'D'][idx] || String(idx + 1);
+  applyWrongAnswerPenalty(2, `Trả lời sai đáp án ${letter} tại Bệ đá #${pid}`);
+
+  const hintText = meta.wrongHint || 'Hãy đọc kĩ quy tắc hiệu hai vectơ cùng gốc A (\\vec{AB} - \\vec{AC} = \\vec{CB}) và chọn lại đáp án đúng!';
+  s1Explorer.modalWrongFeedback = `❌ Đáp án ${letter} chưa chính xác (−2 XP)! Phải trả lời đúng mới thu thập được mảnh mật thư #${pid}. ${hintText}`;
+  vaState.s1Feedback = {
+    text: `❌ Chọn sai tại ${meta.label} (−2 XP)! Hãy chọn lại đáp án đúng để thu thập Mảnh #${pid}.`,
+    good: false
+  };
+  vaState.dragonMsg = `Chưa đúng rồi (−2 XP)! Hãy đọc gợi ý trong bảng câu hỏi và chọn lại đáp án đúng để thu thập Mảnh #${pid} nhé!`;
+  vaState.dragonMood = 'hint';
+
+  if (session?.room && session?.token) {
+    api('/api/stage1Progress', {
+      room: session.room,
+      token: session.token,
+      wrongAttempt: true,
+      pillar: pid,
+      reason: `Trả lời sai đáp án ${letter} tại Bệ đá #${pid}`
+    }).then(srv => {
+      if (srv && typeof srv.score === 'number' && world?.me) {
+        world.me.score = srv.score;
+        syncLiveScoreBadges();
+      }
+    }).catch(() => {});
+  }
+  render();
+}
+
+// Mở khóa Cầu Ánh Sáng sau khi thu thập đủ 4/4 mảnh mật thư (yêu cầu chọn đúng vectơ kết quả CB)
 async function s1ActivateDestinationPillar(targetPid = 'B') {
   s1Explorer.animState = 'INTERACT';
   s1Explorer.interactUntil = performance.now() + 550;
 
-  // Nếu chọn sai hướng (ví dụ A hoặc C thay vì B cho điểm cuối của vectơ CB)
-  if (targetPid === 'C') {
+  // Nếu chọn sai vectơ (ví dụ chọn BC tương ứng targetPid='C' hoặc AC tương ứng targetPid='A' thay vì CB tương ứng targetPid='B')
+  if (targetPid !== 'B') {
     sound('wrong');
-    applyWrongAnswerPenalty(2, 'Chọn sai chiều vectơ');
+    s1Explorer.unlockBridgeWrongChoices.add(targetPid);
+    applyWrongAnswerPenalty(2, 'Chọn sai vectơ kết quả tại Cầu Ánh Sáng');
     if (session?.room && session?.token) {
-      api('/api/stage1Progress', { room: session.room, token: session.token, wrongAttempt: true, reason: 'Chọn sai chiều vectơ tại Cầu Ánh Sáng' }).then(res => {
+      api('/api/stage1Progress', { room: session.room, token: session.token, wrongAttempt: true, reason: 'Chọn sai vectơ tại Cầu Ánh Sáng' }).then(res => {
         if (res && typeof res.score === 'number' && world?.me) {
           world.me.score = res.score;
           syncLiveScoreBadges();
         }
       }).catch(() => {});
     }
+    s1Explorer.unlockBridgeWrongFeedback = '❌ Chưa chính xác (−2 XP)! Với phép trừ hai vectơ cùng gốc A là \\vec{AB} - \\vec{AC}, mũi tên kết quả phải hướng từ điểm C tới điểm B tạo thành \\vec{CB}!';
     vaState.s1Feedback = {
-      text: 'Điểm C là điểm đầu của vectơ hiệu (−2 XP)! Với vectơ AB − vectơ AC = vectơ CB, mũi tên phải hướng từ điểm đầu C tới điểm cuối B!',
+      text: '❌ Chọn sai vectơ mở khóa Cầu Ánh Sáng (−2 XP)! Hãy chọn đúng vectơ CB!',
       good: false
     };
     vaState.dragonMsg = vaState.s1Feedback.text;
@@ -5080,6 +5159,8 @@ async function s1ActivateDestinationPillar(targetPid = 'B') {
     vaState.s1Feedback = null;
     s1Explorer.activeModalPedestal = null;
     s1Explorer.unlockBridgeModalOpen = false;
+    s1Explorer.unlockBridgeWrongChoices.clear();
+    s1Explorer.unlockBridgeWrongFeedback = null;
     vaState.s1BridgeRestoredOverlay = true;
     s1Explorer.animState = 'CELEBRATE';
     s1Explorer.wx = 345;
@@ -5107,13 +5188,14 @@ async function s1ActivateDestinationPillar(targetPid = 'B') {
     }, 2600);
   } else {
     sound('wrong');
-    applyWrongAnswerPenalty(res?.penalty || 3, 'Chọn sai chiều vectơ');
+    applyWrongAnswerPenalty(res?.penalty || 2, 'Chọn sai chiều vectơ');
     if (res && typeof res.score === 'number' && world?.me) {
       world.me.score = res.score;
     }
     s1Explorer.wrongFlashPillar = targetPid;
     s1Explorer.wrongFlashUntil = Date.now() + 1400;
-    const hintText = `Chưa đúng chiều vectơ (−${res?.penalty || 3} XP)! Gợi ý: Với hiệu hai vectơ cùng gốc A (vectơ AB − vectơ AC), mũi tên nối từ điểm C tới điểm B tạo thành vectơ CB!`;
+    const hintText = `Chưa đúng chiều vectơ (−${res?.penalty || 2} XP)! Gợi ý: Với hiệu hai vectơ cùng gốc A (vectơ AB − vectơ AC), mũi tên nối từ điểm C tới điểm B tạo thành vectơ CB!`;
+    s1Explorer.unlockBridgeWrongFeedback = hintText;
     vaState.s1Feedback = { text: hintText, good: false };
     vaState.dragonMsg = hintText;
     vaState.dragonMood = 'hint';
@@ -5121,40 +5203,52 @@ async function s1ActivateDestinationPillar(targetPid = 'B') {
   }
 }
 
-// Hàm xử lý phím E (Tương tác nhanh với Bệ Đá gần nhất hoặc xác nhận Modal đang mở)
+// Hàm xử lý phím E: Chỉ mở bảng câu hỏi giải mã hoặc dẫn đường tới bệ đá (ĐÃ BỎ tính năng thu thập nhanh không cần trả lời)
 async function s1TriggerInteractE() {
   if (vaState.s1BridgeRestoredOverlay) {
     handle('s1ProceedToStage2');
     return;
   }
 
-  // Nếu đang mở Modal mở khóa Cầu Ánh Sáng (khi đã đủ 4/4 mảnh)
+  // Nếu đang mở Modal mở khóa Cầu Ánh Sáng: nhắc học sinh chọn đúng đáp án vectơ bên dưới
   if (s1Explorer.unlockBridgeModalOpen) {
-    await s1ActivateDestinationPillar('B');
+    sound('bleep');
+    s1Explorer.unlockBridgeWrongFeedback = '⚠️ Hãy chọn đúng vectơ kết quả của phép trừ ở bên dưới để mở khóa Cầu Ánh Sáng!';
+    render();
     return;
   }
 
-  // Nếu đang mở Modal câu hỏi tại một Bệ Đá (1..4), bấm E sẽ thu thập luôn mảnh mật thư đó
+  // Nếu đang mở Modal câu hỏi tại một Bệ Đá (1..4): không cho thu thập nhanh bằng phím E, nhắc chọn đáp án A/B/C/D
   if (s1Explorer.activeModalPedestal) {
-    await s1CollectClueAtPillar(s1Explorer.activeModalPedestal);
+    sound('bleep');
+    s1Explorer.modalWrongFeedback = `⚠️ Bạn phải chọn đáp án ĐÚNG (A, B, C hoặc D) ở bên dưới mới thu thập được mảnh mật thư #${s1Explorer.activeModalPedestal}!`;
+    render();
     return;
   }
 
   const count = s1GetCollectedCount();
   if (count >= 4) {
     s1Explorer.unlockBridgeModalOpen = true;
+    s1Explorer.unlockBridgeWrongChoices.clear();
+    s1Explorer.unlockBridgeWrongFeedback = null;
     sound('powerup');
     render();
     return;
   }
 
+  // Nếu đang đứng gần một bệ đá chưa thu thập: mở bảng câu hỏi giải mã của bệ đá đó
   const near = s1Explorer.nearObject;
   if (near && near.type === 'pedestal') {
-    await s1CollectClueAtPillar(near.id);
+    s1Explorer.activeModalPedestal = near.id;
+    s1Explorer.lastAutoModalPedestal = near.id;
+    s1Explorer.modalWrongChoices.clear();
+    s1Explorer.modalWrongFeedback = null;
+    sound('crystal');
+    render();
     return;
   }
 
-  // Nếu bấm E khi chưa đứng sát bệ đá, tự động dẫn Rồng Xanh tới bệ đá gần nhất chưa thu thập
+  // Nếu bấm E khi chưa đứng sát bệ đá, tự động dẫn Rồng Xanh tới bệ đá gần nhất chưa thu thập để mở câu hỏi
   const nextPid = S1_PEDESTAL_IDS.find(id => !vaState.pillars.has(id));
   if (nextPid) {
     const meta = S1_PILLAR_META[nextPid];
@@ -5162,7 +5256,7 @@ async function s1TriggerInteractE() {
     s1Explorer.targetWy = meta.wy;
     s1Explorer.lastAutoModalPedestal = null;
     vaState.s1Feedback = {
-      text: `🐉 Rồng Xanh đang chạy tới ${meta.label}! Khi tới nơi hãy giải mã hoặc bấm [E] để thu thập mảnh mật thư!`,
+      text: `🐉 Rồng Xanh đang chạy tới ${meta.label}! Khi tới nơi hãy trả lời đúng câu hỏi để thu thập mảnh mật thư!`,
       good: true
     };
     sound('step');
@@ -5328,12 +5422,14 @@ function s1Tick(now, dt) {
         bestObj = {
           type: 'pedestal',
           id: pid,
-          prompt: `📜 [E] Giải mã Mảnh #${pid}`
+          prompt: `📜 [E] Mở câu hỏi Mảnh #${pid}`
         };
-        // Tự động mở bảng câu hỏi Mật Thư khi Rồng Xanh bước vào vòng sáng bệ đá (như hunt-preview/__demo__)
+        // Tự động mở bảng câu hỏi Mật Thư khi Rồng Xanh bước vào vòng sáng bệ đá
         if (d <= 52 && s1Explorer.lastAutoModalPedestal !== pid) {
           s1Explorer.lastAutoModalPedestal = pid;
           s1Explorer.activeModalPedestal = pid;
+          s1Explorer.modalWrongChoices.clear();
+          s1Explorer.modalWrongFeedback = null;
           s1Explorer.targetWx = null;
           s1Explorer.targetWy = null;
           s1Explorer.moving = false;
@@ -5418,7 +5514,8 @@ function renderStage1TopBanner(cluesCount) {
   </header>`;
 }
 
-// Render Modal Câu Hỏi Mảnh Mật Thư theo phong cách tấm da dê đóng đinh tán (.hw-frame-question của hunt-preview/__demo__)
+// Render Modal Câu Hỏi Mảnh Mật Thư theo phong cách tấm da dê đóng đinh tán (.hw-frame-question)
+// ĐÃ BỎ nút thu thập nhanh: học sinh bắt buộc phải trả lời ĐÚNG mới thu thập được mảnh mật thư, trả lời SAI bị trừ 2 XP
 function renderStage1PedestalModal() {
   const pid = s1Explorer.activeModalPedestal;
   if (!pid) return '';
@@ -5434,6 +5531,7 @@ function renderStage1PedestalModal() {
 
       <div class="s1-modal-header-ribbon">
         <span>📜 ${esc(meta.subTitle)}</span>
+        <span class="s1-modal-score-pill mv-live-score-pill">⭐ <b class="mv-live-score-val">${Math.max(0, world?.me?.score ?? 20)} XP</b></span>
       </div>
 
       <div class="s1-modal-body">
@@ -5444,25 +5542,35 @@ function renderStage1PedestalModal() {
 
         <p class="s1-modal-question-text">${formatMath(meta.question)}</p>
 
+        ${s1Explorer.modalWrongFeedback ? `
+          <div class="s1-modal-wrong-alert" role="alert">
+            ${formatMath(s1Explorer.modalWrongFeedback)}
+          </div>
+        ` : ''}
+
         <div class="s1-modal-options-list">
-          ${meta.options.map((opt, idx) => `
-            <button type="button"
-              class="s1-modal-opt-btn"
-              data-action="s1AnswerPedestalModal"
-              data-pid="${pid}"
-              data-correct="${opt.correct ? '1' : '0'}">
-              <span class="s1-modal-opt-letter">${['A', 'B', 'C'][idx] || (idx + 1)}</span>
-              <span class="s1-modal-opt-label">${formatMath(opt.text)}</span>
-            </button>
-          `).join('')}
+          ${meta.options.map((opt, idx) => {
+            const isWrongPicked = s1Explorer.modalWrongChoices.has(idx);
+            const letter = ['A', 'B', 'C', 'D'][idx] || (idx + 1);
+            return `
+              <button type="button"
+                class="s1-modal-opt-btn ${isWrongPicked ? 'is-wrong' : ''}"
+                data-action="s1AnswerPedestalModal"
+                data-pid="${pid}"
+                data-idx="${idx}"
+                data-correct="${opt.correct ? '1' : '0'}">
+                <span class="s1-modal-opt-letter">${letter}</span>
+                <span class="s1-modal-opt-label">${formatMath(opt.text)}</span>
+                ${isWrongPicked ? '<span class="s1-modal-opt-wrong-tag">✗ Sai (−2 XP)</span>' : ''}
+              </button>
+            `;
+          }).join('')}
         </div>
       </div>
 
       <div class="s1-modal-footer">
+        <span class="s1-modal-rule-note">🎯 Trả lời đúng (+5 XP & thu thập mảnh) · Trả lời sai (−2 XP)</span>
         <button type="button" class="s1-modal-close-btn" data-action="s1ClosePedestalModal">Để sau</button>
-        <button type="button" class="s1-modal-collect-btn" data-action="s1QuickCollectPedestal" data-pid="${pid}">
-          ✨ Thu thập nhanh mảnh #${pid} [E]
-        </button>
       </div>
     </div>
   </div>`;
@@ -5471,6 +5579,8 @@ function renderStage1PedestalModal() {
 // Render Modal Ghép 4 Mảnh Mật Thư & Mở Khóa Cầu Ánh Sáng (khi đã thu thập đủ 4/4 mảnh)
 function renderStage1UnlockBridgeModal() {
   if (!s1Explorer.unlockBridgeModalOpen) return '';
+  const wrongSet = s1Explorer.unlockBridgeWrongChoices || new Set();
+
   return `<div class="s1-hunt-modal-backdrop">
     <div class="s1-hunt-modal-card hw-frame-question s1-unlock-modal">
       <span class="hw-frame-stud tl"></span>
@@ -5480,6 +5590,7 @@ function renderStage1UnlockBridgeModal() {
 
       <div class="s1-modal-header-ribbon gold">
         <span>🌉 MỞ KHÓA CẦU ÁNH SÁNG · ĐỦ 4/4 MẢNH MẬT THƯ!</span>
+        <span class="s1-modal-score-pill mv-live-score-pill">⭐ <b class="mv-live-score-val">${Math.max(0, world?.me?.score ?? 20)} XP</b></span>
       </div>
 
       <div class="s1-modal-body">
@@ -5491,20 +5602,33 @@ function renderStage1UnlockBridgeModal() {
           <span class="s1-formula-chip">${formatMath('\\vec{AB}')}</span>
           <span class="s1-formula-chip">${formatMath('- \\vec{AC}')}</span>
           <span class="s1-formula-chip">C → B</span>
-          <span class="s1-formula-chip highlight">${formatMath('= \\vec{CB}')}</span>
+          <span class="s1-formula-chip highlight">?</span>
         </div>
 
-        <div class="s1-unlock-eq-large">
-          ${formatMath('\\vec{AB} - \\vec{AC} = \\vec{CB}')}
-        </div>
-
-        <p style="text-align:center;color:#475569;font-size:13.5px;margin:8px 0 14px">
-          🐉 <b>Rồng Xanh:</b> “Tuyệt vời! Mũi tên kết quả nối từ điểm đầu <b>C</b> tới điểm cuối <b>B</b> tạo thành <b>vectơ CB</b>! Hãy nhấn nút bên dưới để khôi phục <b>Cầu Ánh Sáng</b> và nhận <b>Ấn Hướng Đi</b>!”
+        <p style="text-align:center;color:#0F172A;font-weight:800;font-size:14.5px;margin:10px 0 10px">
+          Chọn đúng vectơ kết quả của phép trừ ${formatMath('\\vec{AB} - \\vec{AC}')} để khôi phục <b>Cầu Ánh Sáng</b> (Chọn sai bị trừ <b>2 XP</b>):
         </p>
 
-        <div style="display:flex;justify-content:center;gap:12px;flex-wrap:wrap">
-          <button type="button" class="s1-unlock-confirm-btn" data-action="s1ConfirmUnlockBridge" data-target="B">
-            🌉 KHÔI PHỤC CẦU ÁNH SÁNG & NHẬN THƯỞNG [E] →
+        ${s1Explorer.unlockBridgeWrongFeedback ? `
+          <div class="s1-modal-wrong-alert" role="alert">
+            ${formatMath(s1Explorer.unlockBridgeWrongFeedback)}
+          </div>
+        ` : ''}
+
+        <div class="s1-modal-options-list" style="margin-bottom:10px">
+          <button type="button" class="s1-modal-opt-btn ${wrongSet.has('C') ? 'is-wrong' : ''}" data-action="s1ConfirmUnlockBridge" data-target="C">
+            <span class="s1-modal-opt-letter">A</span>
+            <span class="s1-modal-opt-label">${formatMath('\\vec{AB} - \\vec{AC} = \\vec{BC}')} (Mũi tên nối từ B tới C)</span>
+            ${wrongSet.has('C') ? '<span class="s1-modal-opt-wrong-tag">✗ Sai (−2 XP)</span>' : ''}
+          </button>
+          <button type="button" class="s1-modal-opt-btn" data-action="s1ConfirmUnlockBridge" data-target="B">
+            <span class="s1-modal-opt-letter">B</span>
+            <span class="s1-modal-opt-label">${formatMath('\\vec{AB} - \\vec{AC} = \\vec{CB}')} (Mũi tên nối từ C tới B)</span>
+          </button>
+          <button type="button" class="s1-modal-opt-btn ${wrongSet.has('A') ? 'is-wrong' : ''}" data-action="s1ConfirmUnlockBridge" data-target="A">
+            <span class="s1-modal-opt-letter">C</span>
+            <span class="s1-modal-opt-label">${formatMath('\\vec{AB} - \\vec{AC} = \\vec{AC}')} (Mũi tên nối từ A tới C)</span>
+            ${wrongSet.has('A') ? '<span class="s1-modal-opt-wrong-tag">✗ Sai (−2 XP)</span>' : ''}
           </button>
         </div>
       </div>
@@ -5679,8 +5803,8 @@ function renderStage1CipherBridgeGame(m) {
             <button type="button" class="s1-dpad-btn" data-s1dpad="down" title="Xuống (S / ↓)">▼</button>
             <button type="button" class="s1-dpad-btn" data-s1dpad="right" title="Phải (D / →)">▶</button>
           </div>
-          <button type="button" class="s1-quick-e-btn ${s1Explorer.nearObject || allCollected ? 'pulse-ready' : ''}" data-action="s1PressInteractE" title="Phím E: Tương tác / Thu thập mật thư">
-            [E] Tương tác
+          <button type="button" class="s1-quick-e-btn ${s1Explorer.nearObject || allCollected ? 'pulse-ready' : ''}" data-action="s1PressInteractE" title="Phím E: Di chuyển tới bệ đá và mở câu hỏi giải mã">
+            [E] Mở câu hỏi
           </button>
         </div>
 
@@ -11530,6 +11654,8 @@ async function handle(action,el){
    if(d <= meta.hitRadius + 30){
     s1Explorer.activeModalPedestal = pid;
     s1Explorer.lastAutoModalPedestal = pid;
+    s1Explorer.modalWrongChoices.clear();
+    s1Explorer.modalWrongFeedback = null;
     sound('crystal');
     render();
    } else {
@@ -11543,37 +11669,14 @@ async function handle(action,el){
   }
   if(action==='s1AnswerPedestalModal'){
    const pid = s1NormalizePedestalId(el.dataset.pid);
-   const isCorrect = el.dataset.correct === '1';
-   if(isCorrect){
-    vaState.s1Feedback = null;
-    await s1CollectClueAtPillar(pid);
-   } else {
-    sound('wrong');
-    applyWrongAnswerPenalty(2, `Chọn sai tại Bệ đá #${pid}`);
-    vaState.s1Feedback = {
-     text: `Chưa chính xác (<b>−2 XP</b>)! Hãy xem gợi ý ở góc dưới bên trái: Manh mối về các vectơ ${s2RenderVecArrow('AB', 's4-inline-vec')}, ${s2RenderVecArrow('AC', 's4-inline-vec')}, ${s2RenderVecArrow('CB', 's4-inline-vec')} (${s2RenderVecArrow('AB', 's4-inline-vec')} − ${s2RenderVecArrow('AC', 's4-inline-vec')} = ${s2RenderVecArrow('CB', 's4-inline-vec')}).`,
-     good: false
-    };
-    if(session?.room && session?.token){
-     api('/api/stage1Progress',{room:session.room,token:session.token,wrongAttempt:true,pillar:pid}).then(srv=>{
-      if(srv && typeof srv.score === 'number' && world?.me){
-       world.me.score = srv.score;
-       syncLiveScoreBadges();
-      }
-     }).catch(()=>{});
-    }
-    render();
-   }
-   return;
-  }
-  if(action==='s1QuickCollectPedestal'){
-   const pid = s1NormalizePedestalId(el.dataset.pid);
-   vaState.s1Feedback = null;
-   await s1CollectClueAtPillar(pid);
+   const optIdx = Number(el.dataset.idx);
+   await s1SubmitPedestalAnswer(pid, optIdx);
    return;
   }
   if(action==='s1ClosePedestalModal'){
    s1Explorer.activeModalPedestal = null;
+   s1Explorer.modalWrongChoices.clear();
+   s1Explorer.modalWrongFeedback = null;
    sound('bleep');
    render();
    return;
