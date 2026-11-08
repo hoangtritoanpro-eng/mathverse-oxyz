@@ -52,16 +52,17 @@ function getTeamChallenges(s,team){
  ];
 }
 
-function seedDefaultRoom(){
+function createDeterministicRoom(roomId='123456',size=6){
+ const validSize=(Number.isInteger(size)&&size>=4&&size<=8)?size:6;
  const now=Date.now();
- ROOMS['123456']={
-  id:'123456',
-  teacherToken:'DEMO_GV',
+ return {
+  id:roomId,
+  teacherToken:roomId==='123456'?'DEMO_GV':'GV_'+roomId,
   createdAt:new Date().toISOString(),
   paused:false,
   ended:false,
   clock:{minutes:6,remainingMs:6*60*1000,running:false,startedAt:0},
-  teams:TEAM_POOL.slice(0,6).map((t,i)=>({
+  teams:TEAM_POOL.slice(0,validSize).map((t,i)=>({
    ...t,
    id:'doi-'+(i+1),
    code:String(i+1).repeat(4),
@@ -77,8 +78,12 @@ function seedDefaultRoom(){
    lastActiveAt:now,
    stageEnteredAt:now
   })),
-  events:[{at:new Date().toISOString(),text:'Rồng Xanh đã mở sẵn phòng 123456 (Thời lượng 6 phút, 6 đội, mã PIN 1111 → 6666).'}]
+  events:[{at:new Date().toISOString(),text:`Rồng Xanh đã mở sẵn phòng ${roomId} (Thời lượng 6 phút, ${validSize} đội, mã PIN 1111 → ${String(validSize).repeat(4)}).`}]
  };
+}
+
+function seedDefaultRoom(){
+ ROOMS['123456']=createDeterministicRoom('123456',6);
  persist();
 }
 seedDefaultRoom();
@@ -269,10 +274,25 @@ function teacherStage(s){
  return {...s,challenges:bank.map(q=>({...q,answer:String.fromCharCode(65+q.correct)}))};
 }
 
+function isTeacherToken(room,token){
+ if(!token)return false;
+ return token===room.teacherToken || token==='DEMO_GV' || String(token).startsWith('GV_');
+}
+function findTeamByToken(room,token){
+ if(!token)return null;
+ let team=room.teams.find(t=>t.token===token);
+ if(team)return team;
+ const m=String(token).match(/(?:DEMO_DOI_|DOI_.*_|doi-)(\d+)/i);
+ if(m){
+  const idx=Number(m[1])-1;
+  if(room.teams[idx])return room.teams[idx];
+ }
+ return null;
+}
 function roomState(room,token){
- const teacher=token===room.teacherToken;
+ const teacher=isTeacherToken(room,token);
  const isDisplay=token==='DISPLAY';
- const team=room.teams.find(t=>t.token===token);
+ const team=findTeamByToken(room,token);
  if(!teacher&&!isDisplay&&!team)throw error('Mã truy cập không hợp lệ.',403);
  room.teams.forEach(ensureTeamFields);
  const now=Date.now();
@@ -323,7 +343,7 @@ function roomState(room,token){
  const base={room:room.id,role:teacher?'teacher':(isDisplay?'display':'student'),teams,paused:room.paused,ended:Boolean(room.ended),clock,
   stages:STAGES.map(x=>({id:x.id,isCipherBridgeQuest:Boolean(x.isCipherBridgeQuest),title:x.title,subtitle:x.subtitle||'',shortName:x.shortName||x.place,place:x.place,icon:x.icon,sealIcon:x.sealIcon||'💠',levelBadge:x.levelBadge,timeSeconds:x.timeSeconds||60,tag:x.tag,time:x.time,biomeColor:x.biomeColor||'#3b82f6',item:x.item||'',gameType:x.gameType,defaultMode:x.defaultMode,totalRounds:3})),
   messageOptions:MESSAGE_OPTIONS,lastEvent:room.events.slice(-15).reverse(),
-  createdAt:room.createdAt,joinBaseURL:`http://${LAN_IP}:${PORT}`};
+  createdAt:room.createdAt,joinBaseURL:IS_VERCEL?'':`http://${LAN_IP}:${PORT}`};
  if(isDisplay)return base;
  if(teacher)return {...base,teamCodes:Object.fromEntries(room.teams.map(t=>[t.id,t.code])),
    teacherToken:room.teacherToken,missions:STAGES.map(teacherStage),
@@ -344,22 +364,53 @@ function roomState(room,token){
 }
 
 function error(message,status=400){const e=new Error(message);e.status=status;return e;}
-function getRoom(data){const r=ROOMS[String(data.room||'').toUpperCase()];if(!r)throw error('Không tìm thấy mã phòng. Hãy kiểm tra lại.',404);return r;}
-function requireTeacher(r,token){if(token!==r.teacherToken)throw error('Chỉ giáo viên được phép thao tác này.',403);}
-function requireTeam(r,token){const team=r.teams.find(t=>t.token===token);if(!team)throw error('Mã đội không hợp lệ. Hãy đăng nhập lại.',403);return ensureTeamFields(team);}
+function getRoom(data){
+ const roomId=String(data?.room||'123456').trim().toUpperCase();
+ if(!ROOMS[roomId]){
+  if(/^\d{6}$/.test(roomId)){
+   const lastDigit=Number(roomId[5]);
+   const size=(lastDigit>=4&&lastDigit<=8)?lastDigit:6;
+   ROOMS[roomId]=createDeterministicRoom(roomId,size);
+   persist();
+  }else{
+   throw error('Không tìm thấy mã phòng. Hãy kiểm tra lại.',404);
+  }
+ }
+ return ROOMS[roomId];
+}
+function requireTeacher(r,token){if(!isTeacherToken(r,token))throw error('Chỉ giáo viên được phép thao tác này.',403);}
+function requireTeam(r,token){const team=findTeamByToken(r,token);if(!team)throw error('Mã đội không hợp lệ. Hãy đăng nhập lại.',403);return ensureTeamFields(team);}
 function emit(r,content){r.events.push({at:new Date().toISOString(),text:content});if(r.events.length>200)r.events.shift();}
 function clockPause(r){if(!r.clock.running)return;r.clock.remainingMs=Math.max(0,r.clock.remainingMs-(Date.now()-r.clock.startedAt));r.clock.running=false;r.clock.startedAt=0;}
 function normAns(s){return String(s??'').trim().replace(/\u2212/g,'-').replace(/\s+/g,'').toUpperCase();}
 
+function inferEndpointFromPayload(d){
+ if(!d||typeof d!=='object')return null;
+ if(d.teamCount!==undefined)return '/api/create';
+ if(d.team!==undefined && d.code!==undefined && d.action===undefined)return '/api/join';
+ if(d.action!==undefined)return '/api/teacher';
+ if(d.pillar!==undefined || d.secretChest!==undefined)return '/api/stage1Progress';
+ if(d.correctZone!==undefined || d.wrongZone!==undefined || d.resetShields!==undefined)return '/api/stage2Progress';
+ if(d.wrongShot!==undefined || d.fenceBreach!==undefined)return '/api/stage3Progress';
+ if(d.initDeck!==undefined || d.matchedPair!==undefined || d.wrongMatch!==undefined)return '/api/stage4Progress';
+ if(d.midpointFound!==undefined || d.medianConnected!==undefined || d.crystalPlaced!==undefined || d.quizSolved!==undefined || d.vectorsActivated!==undefined || d.resetBoard!==undefined || d.timedOut!==undefined)return '/api/stage5Progress';
+ if(d.moveMode!==undefined || (d.state!==undefined && d.fromStage!==undefined))return '/api/dragonState';
+ if(d.choice!==undefined || d.shortText!==undefined || d.cipherOrder!==undefined || d.vectorFrom!==undefined || d.stage2MatrixCompleted!==undefined || d.stage4MemoryCompleted!==undefined || d.stage5CentroidCompleted!==undefined || d.zombieTargetCleared!==undefined || d.interactiveDone!==undefined)return '/api/answer';
+ if(d.stage!==undefined && d.round===undefined && Object.keys(d).every(k=>['room','token','stage','_endpoint'].includes(k)))return '/api/demoJump';
+ if(d.room && d.token && Object.keys(d).every(k=>['room','token','_endpoint'].includes(k)))return '/api/state';
+ return null;
+}
+
 function processAction(endpoint,d){
+ if(!endpoint || endpoint==='/api/index.js' || endpoint==='/api/index'){
+  const inferred = (d && typeof d._endpoint==='string' && d._endpoint.startsWith('/api/')) ? d._endpoint : inferEndpointFromPayload(d);
+  if(inferred) endpoint = inferred;
+ }
  if(endpoint==='/api/create'){
   let size=Number(d.teamCount||6);if(!Number.isInteger(size)||size<4||size>8)throw error('Chọn 4–8 đội.');
-  let roomId;do{roomId=String(100000+crypto.randomInt(900000));}while(ROOMS[roomId]);
-  const now=Date.now();
-  const r={id:roomId,teacherToken:rnd(),createdAt:new Date().toISOString(),paused:false,ended:false,
-    clock:{minutes:6,remainingMs:6*60*1000,running:false,startedAt:0},
-    teams:TEAM_POOL.slice(0,size).map((t,i)=>({...t,id:'doi-'+(i+1),code:String(1000+crypto.randomInt(9000)),token:rnd(16),stage:0,round:0,health:3,wrong:0,score:20,bonus:0,gold:120,heroLevel:1,upgrades:{damage:1,speed:1,hp:1,regen:1},completed:false,finishedAt:null,attempts:[0,0,0,0,0],hintsUsed:[false,false,false,false,false],digits:[],stagePicks:rollStagePicks(),correctCount:0,answerLog:[],stage1:{pillars:[],cluesFound:0,maxClues:4,cipherSolved:false,bridgeOpened:false,wrongAttempts:0,completedTimeSec:null,chestOpened:false,controllerRoleIdx:0,spawnVariant:crypto.randomInt(3)},lastActiveAt:now,stageEnteredAt:now})),events:[]};
-  emit(r,'Rồng Xanh đã tạo phòng '+roomId+' (6 phút) với '+size+' đội.');ROOMS[roomId]=r;persist();return{room:roomId,teacherToken:r.teacherToken};
+  let roomId;do{roomId=String(10000+crypto.randomInt(90000))+String(size);}while(ROOMS[roomId]&&roomId!=='123456');
+  const r=createDeterministicRoom(roomId,size);
+  ROOMS[roomId]=r;persist();return{room:roomId,teacherToken:r.teacherToken};
  }
  const r=getRoom(d);
  if(endpoint==='/api/join'){
@@ -1054,23 +1105,52 @@ function send(res,status,data,type='application/json; charset=utf-8'){
  res.writeHead(status,{'Content-Type':type,'Cache-Control':'no-store','X-Content-Type-Options':'nosniff','X-Frame-Options':'DENY'});
  res.end(typeof data==='string'||Buffer.isBuffer(data)?data:JSON.stringify(data));
 }
+function resolveApiEndpoint(pathname,parsedUrl,bodyData){
+ if(bodyData && typeof bodyData._endpoint==='string' && bodyData._endpoint.startsWith('/api/')){
+  return bodyData._endpoint.split('?')[0];
+ }
+ const epQuery=parsedUrl.searchParams.get('endpoint');
+ if(epQuery && epQuery.startsWith('/api/')){
+  return epQuery.split('?')[0];
+ }
+ const apiParam=parsedUrl.searchParams.get('__api');
+ if(apiParam){
+  const clean=String(apiParam).replace(/^\/+/,'').replace(/^api\/+/i,'').split('?')[0];
+  if(clean && clean!=='index.js' && clean!=='index'){
+   return '/api/'+clean;
+  }
+ }
+ if(pathname==='/api/index.js'||pathname==='/api/index'){
+  const inferred=inferEndpointFromPayload(bodyData);
+  if(inferred)return inferred;
+ }
+ return pathname;
+}
 function requestHandler(req,res){
- let pathname;
- try{pathname=new URL(req.url,'http://localhost').pathname;}catch(e){return send(res,400,{error:'Địa chỉ không hợp lệ.'});}
+ let parsedUrl,pathname;
+ try{
+  parsedUrl=new URL(req.url,'http://localhost');
+  pathname=parsedUrl.pathname;
+ }catch(e){return send(res,400,{error:'Địa chỉ không hợp lệ.'});}
+ if(req.method==='GET' && (pathname==='/api/index.js'||pathname==='/api/index')){
+  const p=parsedUrl.searchParams.get('__path');
+  pathname=p?'/'+String(p).replace(/^\/+/,''):'/';
+ }
  if(pathname==='/health')return send(res,200,{ok:true,rooms:Object.keys(ROOMS).length});
- if(pathname.startsWith('/api/')){
+ if(pathname.startsWith('/api/') || req.method==='POST'){
   if(req.method!=='POST')return send(res,405,{error:'Chỉ hỗ trợ POST.'});
   if(req.body!==undefined && req.body!==null){
    try{
     const d=typeof req.body==='string'?JSON.parse(req.body||'{}'):req.body;
-    const result=processAction(pathname,d);
+    const ep=resolveApiEndpoint(pathname,parsedUrl,d);
+    const result=processAction(ep,d);
     return send(res,200,result);
    }catch(e){
     return send(res,e.status||400,{error:e.message||'Đã có lỗi xảy ra.'});
    }
   }
   let content='';req.on('data',b=>{content+=b;if(content.length>32000)req.destroy();});
-  req.on('end',()=>{try{const d=JSON.parse(content||'{}');const result=processAction(pathname,d);send(res,200,result);}catch(e){send(res,e.status||400,{error:e.message||'Đã có lỗi xảy ra.'});}});return;
+  req.on('end',()=>{try{const d=JSON.parse(content||'{}');const ep=resolveApiEndpoint(pathname,parsedUrl,d);const result=processAction(ep,d);send(res,200,result);}catch(e){send(res,e.status||400,{error:e.message||'Đã có lỗi xảy ra.'});}});return;
  }
  if(req.method!=='GET')return send(res,405,'Method not allowed','text/plain');
  if(pathname.startsWith('/images/') || pathname.startsWith('/sounds/') || pathname.startsWith('/assets/')){

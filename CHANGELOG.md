@@ -9,6 +9,15 @@ Tất cả những thay đổi quan trọng của dự án này sẽ được gh
 
 ---
 
+## [5.5.5] - 2026-11-08
+
+### Fixed (Sửa Lỗi Định Tuyến `/api/create` & Đồng Bộ Phòng Học Đa Phiên Trên Vercel Serverless)
+- **Khắc Phục Triệt Để Lỗi `"Đường dẫn API không tồn tại."` Khi Tạo Phòng / Vào Đội Trên Vercel (`vercel.json`, `MATHVERSE_OXYZ_MINIGAMES/server.js`, `MATHVERSE_OXYZ_MINIGAMES/public/app.js`):**
+  1. **Định tuyến API 4 lớp trên Vercel (`resolveApiEndpoint` & `inferEndpointFromPayload` trong `server.js`):** Khi Vercel rewrite `/api/*` về `/api/index.js`, `req.url` bị chuẩn hóa thành `/api/index.js` khiến `processAction` báo lỗi 404 `"Đường dẫn API không tồn tại."`. Hệ thống nay trích xuất chính xác đường dẫn API từ `d._endpoint` (JSON body), `?endpoint=...` (query string), `?__api=$1` (`vercel.json` rewrite) và tự động suy luận endpoint từ payload (`inferEndpointFromPayload`) giúp tương thích 100% kể cả khi trình duyệt còn lưu cache cũ.
+  2. **Khởi tạo & Khôi phục phòng học tất định giữa các Serverless Instances (`createDeterministicRoom`, `getRoom`, `isTeacherToken`, `findTeamByToken`):** Mã phòng 6 chữ số tự động mã hóa số đội ở chữ số cuối và cấp mã PIN cố định dễ nhớ (`1111` $\rightarrow$ `6666`/`8888`), giúp mọi container Serverless của Vercel tự động đồng bộ mã phòng, quyền Giáo viên và mã PIN học sinh mà không bao giờ báo lỗi mất phòng khi chuyển instance.
+
+---
+
 ## [5.5.4] - 2026-11-08
 
 ### Packaged & Deployed (Đóng Gói Độc Lập 100% Tài Nguyên 5 Chặng & Triển Khai Lên GitHub / Vercel)

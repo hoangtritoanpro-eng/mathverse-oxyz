@@ -588,7 +588,10 @@ function restoreSession(){
 async function api(route,payload){
  if(typeof demoApi==='function')return demoApi(route,payload);
  let r;
- try{r=await fetch(route,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload||{})});}
+ const bodyObj={...(payload||{}),_endpoint:route};
+ const sep=route.includes('?')?'&':'?';
+ const url=route.startsWith('/api/')?`${route}${sep}endpoint=${encodeURIComponent(route)}`:route;
+ try{r=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(bodyObj)});}
  catch(e){throw new Error('Không kết nối được máy giáo viên. Hãy kiểm tra Wi-Fi hoặc máy chủ.');}
  let d=await r.json();
  if(!r.ok)throw new Error(d.error||'Đã xảy ra lỗi.');
