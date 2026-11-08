@@ -17,6 +17,7 @@ Tất cả những thay đổi quan trọng của dự án này sẽ được gh
   2. **Xem trước tự động (`Auto-Peek 2.2s`) & Nút `👁️ Mở xem 2.5s (2/2)`:** Khi mới vào ván (hoặc khi bấm nút `👁️ Mở xem 2.5s`), toàn bộ thẻ lật ngửa để học sinh quan sát vị trí trước khi úp xuống.
   3. **Nhãn ghi nhớ thông minh trên mặt sau thẻ đã lật (`.s4-card-seen-tag`) & Tự động sáng viền thẻ cùng cặp:** Thẻ nào đã từng được học sinh mở xem 1 lần sẽ lưu nhãn gợi nhớ trên mặt sau (`👁️ Cặp 1 · Hình vẽ`, `👁️ Cặp 1 · Công thức`...). Khi mở thẻ đầu tiên mà thẻ cùng cặp đã từng được mở trước đó, thẻ cùng cặp tự động sáng viền vàng kim giúp học sinh ghép đúng ngay mà không bị rối trí nhớ.
   4. **Bảng tóm tắt nhanh `📜 Kiến thức: Trung điểm I của AB` (`.s4-quick-theory-parchment`):** Hiển thị ngay ở cột trái phía trên hộp thoại Rồng Xanh để học sinh đối chiếu công thức trực tiếp trên màn hình, kết hợp tăng lượt `💡 Gợi ý cặp thẻ` lên `3/3` và cho phép bấm sang thẻ tiếp theo ngay lập tức mà không bị khóa chờ.
+  5. **Chuẩn hóa ký hiệu mũi tên vectơ trên đầu chữ trong hình vẽ SVG (`P2_A`, `P4_A`, `GA, GB, GC`):** Thay thế hoàn toàn ký tự Unicode kết hợp `\u20D7` (dễ bị lỗi ô vuông `▯` trên Windows) bằng nét vẽ mũi tên SVG trực tiếp phía trên đầu chữ cái ($\overrightarrow{IA}, \overrightarrow{IB}, \overrightarrow{AI}, \overrightarrow{GA}, \overrightarrow{GB}, \overrightarrow{GC}$).
 
 ---
 

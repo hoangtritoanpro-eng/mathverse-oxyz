@@ -4917,7 +4917,7 @@ async function s1ActivateDestinationPillar(targetPid = 'B') {
   if (targetPid === 'C') {
     sound('bleep');
     vaState.s1Feedback = {
-      text: 'Điểm C là điểm đầu của vectơ hiệu! Với AB⃗ − AC⃗ = CB⃗, mũi tên phải hướng từ điểm đầu C tới điểm cuối B!',
+      text: 'Điểm C là điểm đầu của vectơ hiệu! Với vectơ AB − vectơ AC = vectơ CB, mũi tên phải hướng từ điểm đầu C tới điểm cuối B!',
       good: false
     };
     vaState.dragonMsg = vaState.s1Feedback.text;
@@ -4969,7 +4969,7 @@ async function s1ActivateDestinationPillar(targetPid = 'B') {
     s1Explorer.moving = true;
     s1Explorer.bridgeCrossProgress = 0;
     s1Explorer.bridgeCrossing = true;
-    vaState.dragonMsg = 'Chính xác! Bốn mảnh mật thư đã hợp nhất thành AB⃗ − AC⃗ = CB⃗! Cầu Ánh Sáng đã mở khóa!';
+    vaState.dragonMsg = 'Chính xác! Bốn mảnh mật thư đã hợp nhất thành vectơ AB − vectơ AC = vectơ CB! Cầu Ánh Sáng đã mở khóa!';
     vaState.dragonMood = 'win';
     render();
 
@@ -4989,7 +4989,7 @@ async function s1ActivateDestinationPillar(targetPid = 'B') {
     sound('wrong');
     s1Explorer.wrongFlashPillar = targetPid;
     s1Explorer.wrongFlashUntil = Date.now() + 1400;
-    const hintText = 'Chưa đúng chiều vectơ! Gợi ý: Với hiệu hai vectơ cùng gốc A (AB⃗ − AC⃗), mũi tên nối từ điểm C tới điểm B tạo thành vectơ CB⃗!';
+    const hintText = 'Chưa đúng chiều vectơ! Gợi ý: Với hiệu hai vectơ cùng gốc A (vectơ AB − vectơ AC), mũi tên nối từ điểm C tới điểm B tạo thành vectơ CB!';
     vaState.s1Feedback = { text: hintText, good: false };
     vaState.dragonMsg = hintText;
     vaState.dragonMood = 'hint';
@@ -7672,8 +7672,18 @@ const S4_CARD_PAIRS_BANK = [
               <circle cx="24" cy="38" r="6" fill="#0284C7"/>
               <circle cx="105" cy="38" r="7" fill="#EC4899" stroke="#fff" stroke-width="1.5"/>
               <circle cx="186" cy="38" r="6" fill="#059669"/>
-              <text x="64" y="24" text-anchor="middle" font-size="13.5" font-weight="900" fill="#0369A1">← IA⃗</text>
-              <text x="146" y="24" text-anchor="middle" font-size="13.5" font-weight="900" fill="#047857">IB⃗ →</text>
+              <!-- Nhãn vectơ IA có mũi tên trên đầu chữ -->
+              <g fill="#0369A1" stroke="#0369A1">
+                <line x1="54" y1="8" x2="73" y2="8" stroke-width="2" stroke-linecap="round"/>
+                <polyline points="69,5 74,8 69,11" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <text x="64" y="24" text-anchor="middle" font-size="14" font-weight="900" font-style="italic" stroke="none">IA</text>
+              </g>
+              <!-- Nhãn vectơ IB có mũi tên trên đầu chữ -->
+              <g fill="#047857" stroke="#047857">
+                <line x1="136" y1="8" x2="155" y2="8" stroke-width="2" stroke-linecap="round"/>
+                <polyline points="151,5 156,8 151,11" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <text x="146" y="24" text-anchor="middle" font-size="14" font-weight="900" font-style="italic" stroke="none">IB</text>
+              </g>
               <text x="24" y="64" text-anchor="middle" font-size="17" font-weight="900" font-style="italic" fill="#0F172A">A</text>
               <text x="105" y="64" text-anchor="middle" font-size="17" font-weight="900" font-style="italic" fill="#BE185D">I</text>
               <text x="186" y="64" text-anchor="middle" font-size="17" font-weight="900" font-style="italic" fill="#0F172A">B</text>
@@ -7784,8 +7794,18 @@ const S4_CARD_PAIRS_BANK = [
               <circle cx="24" cy="38" r="6" fill="#0D9488"/>
               <circle cx="105" cy="38" r="6.5" fill="#EC4899"/>
               <circle cx="186" cy="38" r="6" fill="#0D9488"/>
-              <text x="64" y="24" text-anchor="middle" font-size="13" font-weight="900" fill="#0F766E">AI⃗ →</text>
-              <text x="146" y="24" text-anchor="middle" font-size="13" font-weight="900" fill="#0F766E">IB⃗ →</text>
+              <!-- Nhãn vectơ AI có mũi tên trên đầu chữ -->
+              <g fill="#0F766E" stroke="#0F766E">
+                <line x1="54" y1="8" x2="73" y2="8" stroke-width="2" stroke-linecap="round"/>
+                <polyline points="69,5 74,8 69,11" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <text x="64" y="24" text-anchor="middle" font-size="14" font-weight="900" font-style="italic" stroke="none">AI</text>
+              </g>
+              <!-- Nhãn vectơ IB có mũi tên trên đầu chữ -->
+              <g fill="#0F766E" stroke="#0F766E">
+                <line x1="136" y1="8" x2="155" y2="8" stroke-width="2" stroke-linecap="round"/>
+                <polyline points="151,5 156,8 151,11" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <text x="146" y="24" text-anchor="middle" font-size="14" font-weight="900" font-style="italic" stroke="none">IB</text>
+              </g>
               <text x="24" y="64" text-anchor="middle" font-size="16" font-weight="900" font-style="italic" fill="#0F172A">A</text>
               <text x="105" y="64" text-anchor="middle" font-size="16" font-weight="900" font-style="italic" fill="#BE185D">I</text>
               <text x="186" y="64" text-anchor="middle" font-size="16" font-weight="900" font-style="italic" fill="#0F172A">B</text>
@@ -9810,18 +9830,24 @@ function renderStage5CentroidRescueGame(m) {
                 <line x1="${G.x}" y1="${G.y}" x2="${C.x - 14}" y2="${C.y - 8}"
                       stroke="#FDE047" stroke-width="4.5" marker-end="url(#s5VecArrowGA)" filter="url(#s5GoldGlow)"/>
 
-                <!-- Nhãn vectơ GA, GB, GC trên 3 luồng sáng -->
+                <!-- Nhãn vectơ GA, GB, GC có mũi tên trên đầu chữ -->
                 <g transform="translate(${(G.x + A.x) / 2 + 28}, ${(G.y + A.y) / 2})">
-                  <rect x="-24" y="-15" width="48" height="26" rx="7" fill="rgba(15,23,42,0.9)" stroke="#FACC15" stroke-width="1.5"/>
-                  <text x="0" y="4" fill="#FEF08A" font-size="14" font-weight="900" text-anchor="middle">GA⃗</text>
+                  <rect x="-24" y="-17" width="48" height="30" rx="7" fill="rgba(15,23,42,0.9)" stroke="#FACC15" stroke-width="1.5"/>
+                  <line x1="-11" y1="-10" x2="10" y2="-10" stroke="#FEF08A" stroke-width="1.8" stroke-linecap="round"/>
+                  <polyline points="6,-13 11,-10 6,-7" fill="none" stroke="#FEF08A" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                  <text x="0" y="7" fill="#FEF08A" font-size="13.5" font-weight="900" font-style="italic" text-anchor="middle">GA</text>
                 </g>
                 <g transform="translate(${(G.x + B.x) / 2 - 22}, ${(G.y + B.y) / 2 - 14})">
-                  <rect x="-24" y="-15" width="48" height="26" rx="7" fill="rgba(15,23,42,0.9)" stroke="#FACC15" stroke-width="1.5"/>
-                  <text x="0" y="4" fill="#FEF08A" font-size="14" font-weight="900" text-anchor="middle">GB⃗</text>
+                  <rect x="-24" y="-17" width="48" height="30" rx="7" fill="rgba(15,23,42,0.9)" stroke="#FACC15" stroke-width="1.5"/>
+                  <line x1="-11" y1="-10" x2="10" y2="-10" stroke="#FEF08A" stroke-width="1.8" stroke-linecap="round"/>
+                  <polyline points="6,-13 11,-10 6,-7" fill="none" stroke="#FEF08A" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                  <text x="0" y="7" fill="#FEF08A" font-size="13.5" font-weight="900" font-style="italic" text-anchor="middle">GB</text>
                 </g>
                 <g transform="translate(${(G.x + C.x) / 2 + 22}, ${(G.y + C.y) / 2 - 14})">
-                  <rect x="-24" y="-15" width="48" height="26" rx="7" fill="rgba(15,23,42,0.9)" stroke="#FACC15" stroke-width="1.5"/>
-                  <text x="0" y="4" fill="#FEF08A" font-size="14" font-weight="900" text-anchor="middle">GC⃗</text>
+                  <rect x="-24" y="-17" width="48" height="30" rx="7" fill="rgba(15,23,42,0.9)" stroke="#FACC15" stroke-width="1.5"/>
+                  <line x1="-11" y1="-10" x2="10" y2="-10" stroke="#FEF08A" stroke-width="1.8" stroke-linecap="round"/>
+                  <polyline points="6,-13 11,-10 6,-7" fill="none" stroke="#FEF08A" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                  <text x="0" y="7" fill="#FEF08A" font-size="13.5" font-weight="900" font-style="italic" text-anchor="middle">GC</text>
                 </g>
               </g>
             ` : ''}
@@ -11181,8 +11207,8 @@ async function handle(action,el){
    s1Explorer.showHintBanner=!s1Explorer.showHintBanner;
    s1Explorer.hintStageShown = (s1Explorer.hintStageShown % 2) + 1;
    const hMsg = s1Explorer.hintStageShown === 1
-    ? '💡 Gợi ý 1: Manh mối về các vectơ AB⃗, AC⃗, CB⃗ — Hai vectơ AB⃗ và AC⃗ cùng xuất phát từ điểm gốc A!'
-    : '💡 Gợi ý 2: Khi trừ hai vectơ cùng gốc A (AB⃗ − AC⃗), mũi tên kết quả nối từ điểm C tới điểm B tạo thành vectơ CB⃗!';
+    ? `💡 Gợi ý 1: Manh mối về các vectơ ${s2RenderVecArrow('AB', 's4-inline-vec')}, ${s2RenderVecArrow('AC', 's4-inline-vec')}, ${s2RenderVecArrow('CB', 's4-inline-vec')} — Hai vectơ ${s2RenderVecArrow('AB', 's4-inline-vec')} và ${s2RenderVecArrow('AC', 's4-inline-vec')} cùng xuất phát từ điểm gốc A!`
+    : `💡 Gợi ý 2: Khi trừ hai vectơ cùng gốc A (${s2RenderVecArrow('AB', 's4-inline-vec')} − ${s2RenderVecArrow('AC', 's4-inline-vec')}), mũi tên kết quả nối từ điểm C tới điểm B tạo thành vectơ ${s2RenderVecArrow('CB', 's4-inline-vec')}!`;
    vaState.dragonMsg = hMsg;
    vaState.s1Feedback = { text: hMsg, good: true };
    vaState.dragonMood='hint';
@@ -11229,7 +11255,7 @@ async function handle(action,el){
    } else {
     sound('wrong');
     vaState.s1Feedback = {
-     text: 'Chưa chính xác! Hãy xem gợi ý ở góc dưới bên trái: Manh mối về các vectơ AB⃗, AC⃗, CB⃗ (AB⃗ − AC⃗ = CB⃗).',
+     text: `Chưa chính xác! Hãy xem gợi ý ở góc dưới bên trái: Manh mối về các vectơ ${s2RenderVecArrow('AB', 's4-inline-vec')}, ${s2RenderVecArrow('AC', 's4-inline-vec')}, ${s2RenderVecArrow('CB', 's4-inline-vec')} (${s2RenderVecArrow('AB', 's4-inline-vec')} − ${s2RenderVecArrow('AC', 's4-inline-vec')} = ${s2RenderVecArrow('CB', 's4-inline-vec')}).`,
      good: false
     };
     if(session?.room && session?.token){
