@@ -2,7 +2,7 @@
   "version": 2,
   "functions": {
     "api/index.js": {
-      "includeFiles": "MATHVERSE_OXYZ_MINIGAMES/**"
+      "includeFiles": "MATHVERSE_OXYZ_MINIGAMES/{public/**,server.js,stages.js}"
     }
   },
   "rewrites": [
@@ -12,3 +12,4 @@
     }
   ]
 }
+
