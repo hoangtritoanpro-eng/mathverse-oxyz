@@ -13237,7 +13237,7 @@ body.bk-mode #app.wrap{max-width:none !important;padding:0 !important;margin:0}
 .bk-lobby-count{margin:0;font-weight:600;font-size:clamp(1.2rem,2vw,1.8rem);color:rgba(255,255,255,.9)}
 .bk-lobby-count b{font-family:var(--bk-display);font-weight:800;font-size:1.6em;color:#fff}
 .bk-lobby-note{margin:0;font-weight:700;font-size:1.2rem}
-.bk-slots{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:18px}
+.bk-slots{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:18px}
 .bk-slot{border-radius:20px;min-height:150px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:14px 10px;text-align:center}
 .bk-slot b{font-family:var(--bk-display);font-weight:800;font-size:clamp(1.25rem,1.7vw,1.6rem);line-height:1.1}
 .bk-slot small{font-weight:700;font-size:.9rem}
@@ -13485,6 +13485,229 @@ body.bk-mode .modal p{color:#4B5185 !important}
   .bk-pips i{width:22px;height:22px}
 }
 .bk-stats-top .bk-back{justify-self:start}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   v5.8.0 · CHƠI TRÊN ĐIỆN THOẠI DỌC (≤ 860px): ít chữ, bản đồ vừa màn hình
+   ═══════════════════════════════════════════════════════════════════════════ */
+.ph-only{display:none}
+@media (max-width:860px){
+  .ph-only{display:block}
+  .ph-hide{display:none !important}
+  /* Khung chung khi đang ở trong chặng */
+  body:has(.s1-dedicated-shell) .hs-topnav{display:none !important}
+  body:has(.s1-dedicated-shell) #app.wrap{padding:0 !important}
+  .s1-dedicated-shell,.s1-dedicated-shell .hs-workspace,.s1-dedicated-shell .hs-left-col,.s1-full-frame,.s1-dedicated-shell #mvActiveGameCanvas{
+    padding:0 !important;margin:0 !important;width:100% !important;min-width:0 !important;max-width:100% !important;border:0 !important;border-radius:0 !important;box-shadow:none !important;min-height:0 !important;
+  }
+  .s1-dedicated-shell .hs-workspace{display:block !important}
+  .ph-action-bar{padding:10px 12px 4px}
+  .ph-big-btn{display:block;width:100%;border:0;border-radius:16px;background:#FFC93C;color:#1D2150;font:800 1.25rem 'Baloo 2','Montserrat',sans-serif;padding:14px 12px 10px;box-shadow:0 6px 0 #D99A0B;cursor:pointer}
+  .ph-big-btn:active{transform:translateY(4px);box-shadow:0 2px 0 #D99A0B}
+  .ph-tip{margin:0;text-align:center;color:#F8FAFF;font-weight:700;font-size:1rem;line-height:1.4;background:rgba(0,0,0,.35);border-radius:12px;padding:10px 12px}
+
+  /* ── CHẶNG 1 · Rừng Vectơ ── */
+  .s1-hunt-shell{display:flex !important;flex-direction:column !important;gap:0 !important;padding:0 !important;min-height:0 !important;height:auto !important;width:100% !important}
+  .s1-banner-main-title{font-size:15px !important;line-height:1.15 !important;margin:0 !important;letter-spacing:0 !important}
+  .s1-banner-sub-title,.s1-banner-leaves,.s1-modal-rule-note{display:none !important}
+  .s1-hunt-topbar{padding:8px 10px !important;gap:8px !important;min-height:0 !important;height:auto !important;flex-wrap:nowrap !important}
+  .s1-topbar-brand,.s1-role-switch-btn,.s1-banner-scroll-icon,.s1-topbar-banner-scroll .s1-banner-sub,.s1-banner-leaf{display:none !important}
+  .s1-topbar-banner-scroll{flex:1 !important;min-width:0 !important;width:auto !important;padding:6px 10px !important;height:auto !important;min-height:0 !important}
+  .s1-banner-Titles{font-size:15px !important;line-height:1.15 !important}
+  .s1-banner-Titles small,.s1-banner-Titles span,.s1-banner-Titles p{display:none !important}
+  .s1-topbar-right-status{gap:6px !important;flex:none !important;width:auto !important}
+  .s1-hunt-main-row{display:block !important;padding:0 !important;gap:0 !important}
+  .s1-hunt-viewport{min-height:0 !important;width:100% !important;height:auto !important;aspect-ratio:16/10 !important;border-width:0 !important;border-radius:0 !important;flex:none !important}
+  .s1-hunt-sidebar,.s1-mini-controls-overlay,.s1-bottom-hint-card,.s1-bottom-wreath,.s1-pedestal-chip-tag,.s1-dragon-prompt{display:none !important}
+  .s1-pedestal-node{width:44px !important;height:44px !important}
+  .s1-pedestal-scroll-card{width:34px !important;height:32px !important}
+  .s1-dragon-sprite{width:46px !important;height:46px !important}
+  .s1-central-altar-node{width:58px !important;height:40px !important}
+  .s1-altar-ready-tag{font-size:10px !important;padding:2px 6px !important}
+  .s1-hunt-bottombar{padding:8px 10px 12px !important;justify-content:center !important;height:auto !important;min-height:0 !important}
+  .s1-bottom-fragments-bar{width:100% !important;justify-content:center !important;padding:6px 8px !important;gap:8px !important;height:auto !important}
+  .s1-fragments-slots-row{width:auto !important;height:auto !important;gap:6px !important}
+  .s1-fragments-divider{display:none !important}
+  .s1-fragments-counter{font-size:13px !important}
+  /* Hộp câu hỏi: phủ toàn màn hình điện thoại, chữ to */
+  .s1-hunt-modal-backdrop{position:fixed !important;inset:0 !important;z-index:500 !important;padding:12px !important;align-items:center !important}
+  .s1-hunt-modal-card{max-width:100% !important;width:100% !important;padding:14px 14px 12px !important;max-height:calc(100dvh - 24px);overflow:auto}
+  .s1-modal-pedestal-badge{display:none !important}
+  .s1-modal-question-text{font-size:1.05rem !important}
+  .s1-floating-feedback-banner{font-size:12px !important;max-width:92% !important}
+}
+@media (max-width:860px){
+  /* ── CHẶNG 2 · Mật Trận Vectơ ── */
+  .s2-matrix-shell{height:auto !important;max-height:none !important;min-height:0 !important;display:flex !important;flex-direction:column !important}
+  .s2-topbar{padding:8px 10px !important;gap:8px !important;height:auto !important}
+  .s2-brand-logo,.s2-top-divider,.s2-stage-heading,.s2-topbar-right button{display:none !important}
+  .s2-topbar-left{gap:8px !important;min-width:0 !important}
+  .s2-main-layout{display:flex !important;flex-direction:column !important;padding:0 !important;gap:0 !important;height:auto !important}
+  .s2-right-sidebar{order:-1;display:grid !important;grid-template-columns:1fr 1fr 1fr;gap:6px !important;padding:6px 8px !important;width:100% !important;max-width:none !important;height:auto !important;overflow:visible !important}
+  .s2-reward-card,.s2-controls-guide-card,.s2-side-label{display:none !important}
+  .s2-side-card{padding:6px 4px !important;min-height:0 !important;margin:0 !important;justify-content:center !important;align-items:center !important;text-align:center}
+  .s2-timer-digits{font-size:22px !important}
+  .s2-shields-row{gap:2px !important;justify-content:center}
+  .s2-shield-badge svg,.s2-shield-svg{width:24px !important;height:24px !important}
+  .s2-progress-ratio{font-size:20px !important}
+  .s2-progress-dots-track{display:none !important}
+  .s2-courtyard-viewport{height:auto !important;width:100% !important;aspect-ratio:10/8 !important;border-radius:0 !important;border-width:0 !important;flex:none !important;min-height:0 !important}
+  .s2-formula-board{left:50% !important;top:6px !important;transform:translateX(-50%) !important;width:auto !important;min-width:0 !important;padding:4px 10px !important}
+  .s2-formula-gem-crest,.s2-formula-header,.s2-formula-subcaption{display:none !important}
+  .s2-formula-parchment{padding:4px 10px !important}
+  .s2-formula-equation{font-size:18px !important;gap:6px !important}
+  .s2-pedestal-zone{width:27% !important}
+  .s2-pedestal-top-badge .s2-badge-interact{display:none !important}
+  .s2-pedestal-inner-ring{font-size:15px !important}
+  .s2-dragon-actor{width:15% !important}
+  .s2-dragon-e-prompt,.s2-companion-corner,.s2-touch-dpad,.s2-gate-open-banner{display:none !important}
+  .s2-ph-bar{order:2}
+  .ph-big-btn .ph-vec{font-size:1.25em}
+  .s2-overlay-backdrop,.s2-victory-floating-banner{position:fixed !important;inset:0 !important;z-index:500 !important;display:flex !important;align-items:center !important;justify-content:center !important;padding:12px !important;background:rgba(5,10,30,.7) !important}
+  .s2-modal-card,.s2-victory-card{max-width:100% !important;width:100% !important;flex-direction:column !important;padding:16px !important}
+  .s2-victory-card p,.s2-modal-card p{display:none !important}
+}
+@media (max-width:860px){
+  /* ── CHẶNG 3 · Bắn zombie ── */
+  .z3-shooter-shell{padding:0 !important;border-radius:0 !important;border:0 !important}
+  .z3-top-nav-bar,.z3-left-parchments,.z3-mascot-corner,.z3-controls-title,.z3-ctrl-label,.z3-fortress-crest,.z3-fortress-titles p,.z3-fortress-titles small,.z3-pill-speed,.z3-kill-label{display:none !important}
+  .z3-arena-subheader{padding:8px 10px !important;gap:8px !important;flex-wrap:nowrap !important;height:auto !important;min-height:0 !important}
+  .z3-fortress-banner{padding:4px 8px !important;min-width:0 !important;flex:1 !important;gap:6px !important}
+  .z3-fortress-titles h2,.z3-fortress-titles h1,.z3-fortress-titles strong{font-size:14px !important;line-height:1.15 !important;margin:0 !important}
+  .z3-status-cluster{gap:4px !important;flex-wrap:nowrap !important}
+  .z3-pill{padding:4px 7px !important;font-size:12px !important;min-height:0 !important}
+  .z3-pill-pause{font-size:0 !important;padding:4px 9px !important}
+  .z3-pill-pause::before{content:'⏸';font-size:14px}
+  .z3-courtyard-viewport{min-height:0 !important;max-height:none !important;aspect-ratio:4/5 !important;border-radius:0 !important}
+  .z3-courtyard-bg{object-fit:cover !important;height:100% !important}
+  .z3-dragon-hero{width:24% !important}
+  .z3-zombie-unit{height:13% !important}
+  .z3-zombie-board-label{font-size:12px !important;padding:1px 5px !important}
+  .z3-lane-key-chip{font-size:9px !important;width:14px !important;height:14px !important}
+  .z3-column-question-card{transform:translateX(-50%) scale(.8) !important;transform-origin:top center !important}
+  .z3-fence-lane-letter{font-size:12px !important;width:20px !important;height:20px !important}
+  .z3-bottom-hud{display:block !important;padding:8px 10px 12px !important;height:auto !important}
+  .z3-controls-card{width:100% !important;padding:0 !important;background:none !important;border:0 !important;box-shadow:none !important}
+  .z3-controls-row{justify-content:center !important;gap:8px !important}
+  .z3-lane-quick-btns{display:grid !important;grid-template-columns:repeat(4,1fr);gap:8px !important;width:100%}
+  .z3-key-cap.lane-key{width:100% !important;height:58px !important;font-size:24px !important;border-radius:14px !important}
+  .z3-space-cap{display:none !important}
+  .z3-kill-progress-bar{margin-top:8px !important;width:100% !important;justify-content:center !important;padding:4px !important}
+  .z3-kill-slot{width:24px !important;height:24px !important;font-size:12px !important}
+  .z3-pause-overlay,.z3-victory-modal-backdrop{position:fixed !important;inset:0 !important;z-index:500 !important}
+  .z3-pause-card,.z3-victory-modal{max-width:92vw !important;padding:16px !important}
+  .z3-breach-sub{display:none !important}
+}
+@media (max-width:860px){
+  .z3-fortress-banner{display:none !important}
+  .z3-status-cluster{width:100% !important;justify-content:space-between !important}
+  .z3-pill{white-space:nowrap !important;font-size:14px !important}
+  .z3-pill-timer{font-size:18px !important}
+  .z3-heart-icon{font-size:14px !important}
+}
+@media (max-width:860px){
+  /* ── CHẶNG 4 · Lật thẻ trung điểm ── */
+  .s4-memory-shell{padding:0 !important;border-radius:0 !important;min-height:0 !important;height:auto !important;display:flex !important;flex-direction:column !important}
+  .s4-top-header{padding:8px 10px !important;gap:8px !important;height:auto !important;min-height:0 !important;flex-wrap:nowrap !important}
+  .s4-brand-ribbon,.s4-header-right,.s4-pill-util-btn,.s4-stage-num-badge,.s4-maze-portal-gate,.s4-fireflies-layer{display:none !important}
+  .s4-header-center-crest{flex:1 !important;min-width:0 !important;width:auto !important;height:auto !important;position:static !important;transform:none !important}
+  .s4-stage-plaque-wrap{margin:0 !important;padding:0 !important}
+  .s4-stage-main-banner{font-size:16px !important;padding:6px 12px !important;margin:0 !important;white-space:nowrap}
+  .s4-main-workspace{display:flex !important;flex-direction:column !important;padding:0 8px 12px !important;gap:8px !important;height:auto !important}
+  .s4-left-guide-col{order:2;display:block !important;width:100% !important;max-width:none !important;padding:0 !important;background:none !important;border:0 !important;box-shadow:none !important;height:auto !important}
+  .s4-quick-theory-parchment,.s4-guide-speech-card,.s4-dragon-mascot-stage,.s4-action-btn.role-btn{display:none !important}
+  .s4-guide-actions-bar{display:grid !important;grid-template-columns:1fr 1fr;gap:8px !important;margin:0 !important}
+  .s4-action-btn{min-height:50px !important;font-size:15px !important;justify-content:center !important}
+  .s4-right-board-col{width:100% !important;padding:0 !important;height:auto !important}
+  .s4-board-frame{padding:8px !important;height:auto !important;border-radius:16px !important}
+  .s4-board-top-hud{display:grid !important;grid-template-columns:1fr 1fr 1fr;gap:6px !important;margin-bottom:8px !important}
+  .s4-hud-pill{padding:6px 4px !important;font-size:13px !important;justify-content:center !important;min-height:0 !important}
+  .s4-hud-pill.progress-pill,.s4-flips-sub,.s4-hud-icon{display:none !important}
+  .s4-cards-grid,.s4-cards-grid.grid-8,.s4-cards-grid.grid-12{grid-template-columns:repeat(4,1fr) !important;gap:6px !important;height:auto !important}
+  .s4-memory-card{min-height:0 !important;height:auto !important;aspect-ratio:3/4 !important}
+  .s4-card-num-corner,.s4-card-role-tag{display:none !important}
+  .s4-card-front-content{font-size:12px !important;padding:2px !important}
+  .s4-card-pair-badge{font-size:9px !important;padding:1px 4px !important}
+  .s4-board-footer-bar{display:none !important}
+}
+@media (max-width:860px){
+  .s4-hud-lbl{display:none !important}
+  .s4-hud-icon{display:inline !important}
+  .s4-hud-pill{font-size:16px !important;gap:4px !important;white-space:nowrap}
+  .s4-card-pair-badge{font-size:0 !important;width:12px !important;height:12px !important;padding:0 !important;border-radius:50% !important;background:var(--pair-color) !important;min-width:0 !important}
+  .s4-card-front-top{justify-content:space-between !important;padding:3px !important}
+  .s4-card-front-content{font-size:10.5px !important;line-height:1.2 !important;overflow:hidden !important}
+  .s4-card-matched-check{width:16px !important;height:16px !important;font-size:10px !important}
+}
+@media (max-width:860px){
+  /* ── CHẶNG 5 · Trọng tâm tam giác ── */
+  .s5-centroid-shell{height:auto !important;min-height:0 !important;max-height:none !important;padding:0 !important;border-radius:0 !important;display:flex !important;flex-direction:column !important}
+  .s5-top-header{padding:8px 10px !important;gap:8px !important;height:auto !important;min-height:0 !important}
+  .s5-brand-book-crest,.s5-sub-title-plaque,.s5-header-right .s5-circle-btn{display:none !important}
+  .s5-header-center-banner{flex:1 !important;min-width:0 !important;position:static !important;transform:none !important;width:auto !important}
+  .s5-main-title-plaque{font-size:15px !important;padding:6px 10px !important;white-space:nowrap}
+  .s5-main-title-plaque *{font-size:15px !important}
+  .s5-main-stage-grid{display:flex !important;flex-direction:column !important;gap:6px !important;padding:0 8px 12px !important;height:auto !important}
+  .s5-left-dragon-col{display:none !important}
+  .s5-right-sidebar{order:-1;display:block !important;width:100% !important;max-width:none !important;padding:0 !important;background:none !important;border:0 !important;box-shadow:none !important;height:auto !important}
+  .s5-right-sidebar .s5-side-section:not(:first-child),.s5-side-title{display:none !important}
+  .s5-right-sidebar .s5-side-section{padding:0 !important;margin:0 !important;background:none !important;border:0 !important}
+  .s5-timer-box{padding:4px 10px !important;font-size:22px !important;max-width:160px;margin:0 auto !important}
+  .s5-center-geometry-arena{width:100% !important;height:auto !important;min-height:0 !important;padding:0 !important}
+  .s5-phase-instruction-pill{font-size:13px !important;padding:6px 10px !important;line-height:1.3 !important;position:static !important;width:100% !important;transform:none !important}
+  .s5-vector-formula-banner{display:none !important}
+  .s5-svg-container{height:auto !important;min-height:0 !important;flex:none !important}
+  .s5-geometry-svg{height:auto !important;max-height:none !important;touch-action:none}
+  .s5-deep-quiz-panel{position:static !important;width:100% !important;max-width:none !important;transform:none !important;padding:10px !important}
+  .s5-dq-options-grid{grid-template-columns:1fr !important;gap:8px !important}
+  .s5-dq-opt-btn{min-height:48px !important;font-size:15px !important}
+  .s5-dq-prompt{font-size:14px !important}
+  .s5-bottom-control-bar{position:static !important;display:flex !important;flex-direction:column !important;gap:8px !important;padding:8px 0 0 !important;transform:none !important;width:100% !important}
+  .s5-bottom-left-pills{display:flex !important;gap:8px !important;width:100%}
+  .s5-bottom-left-pills .s5-purple-pill-btn:not(:first-child){display:none !important}
+  .s5-purple-pill-btn{flex:1 !important;min-height:46px !important;justify-content:center !important}
+  .s5-gold-confirm-btn{width:100% !important;min-height:56px !important;font-size:20px !important;clip-path:none !important;border-radius:16px !important}
+}
+@media (max-width:860px){
+  .s5-main-title-plaque,.s5-main-title-plaque *{font-size:12.5px !important;white-space:nowrap !important;overflow:hidden !important;text-overflow:ellipsis !important}
+  .s5-main-title-plaque{max-width:100% !important;clip-path:none !important;border-radius:999px !important}
+  .s5-header-left,.s5-header-right{flex:none !important}
+}
+@media (max-width:860px){
+  .z3-shooter-shell .z3-pill.z3-pill-pause{font-size:0 !important;padding:6px 10px !important}
+  .z3-shooter-shell .z3-pill{font-size:13px !important;padding:4px 7px !important}
+  .z3-shooter-shell .z3-pill-timer{font-size:15px !important}
+  .z3-shooter-shell .z3-heart-icon{font-size:12px !important}
+  .s4-card-seen-tag{font-size:9px !important;padding:1px 3px !important;white-space:nowrap !important;overflow:hidden !important;text-overflow:ellipsis !important;max-width:100% !important}
+  .s4-action-btn{font-size:14px !important}
+}
+/* Bản đồ / chuyển chặng trên điện thoại */
+.bk-mmain{flex:1;display:flex;flex-direction:column;align-items:center;gap:18px;padding:8px 18px 28px;width:100%;max-width:480px;margin:0 auto}
+.bk-mhead{display:flex;flex-direction:column;align-items:center;gap:4px;margin-top:6px}
+.bk-mbig{font-family:var(--bk-display);font-weight:800;font-size:2.4rem;line-height:1;text-shadow:0 4px 0 var(--bk-blue-deep)}
+.bk-mreward{font-weight:800;color:var(--bk-sun);font-size:1.05rem}
+.bk-mlist{list-style:none;margin:0;padding:0;width:100%;display:flex;flex-direction:column;gap:10px}
+.bk-mstage{display:flex;align-items:center;gap:12px;background:rgba(16,21,90,.5);border-radius:16px;padding:10px 14px;font-weight:700;font-size:1.1rem;position:relative}
+.bk-mnum{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;font-family:var(--bk-display);font-weight:800;font-size:1.2rem;background:rgba(255,255,255,.15);flex:none}
+.bk-mstage.is-done .bk-mnum{background:var(--bk-mint);color:#fff}
+.bk-mstage.is-now{background:#fff;color:var(--bk-ink);box-shadow:0 6px 0 var(--bk-blue-deep)}
+.bk-mstage.is-now .bk-mnum{background:var(--bk-sun);color:var(--bk-ink)}
+.bk-mstage.is-lock{opacity:.55}
+.bk-mstage.just-done{animation:bkPop .5s cubic-bezier(.2,1.4,.4,1)}
+.bk-mdragon{margin-left:auto;font-size:1.8rem;animation:bkBob 1.6s ease-in-out infinite}
+.bk-mnext{margin:0;font-weight:700;color:rgba(255,255,255,.9)}
+.bk-mapph .ph-big-btn{max-width:420px}
+@media (max-width:860px){
+  .s1-hunt-main-row{min-height:0 !important;height:auto !important}
+  .s1-banner-main-title{font-size:14px !important}
+}
+@media (max-width:860px){ .s1-altar-ready-tag{display:none !important} }
+/* Mã QR phóng to: chỉ 1 mã của phòng */
+.bk-qr-full{position:fixed;inset:0;z-index:300;background:rgba(14,19,80,.82);display:grid;place-items:center;padding:16px}
+.bk-qr-card{background:#fff;color:var(--bk-ink);border-radius:28px;padding:22px 22px 18px;box-shadow:0 12px 0 var(--bk-blue-deep);display:flex;flex-direction:column;align-items:center;gap:14px;max-width:92vw}
+.bk-qr-card svg{display:block;width:min(64vh,78vw,440px);height:auto}
+.bk-qr-code{display:flex;align-items:baseline;gap:12px;font-weight:700;color:#4B5185}
+.bk-qr-code b{font-family:var(--bk-display);font-weight:800;font-size:clamp(2.4rem,6vw,3.6rem);color:var(--bk-ink);letter-spacing:.06em;line-height:1}
+.bk-qr-card .bk-btn{font-size:1.1rem;--face:var(--bk-mist);--shade:#C3C9F5}
 </style>
 </head>
 <body>
@@ -14147,6 +14370,7 @@ function formatMath(str){
    .replace(/\\perp/g, '<span class="math-sym">⊥</span>')
    .replace(/\\sqrt\{([^}]+)\}/g, '<span class="math-sym">√</span>($1)')
    .replace(/\\approx/g, '≈')
+   .replace(/\\to\b/g, '→')
    .replace(/\\pi/g, 'π')
    .replace(/\\text\{([^}]+)\}/g, '$1')
    .replace(/\^2/g, '²')
@@ -15291,68 +15515,13 @@ function renderRoomQrSvg(text, pxSize = 140) {
 }
 
 function renderTeacherQrModal(roomCode) {
- const rCode = String(roomCode || world?.room || session?.room || LiveClassroomSync.getActiveRoom() || '123456').trim();
- const mainUrl = getRoomJoinUrl(rCode);
- const activeTeams = (world?.teams && world.teams.length)
-  ? world.teams.map((t, i) => ({
-     id: t.id,
-     num: i + 1,
-     name: t.name.replace(/^Đội\s*\d+\s*[-–·]?\s*/i, '') || t.name,
-     avatar: t.avatar || QUICK_LOGIN_TEAMS[i]?.avatar || '🐉',
-     color: QUICK_LOGIN_TEAMS[i]?.color || '#38BDF8'
-    }))
-  : QUICK_LOGIN_TEAMS.slice(0, 6);
-
- return `<div class="mv-qr-modal-backdrop" data-action="closeQrModal">
-  <div class="mv-qr-modal-card" data-action="bkNoop">
-   <div class="mv-qr-modal-header">
-    <div>
-     <span class="mv-qep-badge teacher">📱 QUÉT MÃ QR VÀO PHÒNG HỌC TRỰC TIẾP (KHÔNG CẦN MÃ PIN)</span>
-     <h2 class="mv-qr-modal-title">Học Sinh Mở Camera / Zalo Quét Mã Để Vào Chơi Ngay</h2>
-    </div>
-    <button type="button" class="mv-qr-close-btn" data-action="closeQrModal">✕ Đóng</button>
-   </div>
-
-   <div class="mv-qr-modal-body">
-    <!-- CỘT TRÁI: MÃ QR CHUNG CỦA PHÒNG -->
-    <div class="mv-qr-main-box">
-     <div class="mv-qr-main-step">CÁCH 1 · QUÉT MÃ PHÒNG CHUNG</div>
-     <div class="mv-qr-main-frame">
-      ${renderRoomQrSvg(mainUrl, 236)}
-     </div>
-     <div class="mv-qr-room-pill">
-      <span>MÃ PHÒNG:</span>
-      <strong>${esc(rCode)}</strong>
-     </div>
-     <p class="mv-qr-main-hint">
-      Quét mã này → Chạm vào tên Đội là vào thẳng Chặng 1!
-     </p>
-     <div class="mv-qr-url-bar">${esc(mainUrl)}</div>
-     <div style="display:flex;gap:8px;width:100%;margin-top:8px">
-      <button type="button" class="button primary block" data-action="copy" data-url="${esc(mainUrl)}">📋 Sao chép Link phòng</button>
-     </div>
-    </div>
-
-    <!-- CỘT PHẢI: MÃ QR VÀO THẲNG TỪNG ĐỘI (0 BƯỚC CHỌN) -->
-    <div class="mv-qr-teams-panel">
-     <div class="mv-qr-main-step">CÁCH 2 · QUÉT MÃ QR CỦA ĐỘI ĐỂ VÀO THẲNG LUÔN (0 CHẠM)</div>
-     <div class="mv-qr-teams-grid">
-      ${activeTeams.map(t => {
-       const tUrl = getRoomJoinUrl(rCode, t.id);
-       return `<div class="mv-qr-team-item" style="--team-accent:${t.color}">
-        <div class="mv-qr-team-top">
-         <span>${t.avatar} <b>Đội ${t.num} · ${esc(t.name)}</b></span>
-         <button type="button" class="mv-chip-btn" data-action="copy" data-url="${esc(tUrl)}" title="Copy link vào thẳng Đội ${t.num}">📋 Link</button>
-        </div>
-        <div class="mv-qr-team-svg-wrap">
-         ${renderRoomQrSvg(tUrl, 112)}
-        </div>
-        <small>Quét là vào thẳng Đội ${t.num}</small>
-       </div>`;
-      }).join('')}
-     </div>
-    </div>
-   </div>
+ const rCode = String(roomCode || world?.room || session?.room || '').trim();
+ const url = getRoomJoinUrl(rCode);
+ return `<div class="bk-qr-full" data-action="closeQrModal" role="dialog" aria-modal="true" aria-label="Mã QR vào phòng">
+  <div class="bk-qr-card" data-action="bkNoop">
+   ${renderRoomQrSvg(url, 360)}
+   <div class="bk-qr-code"><span>Mã phòng</span><b>${esc(rCode)}</b></div>
+   <button type="button" class="bk-btn bk-btn-paper" data-action="closeQrModal">Đóng</button>
   </div>
  </div>`;
 }
@@ -20068,6 +20237,11 @@ function renderStage1CipherBridgeGame(m) {
     </div>
 
     <!-- 3. BOTTOM BAR KHỚP 100% HÌNH ẢNH THAM CHIẾU: HỘP GỢI Ý (TRÁI) + KHAY 4 MẢNH MẬT THƯ [?] [?] [?] [?] (GIỮA) -->
+    <div class="ph-only ph-action-bar">
+      ${allCollected
+        ? `<button type="button" class="ph-big-btn" data-action="s1PressInteractE">Mở Cầu Ánh Sáng</button>`
+        : `<p class="ph-tip">Chạm vào ô <b>↗</b> trên bản đồ để trả lời</p>`}
+    </div>
     <footer class="s1-hunt-bottombar">
       <!-- Hộp Gợi ý góc dưới bên trái -->
       <div class="s1-bottom-hint-card" data-action="s1ToggleHint" title="Nhấn để nghe gợi ý chi tiết từ Rồng Xanh">
@@ -21563,6 +21737,19 @@ function s2SyncDOM(now = performance.now()) {
       promptEl.style.display = 'none';
     }
   }
+  const phBar = document.getElementById('s2PhBar');
+  if (phBar) {
+    const html = s2PhoneBarHtml();
+    if (phBar.dataset.last !== html) { phBar.innerHTML = html; phBar.dataset.last = html; }
+  }
+}
+
+function s2PhoneBarHtml() {
+  if (s2State.gateOpened) return '';
+  const hz = s2State.zones.find(z => z.id === s2State.hoveredZoneId);
+  return hz
+    ? `<button type="button" class="ph-big-btn" data-action="s2PressConfirmE">Chọn ${s2RenderVecArrow(hz.vec, 'ph-vec')}</button>`
+    : `<p class="ph-tip">Chạm vào bệ đá có đáp án đúng</p>`;
 }
 
 async function s2ConfirmCurrentZone() {
@@ -21950,6 +22137,8 @@ function renderStage2VectorMatrixGame(m) {
           </div>
         ` : ''}
       </div>
+
+      <div class="ph-only ph-action-bar s2-ph-bar" id="s2PhBar">${s2PhoneBarHtml()}</div>
 
       <!-- D. SIDEBAR BÊN PHẢI (4 MỤC + HƯỚNG DẪN ĐIỀU KHIỂN ĐÚNG NHƯ ẢNH MẪU) -->
       <aside class="s2-right-sidebar" aria-label="Bảng thông tin Chặng 2">
@@ -23091,18 +23280,18 @@ function renderStage4MidpointMemoryGame(m) {
           <div class="s4-board-top-hud">
             <div class="s4-hud-pill timer-pill ${remSec <= 15 ? 'urgent' : ''}">
               <span class="s4-hud-icon">⏳</span>
-              <span>Thời gian: <strong id="s4TimerClockText">${formatMMSS(remSec)}</strong></span>
+              <span><span class="s4-hud-lbl">Thời gian: </span><strong id="s4TimerClockText">${formatMMSS(remSec)}</strong></span>
             </div>
 
             <div class="s4-hud-pill pairs-pill">
               <span class="s4-hud-icon">🃏</span>
-              <span>Đã ghép: <strong id="s4MatchedCountText">${matchedCount} / ${totalPairs}</strong></span>
+              <span><span class="s4-hud-lbl">Đã ghép: </span><strong id="s4MatchedCountText">${matchedCount} / ${totalPairs}</strong></span>
               <small class="s4-flips-sub">(${s4State.flipCount} lượt lật)</small>
             </div>
 
             <div class="s4-hud-pill score-pill mv-live-score-pill" id="s4ScorePill" title="Điểm năng lượng của đội (Ghép đúng +5 XP, lật sai −2 XP)">
               <span class="s4-hud-icon">⭐</span>
-              <span>Điểm: <strong id="s4ScoreText" class="mv-live-score-val">${Math.max(0, world?.me?.score ?? 80)} XP</strong></span>
+              <span><span class="s4-hud-lbl">Điểm: </span><strong id="s4ScoreText" class="mv-live-score-val">${Math.max(0, world?.me?.score ?? 80)} XP</strong></span>
             </div>
 
             <div class="s4-hud-pill progress-pill">
@@ -26118,6 +26307,19 @@ async function handle(action,el){
    return;
   }
   if(action==='s2PedestalClickRemind'){
+   if(bkIsPhone() || window.matchMedia?.('(pointer: coarse)').matches){
+    const z = s2State.zones.find(zz => zz.id === el.dataset.zone);
+    if(z && !s2State.gateOpened && !s2State.shieldDepletedModal){
+     if(s2State.hoveredZoneId === z.id){ await s2ConfirmCurrentZone(); return; }
+     s2State.facing = z.x < s2State.dragonX ? 'left' : 'right';
+     s2State.dragonX = z.x; s2State.dragonY = Math.min(92, z.y + 6);
+     s2State.animState = 'run';
+     s2State.hoveredZoneId = z.id;
+     sound('step');
+     s2SyncDOM();
+    }
+    return;
+   }
    // Không cho bấm chuột chọn đáp án trực tiếp — nhắc học sinh điều khiển Rồng Xanh đến bệ đá rồi nhấn E
    sound('bleep');
    s2State.companionMsg = 'Hãy dùng phím <b>WASD</b> hoặc <b>Phím mũi tên</b> điều khiển Rồng Xanh bước vào bệ đá rồi nhấn phím <b>E</b> để xác nhận nhé!';
@@ -27311,6 +27513,7 @@ document.addEventListener('pointerup',e=>{
 const keyMap={ArrowUp:'up',ArrowDown:'down',ArrowLeft:'left',ArrowRight:'right',KeyW:'up',KeyS:'down',KeyA:'left',KeyD:'right'};
 window.addEventListener('keydown',e=>{
  if(e.key==='Escape' && typeof bkStatsModal!=='undefined' && bkStatsModal){ bkStatsModal=null; render(); return; }
+ if(e.key==='Escape' && showTeacherQrModal){ showTeacherQrModal=false; if(session) render(); else startScreen(); return; }
  if(document.activeElement?.matches('input,select,textarea')){
   if(e.key==='Enter'){
    if(document.activeElement.id==='huntShortInput')handle('attackHuntMonster');
@@ -27858,11 +28061,12 @@ function exportCSV(){
    Học sinh: nhập mã → chạm chọn đội → sảnh chờ → chơi → kết quả.
    Giáo viên: tạo phòng → sảnh chờ (mã to + QR + đội hiện dần) → bảng đua → bục vinh danh.
    ═══════════════════════════════════════════════════════════════════════════ */
+function bkIsPhone(){ try{ return window.matchMedia('(max-width: 860px)').matches; }catch(e){ return false; } }
 let bkStep = initialRoom ? 'team' : 'code'; // 'code' | 'team' | 'host'
 let bkRoom = initialRoom || '';
 let bkRoomTeams = null;
 let bkError = '';
-let bkHostTeamCount = 6;
+let bkHostTeamCount = 4;
 let bkHostDetail = false;
 let bkKnownJoined = new Set();
 let bkLobbyPrimed = false;
@@ -28065,7 +28269,6 @@ function bkHostBand(){
 function bkHostFoot(controls){
  if (!controls) return `<footer class="bk-host-foot"><button type="button" class="bk-foot-btn" data-action="exitDisplayMode">Bảng điều khiển</button></footer>`;
  return `<footer class="bk-host-foot">
-  <button type="button" class="bk-foot-btn" data-action="openQrModal">Mã QR từng đội</button>
   <button type="button" class="bk-foot-btn" data-action="bkShowDetail">Bảng thống kê chi tiết</button>
   <button type="button" class="bk-foot-btn" data-action="bkNewRoom">Tạo phòng khác</button>
   <span class="bk-foot-gap"></span>
@@ -28253,8 +28456,7 @@ function bkHostStats(){
 
   <footer class="bk-host-foot">
    <button type="button" class="bk-foot-btn" data-action="exportCSV">Tải bảng điểm (CSV)</button>
-   <button type="button" class="bk-foot-btn" data-action="openQrModal">Mã QR từng đội</button>
-   <span class="bk-foot-gap"></span>
+    <span class="bk-foot-gap"></span>
    <button type="button" class="bk-foot-btn" data-action="toggleFullscreen">Toàn màn hình</button>
   </footer>
   ${bkStatsModal?.type === 'team' ? bkTeamSheet() : ''}
@@ -28330,6 +28532,38 @@ function bkAnswersSheet(){
  </div>`;
 }
 
+/* ─── ĐIỆN THOẠI: BẢN ĐỒ 5 CHẶNG & CHUYỂN CHẶNG GỌN ─── */
+const BK_STAGE_SHORT = ['Hiệu vectơ', 'Tổng vectơ', 'Hình bình hành', 'Trung điểm', 'Trọng tâm'];
+function bkPhoneMap(){
+ const me = world.me || {};
+ const tr = StageTransitionController.isTransitioning();
+ const cur = tr ? StageTransitionController.toStage : Math.min(5, me.stage || 0);
+ const done = me.completed ? 5 : cur;
+ const passed = tr ? StageTransitionController.fromStage : -1;
+ const list = BK_STAGE_SHORT.map((name, i) => {
+  const st = i < done ? 'is-done' : i === done ? 'is-now' : 'is-lock';
+  return `<li class="bk-mstage ${st} ${i === passed ? 'just-done' : ''}">
+   <span class="bk-mnum">${i < done ? '✓' : i + 1}</span>
+   <span class="bk-mname">${esc(name)}</span>
+   ${i === done && done < 5 ? `<span class="bk-mdragon" aria-hidden="true">🐉</span>` : ''}
+  </li>`;
+ }).join('');
+ const head = tr
+  ? `<div class="bk-mhead"><span class="bk-mbig">Qua chặng ${passed + 1}!</span><span class="bk-mreward">+10 XP · ${esc(missionMeta[passed]?.mode || '')}</span></div>`
+  : `<div class="bk-mhead"><span class="bk-mbig">Hành trình</span><span class="bk-mreward">${Math.max(0, me.score || 0)} XP</span></div>`;
+ const cta = tr
+  ? `<p class="bk-mnext">${done >= 5 ? 'Sắp tới đích…' : `Đang tới chặng ${done + 1}…`}</p>`
+  : done >= 5 ? '' : `<button type="button" class="ph-big-btn" data-action="hubStartCurrentStage">Chơi chặng ${done + 1}</button>`;
+ return `<div class="bk-page bk-student bk-mapph" style="--tc:${esc(me.color || '#36C6E8')}">
+  <header class="bk-top"><span class="bk-room-tag">Phòng <b>${esc(world.room)}</b></span><span class="bk-room-tag">${me.avatar || '🐉'} ${esc(bkTeamName(me))}</span></header>
+  <main class="bk-mmain">
+   ${head}
+   <ol class="bk-mlist">${list}</ol>
+   ${cta}
+  </main>
+ </div>`;
+}
+
 /* ─── CHỌN MÀN HÌNH ─── */
 function bkBareScreen(){
  if (!session || !world) return '';
@@ -28337,6 +28571,7 @@ function bkBareScreen(){
  if (session.role === 'display') return bkHostScreen(false);
  const kind = bkStudentKind();
  if (kind === 'lobby') return bkStudentLobby();
+ if (!kind && bkIsPhone() && !world.me?.completed && (mvWorldMapOpen || mvShowIntroHub || StageTransitionController.isTransitioning())) return bkPhoneMap();
  if (kind === 'result') return bkStudentResult();
  return '';
 }

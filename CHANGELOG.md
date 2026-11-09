@@ -9,6 +9,25 @@ Tất cả những thay đổi quan trọng của dự án này sẽ được gh
 
 ---
 
+## [5.8.0] - 2026-11-10
+
+### Changed (Chơi Tốt Trên Điện Thoại, Ít Chữ, Dễ Chơi)
+- **5 chặng vừa màn hình điện thoại & máy tính bảng dọc (≤ 860px), không còn phải kéo ngang** (`public/style.css` – khối `v5.8.0`):
+  - Ẩn thanh menu trên cùng, logo, khung nhân vật nói chuyện, bảng phím tắt WASD/E, cột thông tin phụ khi đang trong chặng; chỉ giữ thời gian, điểm và vùng chơi.
+  - **Chặng 1:** bản đồ rừng co vừa chiều ngang; chạm ô ↗ là Rồng Xanh tự đi tới và mở câu hỏi; câu hỏi phủ toàn màn hình, chữ to; đủ 4 mảnh hiện nút lớn **Mở Cầu Ánh Sáng**.
+  - **Chặng 2:** chạm bệ đá để Rồng Xanh bước vào, bấm nút lớn **Chọn …** (hoặc chạm lần nữa) để xác nhận – không cần bàn phím; thời gian/khiên/tiến độ gom thành 1 hàng.
+  - **Chặng 3:** sân đấu dọc, 4 nút A/B/C/D lớn để bắn.
+  - **Chặng 4:** lưới thẻ 4 cột, thanh trên chỉ còn biểu tượng + số, 2 nút Gợi ý / Mở xem.
+  - **Chặng 5:** tam giác vừa màn hình, kéo điểm bằng ngón tay, nút **Xác nhận** lớn.
+- **Chuyển chặng & bản đồ trên điện thoại (`bkPhoneMap`):** thay bản đồ 5 đảo nhiều chữ bằng màn hình "Qua chặng X! +10 XP" và danh sách 5 chặng, nút **Chơi chặng N**.
+- **Mặc định 4 đội** khi tạo phòng (vẫn chọn được 4–8).
+- **Bỏ bảng "Mã QR từng đội"**: nút Phóng to chỉ hiện 1 mã QR của phòng + mã phòng thật to (Esc hoặc Đóng để tắt).
+
+### Fixed
+- Mảnh mật thư Chặng 1 hiện sai ký hiệu `C \to B` → nay hiện `C → B`.
+
+---
+
 ## [5.7.1] - 2026-11-10
 
 ### Changed (Màn Thống Kê Chi Tiết Của Giáo Viên Gọn Như Blooket)

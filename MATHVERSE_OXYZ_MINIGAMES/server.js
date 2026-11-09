@@ -591,7 +591,7 @@ function processAction(endpoint,d){
   if(inferred) endpoint = inferred;
  }
  if(endpoint==='/api/create'){
-  let size=Number(d.teamCount||6);if(!Number.isInteger(size)||size<4||size>8)throw error('Chọn 4–8 đội.');
+  let size=Number(d.teamCount||4);if(!Number.isInteger(size)||size<4||size>8)throw error('Chọn 4–8 đội.');
   let roomId;do{roomId=String(10000+crypto.randomInt(90000))+String(size);}while(ROOMS[roomId]&&roomId!=='123456');
   const r=createDeterministicRoom(roomId,size);
   LATEST_ROOM_ID=roomId;

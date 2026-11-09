@@ -300,6 +300,7 @@ function formatMath(str){
    .replace(/\\perp/g, '<span class="math-sym">⊥</span>')
    .replace(/\\sqrt\{([^}]+)\}/g, '<span class="math-sym">√</span>($1)')
    .replace(/\\approx/g, '≈')
+   .replace(/\\to\b/g, '→')
    .replace(/\\pi/g, 'π')
    .replace(/\\text\{([^}]+)\}/g, '$1')
    .replace(/\^2/g, '²')
@@ -1444,68 +1445,13 @@ function renderRoomQrSvg(text, pxSize = 140) {
 }
 
 function renderTeacherQrModal(roomCode) {
- const rCode = String(roomCode || world?.room || session?.room || LiveClassroomSync.getActiveRoom() || '123456').trim();
- const mainUrl = getRoomJoinUrl(rCode);
- const activeTeams = (world?.teams && world.teams.length)
-  ? world.teams.map((t, i) => ({
-     id: t.id,
-     num: i + 1,
-     name: t.name.replace(/^Đội\s*\d+\s*[-–·]?\s*/i, '') || t.name,
-     avatar: t.avatar || QUICK_LOGIN_TEAMS[i]?.avatar || '🐉',
-     color: QUICK_LOGIN_TEAMS[i]?.color || '#38BDF8'
-    }))
-  : QUICK_LOGIN_TEAMS.slice(0, 6);
-
- return `<div class="mv-qr-modal-backdrop" data-action="closeQrModal">
-  <div class="mv-qr-modal-card" data-action="bkNoop">
-   <div class="mv-qr-modal-header">
-    <div>
-     <span class="mv-qep-badge teacher">📱 QUÉT MÃ QR VÀO PHÒNG HỌC TRỰC TIẾP (KHÔNG CẦN MÃ PIN)</span>
-     <h2 class="mv-qr-modal-title">Học Sinh Mở Camera / Zalo Quét Mã Để Vào Chơi Ngay</h2>
-    </div>
-    <button type="button" class="mv-qr-close-btn" data-action="closeQrModal">✕ Đóng</button>
-   </div>
-
-   <div class="mv-qr-modal-body">
-    <!-- CỘT TRÁI: MÃ QR CHUNG CỦA PHÒNG -->
-    <div class="mv-qr-main-box">
-     <div class="mv-qr-main-step">CÁCH 1 · QUÉT MÃ PHÒNG CHUNG</div>
-     <div class="mv-qr-main-frame">
-      ${renderRoomQrSvg(mainUrl, 236)}
-     </div>
-     <div class="mv-qr-room-pill">
-      <span>MÃ PHÒNG:</span>
-      <strong>${esc(rCode)}</strong>
-     </div>
-     <p class="mv-qr-main-hint">
-      Quét mã này → Chạm vào tên Đội là vào thẳng Chặng 1!
-     </p>
-     <div class="mv-qr-url-bar">${esc(mainUrl)}</div>
-     <div style="display:flex;gap:8px;width:100%;margin-top:8px">
-      <button type="button" class="button primary block" data-action="copy" data-url="${esc(mainUrl)}">📋 Sao chép Link phòng</button>
-     </div>
-    </div>
-
-    <!-- CỘT PHẢI: MÃ QR VÀO THẲNG TỪNG ĐỘI (0 BƯỚC CHỌN) -->
-    <div class="mv-qr-teams-panel">
-     <div class="mv-qr-main-step">CÁCH 2 · QUÉT MÃ QR CỦA ĐỘI ĐỂ VÀO THẲNG LUÔN (0 CHẠM)</div>
-     <div class="mv-qr-teams-grid">
-      ${activeTeams.map(t => {
-       const tUrl = getRoomJoinUrl(rCode, t.id);
-       return `<div class="mv-qr-team-item" style="--team-accent:${t.color}">
-        <div class="mv-qr-team-top">
-         <span>${t.avatar} <b>Đội ${t.num} · ${esc(t.name)}</b></span>
-         <button type="button" class="mv-chip-btn" data-action="copy" data-url="${esc(tUrl)}" title="Copy link vào thẳng Đội ${t.num}">📋 Link</button>
-        </div>
-        <div class="mv-qr-team-svg-wrap">
-         ${renderRoomQrSvg(tUrl, 112)}
-        </div>
-        <small>Quét là vào thẳng Đội ${t.num}</small>
-       </div>`;
-      }).join('')}
-     </div>
-    </div>
-   </div>
+ const rCode = String(roomCode || world?.room || session?.room || '').trim();
+ const url = getRoomJoinUrl(rCode);
+ return `<div class="bk-qr-full" data-action="closeQrModal" role="dialog" aria-modal="true" aria-label="Mã QR vào phòng">
+  <div class="bk-qr-card" data-action="bkNoop">
+   ${renderRoomQrSvg(url, 360)}
+   <div class="bk-qr-code"><span>Mã phòng</span><b>${esc(rCode)}</b></div>
+   <button type="button" class="bk-btn bk-btn-paper" data-action="closeQrModal">Đóng</button>
   </div>
  </div>`;
 }
@@ -6221,6 +6167,11 @@ function renderStage1CipherBridgeGame(m) {
     </div>
 
     <!-- 3. BOTTOM BAR KHỚP 100% HÌNH ẢNH THAM CHIẾU: HỘP GỢI Ý (TRÁI) + KHAY 4 MẢNH MẬT THƯ [?] [?] [?] [?] (GIỮA) -->
+    <div class="ph-only ph-action-bar">
+      ${allCollected
+        ? `<button type="button" class="ph-big-btn" data-action="s1PressInteractE">Mở Cầu Ánh Sáng</button>`
+        : `<p class="ph-tip">Chạm vào ô <b>↗</b> trên bản đồ để trả lời</p>`}
+    </div>
     <footer class="s1-hunt-bottombar">
       <!-- Hộp Gợi ý góc dưới bên trái -->
       <div class="s1-bottom-hint-card" data-action="s1ToggleHint" title="Nhấn để nghe gợi ý chi tiết từ Rồng Xanh">
@@ -7716,6 +7667,19 @@ function s2SyncDOM(now = performance.now()) {
       promptEl.style.display = 'none';
     }
   }
+  const phBar = document.getElementById('s2PhBar');
+  if (phBar) {
+    const html = s2PhoneBarHtml();
+    if (phBar.dataset.last !== html) { phBar.innerHTML = html; phBar.dataset.last = html; }
+  }
+}
+
+function s2PhoneBarHtml() {
+  if (s2State.gateOpened) return '';
+  const hz = s2State.zones.find(z => z.id === s2State.hoveredZoneId);
+  return hz
+    ? `<button type="button" class="ph-big-btn" data-action="s2PressConfirmE">Chọn ${s2RenderVecArrow(hz.vec, 'ph-vec')}</button>`
+    : `<p class="ph-tip">Chạm vào bệ đá có đáp án đúng</p>`;
 }
 
 async function s2ConfirmCurrentZone() {
@@ -8103,6 +8067,8 @@ function renderStage2VectorMatrixGame(m) {
           </div>
         ` : ''}
       </div>
+
+      <div class="ph-only ph-action-bar s2-ph-bar" id="s2PhBar">${s2PhoneBarHtml()}</div>
 
       <!-- D. SIDEBAR BÊN PHẢI (4 MỤC + HƯỚNG DẪN ĐIỀU KHIỂN ĐÚNG NHƯ ẢNH MẪU) -->
       <aside class="s2-right-sidebar" aria-label="Bảng thông tin Chặng 2">
@@ -9244,18 +9210,18 @@ function renderStage4MidpointMemoryGame(m) {
           <div class="s4-board-top-hud">
             <div class="s4-hud-pill timer-pill ${remSec <= 15 ? 'urgent' : ''}">
               <span class="s4-hud-icon">⏳</span>
-              <span>Thời gian: <strong id="s4TimerClockText">${formatMMSS(remSec)}</strong></span>
+              <span><span class="s4-hud-lbl">Thời gian: </span><strong id="s4TimerClockText">${formatMMSS(remSec)}</strong></span>
             </div>
 
             <div class="s4-hud-pill pairs-pill">
               <span class="s4-hud-icon">🃏</span>
-              <span>Đã ghép: <strong id="s4MatchedCountText">${matchedCount} / ${totalPairs}</strong></span>
+              <span><span class="s4-hud-lbl">Đã ghép: </span><strong id="s4MatchedCountText">${matchedCount} / ${totalPairs}</strong></span>
               <small class="s4-flips-sub">(${s4State.flipCount} lượt lật)</small>
             </div>
 
             <div class="s4-hud-pill score-pill mv-live-score-pill" id="s4ScorePill" title="Điểm năng lượng của đội (Ghép đúng +5 XP, lật sai −2 XP)">
               <span class="s4-hud-icon">⭐</span>
-              <span>Điểm: <strong id="s4ScoreText" class="mv-live-score-val">${Math.max(0, world?.me?.score ?? 80)} XP</strong></span>
+              <span><span class="s4-hud-lbl">Điểm: </span><strong id="s4ScoreText" class="mv-live-score-val">${Math.max(0, world?.me?.score ?? 80)} XP</strong></span>
             </div>
 
             <div class="s4-hud-pill progress-pill">
@@ -12271,6 +12237,19 @@ async function handle(action,el){
    return;
   }
   if(action==='s2PedestalClickRemind'){
+   if(bkIsPhone() || window.matchMedia?.('(pointer: coarse)').matches){
+    const z = s2State.zones.find(zz => zz.id === el.dataset.zone);
+    if(z && !s2State.gateOpened && !s2State.shieldDepletedModal){
+     if(s2State.hoveredZoneId === z.id){ await s2ConfirmCurrentZone(); return; }
+     s2State.facing = z.x < s2State.dragonX ? 'left' : 'right';
+     s2State.dragonX = z.x; s2State.dragonY = Math.min(92, z.y + 6);
+     s2State.animState = 'run';
+     s2State.hoveredZoneId = z.id;
+     sound('step');
+     s2SyncDOM();
+    }
+    return;
+   }
    // Không cho bấm chuột chọn đáp án trực tiếp — nhắc học sinh điều khiển Rồng Xanh đến bệ đá rồi nhấn E
    sound('bleep');
    s2State.companionMsg = 'Hãy dùng phím <b>WASD</b> hoặc <b>Phím mũi tên</b> điều khiển Rồng Xanh bước vào bệ đá rồi nhấn phím <b>E</b> để xác nhận nhé!';
@@ -13464,6 +13443,7 @@ document.addEventListener('pointerup',e=>{
 const keyMap={ArrowUp:'up',ArrowDown:'down',ArrowLeft:'left',ArrowRight:'right',KeyW:'up',KeyS:'down',KeyA:'left',KeyD:'right'};
 window.addEventListener('keydown',e=>{
  if(e.key==='Escape' && typeof bkStatsModal!=='undefined' && bkStatsModal){ bkStatsModal=null; render(); return; }
+ if(e.key==='Escape' && showTeacherQrModal){ showTeacherQrModal=false; if(session) render(); else startScreen(); return; }
  if(document.activeElement?.matches('input,select,textarea')){
   if(e.key==='Enter'){
    if(document.activeElement.id==='huntShortInput')handle('attackHuntMonster');
@@ -14011,11 +13991,12 @@ function exportCSV(){
    Học sinh: nhập mã → chạm chọn đội → sảnh chờ → chơi → kết quả.
    Giáo viên: tạo phòng → sảnh chờ (mã to + QR + đội hiện dần) → bảng đua → bục vinh danh.
    ═══════════════════════════════════════════════════════════════════════════ */
+function bkIsPhone(){ try{ return window.matchMedia('(max-width: 860px)').matches; }catch(e){ return false; } }
 let bkStep = initialRoom ? 'team' : 'code'; // 'code' | 'team' | 'host'
 let bkRoom = initialRoom || '';
 let bkRoomTeams = null;
 let bkError = '';
-let bkHostTeamCount = 6;
+let bkHostTeamCount = 4;
 let bkHostDetail = false;
 let bkKnownJoined = new Set();
 let bkLobbyPrimed = false;
@@ -14218,7 +14199,6 @@ function bkHostBand(){
 function bkHostFoot(controls){
  if (!controls) return `<footer class="bk-host-foot"><button type="button" class="bk-foot-btn" data-action="exitDisplayMode">Bảng điều khiển</button></footer>`;
  return `<footer class="bk-host-foot">
-  <button type="button" class="bk-foot-btn" data-action="openQrModal">Mã QR từng đội</button>
   <button type="button" class="bk-foot-btn" data-action="bkShowDetail">Bảng thống kê chi tiết</button>
   <button type="button" class="bk-foot-btn" data-action="bkNewRoom">Tạo phòng khác</button>
   <span class="bk-foot-gap"></span>
@@ -14406,8 +14386,7 @@ function bkHostStats(){
 
   <footer class="bk-host-foot">
    <button type="button" class="bk-foot-btn" data-action="exportCSV">Tải bảng điểm (CSV)</button>
-   <button type="button" class="bk-foot-btn" data-action="openQrModal">Mã QR từng đội</button>
-   <span class="bk-foot-gap"></span>
+    <span class="bk-foot-gap"></span>
    <button type="button" class="bk-foot-btn" data-action="toggleFullscreen">Toàn màn hình</button>
   </footer>
   ${bkStatsModal?.type === 'team' ? bkTeamSheet() : ''}
@@ -14483,6 +14462,38 @@ function bkAnswersSheet(){
  </div>`;
 }
 
+/* ─── ĐIỆN THOẠI: BẢN ĐỒ 5 CHẶNG & CHUYỂN CHẶNG GỌN ─── */
+const BK_STAGE_SHORT = ['Hiệu vectơ', 'Tổng vectơ', 'Hình bình hành', 'Trung điểm', 'Trọng tâm'];
+function bkPhoneMap(){
+ const me = world.me || {};
+ const tr = StageTransitionController.isTransitioning();
+ const cur = tr ? StageTransitionController.toStage : Math.min(5, me.stage || 0);
+ const done = me.completed ? 5 : cur;
+ const passed = tr ? StageTransitionController.fromStage : -1;
+ const list = BK_STAGE_SHORT.map((name, i) => {
+  const st = i < done ? 'is-done' : i === done ? 'is-now' : 'is-lock';
+  return `<li class="bk-mstage ${st} ${i === passed ? 'just-done' : ''}">
+   <span class="bk-mnum">${i < done ? '✓' : i + 1}</span>
+   <span class="bk-mname">${esc(name)}</span>
+   ${i === done && done < 5 ? `<span class="bk-mdragon" aria-hidden="true">🐉</span>` : ''}
+  </li>`;
+ }).join('');
+ const head = tr
+  ? `<div class="bk-mhead"><span class="bk-mbig">Qua chặng ${passed + 1}!</span><span class="bk-mreward">+10 XP · ${esc(missionMeta[passed]?.mode || '')}</span></div>`
+  : `<div class="bk-mhead"><span class="bk-mbig">Hành trình</span><span class="bk-mreward">${Math.max(0, me.score || 0)} XP</span></div>`;
+ const cta = tr
+  ? `<p class="bk-mnext">${done >= 5 ? 'Sắp tới đích…' : `Đang tới chặng ${done + 1}…`}</p>`
+  : done >= 5 ? '' : `<button type="button" class="ph-big-btn" data-action="hubStartCurrentStage">Chơi chặng ${done + 1}</button>`;
+ return `<div class="bk-page bk-student bk-mapph" style="--tc:${esc(me.color || '#36C6E8')}">
+  <header class="bk-top"><span class="bk-room-tag">Phòng <b>${esc(world.room)}</b></span><span class="bk-room-tag">${me.avatar || '🐉'} ${esc(bkTeamName(me))}</span></header>
+  <main class="bk-mmain">
+   ${head}
+   <ol class="bk-mlist">${list}</ol>
+   ${cta}
+  </main>
+ </div>`;
+}
+
 /* ─── CHỌN MÀN HÌNH ─── */
 function bkBareScreen(){
  if (!session || !world) return '';
@@ -14490,6 +14501,7 @@ function bkBareScreen(){
  if (session.role === 'display') return bkHostScreen(false);
  const kind = bkStudentKind();
  if (kind === 'lobby') return bkStudentLobby();
+ if (!kind && bkIsPhone() && !world.me?.completed && (mvWorldMapOpen || mvShowIntroHub || StageTransitionController.isTransitioning())) return bkPhoneMap();
  if (kind === 'result') return bkStudentResult();
  return '';
 }
