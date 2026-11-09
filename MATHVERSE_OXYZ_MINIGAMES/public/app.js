@@ -675,7 +675,12 @@ function restoreSession(){
  if(!initialRoom)return null;
  if(initialView==='display')return{role:'display',room:initialRoom,token:'DISPLAY'};
  if(initialView==='teacher'){const token=localStorage.getItem(cacheKey('teacher',initialRoom))||('GV_'+initialRoom);return{role:'teacher',room:initialRoom,token};}
- if(initialTeam){const token=localStorage.getItem(cacheKey('student',initialRoom,initialTeam));if(token)return{role:'student',room:initialRoom,teamId:initialTeam,token};}
+ if(initialTeam){
+  const m=/^doi-(\d+)$/i.exec(String(initialTeam));
+  const fallbackToken='DEMO_DOI_'+(m?m[1]:'1');
+  const token=localStorage.getItem(cacheKey('student',initialRoom,initialTeam))||fallbackToken;
+  return{role:'student',room:initialRoom,teamId:initialTeam,token};
+ }
  return null;
 }
 async function api(route,payload){
@@ -1203,16 +1208,103 @@ function renderIntroHubBanner(isStudentLogged = false) {
   </div>`;
 }
 
+const QUICK_LOGIN_TEAMS = [
+ { id: 'doi-1', num: 1, name: 'Rồng Xanh',    avatar: '🐉', color: '#38BDF8' },
+ { id: 'doi-2', num: 2, name: 'Tia Chớp',     avatar: '⚡', color: '#F59E0B' },
+ { id: 'doi-3', num: 3, name: 'Phượng Hoàng', avatar: '🔥', color: '#EC4899' },
+ { id: 'doi-4', num: 4, name: 'Ngôi Sao',     avatar: '🌟', color: '#10B981' },
+ { id: 'doi-5', num: 5, name: 'Sóng Thần',    avatar: '🌊', color: '#6366F1' },
+ { id: 'doi-6', num: 6, name: 'Tinh Thể',     avatar: '💎', color: '#14B8A6' },
+ { id: 'doi-7', num: 7, name: 'Hộ Vệ',        avatar: '🛡️', color: '#F97316' },
+ { id: 'doi-8', num: 8, name: 'Sao Băng',     avatar: '☄️', color: '#A855F7' }
+];
+
 function startScreen(msg=''){
- const fRoom=esc(initialRoom || LiveClassroomSync.getActiveRoom() || '123456'),fTeam=esc(initialTeam);
- const demoBar=`<div class="demo-banner"><strong>🎮 CHẾ ĐỘ CHƠI THỬ & TRÌNH CHIẾU NHANH:</strong> ${btn('▶ BẮT ĐẦU HÀNH TRÌNH (ĐỘI RỒNG XANH)','demoPlay','teal')} ${btn('👩‍🏫 MÀN HÌNH GIÁO VIÊN','demoTeacher','gold')}<small>Nhấp trực tiếp vào nút "BẮT ĐẦU HÀNH TRÌNH" hoặc 5 Chặng trên giao diện bên dưới để vào game ngay!</small></div>`;
+ const fRoom=esc(initialRoom || LiveClassroomSync.getActiveRoom() || '123456'),fTeam=esc(initialTeam || 'doi-1');
+ const teamCardsHtml = QUICK_LOGIN_TEAMS.map(t => `
+  <button type="button"
+   class="mv-quick-team-card ${fTeam === t.id ? 'is-selected' : ''}"
+   style="--team-accent:${t.color}"
+   data-action="quickJoinTeam"
+   data-team="${t.id}"
+   title="Nhấn 1 lần để vào ngay Đội ${t.num} – ${t.name}">
+   <span class="mv-qtc-avatar">${t.avatar}</span>
+   <span class="mv-qtc-info">
+    <small>ĐỘI ${t.num}</small>
+    <strong>${t.name}</strong>
+   </span>
+   <span class="mv-qtc-go">Vào ngay →</span>
+  </button>
+ `).join('');
+
  app.innerHTML=layout(`
- ${demoBar}
- ${renderIntroHubBanner(false)}
- <div class="tabs"><button class="active" data-action="switch-tab" data-tab="teacher">👩‍🏫 Tạo phòng – Giáo viên</button><button data-action="switch-tab" data-tab="student">🧑‍🚀 Vào đội – Học sinh</button></div>
- ${msg?`<div class="notice error">${esc(msg)}</div>`:''}
- <section class="setup grid grid-2" id="entry"><div class="panel" data-tabbox="teacher"><div class="section-title"><h2>🎓 Phòng điều khiển Giáo viên</h2></div><p>Giáo viên tạo mã phòng, phát mã PIN cho 4–8 nhóm học sinh (3–5 HS/đội), chiếu Hành trình Giải cứu Lục địa OXYZ (6 phút) và theo dõi tiến độ thu hồi 5 Ấn Vectơ thời gian thực.</p><div class="form-field"><label>Số đội tham gia</label><select id="teamCount"><option value="4">4 đội</option><option value="5">5 đội</option><option value="6" selected>6 đội</option><option value="7">7 đội</option><option value="8">8 đội</option></select></div>${btn('✨ TẠO PHÒNG MATHVERSE (6 PHÚT)','create','primary block')}</div>
- <div class="panel" data-tabbox="student"><div class="section-title"><h2>🚀 Đăng nhập Đội Thám Hiểm</h2></div><p>Nhận mã phòng và mã PIN đội từ giáo viên để cùng Rồng Xanh vượt qua 5 vùng đất và khôi phục Tâm Thạch Vectơ!</p><div class="form-field"><label>Mã phòng 6 chữ số</label><input id="roomInput" type="text" inputmode="numeric" maxlength="6" class="mono" value="${fRoom}" placeholder="VD: 123456" /></div><div class="form-field"><label>Đội thám hiểm</label><select id="teamSelect">${Array.from({length:8},(_,i)=>`<option value="doi-${i+1}" ${fTeam===`doi-${i+1}`?'selected':''}>Đội ${i+1}</option>`).join('')}</select></div><div class="form-field"><label>Mã đội 4 chữ số</label><input id="teamCode" type="password" inputmode="numeric" maxlength="4" placeholder="Mã PIN của đội" /></div>${btn('🗝️ VÀO HÀNH TRÌNH NGAY','join','teal block')}</div></section>`);
+  ${msg?`<div class="notice error" style="margin-bottom:12px">${esc(msg)}</div>`:''}
+
+  <!-- CỔNG ĐĂNG NHẬP SIÊU TỐC 1–2 BƯỚC ĐẶT NGAY ĐẦU TRANG (KHÔNG CẦN CUỘN, KHÔNG CẦN MÃ PIN) -->
+  <section class="mv-quick-entry-portal" id="entry">
+   <!-- KHỐI HỌC SINH: CHỈ CẦN CHẠM VÀO ĐỘI ĐỂ VÀO CHƠI NGAY -->
+   <div class="mv-qep-card student-portal">
+    <div class="mv-qep-header">
+     <div>
+      <span class="mv-qep-badge student">🧑‍🚀 DÀNH CHO HỌC SINH · VÀO GAME TRONG 2 GIÂY</span>
+      <h2 class="mv-qep-title">Chọn Đội Thám Hiểm Để Vào Phòng Ngay</h2>
+     </div>
+     <div class="mv-qep-room-box">
+      <label for="roomInput">Bước 1 · Mã phòng</label>
+      <input id="roomInput" type="text" inputmode="numeric" maxlength="6" class="mono mv-qep-room-input" value="${fRoom}" placeholder="123456" title="Nhập mã phòng 6 số do Giáo viên cung cấp (hoặc giữ nguyên mã phòng mặc định)" />
+     </div>
+    </div>
+
+    <p class="mv-qep-step-hint">
+     <b>Bước 2:</b> Nhấn trực tiếp vào <b>Đội của nhóm em</b> ở bên dưới để vào thẳng <b>Chặng 1</b> (<i>Không cần nhập mật khẩu hay mã PIN</i>):
+    </p>
+
+    <div class="mv-quick-teams-grid">
+     ${teamCardsHtml}
+    </div>
+   </div>
+
+   <!-- KHỐI GIÁO VIÊN: TẠO PHÒNG & BẢNG ĐIỀU KHIỂN 1 CHẠM -->
+   <div class="mv-qep-card teacher-portal">
+    <span class="mv-qep-badge teacher">👩‍🏫 DÀNH CHO GIÁO VIÊN</span>
+    <h2 class="mv-qep-title">Phòng Điều Khiển & Trình Chiếu</h2>
+    <p class="mv-qep-desc">
+     Tạo phòng học mới hoặc mở ngay Bảng xếp hạng trực tiếp để trình chiếu trên máy chiếu lớp học (6 phút).
+    </p>
+
+    <div class="form-field" style="margin:10px 0 12px">
+     <label for="teamCount">Số đội tham gia trong lớp</label>
+     <select id="teamCount">
+      <option value="4">4 đội (Đội 1 → Đội 4)</option>
+      <option value="5">5 đội (Đội 1 → Đội 5)</option>
+      <option value="6" selected>6 đội (Đội 1 → Đội 6)</option>
+      <option value="7">7 đội (Đội 1 → Đội 7)</option>
+      <option value="8">8 đội (Đội 1 → Đội 8)</option>
+     </select>
+    </div>
+
+    <div class="mv-qep-teacher-actions">
+     ${btn('✨ TẠO PHÒNG MỚI & MỞ MÀN HÌNH GV','create','primary block')}
+     ${btn('🖥️ MỞ NGAY MÀN HÌNH GIÁO VIÊN','demoTeacher','gold block')}
+    </div>
+   </div>
+  </section>
+
+  ${renderIntroHubBanner(false)}
+ `);
+
+ // Tự động đồng bộ mã phòng mới nhất nếu Giáo viên vừa tạo phòng trên máy chủ
+ if(!initialRoom){
+  api('/api/state',{room:fRoom,token:'DISPLAY'}).then(d=>{
+   if(d && d.activeRoom && d.activeRoom !== '123456'){
+    LiveClassroomSync.setActiveRoom(d.activeRoom);
+    const inp = document.getElementById('roomInput');
+    if(inp && (inp.value === '123456' || !inp.value.trim())){
+     inp.value = d.activeRoom;
+    }
+   }
+  }).catch(()=>{});
+ }
 }
 function getStageFormulaSafe(stageIdx, currentTeamStage) {
  if (stageIdx === 0) {
@@ -2263,7 +2355,7 @@ function teacherScreen(){
 
   ${showTeacherPinDrawer ? `<section class="gv-drawer-box">
    <div class="flex-between" style="margin-bottom:10px">
-    <strong style="color:#36DEF4">🔑 MÃ PHÒNG <span style="color:#FFC953">${esc(world.room)}</span> & MÃ PIN ĐĂNG NHẬP TỪNG ĐỘI (URL: ${esc(joinBase)})</strong>
+    <strong style="color:#36DEF4">🔑 MÃ PHÒNG: <span style="color:#FFC953;font-size:17px">${esc(world.room)}</span> — HỌC SINH CHỈ CẦN NHẬP MÃ PHÒNG & CHẠM VÀO TÊN ĐỘI ĐỂ VÀO NGAY (URL: ${esc(joinBase)})</strong>
     <div style="display:flex;gap:8px">
      ${window.IS_DEMO_MODE ? `<button type="button" class="mv-chip-btn" data-action="demoPlay">🎮 Chuyển sang Màn hình Học sinh</button>` : ''}
      <button type="button" class="mv-chip-btn" data-action="exportCSV">📥 Xuất CSV</button>
@@ -2272,8 +2364,8 @@ function teacherScreen(){
    </div>
    <div class="gv-pin-grid">
     ${teams.map(t => `<div class="gv-pin-card">
-     <div><b>${t.avatar} ${esc(t.name)}</b><br/><small>Mã đội: ${esc(t.id)} · PIN: <b style="color:#FFC953;font-size:14px">${esc(world.teamCodes?.[t.id] || '----')}</b></small></div>
-     <button type="button" class="mv-chip-btn" data-action="copy" data-url="${esc(baseUrl+'?room='+world.room+'&team='+t.id)}">⧉ Link</button>
+     <div><b>${t.avatar} ${esc(t.name)}</b><br/><small style="color:#A7F3D0">✓ Chạm 1 lần vào thẻ đội để vào ngay (Không cần PIN)</small></div>
+     <button type="button" class="mv-chip-btn" data-action="copy" data-url="${esc(baseUrl+'?room='+world.room+'&team='+t.id)}">⧉ Link vào thẳng</button>
     </div>`).join('')}
    </div>
   </section>` : ''}
@@ -12401,8 +12493,32 @@ async function handle(action,el){
   }
   if(action==='toggleSound'){soundEnabled=!soundEnabled;render();return;}
   if(action==='switch-tab'){$('.tabs .active')?.classList.remove('active');el.classList.add('active');$('[data-tabbox="'+el.dataset.tab+'"]')?.scrollIntoView({behavior:'smooth',block:'center'});return;}
-  if(action==='create'){el.disabled=true;const count=Number($('#teamCount').value);const r=await api('/api/create',{teamCount:count});saveSession({role:'teacher',room:r.room,token:r.teacherToken});await refresh(true);return;}
-  if(action==='join'){el.disabled=true;const room=$('#roomInput').value.trim(),team=$('#teamSelect').value,code=$('#teamCode').value.trim();const r=await api('/api/join',{room,team,code});saveSession({role:'student',room:r.room,teamId:r.team,token:r.token});await refresh(true);return;}
+  if(action==='create'){el.disabled=true;const count=Number($('#teamCount')?.value||6);const r=await api('/api/create',{teamCount:count});saveSession({role:'teacher',room:r.room,token:r.teacherToken});await refresh(true);return;}
+  if(action==='quickJoinTeam'){
+   el.disabled=true;
+   const rawRoom=($('#roomInput')?.value||'').trim()||LiveClassroomSync.getActiveRoom()||initialRoom||'123456';
+   const team=el.dataset.team||'doi-1';
+   mvShowIntroHub=false;
+   mvWorldMapOpen=false;
+   const r=await api('/api/join',{room:rawRoom,team});
+   saveSession({role:'student',room:r.room,teamId:r.team,token:r.token});
+   activePlayMode=null;
+   await refresh(true);
+   return;
+  }
+  if(action==='join'){
+   el.disabled=true;
+   const room=($('#roomInput')?.value||'').trim()||LiveClassroomSync.getActiveRoom()||'123456';
+   const team=$('#teamSelect')?.value||'doi-1';
+   const code=($('#teamCode')?.value||'').trim();
+   mvShowIntroHub=false;
+   mvWorldMapOpen=false;
+   const r=await api('/api/join',{room,team,code});
+   saveSession({role:'student',room:r.room,teamId:r.team,token:r.token});
+   activePlayMode=null;
+   await refresh(true);
+   return;
+  }
   if(action==='home'){const yes=confirm('Quay về màn hình đăng nhập? Tiến độ của đội vẫn được lưu an toàn.');if(yes){session=null;world=null;history.replaceState({},'',location.pathname);startScreen();}return;}
   if(action==='setMode'){
    activePlayMode=el.dataset.mode;

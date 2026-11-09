@@ -9,6 +9,18 @@ Tất cả những thay đổi quan trọng của dự án này sẽ được gh
 
 ---
 
+## [5.5.9] - 2026-11-09
+
+### Changed (Tối Giản Đăng Nhập 1–2 Bước: Học Sinh Chạm Thẻ Đội Là Vào Phòng Game Ngay)
+- **Thiết Kế Lại Cổng Đăng Nhập Siêu Tốc 1–2 Bước (`MATHVERSE_OXYZ_MINIGAMES/public/app.js`, `MATHVERSE_OXYZ_MINIGAMES/public/style.css`, `MATHVERSE_OXYZ_MINIGAMES/server.js`):**
+  1. **Đưa Cổng Đăng Nhập Nhanh (`.mv-quick-entry-portal`) lên ngay đầu trang (`startScreen()`):** Học sinh mở web trên điện thoại/máy tính nhìn thấy ngay danh sách 8 thẻ Đội Thám Hiểm (`🐉 Đội 1 · Rồng Xanh` $\rightarrow$ `☄️ Đội 8 · Sao Băng`) mà không cần cuộn trang hay mở menu thả xuống.
+  2. **Vào phòng chỉ với 1–2 bước (Bỏ bắt buộc nhập mã PIN 4 chữ số):**
+     - **Bước 1:** Ô `Mã phòng` tự động phát hiện và điền sẵn mã phòng mới nhất do Giáo viên vừa tạo (hoặc học sinh nhập mã 6 số nếu muốn).
+     - **Bước 2:** Học sinh **chỉ cần chạm 1 lần vào thẻ Đội của nhóm mình** (`quickJoinTeam`) là đăng nhập và vào thẳng **Chặng 1** ngay lập tức (không cần nhập mật khẩu/PIN đội).
+  3. **Hỗ trợ Link vào thẳng 0-Click (`restoreSession()`):** Khi Giáo viên sao chép link đội (`?room=XXXXXX&team=doi-X`) gửi cho nhóm, học sinh mở link sẽ tự động đăng nhập thẳng vào đội đó mà không cần qua màn hình chờ.
+
+---
+
 ## [5.5.8] - 2026-11-08
 
 ### Added (Tiếng Chuông Báo Đồng Hồ Khi Còn 10 Giây Cuối Của Mỗi Chặng)

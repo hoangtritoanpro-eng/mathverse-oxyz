@@ -498,15 +498,20 @@ function roomState(room,token){
 
 function error(message,status=400){const e=new Error(message);e.status=status;return e;}
 function getRoom(data){
- const roomId=String(data?.room||'123456').trim().toUpperCase();
+ let rawId=String(data?.room||'').trim().toUpperCase();
+ if((!rawId||rawId==='123456')&&LATEST_ROOM_ID&&ROOMS[LATEST_ROOM_ID]){
+  rawId=LATEST_ROOM_ID;
+ }
+ const roomId=rawId||'123456';
  if(!ROOMS[roomId]){
-  if(/^\d{6}$/.test(roomId)){
-   const lastDigit=Number(roomId[5]);
+  if(/^\d{4,6}$/.test(roomId)){
+   const lastDigit=Number(roomId[roomId.length-1]);
    const size=(lastDigit>=4&&lastDigit<=8)?lastDigit:6;
    ROOMS[roomId]=createDeterministicRoom(roomId,size);
    persist();
   }else{
-   throw error('Không tìm thấy mã phòng. Hãy kiểm tra lại.',404);
+   ROOMS[roomId]=createDeterministicRoom(roomId,6);
+   persist();
   }
  }
  return ROOMS[roomId];
@@ -520,7 +525,7 @@ function normAns(s){return String(s??'').trim().replace(/\u2212/g,'-').replace(/
 function inferEndpointFromPayload(d){
  if(!d||typeof d!=='object')return null;
  if(d.teamCount!==undefined)return '/api/create';
- if(d.team!==undefined && d.code!==undefined && d.action===undefined)return '/api/join';
+ if(d.team!==undefined && d.action===undefined)return '/api/join';
  if(d.action!==undefined)return '/api/teacher';
  if(d.pillar!==undefined || d.secretChest!==undefined || d.wrongAttempt!==undefined)return '/api/stage1Progress';
  if(d.correctZone!==undefined || d.wrongZone!==undefined || d.resetShields!==undefined)return '/api/stage2Progress';
@@ -566,10 +571,16 @@ function processAction(endpoint,d){
   }
  }
  if(endpoint==='/api/join'){
-  const t=r.teams.find(t=>t.id===d.team&&t.code===String(d.code||'').trim());
-  if(!t)throw error('Sai mã đội hoặc mã phòng. Hãy hỏi giáo viên.',403);
+  let t=r.teams.find(x=>x.id===d.team);
+  if(!t){
+   const m=/^doi-(\d+)$/i.exec(String(d.team||''));
+   const idx=m?Math.max(0,Math.min(7,Number(m[1])-1)):0;
+   t=r.teams[idx]||r.teams[0];
+  }
+  if(!t)throw error('Không tìm thấy đội chơi.',404);
   ensureTeamFields(t);
   t.lastActiveAt=Date.now();
+  persist();
   return{token:t.token,room:r.id,team:t.id};
  }
  if(endpoint==='/api/state')return roomState(r,d.token);
