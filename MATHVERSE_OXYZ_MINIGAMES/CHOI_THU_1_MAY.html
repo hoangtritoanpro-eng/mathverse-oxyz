@@ -12499,6 +12499,518 @@ body {
   }
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   MÃ QR QUÉT PHÒNG ĐƠN GIẢN & THANH ĐIỀU KHIỂN DỄ DÙNG CHO GIÁO VIÊN (v5.6.0)
+   ═══════════════════════════════════════════════════════════════════════════ */
+.mv-room-qr-svg {
+  display: block;
+  border-radius: 8px;
+  background: #FFFFFF;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+}
+
+/* Preview QR trên cổng Giáo viên ở màn hình đầu */
+.mv-qep-qr-preview-box {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(15, 23, 42, 0.78);
+  border: 1.5px solid rgba(250, 204, 21, 0.45);
+  border-radius: 12px;
+  padding: 8px 12px;
+  margin-top: 8px;
+}
+.mv-qep-qr-svg {
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: transform 0.16s ease;
+}
+.mv-qep-qr-svg:hover {
+  transform: scale(1.04);
+}
+.mv-qep-qr-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.mv-qep-qr-meta small {
+  font-size: 10.5px;
+  font-weight: 800;
+  color: #94A3B8;
+  letter-spacing: 0.05em;
+}
+.mv-qep-qr-meta strong {
+  font-size: 24px;
+  font-weight: 900;
+  color: #FDE047;
+  letter-spacing: 0.12em;
+  line-height: 1.1;
+}
+.mv-chip-btn.gold {
+  background: linear-gradient(135deg, #F59E0B, #D97706);
+  color: #0F172A;
+  font-weight: 900;
+  border-color: #FDE047;
+}
+
+/* Thanh Điều Khiển Nhanh 3 Bước ở đầu Màn hình Giáo viên */
+.gv-easy-command-banner {
+  display: grid;
+  grid-template-columns: 1.15fr 1.1fr 1fr;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+.gv-ecb-card {
+  background: linear-gradient(165deg, rgba(15, 31, 62, 0.96), rgba(9, 19, 40, 0.98));
+  border: 1.5px solid rgba(56, 189, 248, 0.38);
+  border-radius: 14px;
+  padding: 12px 14px;
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.38);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 8px;
+}
+.gv-ecb-card.qr-card {
+  flex-direction: row;
+  align-items: center;
+  gap: 14px;
+  border-color: rgba(250, 204, 21, 0.55);
+  background: linear-gradient(165deg, rgba(30, 41, 59, 0.96), rgba(15, 23, 42, 0.98));
+}
+.gv-qr-thumb-box {
+  position: relative;
+  cursor: pointer;
+  flex-shrink: 0;
+  padding: 4px;
+  background: #FFFFFF;
+  border-radius: 10px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
+  transition: transform 0.16s ease, box-shadow 0.16s ease;
+}
+.gv-qr-thumb-box:hover {
+  transform: scale(1.04);
+  box-shadow: 0 0 20px rgba(250, 204, 21, 0.65);
+}
+.gv-qr-zoom-tag {
+  position: absolute;
+  bottom: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #0F172A;
+  color: #FDE047;
+  border: 1px solid #FACC15;
+  border-radius: 99px;
+  font-size: 10px;
+  font-weight: 900;
+  padding: 1px 7px;
+  white-space: nowrap;
+}
+.gv-qr-info-col {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  flex: 1;
+}
+.gv-ecb-step-badge {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  font-size: 10.5px;
+  font-weight: 900;
+  letter-spacing: 0.05em;
+  padding: 2px 8px;
+  border-radius: 99px;
+  background: rgba(56, 189, 248, 0.16);
+  color: #7DD3FC;
+  border: 1px solid rgba(56, 189, 248, 0.4);
+}
+.gv-qr-room-code-line {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+.gv-qr-room-code-line span {
+  font-size: 12px;
+  font-weight: 800;
+  color: #CBD5E1;
+}
+.gv-qr-room-code-line strong {
+  font-size: 28px;
+  font-weight: 900;
+  color: #FDE047;
+  letter-spacing: 0.1em;
+  line-height: 1.05;
+}
+.gv-qr-sub-text {
+  font-size: 11.5px;
+  color: #94A3B8;
+  line-height: 1.3;
+}
+.gv-qr-btn-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 2px;
+  flex-wrap: wrap;
+}
+.gv-easy-btn {
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  border-radius: 8px;
+  padding: 6px 11px;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+}
+.gv-easy-btn.gold {
+  background: linear-gradient(135deg, #FACC15, #F59E0B);
+  color: #0F172A;
+  border-color: #FEF08A;
+}
+.gv-easy-btn.gold:hover {
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+}
+.gv-easy-btn.cyan {
+  background: rgba(14, 165, 233, 0.22);
+  color: #E0F2FE;
+  border-color: rgba(56, 189, 248, 0.55);
+}
+.gv-easy-btn.cyan:hover {
+  background: rgba(14, 165, 233, 0.36);
+}
+.gv-easy-btn.slate {
+  background: rgba(30, 41, 59, 0.85);
+  color: #E2E8F0;
+  border-color: rgba(148, 163, 184, 0.38);
+}
+.gv-easy-btn.slate:hover {
+  background: rgba(51, 65, 85, 0.95);
+}
+.gv-easy-btn.rose {
+  background: rgba(225, 29, 72, 0.24);
+  color: #FFE4E6;
+  border-color: rgba(251, 113, 133, 0.5);
+}
+.gv-easy-btn.rose:hover:not(:disabled) {
+  background: rgba(225, 29, 72, 0.4);
+}
+.gv-easy-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.gv-live-state-pill {
+  font-size: 11px;
+  font-weight: 800;
+  padding: 2px 9px;
+  border-radius: 99px;
+}
+.gv-live-state-pill.running {
+  background: rgba(16, 185, 129, 0.2);
+  color: #6EE7B7;
+  border: 1px solid rgba(52, 211, 153, 0.5);
+}
+.gv-live-state-pill.paused {
+  background: rgba(245, 158, 11, 0.22);
+  color: #FDE68A;
+  border: 1px solid rgba(251, 191, 36, 0.5);
+}
+.gv-live-state-pill.idle {
+  background: rgba(148, 163, 184, 0.18);
+  color: #CBD5E1;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+}
+
+.gv-giant-primary-btn {
+  width: 100%;
+  padding: 11px 16px;
+  border-radius: 11px;
+  font-size: 15px;
+  font-weight: 900;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: all 0.16s ease;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+}
+.gv-giant-primary-btn.start {
+  background: linear-gradient(135deg, #10B981, #059669);
+  color: #FFFFFF;
+  border-color: #6EE7B7;
+}
+.gv-giant-primary-btn.start:hover {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}
+.gv-giant-primary-btn.pause {
+  background: linear-gradient(135deg, #F59E0B, #D97706);
+  color: #0F172A;
+  border-color: #FDE68A;
+}
+.gv-giant-primary-btn.resume {
+  background: linear-gradient(135deg, #0EA5E9, #0284C7);
+  color: #FFFFFF;
+  border-color: #7DD3FC;
+}
+
+.gv-quick-sub-actions {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+
+.gv-tools-grid-2x2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 6px;
+}
+.gv-tool-tile {
+  background: rgba(15, 23, 42, 0.78);
+  border: 1px solid rgba(125, 211, 252, 0.32);
+  border-radius: 9px;
+  padding: 7px 9px;
+  text-align: left;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  transition: all 0.15s ease;
+}
+.gv-tool-tile:hover {
+  border-color: #38BDF8;
+  background: rgba(30, 58, 138, 0.55);
+  transform: translateY(-1px);
+}
+.gv-tool-tile strong {
+  font-size: 12px;
+  font-weight: 900;
+  color: #F8FAFC;
+}
+.gv-tool-tile small {
+  font-size: 10.5px;
+  color: #94A3B8;
+}
+
+/* Thẻ QR trên Màn hình Trình chiếu Lớp học */
+.gv-display-qr-card {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 12px !important;
+  border-color: rgba(250, 204, 21, 0.55) !important;
+}
+.gv-display-qr-thumb {
+  background: #FFFFFF;
+  padding: 4px;
+  border-radius: 9px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+/* Modal Phóng To Mã QR Toàn Màn Hình Máy Chiếu */
+.mv-qr-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(4, 10, 24, 0.88);
+  backdrop-filter: blur(8px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+.mv-qr-modal-card {
+  width: min(1120px, 96vw);
+  max-height: 92vh;
+  overflow-y: auto;
+  background: linear-gradient(165deg, #0F2143 0%, #09142B 100%);
+  border: 2px solid #38BDF8;
+  border-radius: 20px;
+  padding: 20px 24px;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.85);
+}
+.mv-qr-modal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 16px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.22);
+  padding-bottom: 12px;
+}
+.mv-qr-modal-title {
+  margin: 4px 0 0;
+  font-size: clamp(19px, 2.1vw, 25px);
+  font-weight: 900;
+  color: #FFFFFF;
+}
+.mv-qr-close-btn {
+  background: rgba(239, 68, 68, 0.2);
+  border: 1.5px solid rgba(248, 113, 113, 0.55);
+  color: #FECACA;
+  font-size: 14px;
+  font-weight: 900;
+  padding: 7px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+.mv-qr-modal-body {
+  display: grid;
+  grid-template-columns: 330px 1fr;
+  gap: 20px;
+  align-items: stretch;
+}
+.mv-qr-main-box {
+  background: rgba(15, 23, 42, 0.85);
+  border: 2px solid rgba(250, 204, 21, 0.55);
+  border-radius: 16px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+.mv-qr-main-step {
+  font-size: 12px;
+  font-weight: 900;
+  color: #FDE047;
+  letter-spacing: 0.05em;
+  margin-bottom: 10px;
+}
+.mv-qr-main-frame {
+  background: #FFFFFF;
+  padding: 10px;
+  border-radius: 14px;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.5);
+  margin-bottom: 12px;
+}
+.mv-qr-room-pill {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+  background: rgba(250, 204, 21, 0.16);
+  border: 1.5px solid #FACC15;
+  border-radius: 12px;
+  padding: 6px 16px;
+  margin-bottom: 8px;
+}
+.mv-qr-room-pill span {
+  font-size: 13px;
+  font-weight: 800;
+  color: #FEF08A;
+}
+.mv-qr-room-pill strong {
+  font-size: 30px;
+  font-weight: 900;
+  color: #FFFFFF;
+  letter-spacing: 0.12em;
+}
+.mv-qr-main-hint {
+  font-size: 13px;
+  color: #CBD5E1;
+  margin: 0 0 8px;
+}
+.mv-qr-url-bar {
+  width: 100%;
+  background: rgba(2, 6, 23, 0.75);
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-family: monospace;
+  font-size: 12px;
+  color: #7DD3FC;
+  word-break: break-all;
+}
+.mv-qr-teams-panel {
+  background: rgba(15, 23, 42, 0.68);
+  border: 1.5px solid rgba(56, 189, 248, 0.35);
+  border-radius: 16px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+}
+.mv-qr-teams-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  flex: 1;
+}
+.mv-qr-team-item {
+  background: rgba(30, 41, 59, 0.86);
+  border: 1.5px solid var(--team-accent, #38BDF8);
+  border-radius: 12px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  text-align: center;
+}
+.mv-qr-team-top {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12.5px;
+  color: #F8FAFC;
+}
+.mv-qr-team-svg-wrap {
+  background: #FFFFFF;
+  padding: 5px;
+  border-radius: 8px;
+}
+.mv-qr-team-item small {
+  font-size: 11px;
+  color: #A7F3D0;
+  font-weight: 700;
+}
+
+/* Lưới 3 thẻ thống kê màn hình hoàn thành của Học sinh */
+.mv-stats-3grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+}
+.mv-stat-card {
+  background: rgba(15, 23, 42, 0.82);
+  border: 1.5px solid rgba(56, 189, 248, 0.4);
+  border-radius: 14px;
+  padding: 14px 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+.mv-stat-card b {
+  font-size: 24px;
+  font-weight: 900;
+  color: #FDE047;
+}
+.mv-stat-card small {
+  font-size: 11.5px;
+  font-weight: 800;
+  color: #94A3B8;
+  letter-spacing: 0.05em;
+}
+
+@media (max-width: 1024px) {
+  .gv-easy-command-banner {
+    grid-template-columns: 1fr;
+  }
+  .mv-qr-modal-body {
+    grid-template-columns: 1fr;
+  }
+  .mv-qr-teams-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
 </style>
 </head>
 <body>
@@ -14063,8 +14575,248 @@ const QUICK_LOGIN_TEAMS = [
  { id: 'doi-8', num: 8, name: 'Sao Băng',     avatar: '☄️', color: '#A855F7' }
 ];
 
+let showTeacherQrModal = false;
+
+function getRoomJoinUrl(roomCode, teamId = '') {
+ const rCode = String(roomCode || session?.room || LiveClassroomSync.getActiveRoom() || initialRoom || '123456').trim();
+ const joinBase = (world && world.joinBaseURL) ? world.joinBaseURL : location.origin;
+ const base = joinBase + location.pathname;
+ return `${base}?room=${encodeURIComponent(rCode)}${teamId ? '&team=' + encodeURIComponent(teamId) : ''}`;
+}
+
+/* ─── BỘ TẠO MÃ QR SVG THUẦN JAVASCRIPT (CHUẨN ISO/IEC 18004 · OFFLINE & ONLINE 100%) ─── */
+function renderRoomQrSvg(text, pxSize = 140) {
+ const bytes = Array.from(new TextEncoder().encode(String(text || '')));
+ const VER_TABLE = [
+  null,
+  { size: 21, total: 26,  ec: 7,  align: [] },
+  { size: 25, total: 44,  ec: 10, align: [6, 18] },
+  { size: 29, total: 70,  ec: 15, align: [6, 22] },
+  { size: 33, total: 100, ec: 20, align: [6, 26] },
+  { size: 37, total: 134, ec: 26, align: [6, 30] }
+ ];
+ let ver = 1;
+ while (ver <= 5 && (VER_TABLE[ver].total - VER_TABLE[ver].ec) < bytes.length + 3) ver++;
+ if (ver > 5) ver = 5;
+ const cfg = VER_TABLE[ver];
+ const dataCap = cfg.total - cfg.ec;
+
+ const bits = [];
+ const pushBits = (val, len) => {
+  for (let i = len - 1; i >= 0; i--) bits.push((val >> i) & 1);
+ };
+ pushBits(0b0100, 4);
+ const payload = bytes.slice(0, dataCap - 2);
+ pushBits(payload.length, 8);
+ for (const b of payload) pushBits(b, 8);
+ for (let i = 0; i < 4 && bits.length < dataCap * 8; i++) bits.push(0);
+ while (bits.length % 8 !== 0) bits.push(0);
+ const dataCw = [];
+ for (let i = 0; i < bits.length; i += 8) {
+  let byte = 0;
+  for (let j = 0; j < 8; j++) byte = (byte << 1) | bits[i + j];
+  dataCw.push(byte);
+ }
+ const pads = [0xEC, 0x11];
+ let padIdx = 0;
+ while (dataCw.length < dataCap) dataCw.push(pads[padIdx++ % 2]);
+
+ const EXP = new Uint8Array(512);
+ const LOG = new Uint8Array(256);
+ let x = 1;
+ for (let i = 0; i < 255; i++) {
+  EXP[i] = x;
+  LOG[x] = i;
+  x <<= 1;
+  if (x & 0x100) x ^= 0x11D;
+ }
+ for (let i = 255; i < 512; i++) EXP[i] = EXP[i - 255];
+ const gfMul = (a, b) => (a === 0 || b === 0) ? 0 : EXP[LOG[a] + LOG[b]];
+
+ let gen = [1];
+ for (let i = 0; i < cfg.ec; i++) {
+  const next = new Array(gen.length + 1).fill(0);
+  const root = EXP[i];
+  for (let j = 0; j < gen.length; j++) {
+   next[j] ^= gen[j];
+   next[j + 1] ^= gfMul(gen[j], root);
+  }
+  gen = next;
+ }
+ const msg = [...dataCw, ...new Array(cfg.ec).fill(0)];
+ for (let i = 0; i < dataCw.length; i++) {
+  const coef = msg[i];
+  if (coef !== 0) {
+   for (let j = 0; j < gen.length; j++) msg[i + j] ^= gfMul(gen[j], coef);
+  }
+ }
+ const allCw = [...dataCw, ...msg.slice(dataCw.length)];
+
+ const N = cfg.size;
+ const mat = Array.from({ length: N }, () => new Array(N).fill(null));
+ const isFunc = Array.from({ length: N }, () => new Array(N).fill(false));
+ const setMod = (r, c, val) => {
+  if (r >= 0 && r < N && c >= 0 && c < N) {
+   mat[r][c] = val ? 1 : 0;
+   isFunc[r][c] = true;
+  }
+ };
+ const placeFinder = (r0, c0) => {
+  for (let dr = -1; dr <= 7; dr++) {
+   for (let dc = -1; dc <= 7; dc++) {
+    const inOuter = dr >= 0 && dr <= 6 && dc >= 0 && dc <= 6;
+    const onBorder = dr === 0 || dr === 6 || dc === 0 || dc === 6;
+    const inInner = dr >= 2 && dr <= 4 && dc >= 2 && dc <= 4;
+    setMod(r0 + dr, c0 + dc, inOuter && (onBorder || inInner));
+   }
+  }
+ };
+ placeFinder(0, 0);
+ placeFinder(0, N - 7);
+ placeFinder(N - 7, 0);
+
+ for (let i = 8; i < N - 8; i++) {
+  setMod(6, i, i % 2 === 0);
+  setMod(i, 6, i % 2 === 0);
+ }
+ for (const ar of cfg.align) {
+  for (const ac of cfg.align) {
+   if ((ar <= 8 && ac <= 8) || (ar <= 8 && ac >= N - 9) || (ar >= N - 9 && ac <= 8)) continue;
+   for (let dr = -2; dr <= 2; dr++) {
+    for (let dc = -2; dc <= 2; dc++) {
+     setMod(ar + dr, ac + dc, Math.max(Math.abs(dr), Math.abs(dc)) !== 1);
+    }
+   }
+  }
+ }
+ for (let i = 0; i < 9; i++) {
+  if (!isFunc[8][i]) setMod(8, i, 0);
+  if (!isFunc[i][8]) setMod(i, 8, 0);
+ }
+ for (let i = 0; i < 8; i++) {
+  if (!isFunc[8][N - 1 - i]) setMod(8, N - 1 - i, 0);
+  if (!isFunc[N - 1 - i][8]) setMod(N - 1 - i, 8, 0);
+ }
+ setMod(N - 8, 8, 1);
+
+ const streamBits = [];
+ for (const cw of allCw) {
+  for (let i = 7; i >= 0; i--) streamBits.push((cw >> i) & 1);
+ }
+ let bitIdx = 0;
+ let upward = true;
+ for (let col = N - 1; col >= 1; col -= 2) {
+  if (col === 6) col--;
+  for (let step = 0; step < N; step++) {
+   const r = upward ? (N - 1 - step) : step;
+   for (let dc = 0; dc < 2; dc++) {
+    const c = col - dc;
+    if (!isFunc[r][c]) {
+     const b = bitIdx < streamBits.length ? streamBits[bitIdx++] : 0;
+     mat[r][c] = b ^ (((r + c) % 2 === 0) ? 1 : 0);
+    }
+   }
+  }
+  upward = !upward;
+ }
+
+ const fmt = 0x77C4;
+ for (let i = 0; i < 15; i++) {
+  const bit = (fmt >> i) & 1;
+  if (i < 6) mat[i][8] = bit;
+  else if (i === 6) mat[7][8] = bit;
+  else if (i === 7) mat[8][8] = bit;
+  else if (i === 8) mat[8][7] = bit;
+  else mat[8][14 - i] = bit;
+
+  if (i < 8) mat[8][N - 1 - i] = bit;
+  else mat[N - 15 + i][8] = bit;
+ }
+
+ const quiet = 2;
+ const totalMod = N + quiet * 2;
+ let pathD = '';
+ for (let r = 0; r < N; r++) {
+  for (let c = 0; c < N; c++) {
+   if (mat[r][c]) pathD += `M${c + quiet},${r + quiet}h1v1h-1z`;
+  }
+ }
+ return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${totalMod} ${totalMod}" width="${pxSize}" height="${pxSize}" class="mv-room-qr-svg" shape-rendering="crispEdges" role="img" aria-label="Mã QR vào phòng ${esc(text)}">
+  <rect width="${totalMod}" height="${totalMod}" rx="1.5" fill="#FFFFFF"/>
+  <path d="${pathD}" fill="#0F172A"/>
+ </svg>`;
+}
+
+function renderTeacherQrModal(roomCode) {
+ const rCode = String(roomCode || world?.room || session?.room || LiveClassroomSync.getActiveRoom() || '123456').trim();
+ const mainUrl = getRoomJoinUrl(rCode);
+ const activeTeams = (world?.teams && world.teams.length)
+  ? world.teams.map((t, i) => ({
+     id: t.id,
+     num: i + 1,
+     name: t.name.replace(/^Đội\s*\d+\s*[-–·]?\s*/i, '') || t.name,
+     avatar: t.avatar || QUICK_LOGIN_TEAMS[i]?.avatar || '🐉',
+     color: QUICK_LOGIN_TEAMS[i]?.color || '#38BDF8'
+    }))
+  : QUICK_LOGIN_TEAMS.slice(0, 6);
+
+ return `<div class="mv-qr-modal-backdrop" data-action="closeQrModal">
+  <div class="mv-qr-modal-card" onclick="event.stopPropagation()">
+   <div class="mv-qr-modal-header">
+    <div>
+     <span class="mv-qep-badge teacher">📱 QUÉT MÃ QR VÀO PHÒNG HỌC TRỰC TIẾP (KHÔNG CẦN MÃ PIN)</span>
+     <h2 class="mv-qr-modal-title">Học Sinh Mở Camera / Zalo Quét Mã Để Vào Chơi Ngay</h2>
+    </div>
+    <button type="button" class="mv-qr-close-btn" data-action="closeQrModal">✕ Đóng</button>
+   </div>
+
+   <div class="mv-qr-modal-body">
+    <!-- CỘT TRÁI: MÃ QR CHUNG CỦA PHÒNG -->
+    <div class="mv-qr-main-box">
+     <div class="mv-qr-main-step">CÁCH 1 · QUÉT MÃ PHÒNG CHUNG</div>
+     <div class="mv-qr-main-frame">
+      ${renderRoomQrSvg(mainUrl, 236)}
+     </div>
+     <div class="mv-qr-room-pill">
+      <span>MÃ PHÒNG:</span>
+      <strong>${esc(rCode)}</strong>
+     </div>
+     <p class="mv-qr-main-hint">
+      Quét mã này → Chạm vào tên Đội là vào thẳng Chặng 1!
+     </p>
+     <div class="mv-qr-url-bar">${esc(mainUrl)}</div>
+     <div style="display:flex;gap:8px;width:100%;margin-top:8px">
+      <button type="button" class="button primary block" data-action="copy" data-url="${esc(mainUrl)}">📋 Sao chép Link phòng</button>
+     </div>
+    </div>
+
+    <!-- CỘT PHẢI: MÃ QR VÀO THẲNG TỪNG ĐỘI (0 BƯỚC CHỌN) -->
+    <div class="mv-qr-teams-panel">
+     <div class="mv-qr-main-step">CÁCH 2 · QUÉT MÃ QR CỦA ĐỘI ĐỂ VÀO THẲNG LUÔN (0 CHẠM)</div>
+     <div class="mv-qr-teams-grid">
+      ${activeTeams.map(t => {
+       const tUrl = getRoomJoinUrl(rCode, t.id);
+       return `<div class="mv-qr-team-item" style="--team-accent:${t.color}">
+        <div class="mv-qr-team-top">
+         <span>${t.avatar} <b>Đội ${t.num} · ${esc(t.name)}</b></span>
+         <button type="button" class="mv-chip-btn" data-action="copy" data-url="${esc(tUrl)}" title="Copy link vào thẳng Đội ${t.num}">📋 Link</button>
+        </div>
+        <div class="mv-qr-team-svg-wrap">
+         ${renderRoomQrSvg(tUrl, 112)}
+        </div>
+        <small>Quét là vào thẳng Đội ${t.num}</small>
+       </div>`;
+      }).join('')}
+     </div>
+    </div>
+   </div>
+  </div>
+ </div>`;
+}
+
 function startScreen(msg=''){
  const fRoom=esc(initialRoom || LiveClassroomSync.getActiveRoom() || '123456'),fTeam=esc(initialTeam || 'doi-1');
+ const roomJoinUrl = getRoomJoinUrl(fRoom);
  const teamCardsHtml = QUICK_LOGIN_TEAMS.map(t => `
   <button type="button"
    class="mv-quick-team-card ${fTeam === t.id ? 'is-selected' : ''}"
@@ -14100,7 +14852,7 @@ function startScreen(msg=''){
     </div>
 
     <p class="mv-qep-step-hint">
-     <b>Bước 2:</b> Nhấn trực tiếp vào <b>Đội của nhóm em</b> ở bên dưới để vào thẳng <b>Chặng 1</b> (<i>Không cần nhập mật khẩu hay mã PIN</i>):
+     <b>Bước 2:</b> Nhấn trực tiếp vào <b>Đội của nhóm em</b> ở bên dưới để vào thẳng <b>Chặng 1</b> (<i>Hoặc quét mã QR trên màn hình Giáo viên</i>):
     </p>
 
     <div class="mv-quick-teams-grid">
@@ -14108,15 +14860,23 @@ function startScreen(msg=''){
     </div>
    </div>
 
-   <!-- KHỐI GIÁO VIÊN: TẠO PHÒNG & BẢNG ĐIỀU KHIỂN 1 CHẠM -->
+   <!-- KHỐI GIÁO VIÊN: QUÉT MÃ QR & BẢNG ĐIỀU KHIỂN 1 CHẠM DỄ DÙNG -->
    <div class="mv-qep-card teacher-portal">
-    <span class="mv-qep-badge teacher">👩‍🏫 DÀNH CHO GIÁO VIÊN</span>
-    <h2 class="mv-qep-title">Phòng Điều Khiển & Trình Chiếu</h2>
-    <p class="mv-qep-desc">
-     Tạo phòng học mới hoặc mở ngay Bảng xếp hạng trực tiếp để trình chiếu trên máy chiếu lớp học (6 phút).
-    </p>
+    <span class="mv-qep-badge teacher">👩‍🏫 DÀNH CHO GIÁO VIÊN · DỄ DÙNG 1 CHẠM</span>
+    <h2 class="mv-qep-title">Mã QR & Bảng Điều Khiển Lớp Học</h2>
 
-    <div class="form-field" style="margin:10px 0 12px">
+    <div class="mv-qep-qr-preview-box">
+     <div class="mv-qep-qr-svg" data-action="openQrModal" title="Nhấn để phóng to Mã QR lên máy chiếu">
+      ${renderRoomQrSvg(roomJoinUrl, 92)}
+     </div>
+     <div class="mv-qep-qr-meta">
+      <small>MÃ PHÒNG HIỆN TẠI</small>
+      <strong class="mono">${fRoom}</strong>
+      <button type="button" class="mv-chip-btn gold" data-action="openQrModal">🔍 Phóng to Mã QR</button>
+     </div>
+    </div>
+
+    <div class="form-field" style="margin:8px 0 10px">
      <label for="teamCount">Số đội tham gia trong lớp</label>
      <select id="teamCount">
       <option value="4">4 đội (Đội 1 → Đội 4)</option>
@@ -14128,13 +14888,14 @@ function startScreen(msg=''){
     </div>
 
     <div class="mv-qep-teacher-actions">
-     ${btn('✨ TẠO PHÒNG MỚI & MỞ MÀN HÌNH GV','create','primary block')}
      ${btn('🖥️ MỞ NGAY MÀN HÌNH GIÁO VIÊN','demoTeacher','gold block')}
+     ${btn('✨ TẠO PHÒNG MỚI & LẤY MÃ QR MỚI','create','primary block')}
     </div>
    </div>
   </section>
 
   ${renderIntroHubBanner(false)}
+  ${showTeacherQrModal ? renderTeacherQrModal(fRoom) : ''}
  `);
 
  // Tự động đồng bộ mã phòng mới nhất nếu Giáo viên vừa tạo phòng trên máy chủ
@@ -15131,8 +15892,85 @@ function teacherScreen(){
 
  const joinBase = world.joinBaseURL || location.origin;
  const baseUrl = joinBase + location.pathname;
+ const roomJoinUrl = getRoomJoinUrl(world.room);
 
  return `<div class="gv-shell">
+  <!-- 0. THANH ĐIỀU KHIỂN NHANH & MÃ QR ĐƠN GIẢN DÀNH CHO GIÁO VIÊN -->
+  <section class="gv-easy-command-banner">
+   <!-- KHỐI 1: MÃ QR & MÃ PHÒNG LỚP HỌC -->
+   <div class="gv-ecb-card qr-card">
+    <div class="gv-qr-thumb-box" data-action="openQrModal" title="Nhấn để phóng to Mã QR lên máy chiếu cho cả lớp quét">
+     ${renderRoomQrSvg(roomJoinUrl, 108)}
+     <span class="gv-qr-zoom-tag">🔍 Phóng to</span>
+    </div>
+    <div class="gv-qr-info-col">
+     <span class="gv-ecb-step-badge">BƯỚC 1 · HỌC SINH VÀO PHÒNG</span>
+     <div class="gv-qr-room-code-line">
+      <span>MÃ PHÒNG:</span>
+      <strong class="mono">${esc(world.room)}</strong>
+     </div>
+     <small class="gv-qr-sub-text">Học sinh quét QR hoặc nhập mã phòng rồi chạm tên Đội (Không cần PIN)</small>
+     <div class="gv-qr-btn-row">
+      <button type="button" class="gv-easy-btn gold" data-action="openQrModal">📱 Phóng to Mã QR</button>
+      <button type="button" class="gv-easy-btn cyan" data-action="copy" data-url="${esc(roomJoinUrl)}">📋 Copy Link</button>
+     </div>
+    </div>
+   </div>
+
+   <!-- KHỐI 2: ĐIỀU KHIỂN TRÒ CHƠI 1 CHẠM -->
+   <div class="gv-ecb-card action-card">
+    <div class="flex-between">
+     <span class="gv-ecb-step-badge">BƯỚC 2 · ĐIỀU KHIỂN LƯỢT CHƠI (6 PHÚT)</span>
+     <span class="gv-live-state-pill ${isRunning ? 'running' : isPaused ? 'paused' : 'idle'}">
+      ${isRunning ? '🟢 Đang chạy' : isPaused ? '⏸ Đang tạm dừng' : isEnded ? '🏁 Đã kết thúc' : '⏳ Chờ bắt đầu'}
+     </span>
+    </div>
+    <div class="gv-primary-cta-wrap">
+     ${!isRunning && !isPaused ? `
+      <button type="button" class="gv-giant-primary-btn start" data-action="hostStartContest">
+       ▶️ BẮT ĐẦU TRÒ CHƠI NGAY (06:00)
+      </button>
+     ` : isRunning ? `
+      <button type="button" class="gv-giant-primary-btn pause" data-action="hostPauseContest">
+       ⏸️ TẠM DỪNG ĐỒNG HỒ LỚP HỌC
+      </button>
+     ` : `
+      <button type="button" class="gv-giant-primary-btn resume" data-action="hostResumeContest">
+       ▶️ TIẾP TỤC LƯỢT CHƠI
+      </button>
+     `}
+    </div>
+    <div class="gv-quick-sub-actions">
+     <button type="button" class="gv-easy-btn slate" data-action="timerReset" title="Đặt lại đồng hồ về 06:00">🔄 Đặt lại 06:00</button>
+     <button type="button" class="gv-easy-btn slate" data-action="teacherQuickNewRoom" title="Tạo mã phòng mới cho lớp học tiếp theo">➕ Tạo phòng mới</button>
+     <button type="button" class="gv-easy-btn rose" data-action="hostEndContest" ${isEnded ? 'disabled' : ''} title="Kết thúc lượt thi và mở Bảng Vinh Danh">🏆 Vinh danh</button>
+    </div>
+   </div>
+
+   <!-- KHỐI 3: CHẾ ĐỘ MÁY CHIẾU & CÔNG CỤ SƯ PHẠM -->
+   <div class="gv-ecb-card tools-card">
+    <span class="gv-ecb-step-badge">BƯỚC 3 · TRÌNH CHIẾU & HỖ TRỢ LỚP</span>
+    <div class="gv-tools-grid-2x2">
+     <button type="button" class="gv-tool-tile projector" data-action="hostOpenDisplay">
+      <strong>🖥️ Màn hình Máy chiếu</strong>
+      <small>Ẩn đáp án · Hiện QR & BXH</small>
+     </button>
+     <button type="button" class="gv-tool-tile model3d" data-action="toggleTeacher3DDrawer">
+      <strong>🧊 Mô hình 3D & Đáp án</strong>
+      <small>Giảng giải trực quan Oxyz</small>
+     </button>
+     <button type="button" class="gv-tool-tile broadcast" data-action="teacherBroadcast">
+      <strong>📢 Nhắn cả lớp</strong>
+      <small>Gửi gợi ý cho các đội</small>
+     </button>
+     <button type="button" class="gv-tool-tile student-preview" data-action="demoPlay">
+      <strong>🎮 Vào thử màn HS</strong>
+      <small>Chơi thử với tư cách Đội 1</small>
+     </button>
+    </div>
+   </div>
+  </section>
+
   <!-- 1. BỐN THẺ KPI LỚN (4 KPI CARDS) -->
   <section class="gv-kpi-container">
    <div class="gv-kpi-grid">
@@ -15352,6 +16190,7 @@ function teacherScreen(){
    <button type="button" class="gv-ctrl-btn end" data-action="hostEndContest" ${isEnded ? 'disabled' : ''}>KẾT THÚC</button>
   </footer>
   ${renderTeacherTeamModal()}
+  ${showTeacherQrModal ? renderTeacherQrModal(world.room) : ''}
  </div>`;
 }
 
@@ -15362,10 +16201,24 @@ function displayScreen(){
  const barColors = ['#FFC953', '#7DD3FC', '#C4B5FD', '#FDBA74', '#35C992', '#F472B6'];
  const journeyLabels = ['1 · Hiệu vectơ', '2 · Tổng vectơ', '3 · Hình bình hành', '4 · Trung điểm', '5 · Trọng tâm'];
  const phaseInfo = getTimelinePhaseInfo(world.clock);
+ const roomJoinUrl = getRoomJoinUrl(world.room);
 
  return `<div class="gv-shell display-mode-shell">
   <section class="gv-kpi-container">
-   <div class="gv-kpi-grid" style="grid-template-columns:repeat(3,1fr)">
+   <div class="gv-kpi-grid" style="grid-template-columns:1.35fr repeat(3,1fr)">
+    <div class="gv-kpi-card gv-display-qr-card">
+     <div class="gv-display-qr-thumb" data-action="openQrModal" title="Nhấn để phóng to Mã QR toàn màn hình">
+      ${renderRoomQrSvg(roomJoinUrl, 86)}
+     </div>
+     <div class="gv-display-qr-meta">
+      <span class="gv-kpi-label">QUÉT QR VÀO PHÒNG</span>
+      <strong class="gv-kpi-value gold mono" style="font-size:24px">${esc(world.room)}</strong>
+      <div style="display:flex;gap:6px;margin-top:4px">
+       <button type="button" class="gv-easy-btn gold" style="padding:4px 9px;font-size:11.5px" data-action="openQrModal">🔍 Phóng to QR</button>
+       <button type="button" class="gv-easy-btn slate" style="padding:4px 9px;font-size:11.5px" data-action="exitDisplayMode">🎛️ Màn Giáo viên</button>
+      </div>
+     </div>
+    </div>
     <div class="gv-kpi-card">
      <span class="gv-kpi-label">ĐỘI THAM GIA</span>
      <strong class="gv-kpi-value cyan">${String(teams.length).padStart(2, '0')} ĐỘI</strong>
@@ -15440,6 +16293,7 @@ function displayScreen(){
     }).join('')}
    </div>
   </section>
+  ${showTeacherQrModal ? renderTeacherQrModal(world.room) : ''}
  </div>`;
 }
 
@@ -25769,6 +26623,24 @@ async function handle(action,el){
    LiveClassroomSync.clearTeamSnapshot(team);
    await submit('/api/teacher',{action:'resetTeam',team});
    updateAfterAction();
+   return;
+  }
+  if(action==='openQrModal'){
+   showTeacherQrModal = true;
+   if(session) render(); else startScreen();
+   return;
+  }
+  if(action==='closeQrModal'){
+   showTeacherQrModal = false;
+   if(session) render(); else startScreen();
+   return;
+  }
+  if(action==='teacherQuickNewRoom'){
+   const count = Number(world?.teams?.length || 6);
+   const r = await api('/api/create',{teamCount:count});
+   saveSession({role:'teacher',room:r.room,token:r.teacherToken});
+   showTeacherQrModal = true;
+   await refresh(true);
    return;
   }
   if(action==='toggleTeacherPinDrawer'){

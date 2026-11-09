@@ -9,6 +9,21 @@ Tất cả những thay đổi quan trọng của dự án này sẽ được gh
 
 ---
 
+## [5.6.0] - 2026-11-09
+
+### Added & Changed (Tạo Mã QR Quét Phòng Đơn Giản & Màn Hình Giáo Viên Dễ Sử Dụng 1 Chạm)
+- **Bộ Tạo Mã QR SVG Thuần JavaScript & Cửa Sổ Trình Chiếu Mã QR Toàn Màn Hình (`MATHVERSE_OXYZ_MINIGAMES/public/app.js`, `MATHVERSE_OXYZ_MINIGAMES/public/style.css`):**
+  1. **Tạo mã QR tự động chuẩn ISO/IEC 18004 (`renderRoomQrSvg`, `getRoomJoinUrl`):** Không phụ thuộc thư viện ngoài hay Internet, hoạt động 100% cả trên mạng LAN lớp học lẫn trên Vercel (`https://mathverse-oxyz.vercel.app`).
+  2. **Bảng Phóng To Mã QR Lên Máy Chiếu (`renderTeacherQrModal`):** Hỗ trợ 2 cách quét cực kỳ linh hoạt cho học sinh:
+     - **Cách 1 – Quét Mã QR Chung của Phòng (`?room=XXXXXX`):** Học sinh quét 1 lần rồi chạm vào tên Đội là vào thẳng Chặng 1.
+     - **Cách 2 – Quét Mã QR Riêng của từng Đội (`?room=XXXXXX&team=doi-X`):** Học sinh quét đúng mã QR của đội mình là tự động đăng nhập thẳng vào đội đó (0 bước chạm).
+  3. **Thanh Điều Khiển Nhanh 3 Bước Ở Đầu Màn Hình Giáo Viên (`.gv-easy-command-banner` trong `teacherScreen()` & `displayScreen()`):**
+     - **Bước 1 (Vào phòng):** Hiển thị trực tiếp Mã QR + Mã phòng cỡ lớn + nút `📱 Phóng to Mã QR` + `📋 Copy Link`.
+     - **Bước 2 (Điều khiển 1 chạm):** Nút chính nổi bật (`▶️ BẮT ĐẦU TRÒ CHƠI NGAY (06:00)` / `⏸️ TẠM DỪNG` / `▶️ TIẾP TỤC`) kèm nút `🔄 Đặt lại 06:00`, `➕ Tạo phòng mới` và `🏆 Vinh danh`.
+     - **Bước 3 (Trình chiếu & Hỗ trợ lớp):** Bố cục 4 ô trực quan (`🖥️ Màn hình Máy chiếu`, `🧊 Mô hình 3D & Đáp án`, `📢 Nhắn cả lớp`, `🎮 Vào thử màn HS`).
+
+---
+
 ## [5.5.9] - 2026-11-09
 
 ### Changed (Tối Giản Đăng Nhập 1–2 Bước: Học Sinh Chạm Thẻ Đội Là Vào Phòng Game Ngay)
