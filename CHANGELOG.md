@@ -9,6 +9,22 @@ Tất cả những thay đổi quan trọng của dự án này sẽ được gh
 
 ---
 
+## [5.6.1] - 2026-11-09
+
+### Changed & Fixed (Giao Diện Thân Thiện, Ít Chữ, Dễ Dùng & Chuẩn Hóa Logic Game Lớp Học)
+- **Tối Giản Toàn Bộ 4 Màn Hình Để Ít Chữ, Thoáng Đãng & Dễ Nhìn (`MATHVERSE_OXYZ_MINIGAMES/public/app.js`, `MATHVERSE_OXYZ_MINIGAMES/public/style.css`):**
+  1. **Màn Hình Đăng Nhập (`startScreen`):** Gỡ bỏ khung giới thiệu dài dòng bên dưới (`renderIntroHubBanner(false)`), chỉ giữ duy nhất 2 thẻ gọn gàng: **Học sinh chọn Đội 1 chạm** và **Giáo viên quét Mã QR / mở Bảng điều khiển 1 chạm**.
+  2. **Màn Hình Giáo Viên (`teacherScreen`):** Xóa thanh điều khiển trùng lặp dưới đáy (`<footer class="gv-control-bar">`), gom 7 huy hiệu nhỏ li ti ở mỗi dòng đội thành tối đa 2 nhãn rõ ràng (`🏆 Đã về đích` / `🐉 Đang giải Chặng X` + `❌ Y sai`), rút gọn cột phải.
+  3. **Màn Hình Máy Chiếu (`displayScreen`):** Lược bỏ toàn bộ các dòng phụ nhỏ dưới tên đội để học sinh ngồi cuối lớp vẫn đọc rõ **Hạng, Tên đội, Chặng X/5, Thanh tiến độ 5 Ấn và Điểm XP**.
+  4. **Màn Hình 5 Chặng Của Học Sinh (`studentScreen` & Chặng 1–5):** Rút gọn các câu thoại hướng dẫn của Rồng Xanh và tiêu đề bước thành 1 dòng súc tích, dễ đọc nhanh.
+- **Chuẩn Hóa 4 Logic Game Cốt Lõi (`MATHVERSE_OXYZ_MINIGAMES/server.js`, `MATHVERSE_OXYZ_MINIGAMES/public/app.js`, `scratch/build_standalone.js`):**
+  1. **Chờ Giáo Viên Bấm Bắt Đầu (`isWaitingForTeacherStart`, `/api/startRoom`, `GLOBAL_ROOM_STATUS`):** Học sinh vào phòng trước sẽ hiển thị màn hình chờ thân thiện (`⏳ ĐỘI ĐÃ VÀO PHÒNG · Chờ Giáo viên bấm ▶️ BẮT ĐẦU`) để cả lớp xuất phát công bằng cùng lúc (vẫn kèm nút `▶️ Chơi tự luyện ngay` nếu học sinh tự ôn tập ở nhà).
+  2. **Điểm Sàn `0 XP` & Đồng Bộ Điểm Chính Xác (`mergeTeamSnapshot`):** Đảm bảo điểm XP của mọi đội không bao giờ âm (`Math.max(0, score)`), đồng thời ưu tiên đồng bộ bản ghi mới nhất kể cả khi đội vừa bị trừ điểm do trả lời sai.
+  3. **Tự Động Dừng & Mở Bục Vinh Danh Khi Hết 06:00 (`updateClock`, `roomState`):** Khi đồng hồ chủ 6 phút của phòng về `00:00`, hệ thống tự động khóa lượt thi (`ended = true`), hiển thị thẻ tổng kết điểm cho học sinh và bật **Bục Vinh Danh Top 3** trên màn hình Giáo viên.
+  4. **Xếp Hạng Công Bằng (`sortTeamsFairly`):** Thống nhất thứ tự xếp hạng trên mọi màn hình và file CSV: **(1) Đội đã hoàn thành đủ 5/5 chặng** $\rightarrow$ **(2) Tổng điểm XP cao hơn** $\rightarrow$ **(3) Về đích sớm hơn (hoặc đang ở chặng/tiến độ cao hơn)** $\rightarrow$ **(4) Ít lượt sai hơn**.
+
+---
+
 ## [5.6.0] - 2026-11-09
 
 ### Added & Changed (Tạo Mã QR Quét Phòng Đơn Giản & Màn Hình Giáo Viên Dễ Sử Dụng 1 Chạm)

@@ -631,18 +631,68 @@ const LiveClassroomSync = {
   const cur = world.teams[idx];
   const mergedStage = Math.max(cur.stage || 0, snap.stage || 0, snap.completed ? 5 : 0);
   const isCompleted = Boolean(cur.completed || snap.completed || mergedStage >= 5);
+  const isNewer = (snap.updatedAt || 0) >= (cur.updatedAt || 0);
+  const nextScore = typeof snap.score === 'number'
+   ? Math.max(0, isNewer ? snap.score : Math.max(cur.score ?? 20, snap.score))
+   : Math.max(0, cur.score ?? 20);
   world.teams[idx] = {
    ...cur,
    ...snap,
    stage: isCompleted ? 5 : mergedStage,
    completed: isCompleted,
-   score: Math.max(cur.score ?? 20, snap.score ?? 20),
+   score: nextScore,
    gold: Math.max(cur.gold ?? 120, snap.gold ?? 120),
    digits: (snap.digits && snap.digits.length >= (cur.digits?.length || 0)) ? snap.digits : (cur.digits || [])
   };
   return true;
+ },
+ broadcastRoomStatus(statusObj) {
+  if (!this.channel || !statusObj) return;
+  try {
+   this.channel.postMessage({ type: 'room_status', ...statusObj, updatedAt: Date.now() });
+  } catch (e) {}
  }
 };
+
+let studentSoloStarted = false;
+
+function sortTeamsFairly(teams) {
+ return [...(teams || [])].sort((a, b) => {
+  const aComp = Boolean(a.completed || (a.stage || 0) >= 5) ? 1 : 0;
+  const bComp = Boolean(b.completed || (b.stage || 0) >= 5) ? 1 : 0;
+  if (bComp !== aComp) return bComp - aComp;
+  const aScore = Math.max(0, a.score ?? 0);
+  const bScore = Math.max(0, b.score ?? 0);
+  if (aComp && bComp) {
+   if (bScore !== aScore) return bScore - aScore;
+   const aFin = String(a.finishedAt || '9999');
+   const bFin = String(b.finishedAt || '9999');
+   if (aFin !== bFin) return aFin.localeCompare(bFin);
+  }
+  const aStg = a.stage || 0;
+  const bStg = b.stage || 0;
+  if (bStg !== aStg) return bStg - aStg;
+  if (bScore !== aScore) return bScore - aScore;
+  const aProg = (a.round || 0) * 10 + (a.stage1?.cluesFound || 0) + (a.stage2?.solvedCount || 0) + (a.stage4?.matchedCount || 0) + (a.stage5?.phase || 0);
+  const bProg = (b.round || 0) * 10 + (b.stage1?.cluesFound || 0) + (b.stage2?.solvedCount || 0) + (b.stage4?.matchedCount || 0) + (b.stage5?.phase || 0);
+  if (bProg !== aProg) return bProg - aProg;
+  const aWrong = (a.wrong || 0) + (a.stage1?.wrongAttempts || 0) + (a.stage2?.wrongAttempts || 0) + (a.stage4?.wrongMatches || 0) + (a.stage5?.wrongAttempts || 0);
+  const bWrong = (b.wrong || 0) + (b.stage1?.wrongAttempts || 0) + (b.stage2?.wrongAttempts || 0) + (b.stage4?.wrongMatches || 0) + (b.stage5?.wrongAttempts || 0);
+  if (aWrong !== bWrong) return aWrong - bWrong;
+  return String(a.finishedAt || '9999').localeCompare(String(b.finishedAt || '9999'));
+ });
+}
+
+function isWaitingForTeacherStart() {
+ if (session?.role !== 'student' || window.IS_DEMO_MODE || studentSoloStarted) return false;
+ if (!world || world.ended || world.paused) return false;
+ if (world.started || world.clock?.running) return false;
+ const totalMs = (world.clock?.minutes || 6) * 60000;
+ if (typeof world.clock?.remainingMs === 'number' && world.clock.remainingMs < totalMs - 1000) return false;
+ const me = world.me || {};
+ if ((me.stage || 0) > 0 || me.completed || (me.stage1?.cluesFound || 0) > 0) return false;
+ return true;
+}
 
 if (LiveClassroomSync.channel) {
  LiveClassroomSync.channel.onmessage = (ev) => {
@@ -653,6 +703,8 @@ if (LiveClassroomSync.channel) {
     lastSignature = '';
     render();
    }
+  } else if (msg.type === 'room_status' && session) {
+   refresh(true);
   }
  };
 }
@@ -1480,65 +1532,60 @@ function startScreen(msg=''){
  app.innerHTML=layout(`
   ${msg?`<div class="notice error" style="margin-bottom:12px">${esc(msg)}</div>`:''}
 
-  <!-- CỔNG ĐĂNG NHẬP SIÊU TỐC 1–2 BƯỚC ĐẶT NGAY ĐẦU TRANG (KHÔNG CẦN CUỘN, KHÔNG CẦN MÃ PIN) -->
+  <!-- CỔNG ĐĂNG NHẬP SIÊU TỐC 1–2 BƯỚC ĐẶT NGAY ĐẦU TRANG (ÍT CHỮ, DỄ DÙNG) -->
   <section class="mv-quick-entry-portal" id="entry">
    <!-- KHỐI HỌC SINH: CHỈ CẦN CHẠM VÀO ĐỘI ĐỂ VÀO CHƠI NGAY -->
    <div class="mv-qep-card student-portal">
     <div class="mv-qep-header">
      <div>
-      <span class="mv-qep-badge student">🧑‍🚀 DÀNH CHO HỌC SINH · VÀO GAME TRONG 2 GIÂY</span>
-      <h2 class="mv-qep-title">Chọn Đội Thám Hiểm Để Vào Phòng Ngay</h2>
+      <span class="mv-qep-badge student">🧑‍🚀 HỌC SINH</span>
+      <h2 class="mv-qep-title">Chạm Vào Đội Để Vào Phòng Ngay</h2>
      </div>
      <div class="mv-qep-room-box">
-      <label for="roomInput">Bước 1 · Mã phòng</label>
-      <input id="roomInput" type="text" inputmode="numeric" maxlength="6" class="mono mv-qep-room-input" value="${fRoom}" placeholder="123456" title="Nhập mã phòng 6 số do Giáo viên cung cấp (hoặc giữ nguyên mã phòng mặc định)" />
+      <label for="roomInput">Mã phòng</label>
+      <input id="roomInput" type="text" inputmode="numeric" maxlength="6" class="mono mv-qep-room-input" value="${fRoom}" placeholder="123456" title="Mã phòng 6 số" />
      </div>
     </div>
 
-    <p class="mv-qep-step-hint">
-     <b>Bước 2:</b> Nhấn trực tiếp vào <b>Đội của nhóm em</b> ở bên dưới để vào thẳng <b>Chặng 1</b> (<i>Hoặc quét mã QR trên màn hình Giáo viên</i>):
-    </p>
-
-    <div class="mv-quick-teams-grid">
+    <div class="mv-quick-teams-grid" style="margin-top:6px">
      ${teamCardsHtml}
     </div>
    </div>
 
    <!-- KHỐI GIÁO VIÊN: QUÉT MÃ QR & BẢNG ĐIỀU KHIỂN 1 CHẠM DỄ DÙNG -->
    <div class="mv-qep-card teacher-portal">
-    <span class="mv-qep-badge teacher">👩‍🏫 DÀNH CHO GIÁO VIÊN · DỄ DÙNG 1 CHẠM</span>
-    <h2 class="mv-qep-title">Mã QR & Bảng Điều Khiển Lớp Học</h2>
+    <span class="mv-qep-badge teacher">👩‍🏫 GIÁO VIÊN</span>
+    <h2 class="mv-qep-title">Mã QR & Điều Khiển Lớp Học</h2>
 
     <div class="mv-qep-qr-preview-box">
      <div class="mv-qep-qr-svg" data-action="openQrModal" title="Nhấn để phóng to Mã QR lên máy chiếu">
-      ${renderRoomQrSvg(roomJoinUrl, 92)}
+      ${renderRoomQrSvg(roomJoinUrl, 96)}
      </div>
      <div class="mv-qep-qr-meta">
-      <small>MÃ PHÒNG HIỆN TẠI</small>
+      <small>MÃ PHÒNG</small>
       <strong class="mono">${fRoom}</strong>
-      <button type="button" class="mv-chip-btn gold" data-action="openQrModal">🔍 Phóng to Mã QR</button>
+      <button type="button" class="mv-chip-btn gold" data-action="openQrModal">🔍 Phóng to QR</button>
      </div>
     </div>
 
-    <div class="form-field" style="margin:8px 0 10px">
-     <label for="teamCount">Số đội tham gia trong lớp</label>
+    <div class="form-field" style="margin:6px 0 8px">
+     <label for="teamCount">Số đội tham gia</label>
      <select id="teamCount">
-      <option value="4">4 đội (Đội 1 → Đội 4)</option>
-      <option value="5">5 đội (Đội 1 → Đội 5)</option>
-      <option value="6" selected>6 đội (Đội 1 → Đội 6)</option>
-      <option value="7">7 đội (Đội 1 → Đội 7)</option>
-      <option value="8">8 đội (Đội 1 → Đội 8)</option>
+      <option value="4">4 đội</option>
+      <option value="5">5 đội</option>
+      <option value="6" selected>6 đội (Mặc định)</option>
+      <option value="7">7 đội</option>
+      <option value="8">8 đội</option>
      </select>
     </div>
 
     <div class="mv-qep-teacher-actions">
-     ${btn('🖥️ MỞ NGAY MÀN HÌNH GIÁO VIÊN','demoTeacher','gold block')}
-     ${btn('✨ TẠO PHÒNG MỚI & LẤY MÃ QR MỚI','create','primary block')}
+     ${btn('🖥️ MỞ MÀN HÌNH GIÁO VIÊN','demoTeacher','gold block')}
+     ${btn('✨ TẠO PHÒNG MỚI','create','primary block')}
     </div>
    </div>
   </section>
 
-  ${renderIntroHubBanner(false)}
   ${showTeacherQrModal ? renderTeacherQrModal(fRoom) : ''}
  `);
 
@@ -2363,7 +2410,7 @@ function teacherMap(teams){
 }
 
 function standings(teams,compact=false){
- const list=[...teams].sort((a,b)=>b.score-a.score||(b.stage-a.stage)||(b.round-a.round)||((a.finishedAt||'9999').localeCompare(b.finishedAt||'9999')));
+ const list=sortTeamsFairly(teams);
  if(compact){
   const meId = world?.me?.id;
   const myIdx = Math.max(0, list.findIndex(t => t.id === meId));
@@ -2501,7 +2548,7 @@ window.switchInspectorTeam = function(teamId) {
 
 function teacherScreen(){
  const teams = world.teams || [];
- const sortedTeams = [...teams].sort((a,b)=>b.score-a.score||(b.stage-a.stage)||(b.round-a.round)||((a.finishedAt||'9999').localeCompare(b.finishedAt||'9999')));
+ const sortedTeams = sortTeamsFairly(teams);
  const onlineTeams = teams.filter(t => (t.answerLog?.length > 0) || t.stage > 0 || t.round > 0 || t.score > 0);
  const activeCount = onlineTeams.length || teams.length;
  const maxStageNum = Math.min(5, Math.max(1, ...teams.map(t => Math.min(5, (t.stage || 0) + 1))));
@@ -2539,23 +2586,22 @@ function teacherScreen(){
  const roomJoinUrl = getRoomJoinUrl(world.room);
 
  return `<div class="gv-shell">
-  <!-- 0. THANH ĐIỀU KHIỂN NHANH & MÃ QR ĐƠN GIẢN DÀNH CHO GIÁO VIÊN -->
+  <!-- 0. THANH ĐIỀU KHIỂN NHANH & MÃ QR ĐƠN GIẢN DÀNH CHO GIÁO VIÊN (GỌN, KHÔNG TRÙNG NÚT) -->
   <section class="gv-easy-command-banner">
    <!-- KHỐI 1: MÃ QR & MÃ PHÒNG LỚP HỌC -->
    <div class="gv-ecb-card qr-card">
-    <div class="gv-qr-thumb-box" data-action="openQrModal" title="Nhấn để phóng to Mã QR lên máy chiếu cho cả lớp quét">
-     ${renderRoomQrSvg(roomJoinUrl, 108)}
+    <div class="gv-qr-thumb-box" data-action="openQrModal" title="Nhấn để phóng to Mã QR lên máy chiếu">
+     ${renderRoomQrSvg(roomJoinUrl, 104)}
      <span class="gv-qr-zoom-tag">🔍 Phóng to</span>
     </div>
     <div class="gv-qr-info-col">
-     <span class="gv-ecb-step-badge">BƯỚC 1 · HỌC SINH VÀO PHÒNG</span>
+     <span class="gv-ecb-step-badge">1 · HỌC SINH VÀO PHÒNG</span>
      <div class="gv-qr-room-code-line">
-      <span>MÃ PHÒNG:</span>
+      <span>PHÒNG:</span>
       <strong class="mono">${esc(world.room)}</strong>
      </div>
-     <small class="gv-qr-sub-text">Học sinh quét QR hoặc nhập mã phòng rồi chạm tên Đội (Không cần PIN)</small>
      <div class="gv-qr-btn-row">
-      <button type="button" class="gv-easy-btn gold" data-action="openQrModal">📱 Phóng to Mã QR</button>
+      <button type="button" class="gv-easy-btn gold" data-action="openQrModal">📱 Phóng to QR</button>
       <button type="button" class="gv-easy-btn cyan" data-action="copy" data-url="${esc(roomJoinUrl)}">📋 Copy Link</button>
      </div>
     </div>
@@ -2564,19 +2610,19 @@ function teacherScreen(){
    <!-- KHỐI 2: ĐIỀU KHIỂN TRÒ CHƠI 1 CHẠM -->
    <div class="gv-ecb-card action-card">
     <div class="flex-between">
-     <span class="gv-ecb-step-badge">BƯỚC 2 · ĐIỀU KHIỂN LƯỢT CHƠI (6 PHÚT)</span>
+     <span class="gv-ecb-step-badge">2 · ĐIỀU KHIỂN LƯỢT CHƠI</span>
      <span class="gv-live-state-pill ${isRunning ? 'running' : isPaused ? 'paused' : 'idle'}">
-      ${isRunning ? '🟢 Đang chạy' : isPaused ? '⏸ Đang tạm dừng' : isEnded ? '🏁 Đã kết thúc' : '⏳ Chờ bắt đầu'}
+      ${isRunning ? '🟢 Đang chạy' : isPaused ? '⏸ Tạm dừng' : isEnded ? '🏁 Đã kết thúc' : '⏳ Chờ bắt đầu'}
      </span>
     </div>
     <div class="gv-primary-cta-wrap">
      ${!isRunning && !isPaused ? `
       <button type="button" class="gv-giant-primary-btn start" data-action="hostStartContest">
-       ▶️ BẮT ĐẦU TRÒ CHƠI NGAY (06:00)
+       ▶️ BẮT ĐẦU TRÒ CHƠI (06:00)
       </button>
      ` : isRunning ? `
       <button type="button" class="gv-giant-primary-btn pause" data-action="hostPauseContest">
-       ⏸️ TẠM DỪNG ĐỒNG HỒ LỚP HỌC
+       ⏸️ TẠM DỪNG ĐỒNG HỒ
       </button>
      ` : `
       <button type="button" class="gv-giant-primary-btn resume" data-action="hostResumeContest">
@@ -2586,30 +2632,30 @@ function teacherScreen(){
     </div>
     <div class="gv-quick-sub-actions">
      <button type="button" class="gv-easy-btn slate" data-action="timerReset" title="Đặt lại đồng hồ về 06:00">🔄 Đặt lại 06:00</button>
-     <button type="button" class="gv-easy-btn slate" data-action="teacherQuickNewRoom" title="Tạo mã phòng mới cho lớp học tiếp theo">➕ Tạo phòng mới</button>
+     <button type="button" class="gv-easy-btn slate" data-action="teacherQuickNewRoom" title="Tạo mã phòng mới">➕ Phòng mới</button>
      <button type="button" class="gv-easy-btn rose" data-action="hostEndContest" ${isEnded ? 'disabled' : ''} title="Kết thúc lượt thi và mở Bảng Vinh Danh">🏆 Vinh danh</button>
     </div>
    </div>
 
    <!-- KHỐI 3: CHẾ ĐỘ MÁY CHIẾU & CÔNG CỤ SƯ PHẠM -->
    <div class="gv-ecb-card tools-card">
-    <span class="gv-ecb-step-badge">BƯỚC 3 · TRÌNH CHIẾU & HỖ TRỢ LỚP</span>
+    <span class="gv-ecb-step-badge">3 · TRÌNH CHIẾU & HỖ TRỢ</span>
     <div class="gv-tools-grid-2x2">
      <button type="button" class="gv-tool-tile projector" data-action="hostOpenDisplay">
-      <strong>🖥️ Màn hình Máy chiếu</strong>
-      <small>Ẩn đáp án · Hiện QR & BXH</small>
+      <strong>🖥️ Màn Máy chiếu</strong>
+      <small>Ẩn đáp án · Hiện BXH</small>
      </button>
      <button type="button" class="gv-tool-tile model3d" data-action="toggleTeacher3DDrawer">
       <strong>🧊 Mô hình 3D & Đáp án</strong>
-      <small>Giảng giải trực quan Oxyz</small>
+      <small>Giảng giải Oxyz</small>
      </button>
      <button type="button" class="gv-tool-tile broadcast" data-action="teacherBroadcast">
       <strong>📢 Nhắn cả lớp</strong>
-      <small>Gửi gợi ý cho các đội</small>
+      <small>Gửi gợi ý nhanh</small>
      </button>
      <button type="button" class="gv-tool-tile student-preview" data-action="demoPlay">
       <strong>🎮 Vào thử màn HS</strong>
-      <small>Chơi thử với tư cách Đội 1</small>
+      <small>Chơi thử Đội 1</small>
      </button>
     </div>
    </div>
@@ -2619,38 +2665,38 @@ function teacherScreen(){
   <section class="gv-kpi-container">
    <div class="gv-kpi-grid">
     <div class="gv-kpi-card">
-     <span class="gv-kpi-label">ĐỘI ĐANG CHƠI</span>
-     <strong class="gv-kpi-value cyan">${String(activeCount).padStart(2, '0')}</strong>
-     <small class="gv-kpi-sub">Tổng số: ${teams.length} đội trong phòng</small>
+     <span class="gv-kpi-label">ĐỘI THAM GIA</span>
+     <strong class="gv-kpi-value cyan">${String(activeCount).padStart(2, '0')}/${String(teams.length).padStart(2, '0')}</strong>
+     <small class="gv-kpi-sub">Đội đang hoạt động</small>
     </div>
     <div class="gv-kpi-card">
-     <span class="gv-kpi-label">CHẶNG HIỆN TẠI</span>
-     <strong class="gv-kpi-value cyan">${String(maxStageNum).padStart(2, '0')}/05</strong>
+     <span class="gv-kpi-label">CHẶNG DẪN ĐẦU</span>
+     <strong class="gv-kpi-value cyan">0${maxStageNum}/05</strong>
      <small class="gv-kpi-sub">${esc(phaseInfo.label)}</small>
     </div>
     <div class="gv-kpi-card">
-     <span class="gv-kpi-label">CÂU ĐÚNG TOÀN LỚP</span>
+     <span class="gv-kpi-label">CÂU ĐÚNG CẢ LỚP</span>
      <strong class="gv-kpi-value cyan">${String(totalCorrect).padStart(2, '0')}/${String(totalDenom).padStart(2, '0')}</strong>
-     <small class="gv-kpi-sub">${ped.totalAnswered > 0 ? `Trên ${ped.totalAnswered} lượt trả lời hợp lệ` : `Tối đa ${teams.length * 10} câu toàn lớp`}</small>
+     <small class="gv-kpi-sub">Tỉ lệ hoàn thành câu hỏi</small>
     </div>
     <div class="gv-kpi-card">
      <span class="gv-kpi-label">THỜI GIAN CÒN LẠI</span>
      <strong class="gv-kpi-value gold" id="clock">06:00</strong>
-     <small class="gv-kpi-sub">Kịch bản chuẩn 360 giây (6 phút)</small>
+     <small class="gv-kpi-sub">Tự động vinh danh khi hết giờ</small>
     </div>
    </div>
   </section>
 
   <!-- 2. THANH HÀNH TRÌNH 5 CHẶNG (HÀNH TRÌNH) -->
   <section class="gv-journey-bar">
-   <span class="gv-journey-title">HÀNH TRÌNH</span>
+   <span class="gv-journey-title">5 CHẶNG</span>
    <div class="gv-journey-pills">
     ${journeyLabels.map((lbl, idx) => {
      const stNum = idx + 1;
      const isCur = stNum === maxStageNum;
      const isDone = stNum < maxStageNum;
      const teamsHere = teams.filter(t => (t.stage === idx && !t.completed) || (idx === 4 && t.completed)).length;
-     return `<button type="button" class="gv-journey-pill ${isCur ? 'active' : isDone ? 'done' : ''}" data-action="teacherSelectStage3D" data-stage="${idx}" title="Nhấn để xem mô hình 3D & câu hỏi Chặng ${stNum}">
+     return `<button type="button" class="gv-journey-pill ${isCur ? 'active' : isDone ? 'done' : ''}" data-action="teacherSelectStage3D" data-stage="${idx}" title="Xem mô hình 3D & đáp án Chặng ${stNum}">
       <span>${esc(lbl)}</span>
       ${teamsHere > 0 ? `<small class="gv-pill-count">${teamsHere} đội</small>` : ''}
      </button>`;
@@ -2660,7 +2706,7 @@ function teacherScreen(){
 
   ${showTeacher3DDrawer ? `<section class="gv-drawer-box">
    <div class="flex-between" style="margin-bottom:8px">
-    <strong style="color:#FFC953">🧊 Mô hình 3D & Đáp án Sư phạm Chặng ${teacherPreviewStage + 1}: ${esc(world.missions[teacherPreviewStage]?.title || '')}</strong>
+    <strong style="color:#FFC953">🧊 Mô hình 3D & Đáp án Chặng ${teacherPreviewStage + 1}: ${esc(world.missions[teacherPreviewStage]?.title || '')}</strong>
     <button type="button" class="mv-chip-btn" data-action="toggleTeacher3DDrawer">✕ Đóng</button>
    </div>
    ${renderOxyz3D(world.missions[teacherPreviewStage] || world.stages[teacherPreviewStage], true)}
@@ -2668,12 +2714,10 @@ function teacherScreen(){
     ${(world.missions[teacherPreviewStage]?.questionPool || world.missions[teacherPreviewStage]?.challenges || []).map((q, qi) => {
      const qStat = ped.byQuestion?.[q.id] || { correct: 0, total: 0 };
      const qPct = qStat.total > 0 ? Math.round((qStat.correct / qStat.total) * 100) + '%' : 'Chưa làm';
-     const allTeamsPassedStage = teams.length > 0 && teams.every(tm => tm.completed || (tm.stage || 0) > teacherPreviewStage);
-     const canRevealAnswerOnProjector = world.status === 'ended' || allTeamsPassedStage;
      return `<div class="gv-ped-qcard">
       <div class="flex-between"><b style="color:#36DEF4">Câu ${esc(q.id || (qi+1))}</b><span class="pill green">Đúng: ${qPct} (${qStat.correct}/${qStat.total})</span></div>
       <div style="margin:6px 0;font-size:13px;color:#F8FAFF">${formatMath(q.prompt)}</div>
-      <div style="color:#FFC953;font-size:12.5px;font-weight:800">${canRevealAnswerOnProjector ? `✓ Đáp án ${esc(q.answer)}: ${formatMath(q.options?.[q.correct] || '')}` : '🔒 Đáp án đang ẩn trên máy chiếu để bảo mật trong khi các đội đang giải mã'}</div>
+      <div style="color:#FFC953;font-size:12.5px;font-weight:800">✓ Đáp án ${esc(q.answer)}: ${formatMath(q.options?.[q.correct] || '')}</div>
      </div>`;
     }).join('')}
    </div>
@@ -2681,30 +2725,26 @@ function teacherScreen(){
 
   ${showTeacherPinDrawer ? `<section class="gv-drawer-box">
    <div class="flex-between" style="margin-bottom:10px">
-    <strong style="color:#36DEF4">🔑 MÃ PHÒNG: <span style="color:#FFC953;font-size:17px">${esc(world.room)}</span> — HỌC SINH CHỈ CẦN NHẬP MÃ PHÒNG & CHẠM VÀO TÊN ĐỘI ĐỂ VÀO NGAY (URL: ${esc(joinBase)})</strong>
-    <div style="display:flex;gap:8px">
-     ${window.IS_DEMO_MODE ? `<button type="button" class="mv-chip-btn" data-action="demoPlay">🎮 Chuyển sang Màn hình Học sinh</button>` : ''}
-     <button type="button" class="mv-chip-btn" data-action="exportCSV">📥 Xuất CSV</button>
-     <button type="button" class="mv-chip-btn" data-action="toggleTeacherPinDrawer">✕ Đóng</button>
-    </div>
+    <strong style="color:#36DEF4">🔗 LINK VÀO THẲNG TỪNG ĐỘI (PHÒNG ${esc(world.room)})</strong>
+    <button type="button" class="mv-chip-btn" data-action="toggleTeacherPinDrawer">✕ Đóng</button>
    </div>
    <div class="gv-pin-grid">
     ${teams.map(t => `<div class="gv-pin-card">
-     <div><b>${t.avatar} ${esc(t.name)}</b><br/><small style="color:#A7F3D0">✓ Chạm 1 lần vào thẻ đội để vào ngay (Không cần PIN)</small></div>
-     <button type="button" class="mv-chip-btn" data-action="copy" data-url="${esc(baseUrl+'?room='+world.room+'&team='+t.id)}">⧉ Link vào thẳng</button>
+     <div><b>${t.avatar} ${esc(t.name)}</b></div>
+     <button type="button" class="mv-chip-btn" data-action="copy" data-url="${esc(baseUrl+'?room='+world.room+'&team='+t.id)}">📋 Copy Link Đội</button>
     </div>`).join('')}
    </div>
   </section>` : ''}
 
-  <!-- 3. KHU VỰC CHÍNH 2 CỘT: BẢNG XẾP HẠNG TRỰC TIẾP & THỐNG KÊ SƯ PHẠM -->
+  <!-- 3. KHU VỰC CHÍNH 2 CỘT: BẢNG XẾP HẠNG TRỰC TIẾP & THỐNG KÊ NHANH -->
   <div class="gv-main-grid">
-   <!-- CỘT TRÁI: BẢNG XẾP HẠNG TRỰC TIẾP -->
+   <!-- CỘT TRÁI: BẢNG XẾP HẠNG TRỰC TIẾP (ÍT CHỮ, DỄ NHÌN) -->
    <section class="gv-panel gv-leaderboard-panel">
     <div class="flex-between" style="margin-bottom:10px">
-     <h2 class="gv-panel-title">BẢNG XẾP HẠNG TRỰC TIẾP</h2>
+     <h2 class="gv-panel-title">🏆 BẢNG XẾP HẠNG TRỰC TIẾP</h2>
      <div style="display:flex;gap:6px">
-      <button type="button" class="mv-chip-btn" data-action="toggleTeacherPinDrawer">🔑 Mã PIN (${teams.length} đội)</button>
-      <button type="button" class="mv-chip-btn" data-action="teacherBroadcast">📢 Nhắn lớp</button>
+      <button type="button" class="mv-chip-btn" data-action="openTeamInspector">🔍 Chi tiết đội</button>
+      <button type="button" class="mv-chip-btn" data-action="toggleTeacherPinDrawer">🔗 Link đội</button>
       <button type="button" class="mv-chip-btn" data-action="exportCSV">📥 Xuất CSV</button>
      </div>
     </div>
@@ -2715,81 +2755,59 @@ function teacherScreen(){
      <span>Chặng</span>
      <span>Tiến độ</span>
      <span>Đúng</span>
-     <span>XP</span>
+     <span>Điểm XP</span>
     </div>
 
     <div class="gv-rows-list">
      ${sortedTeams.map((t, idx) => {
       const rankNum = idx + 1;
       const rankCls = rankNum === 1 ? 'rank-1' : rankNum === 2 ? 'rank-2' : rankNum === 3 ? 'rank-3' : 'rank-n';
-      const stgDisplay = t.completed ? '5/5' : `${Math.min(5, (t.stage || 0) + (t.round > 0 ? 1 : 1))}/5`;
+      const stgDisplay = t.completed ? '🏆 5/5' : `${Math.min(5, (t.stage || 0) + 1)}/5`;
       const s1Clues = t.stage > 0 ? 4 : Math.min(4, (t.stage1?.cluesFound ?? (t.round >= 1 ? 4 : 0)));
-      const s1Cipher = Boolean(t.stage > 0 || t.stage1?.cipherSolved || t.round >= 1);
-      const s1Bridge = Boolean(t.stage > 0 || t.stage1?.bridgeOpened);
-      const s1TimeSec = t.stage1?.completedTimeSec;
-      const s1WrongCount = t.stage1?.wrongAttempts ?? 0;
+      const totalWrong = (t.wrong || 0) + (t.stage1?.wrongAttempts ?? 0) + (t.stage2?.wrongAttempts ?? 0) + (t.stage4?.wrongMatches ?? 0) + (t.stage5?.wrongAttempts ?? 0);
       const pct = t.completed ? 100 : Math.max(8, Math.round((((t.stage || 0) * 3 + (t.round || 0) + (t.stage === 0 && t.round === 0 ? (s1Clues / 4) : 0)) / 15) * 100));
       const barColor = barColors[idx % barColors.length];
       const correctVal = t.correctCount ?? ((t.digits || []).length * 2);
-      const drgMoving = Boolean(t.dragon?.state && t.dragon.state !== 'PLAYING');
-      const drgPillText = t.completed
-       ? '🐉 Đỉnh Tâm Thạch'
-       : drgMoving
-         ? `🐉 Bay ${(t.dragon.fromStage ?? 0) + 1}→${(t.dragon.toStage ?? 0) >= 5 ? 'Tâm Thạch' : ((t.dragon.toStage ?? 0) + 1)}`
-         : `🐉 Chặng ${Math.min(5, (t.stage || 0) + 1)}`;
-      const s1LiveBadge = `<div class="gv-s1-inline-badges">
-       <span class="gv-s1-pill ${drgMoving ? 'moving' : 'done'}" title="Vị trí & Trạng thái di chuyển của Rồng Xanh">${esc(drgPillText)}</span>
-       <span class="gv-s1-pill ${s1Clues >= 4 ? 'done' : ''}" title="Số mảnh mật thư Chặng 1 đã tìm thấy">📜 ${s1Clues}/4</span>
-       <span class="gv-s1-pill ${s1Bridge ? 'done' : ''}" title="Trạng thái giải mã & mở Cầu ánh sáng Chặng 1">🌉 ${s1Bridge ? 'Đã giải mã' : (s1Cipher ? 'Đủ 4/4 mảnh' : 'Tìm mật thư')}</span>
-       <span class="gv-s1-pill ${(t.stage > 1 || (t.stage2?.solvedCount ?? 0) >= 6) ? 'done' : ''}" title="Tiến độ Chặng 2 – Mật Trận Vectơ">🏰 Mật trận ${t.stage > 1 ? 6 : (t.stage2?.solvedCount ?? 0)}/6 · 🛡️${t.stage2?.shields ?? 3}</span>
-       <span class="gv-s1-pill ${(t.stage > 3 || (t.stage4?.matchedCount ?? 0) >= (t.stage4?.totalPairs || 6)) ? 'done' : ''}" title="Tiến độ Chặng 4 – Lật Thẻ Trung Điểm">🃏 Thẻ ${t.stage > 3 ? (t.stage4?.totalPairs || 6) : (t.stage4?.matchedCount ?? 0)}/${t.stage4?.totalPairs || 6} · 🔄${t.stage4?.flipCount ?? 0}</span>
-       <span class="gv-s1-pill ${(t.stage > 4 || t.stage5?.completed) ? 'done' : ''}" title="Tiến độ Chặng 5 – Giải Cứu Tâm Thạch">👑 Tâm Thạch: ${(t.stage > 4 || t.stage5?.completed) ? 'Đã khôi phục' : (`B${t.stage5?.phase ?? 1}/4`)}</span>
-       <span class="gv-s1-pill" title="Số lần thử sai tại các chặng">❌ ${(s1WrongCount + (t.stage2?.wrongAttempts ?? 0) + (t.stage4?.wrongMatches ?? 0) + (t.stage5?.wrongAttempts ?? 0))} sai</span>
-      </div>`;
-      return `<div class="gv-rank-row ${rankCls}" data-action="inspectTeamRow" data-team="${t.id}" title="Nhấn để xem chi tiết từng bước của ${esc(t.name)}">
+      const statusPill = t.completed
+       ? `<span class="gv-s1-pill done">🏆 Đã về đích</span>`
+       : `<span class="gv-s1-pill">🐉 Đang giải Chặng ${Math.min(5, (t.stage || 0) + 1)}</span>`;
+      const wrongPill = totalWrong > 0 ? `<span class="gv-s1-pill">❌ ${totalWrong} sai</span>` : '';
+      return `<div class="gv-rank-row ${rankCls}" data-action="inspectTeamRow" data-team="${t.id}" title="Nhấn để xem chi tiết ${esc(t.name)}">
        <span class="gv-col-rank">#${rankNum}</span>
-       <span class="gv-col-team"><strong>${esc(t.name)}</strong>${s1LiveBadge}</span>
+       <span class="gv-col-team"><strong>${t.avatar} ${esc(t.name)}</strong><div class="gv-s1-inline-badges">${statusPill}${wrongPill}</div></span>
        <span class="gv-col-stage">${stgDisplay}</span>
        <div class="gv-col-progress">
         <div class="gv-prog-track"><div class="gv-prog-fill" style="width:${pct}%;background:${barColor}"></div></div>
        </div>
        <span class="gv-col-correct">${correctVal}/10</span>
-       <span class="gv-col-xp">${t.score}</span>
+       <span class="gv-col-xp">${Math.max(0, t.score || 0)} XP</span>
       </div>`;
      }).join('')}
     </div>
-
-    <div class="gv-live-summary-bar">
-     <span>Trực tuyến: <b>${activeCount}/${teams.length} đội</b></span>
-     <span>·</span>
-     <span>Đang trả lời: <b>${answeringCount} đội</b></span>
-     <span>·</span>
-     <span>Cần hỗ trợ: <b>${stuckTeams.length} đội</b></span>
-    </div>
    </section>
 
-   <!-- CỘT PHẢI: THỐNG KÊ THEO MỨC ĐỘ & TRẠNG THÁI CẢNH BÁO -->
+   <!-- CỘT PHẢI: THỐNG KÊ MỨC ĐỘ & TÁC VỤ NHANH -->
    <div class="gv-right-stack">
     <section class="gv-panel">
      <div class="flex-between" style="margin-bottom:10px">
-      <h2 class="gv-panel-title">THỐNG KÊ THEO MỨC ĐỘ</h2>
-      <button type="button" class="mv-chip-btn" data-action="toggleTeacher3DDrawer">📐 Chi tiết câu</button>
+      <h2 class="gv-panel-title">MỨC ĐỘ ĐẠT ĐƯỢC</h2>
+      <button type="button" class="mv-chip-btn" data-action="toggleTeacher3DDrawer">📐 Xem đáp án</button>
      </div>
 
      <div class="gv-level-stat-block">
       <div class="flex-between">
-       <span class="gv-level-name">NHẬN BIẾT <small style="color:#94A3B8;font-weight:600">(Chặng 1–3)</small></span>
-       <strong class="gv-level-pct">${ped.nhanBiet?.pct !== null && ped.nhanBiet?.pct !== undefined ? ped.nhanBiet.pct + '%' : (nbPct + '%')} <small style="color:#94A3B8;font-size:11.5px">(${ped.nhanBiet?.correct || 0}/${ped.nhanBiet?.total || 0})</small></strong>
+       <span class="gv-level-name">NHẬN BIẾT <small style="color:#94A3B8">(Chặng 1–3)</small></span>
+       <strong class="gv-level-pct">${ped.nhanBiet?.pct !== null && ped.nhanBiet?.pct !== undefined ? ped.nhanBiet.pct + '%' : (nbPct + '%')}</strong>
       </div>
       <div class="gv-level-track">
        <div class="gv-level-fill green" style="width:${Math.max(4, nbPct)}%"></div>
       </div>
      </div>
 
-     <div class="gv-level-stat-block" style="margin-top:16px">
+     <div class="gv-level-stat-block" style="margin-top:14px">
       <div class="flex-between">
-       <span class="gv-level-name">THÔNG HIỂU <small style="color:#94A3B8;font-weight:600">(Chặng 4–5)</small></span>
-       <strong class="gv-level-pct">${ped.thongHieu?.pct !== null && ped.thongHieu?.pct !== undefined ? ped.thongHieu.pct + '%' : (thPct + '%')} <small style="color:#94A3B8;font-size:11.5px">(${ped.thongHieu?.correct || 0}/${ped.thongHieu?.total || 0})</small></strong>
+       <span class="gv-level-name">THÔNG HIỂU <small style="color:#94A3B8">(Chặng 4–5)</small></span>
+       <strong class="gv-level-pct">${ped.thongHieu?.pct !== null && ped.thongHieu?.pct !== undefined ? ped.thongHieu.pct + '%' : (thPct + '%')}</strong>
       </div>
       <div class="gv-level-track">
        <div class="gv-level-fill purple" style="width:${Math.max(4, thPct)}%"></div>
@@ -2798,41 +2816,16 @@ function teacherScreen(){
     </section>
 
     <section class="gv-panel">
-     <h2 class="gv-panel-title" style="margin-bottom:12px">TRẠNG THÁI & CẢNH BÁO</h2>
-     <ul class="gv-status-list">
-      <li class="gv-status-item">
-       <span class="gv-dot green"></span>
-       <span style="color:#35C992;font-weight:800">${activeCount} đội đang kết nối</span>
-      </li>
-      ${stuckTeams.length > 0 ? stuckTeams.slice(0, 2).map(st => `<li class="gv-status-item">
-       <span class="gv-dot gold"></span>
-       <span style="color:#FFC953;font-weight:800">${esc(st.name)} đang ở chặng ${Math.min(5, (st.stage||0)+1)} ${st.wrong ? `(${st.wrong} lần thử sai)` : ''}</span>
-      </li>`).join('') : `<li class="gv-status-item">
-       <span class="gv-dot gold"></span>
-       <span style="color:#FFC953;font-weight:800">${esc(sortedTeams[sortedTeams.length - 1]?.name || 'Đội chơi')} đang ở chặng ${Math.min(5, (sortedTeams[sortedTeams.length - 1]?.stage || 0) + 1)}</span>
-      </li>`}
-      <li class="gv-status-item">
-       <span class="gv-dot slate"></span>
-       <span style="color:#CBD5E1;font-weight:700">Đáp án chỉ hiện ở màn giáo viên</span>
-      </li>
-     </ul>
-     ${world.lastEvent?.length ? `<div class="gv-mini-event-feed">
-      <div style="font-size:11px;font-weight:800;color:#36DEF4;margin-bottom:4px">NHẬT KÝ MỚI NHẤT:</div>
-      <div style="font-size:12px;color:#E2E8F0">${esc(world.lastEvent[0].text)}</div>
-     </div>` : ''}
+     <h2 class="gv-panel-title" style="margin-bottom:10px">HỖ TRỢ NHANH CẢ LỚP</h2>
+     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+      <button type="button" class="gv-easy-btn cyan" data-action="teacherHealAll">💖 Hồi đầy khiên</button>
+      <button type="button" class="gv-easy-btn gold" data-action="teacherBonusAll">✨ Thưởng +5 XP</button>
+     </div>
+     ${stuckTeams.length > 0 ? `<div style="font-size:12.5px;color:#FFC953;font-weight:800">⚠️ Cần hỗ trợ: ${stuckTeams.map(st => esc(st.name)).join(', ')}</div>` : `<div style="font-size:12.5px;color:#35C992;font-weight:800">✓ ${activeCount}/${teams.length} đội đang làm bài tốt</div>`}
     </section>
    </div>
   </div>
 
-  <!-- 4. THANH ĐIỀU KHIỂN CUỘC THI DƯỚI CÙNG (6 NÚT HOST CONTROL) -->
-  <footer class="gv-control-bar">
-   <button type="button" class="gv-ctrl-btn start" data-action="hostStartContest" ${isRunning ? 'disabled' : ''}>BẮT ĐẦU</button>
-   <button type="button" class="gv-ctrl-btn pause" data-action="hostPauseContest" ${!isRunning ? 'disabled' : ''}>TẠM DỪNG</button>
-   <button type="button" class="gv-ctrl-btn resume" data-action="hostResumeContest" ${!isPaused ? 'disabled' : ''}>TIẾP TỤC</button>
-   <button type="button" class="gv-ctrl-btn display" data-action="hostOpenDisplay">TRÌNH CHIẾU</button>
-   <button type="button" class="gv-ctrl-btn detail" data-action="openTeamInspector">CHI TIẾT TỪNG ĐỘI</button>
-   <button type="button" class="gv-ctrl-btn end" data-action="hostEndContest" ${isEnded ? 'disabled' : ''}>KẾT THÚC</button>
-  </footer>
   ${renderTeacherTeamModal()}
   ${showTeacherQrModal ? renderTeacherQrModal(world.room) : ''}
  </div>`;
@@ -2840,7 +2833,7 @@ function teacherScreen(){
 
 function displayScreen(){
  const teams = world.teams || [];
- const sortedTeams = [...teams].sort((a,b)=>b.score-a.score||(b.stage-a.stage)||(b.round-a.round));
+ const sortedTeams = sortTeamsFairly(teams);
  const maxStageNum = Math.min(5, Math.max(1, ...teams.map(t => Math.min(5, (t.stage || 0) + 1))));
  const barColors = ['#FFC953', '#7DD3FC', '#C4B5FD', '#FDBA74', '#35C992', '#F472B6'];
  const journeyLabels = ['1 · Hiệu vectơ', '2 · Tổng vectơ', '3 · Hình bình hành', '4 · Trung điểm', '5 · Trọng tâm'];
@@ -2866,7 +2859,7 @@ function displayScreen(){
     <div class="gv-kpi-card">
      <span class="gv-kpi-label">ĐỘI THAM GIA</span>
      <strong class="gv-kpi-value cyan">${String(teams.length).padStart(2, '0')} ĐỘI</strong>
-     <small class="gv-kpi-sub">Hành trình Giải cứu Lục địa OXYZ</small>
+     <small class="gv-kpi-sub">Hành trình 5 Chặng Oxyz</small>
     </div>
     <div class="gv-kpi-card">
      <span class="gv-kpi-label">CHẶNG DẪN ĐẦU</span>
@@ -2876,7 +2869,7 @@ function displayScreen(){
     <div class="gv-kpi-card">
      <span class="gv-kpi-label">ĐỒNG HỒ TOÀN LỚP</span>
      <strong class="gv-kpi-value gold" id="clock">06:00</strong>
-     <small class="gv-kpi-sub">${world.paused ? '⏸ Đang tạm dừng' : world.ended ? '🏁 Đã kết thúc' : '🟢 Đang diễn ra trực tiếp'}</small>
+     <small class="gv-kpi-sub">${world.paused ? '⏸ Đang tạm dừng' : world.ended ? '🏁 Đã kết thúc' : world.clock?.running ? '🟢 Đang diễn ra' : '⏳ Chờ bắt đầu'}</small>
     </div>
    </div>
   </section>
@@ -2897,14 +2890,14 @@ function displayScreen(){
 
   <section class="gv-panel" style="margin-top:8px">
    <div class="flex-between" style="margin-bottom:12px">
-    <h2 class="gv-panel-title">🏆 BẢNG XẾP HẠNG & TIẾN ĐỘ TRỰC TIẾP CÁC ĐỘI</h2>
-    <span class="pill green">Chế độ trình chiếu công khai (Không hiển thị đáp án)</span>
+    <h2 class="gv-panel-title">🏆 BẢNG XẾP HẠNG TRỰC TIẾP CÁC ĐỘI</h2>
+    <span class="pill green">Trình chiếu lớp học</span>
    </div>
    <div class="gv-table-head">
     <span>Hạng</span>
     <span>Đội thám hiểm</span>
     <span>Chặng</span>
-    <span>Tiến độ thu hồi 5 Ấn Vectơ</span>
+    <span>Tiến độ 5 Chặng</span>
     <span>Ấn Vectơ</span>
     <span>Điểm XP</span>
    </div>
@@ -2913,26 +2906,18 @@ function displayScreen(){
      const rankNum = idx + 1;
      const rankCls = rankNum === 1 ? 'rank-1' : rankNum === 2 ? 'rank-2' : rankNum === 3 ? 'rank-3' : 'rank-n';
      const s1Clues = t.stage > 0 ? 4 : Math.min(4, (t.stage1?.cluesFound ?? (t.round >= 1 ? 4 : 0)));
-     const s1Cipher = Boolean(t.stage > 0 || t.stage1?.cipherSolved || t.round >= 2);
-     const s1Bridge = Boolean(t.stage > 0 || t.stage1?.bridgeOpened);
      const seals = Math.max((t.digits || []).length, t.completed ? 5 : Math.min(5, t.stage || 0));
      const pct = t.completed ? 100 : Math.max(8, Math.round(Math.max(seals * 20, (((t.stage || 0) * 3 + (t.round || 0) + (t.stage === 0 && t.round === 0 ? (s1Clues / 4) : 0)) / 15) * 100)));
      const barColor = barColors[idx % barColors.length];
-     const drgMoving = Boolean(t.dragon?.state && t.dragon.state !== 'PLAYING');
-     const drgPillText = t.completed
-      ? '🐉 Đỉnh Tâm Thạch'
-      : drgMoving
-        ? `🐉 Bay ${(t.dragon.fromStage ?? 0) + 1}→${(t.dragon.toStage ?? 0) >= 5 ? 'Tâm Thạch' : ((t.dragon.toStage ?? 0) + 1)}`
-        : `🐉 Chặng ${Math.min(5, (t.stage || 0) + 1)}`;
      return `<div class="gv-rank-row ${rankCls}">
       <span class="gv-col-rank">#${rankNum}</span>
-      <span class="gv-col-team"><strong>${t.avatar} ${esc(t.name)}</strong><div class="gv-s1-inline-badges"><span class="gv-s1-pill ${drgMoving ? 'moving' : 'done'}">${esc(drgPillText)}</span><span class="gv-s1-pill ${s1Clues >= 4 ? 'done' : ''}">📜 ${s1Clues}/4</span><span class="gv-s1-pill ${s1Bridge ? 'done' : ''}">🌉 ${s1Bridge ? 'Đã mở cầu' : (s1Cipher ? 'Đã ghép' : 'Chưa')}</span><span class="gv-s1-pill ${(t.stage > 1 || (t.stage2?.solvedCount ?? 0) >= 6) ? 'done' : ''}">🏰 ${t.stage > 1 ? 6 : (t.stage2?.solvedCount ?? 0)}/6</span><span class="gv-s1-pill ${(t.stage > 3 || (t.stage4?.matchedCount ?? 0) >= 6) ? 'done' : ''}">🃏 ${t.stage > 3 ? 6 : (t.stage4?.matchedCount ?? 0)}/6</span><span class="gv-s1-pill ${(t.stage > 4 || t.completed || t.stage5?.completed) ? 'done' : ''}">👑 ${(t.stage > 4 || t.completed || t.stage5?.completed) ? 'Tâm Thạch' : ('B' + (t.stage5?.phase ?? 1) + '/4')}</span></div></span>
-      <span class="gv-col-stage">${t.completed ? 'Đích 🏆' : `${Math.min(5, (t.stage||0)+1)}/5`}</span>
+      <span class="gv-col-team"><strong style="font-size:16px">${t.avatar} ${esc(t.name)}</strong></span>
+      <span class="gv-col-stage">${t.completed ? '🏆 Về đích' : `Chặng ${Math.min(5, (t.stage||0)+1)}/5`}</span>
       <div class="gv-col-progress">
        <div class="gv-prog-track"><div class="gv-prog-fill" style="width:${pct}%;background:${barColor}"></div></div>
       </div>
       <span class="gv-col-correct">${seals}/5 Ấn</span>
-      <span class="gv-col-xp">${t.score} XP</span>
+      <span class="gv-col-xp">${Math.max(0, t.score || 0)} XP</span>
      </div>`;
     }).join('')}
    </div>
@@ -5932,7 +5917,7 @@ function renderStage1TopBanner(cluesCount) {
       </div>
       <div class="s1-banner-Titles">
         <h1 class="s1-banner-main-title">CHẶNG 1 – MẬT THƯ RỪNG VECTƠ</h1>
-        <p class="s1-banner-sub-title">✦ Thử thách khám phá – săn lùng mảnh mật thư trong rừng phép! ✦</p>
+        <p class="s1-banner-sub-title">✦ Thu thập 4 mảnh mật thư để mở Cầu Ánh Sáng ✦</p>
       </div>
       <span class="s1-banner-leaves right" aria-hidden="true">🌿</span>
     </div>
@@ -6446,7 +6431,7 @@ const z3State = {
   bullets: [],      // Các quả cầu năng lượng đang bay theo làn
   popups: [],       // Hiệu ứng chữ nổi ✓ Chính xác / ✗ Sai! Zombie tăng tốc
   results: [],      // Kết quả từng câu hỏi: { selectedIdx, cleared, wrongShots }
-  mascotMsg: 'Bấm vào zombie mang <b>đáp án đúng (A/B/C/D)</b> để tiêu diệt cả cột! Bắn sai sẽ khiến cả đàn zombie <b>bứt tốc</b>!',
+  mascotMsg: 'Bấm vào zombie mang <b>đáp án đúng (A/B/C/D)</b> để tiêu diệt cả cột!',
   mascotMood: 'normal',
   victoryOverlay: false,
   submittingServer: false,
@@ -8682,7 +8667,7 @@ const s4State = {
   knowledgeModalOpen: false,
   lastMatchedExplain: null,
   dragonMood: 'idle', // 'idle' | 'cheer' | 'think' | 'warn' | 'runToGate'
-  dragonSpeech: 'Nhiệm vụ: Lật thẻ và ghép đúng 4 cặp kiến thức về trung điểm (các thẻ đã mở sẽ lưu dấu gợi nhớ trên mặt sau)!',
+  dragonSpeech: 'Nhiệm vụ: Lật thẻ và ghép đúng 4 cặp kiến thức về trung điểm!',
   warned15s: false,
   gateOpened: false,
   rewardSubmitted: false,
@@ -10360,13 +10345,13 @@ function renderStage5CentroidRescueGame(m) {
 
   const phaseTitles = [
     '',
-    'GIAI ĐOẠN 1/4: Kéo 2 điểm sáng về đúng TRUNG ĐIỂM cạnh BC và AC',
-    'GIAI ĐOẠN 2/4: Kéo nối đỉnh A với trung điểm BC & đỉnh B với trung điểm AC',
-    'GIAI ĐOẠN 3/4: Kéo viên TÂM THẠCH đặt vào đúng TRỌNG TÂM G',
+    'BƯỚC 1/4: Kéo 2 điểm sáng về TRUNG ĐIỂM cạnh BC và AC',
+    'BƯỚC 2/4: Kéo nối A → M (trung điểm BC) và B → N (trung điểm AC)',
+    'BƯỚC 3/4: Kéo viên TÂM THẠCH đặt vào đúng TRỌNG TÂM G',
     s5State.quizSolvedCount < 3
-      ? `GIAI ĐOẠN 4/4: Trả lời Câu hỏi hiểu sâu Trọng tâm (${s5State.quizSolvedCount + 1}/3) & nhấn XÁC NHẬN`
-      : 'GIAI ĐOẠN 4/4: Đã giải mã 3/3 câu hỏi! Nhấn ⚡ KÍCH HOẠT TÂM THẠCH để chiến thắng!',
-    'HOÀN TẤT: Tâm Thạch & 5 Ấn Vectơ đã hợp nhất – Lục địa OXYZ được giải cứu!'
+      ? `BƯỚC 4/4: Chọn đáp án Câu ${s5State.quizSolvedCount + 1}/3 & nhấn XÁC NHẬN`
+      : 'BƯỚC 4/4: Đã xong 3/3 câu! Nhấn ⚡ KÍCH HOẠT TÂM THẠCH!',
+    'HOÀN TẤT: Đã khôi phục Tâm Thạch & 5 Ấn Vectơ!'
   ];
   const curPhaseBanner = phaseTitles[s5State.phase] || phaseTitles[1];
   const s5Questions = getS5CentroidQuestions();
@@ -11247,7 +11232,7 @@ function finalContent(){
   </div>`;
  }
  const sealsCount = (me.digits || []).length;
- const rank = [...(world.teams || [])].sort((a,b)=>b.score-a.score);
+ const rank = sortTeamsFairly(world.teams || []);
  const mineRank = Math.max(1, rank.findIndex(t=>t.id===me.id)+1);
  const correctAns = me.correctCount || (sealsCount * 2);
 
@@ -11256,12 +11241,12 @@ function finalContent(){
    <div class="hs-stage-header-left">
     ${DIAMOND_ICON_SVG}
     <div>
-     <h1 class="hs-stage-title">KHÔI PHỤC TÂM THẠCH VECTƠ · TỔNG KẾT HÀNH TRÌNH</h1>
-     <p class="hs-stage-subtitle">🐉 Rồng Xanh đã bay lên đỉnh Thành Trì · Thu hồi ${sealsCount}/5 Ấn Vectơ</p>
+     <h1 class="hs-stage-title">KHÔI PHỤC TÂM THẠCH VECTƠ</h1>
+     <p class="hs-stage-subtitle">🐉 Rồng Xanh đã thu hồi ${sealsCount}/5 Ấn Vectơ</p>
     </div>
    </div>
    <div style="display:flex;gap:8px;align-items:center">
-    <button type="button" class="mv-chip-btn" data-action="toggleWorldMap">🗺️ Xem Bản Đồ 5 Chặng</button>
+    <button type="button" class="mv-chip-btn" data-action="toggleWorldMap">🗺️ Bản Đồ</button>
     <div class="hs-stage-timer-box"><span>${sealsCount}/5 ẤN</span></div>
    </div>
   </div>
@@ -11269,19 +11254,19 @@ function finalContent(){
    <div style="display:flex;align-items:center;gap:14px;padding:12px 16px;margin-bottom:14px;background:rgba(16,185,129,0.14);border:1px solid rgba(53,201,146,0.45);border-radius:12px">
     <img src="/assets/RongXanh.png" alt="Rồng Xanh" style="width:58px;height:58px;object-fit:contain;filter:drop-shadow(0 4px 10px rgba(0,0,0,0.5))" draggable="false"/>
     <div>
-     <strong style="color:#FFC953;font-size:14px">💎 TÂM THẠCH VECTƠ ĐÃ SẴN SÀNG KHÔI PHỤC!</strong>
-     <p style="color:#E2E8F0;font-size:12.5px;margin:3px 0 0">Rồng Xanh đã hoàn thành hành trình qua 5 vùng đất và mang các Ấn Vectơ lên đỉnh Thành Trì Trí Tuệ. Hãy nhấn nút bên dưới để kích hoạt Tâm Thạch!</p>
+     <strong style="color:#FFC953;font-size:14px">💎 TÂM THẠCH VECTƠ ĐÃ SẴN SÀNG!</strong>
+     <p style="color:#E2E8F0;font-size:12.5px;margin:3px 0 0">Nhấn nút bên dưới để kích hoạt Tâm Thạch và hoàn tất hành trình!</p>
     </div>
    </div>
    <div class="mv-stats-3grid" style="margin:10px 0 18px">
-    <div class="mv-stat-card"><b>${sealsCount}/5</b><small>Ấn Vectơ thu hồi</small></div>
-    <div class="mv-stat-card"><b>${correctAns}/10</b><small>Câu giải mã đúng</small></div>
-    <div class="mv-stat-card"><b>#${mineRank} (${me.score} XP)</b><small>Thứ hạng & Điểm XP</small></div>
+    <div class="mv-stat-card"><b>${sealsCount}/5</b><small>Ấn Vectơ</small></div>
+    <div class="mv-stat-card"><b>${correctAns}/10</b><small>Câu đúng</small></div>
+    <div class="mv-stat-card"><b>#${mineRank} (${Math.max(0, me.score || 0)} XP)</b><small>Hạng & Điểm</small></div>
    </div>
    <input id="finalCode" type="hidden" value="30524"/>
    <input type="radio" name="message" value="0" checked style="display:none"/>
    <button type="button" class="hs-confirm-btn" style="width:100%;padding:14px" data-action="final">
-    KÍCH HOẠT TÂM THẠCH VECTƠ & HOÀN TẤT HÀNH TRÌNH
+    ✨ KÍCH HOẠT TÂM THẠCH & VỀ ĐÍCH
    </button>
   </div>
  </div>`;
@@ -11298,14 +11283,14 @@ function renderStudentProgressMetrics(me, mineRank){
    </div>
   </div>
   <div class="hs-xp-subline">
-   <span>${(me.score || 0).toLocaleString('vi-VN')} XP  ·  Lv.${lv}</span>
+   <span>${Math.max(0, me.score || 0).toLocaleString('vi-VN')} XP  ·  Lv.${lv}</span>
    <button type="button" class="mv-link-btn" data-action="openFullLeaderboard">Hạng #${mineRank} &gt;</button>
   </div>`;
 }
 
 function studentScreen(){
  const me = world.me || {};
- const rank = [...(world.teams || [])].sort((a,b)=>b.score-a.score);
+ const rank = sortTeamsFairly(world.teams || []);
  const mineRank = Math.max(1, rank.findIndex(t=>t.id===me.id)+1);
  const activeBroadcast = (world.lastEvent||[]).find(e=>e.text.includes('📢'));
  const broadcastHtml = activeBroadcast ? `<div class="teacher-broadcast-bar">${esc(activeBroadcast.text)}</div>` : '';
@@ -11313,45 +11298,60 @@ function studentScreen(){
  const stageBgUrl = STAGE_BG_ASSETS[curStageIdx] || STAGE_BG_ASSETS[0];
  const m = world.current || (world.stages && world.stages[curStageIdx]) || {};
  ensureVaStateForStage(m);
+ const waitingStart = isWaitingForTeacherStart();
+ if (waitingStart) {
+  vaState.stageStartedAt = Date.now();
+ }
  const dragonText = vaState.dragonMsg || m.dragonIntro || 'Cùng nhau tìm đúng hướng của vectơ nhé!';
- const isS1DedicatedUI = !me.completed && me.stage < 5 && (m.id === 1 || m.id === 2 || m.id === 3 || m.id === 4 || m.id === 5 || vaState.s1BridgeRestoredOverlay) && !mvWorldMapOpen && !StageTransitionController.isTransitioning() && !mvShowIntroHub;
+ const isS1DedicatedUI = !waitingStart && !world.ended && !me.completed && me.stage < 5 && (m.id === 1 || m.id === 2 || m.id === 3 || m.id === 4 || m.id === 5 || vaState.s1BridgeRestoredOverlay) && !mvWorldMapOpen && !StageTransitionController.isTransitioning() && !mvShowIntroHub;
 
  return `<div class="hs-screen-shell ${isS1DedicatedUI ? 's1-dedicated-shell' : ''}" style="--stage-bg: url('${stageBgUrl}')">
   ${!isS1DedicatedUI ? mapTrack(me.stage) : ''}
   ${broadcastHtml}
-  ${world.paused ? '<div class="notice error" style="margin:6px 0"><b>⏸ Giáo viên đang tạm dừng lượt thi. Vui lòng chờ hiệu lệnh tiếp tục!</b></div>' : ''}
-  ${world.ended ? '<div class="notice good" style="margin:6px 0"><b>🏁 Giáo viên đã kết thúc lượt thi. Dưới đây là kết quả của đội!</b></div>' : ''}
+  ${world.paused ? '<div class="notice error" style="margin:6px 0"><b>⏸ Giáo viên đang tạm dừng. Vui lòng chờ hiệu lệnh tiếp tục!</b></div>' : ''}
+  ${world.ended ? '<div class="notice good" style="margin:6px 0"><b>🏁 Lượt thi đã kết thúc. Dưới đây là kết quả của đội!</b></div>' : ''}
 
-  <div class="hs-workspace ${(mvSidebarCollapsed || isS1DedicatedUI) ? 'sidebar-collapsed' : ''}">
+  <div class="hs-workspace ${(mvSidebarCollapsed || isS1DedicatedUI || waitingStart || world.ended) ? 'sidebar-collapsed' : ''}">
    <div class="hs-left-col">
     ${me.completed ? `<div class="hs-main-frame" style="text-align:center;padding:32px 24px">
-     <h2 style="color:#FFC953;font-size:26px;margin-bottom:8px">ĐỘI ${esc(me.name).toUpperCase()} ĐÃ KHÔI PHỤC TÂM THẠCH VECTƠ!</h2>
-     <p style="font-size:17px;font-weight:800;color:#36DEF4;margin-bottom:18px">“TƯ DUY VÀ HỢP TÁC MỞ KHO BÁU”</p>
+     <h2 style="color:#FFC953;font-size:26px;margin-bottom:8px">🏆 ĐỘI ${esc(me.name).toUpperCase()} ĐÃ VỀ ĐÍCH!</h2>
+     <p style="font-size:16px;font-weight:800;color:#36DEF4;margin-bottom:18px">“TƯ DUY VÀ HỢP TÁC MỞ KHO BÁU”</p>
      <div class="mv-stats-3grid" style="max-width:560px;margin:0 auto">
       <div class="mv-stat-card"><b>${(me.digits||[]).length}/5</b><small>ẤN VECTƠ</small></div>
-      <div class="mv-stat-card"><b>${me.score} XP</b><small>TỔNG ĐIỂM</small></div>
+      <div class="mv-stat-card"><b>${Math.max(0, me.score || 0)} XP</b><small>TỔNG ĐIỂM</small></div>
       <div class="mv-stat-card"><b>#${mineRank}</b><small>XẾP HẠNG LỚP</small></div>
+     </div>
+    </div>` : world.ended ? `<div class="hs-main-frame" style="text-align:center;padding:32px 24px">
+     <h2 style="color:#FFC953;font-size:25px;margin-bottom:8px">🏁 HẾT GIỜ THI ĐẤU · KẾT QUẢ CỦA ĐỘI ${esc(me.name).toUpperCase()}</h2>
+     <p style="font-size:15px;font-weight:700;color:#E2E8F0;margin-bottom:18px">Đội đã dừng tại Chặng ${Math.min(5, (me.stage || 0) + 1)}/5</p>
+     <div class="mv-stats-3grid" style="max-width:560px;margin:0 auto">
+      <div class="mv-stat-card"><b>${(me.digits||[]).length}/5</b><small>ẤN VECTƠ</small></div>
+      <div class="mv-stat-card"><b>${Math.max(0, me.score || 0)} XP</b><small>TỔNG ĐIỂM</small></div>
+      <div class="mv-stat-card"><b>#${mineRank}</b><small>XẾP HẠNG LỚP</small></div>
+     </div>
+    </div>` : waitingStart ? `<div class="hs-main-frame hs-waiting-start-card">
+     <div class="hs-waiting-badge">⏳ PHÒNG ${esc(world.room)} · SẴN SÀNG XUẤT PHÁT</div>
+     <div class="hs-waiting-avatar">${me.avatar || '🐉'}</div>
+     <h2 class="hs-waiting-title">ĐỘI ${esc(me.name).toUpperCase()} ĐÃ VÀO PHÒNG!</h2>
+     <p class="hs-waiting-desc">Hãy nhìn lên màn hình máy chiếu và chờ Giáo viên bấm <b>▶️ BẮT ĐẦU</b> để cả lớp xuất phát cùng lúc.</p>
+     <div class="hs-waiting-actions">
+      <button type="button" class="hs-confirm-btn" data-action="studentStartNow">▶️ Chơi tự luyện ngay (Không cần chờ)</button>
      </div>
     </div>` : me.stage >= 5 ? finalContent() : stageContent(m)}
    </div>
 
-   ${!isS1DedicatedUI ? `<!-- CỘT PHẢI: 3 WIDGET NHỎ GỌN CHUẨN BỐ CỤC THAM CHIẾU -->
+   ${(!isS1DedicatedUI && !waitingStart && !world.ended) ? `<!-- CỘT PHẢI: 3 WIDGET NHỎ GỌN -->
    <aside class="hs-right-sidebar ${mvSidebarCollapsed ? 'hidden-sidebar' : ''}">
-    <!-- WIDGET 1: TÚI ẤN VECTƠ -->
     <div class="hs-widget-card">
      <div class="hs-widget-title">TÚI ẤN VECTƠ</div>
      ${inv(me.digits)}
     </div>
-
-    <!-- WIDGET 2: TIẾN TRÌNH ĐỘI -->
     <div class="hs-widget-card">
      <div class="hs-widget-title">TIẾN TRÌNH ĐỘI</div>
      <div id="studentSidebarMetrics">
       ${renderStudentProgressMetrics(me, mineRank)}
      </div>
     </div>
-
-    <!-- WIDGET 3: RỒNG XANH ĐỒNG HÀNH -->
     <div class="hs-widget-card hs-dragon-widget">
      <div class="hs-widget-title">RỒNG XANH ĐỒNG HÀNH</div>
      <div class="hs-dragon-bubble" id="vaDragonSpeech">
@@ -11359,8 +11359,8 @@ function studentScreen(){
      </div>
      <div class="hs-dragon-mascot-wrap">
       <img src="/assets/RongXanh.png" alt="Rồng Xanh" class="hs-dragon-art" draggable="false"/>
-      <button type="button" class="hs-dragon-hint-btn" data-action="quickHint" title="Nhận gợi ý công thức từ Rồng Xanh">
-       GỢI Ý TỪ RỒNG XANH
+      <button type="button" class="hs-dragon-hint-btn" data-action="quickHint">
+       💡 GỢI Ý NHANH
       </button>
      </div>
     </div>
@@ -11843,6 +11843,7 @@ function sound(type){
 
 // Kiểm tra xem chặng hiện tại đã hoàn thành/mở cổng hay đang tạm dừng chưa (để ngắt chuông đồng hồ 10s cuối hợp lý)
 function isActiveStageCountdownRunning(stageId){
+ if(isWaitingForTeacherStart() || world?.paused || world?.ended) return false;
  if(mvWorldMapOpen || mvShowIntroHub || StageTransitionController.isTransitioning()) return false;
  if(stageId === 1) return !vaState.s1BridgeRestoredOverlay;
  if(stageId === 2) return !s2State.gateOpened;
@@ -11887,17 +11888,37 @@ function triggerStage10sClockAlarm(remSec, stageId){
 function setClock(){clockBase=world?.clock||null;tickBase=Date.now();updateClock();}
 function updateClock(){
  if(clockBase){
+  let remaining=clockBase.remainingMs-(clockBase.running?Date.now()-tickBase:0);
+  remaining=Math.max(0,remaining);
   const node=$('#clock');
   if(node){
-   let remaining=clockBase.remainingMs-(clockBase.running?Date.now()-tickBase:0);
-   remaining=Math.max(0,remaining);
    const sec=Math.floor(remaining/1000);
    node.textContent=`${String(Math.floor(sec/60)).padStart(2,'0')}:${String(sec%60).padStart(2,'0')}`;
    node.classList.toggle('warn',sec<=60);
   }
+  // Khi đồng hồ chủ 6 phút của phòng về 00:00: tự động dừng lượt thi và mở Bục Vinh Danh
+  if(clockBase.running && remaining<=0){
+   clockBase.running=false;
+   clockBase.remainingMs=0;
+   if(world && !world.ended){
+    world.ended=true;
+    if(session?.role==='teacher'){
+     showAward=true;
+     sound('fanfare');
+     triggerConfetti(3200);
+    }
+    refresh(true);
+    render();
+   }
+  }
+ }
+ // Nếu đang chờ Giáo viên bấm Bắt đầu hoặc đã hết giờ phòng học: giữ nguyên đồng hồ chặng
+ if(session?.role==='student' && (isWaitingForTeacherStart() || world?.ended || world?.paused)){
+  vaState.stageStartedAt = Date.now();
+  return;
  }
  // Đồng hồ đếm ngược từng chặng (60s / 60s / 65s / 65s / 70s)
- if(session?.role==='student' && world?.current && !world.paused && (world.me?.stage ?? 0) < 5){
+ if(session?.role==='student' && world?.current && !world.paused && !world.ended && (world.me?.stage ?? 0) < 5){
   const elapsedSec = Math.floor((Date.now() - vaState.stageStartedAt) / 1000);
   const remSec = Math.max(0, vaState.stageDurationSec - elapsedSec);
   const stNode = $('#vaStageSecText');
@@ -11912,19 +11933,19 @@ function updateClock(){
     s1Explorer.hintStageShown = 1;
     s1Explorer.showHintBanner = true;
     vaState.dragonMood = 'hint';
-    vaState.dragonMsg = '💡 Gợi ý 1: "Hãy quan sát điểm đầu và điểm cuối của mỗi vectơ."';
+    vaState.dragonMsg = '💡 Gợi ý 1: Quan sát điểm đầu và điểm cuối của mỗi vectơ.';
     render();
    }else if(remSec <= 15 && s1Explorer.hintStageShown < 2){
     s1Explorer.hintStageShown = 2;
     s1Explorer.showHintBanner = true;
     vaState.dragonMood = 'hint';
-    vaState.dragonMsg = '💡 Gợi ý 2: "Khi trừ hai vectơ cùng điểm đầu, hãy tìm hướng nối hai điểm cuối."';
+    vaState.dragonMsg = '💡 Gợi ý 2: Trừ hai vectơ chung gốc → nối ngược hai điểm ngọn.';
     render();
    }
   }else if(remSec === 15 && vaState.dragonMood !== 'hint' && !vaState.s1BridgeRestoredOverlay){
    vaState.dragonMood = 'hint';
    const m = world.current;
-   vaState.dragonMsg = '💡 Gợi ý nhanh: ' + (m.visual3D?.formula || m.dragonIntro);
+   vaState.dragonMsg = '💡 Gợi ý: ' + (m.visual3D?.formula || m.dragonIntro);
    const sp = $('#vaDragonSpeech');
    if(sp) sp.innerHTML = formatMath(vaState.dragonMsg);
   }
@@ -11974,11 +11995,11 @@ async function refresh(force=false){
   }
   if(session.role==='student'&&!force){
    const me=d.me||{};
-   const studentKey=`${me.stage}_${me.round}_${me.completed}_${d.paused}`;
+   const studentKey=`${me.stage}_${me.round}_${me.completed}_${d.paused}_${d.started}_${d.ended}_${studentSoloStarted}`;
    if(studentKey===lastStudentKey){
     const ranksEl=$('#studentSidebarRanks');
     if(ranksEl)ranksEl.innerHTML=standings(d.teams,true);
-    const rank=[...d.teams].sort((a,b)=>b.score-a.score),mineRank=rank.findIndex(t=>t.id===me.id)+1;
+    const rank=sortTeamsFairly(d.teams||[]),mineRank=Math.max(1,rank.findIndex(t=>t.id===me.id)+1);
     const metricsEl=$('#studentSidebarMetrics');
     if(metricsEl)metricsEl.innerHTML=renderStudentProgressMetrics(me, mineRank);
     return;
@@ -11986,7 +12007,7 @@ async function refresh(force=false){
    lastStudentKey=studentKey;
   }
   if(session.role==='student'&&d.me){
-   lastStudentKey=`${d.me.stage}_${d.me.round}_${d.me.completed}_${d.paused}`;
+   lastStudentKey=`${d.me.stage}_${d.me.round}_${d.me.completed}_${d.paused}_${d.started}_${d.ended}_${studentSoloStarted}`;
   }
   let slim={...d,clock:{...d.clock,remainingMs:0}};
   const sig=JSON.stringify(slim);
@@ -13200,26 +13221,39 @@ async function handle(action,el){
    updateAfterAction();return;
   }
   if(action==='closeModal'){modal=null;$('.modal-backdrop')?.remove();await refresh(true);return;}
+  if(action==='studentStartNow'){
+   studentSoloStarted = true;
+   vaState.stageStartedAt = Date.now();
+   sound('powerup');
+   api('/api/startRoom',{room:session.room,token:session.token}).catch(()=>{});
+   LiveClassroomSync.broadcastRoomStatus({ started: true, paused: false, ended: false });
+   await refresh(true);
+   return;
+  }
   if(action==='hostStartContest'){
    await submit('/api/teacher',{action:'startContest'});
+   LiveClassroomSync.broadcastRoomStatus({ started: true, paused: false, ended: false });
    sound('win');
    updateAfterAction();
    return;
   }
   if(action==='hostPauseContest'){
    await submit('/api/teacher',{action:'pauseContest'});
+   LiveClassroomSync.broadcastRoomStatus({ started: true, paused: true, ended: false });
    updateAfterAction();
    return;
   }
   if(action==='hostResumeContest'){
    await submit('/api/teacher',{action:'resumeContest'});
+   LiveClassroomSync.broadcastRoomStatus({ started: true, paused: false, ended: false });
    sound('powerup');
    updateAfterAction();
    return;
   }
   if(action==='hostEndContest'){
-   if(!confirm('Xác nhận KẾT THÚC SỚM lượt thi của phòng học? Đồng hồ chủ sẽ dừng và mở bảng vinh danh tổng kết.')) return;
+   if(!confirm('Xác nhận KẾT THÚC lượt thi của phòng học? Đồng hồ sẽ dừng và mở Bục Vinh Danh.')) return;
    await submit('/api/teacher',{action:'endContest'});
+   LiveClassroomSync.broadcastRoomStatus({ started: true, paused: false, ended: true });
    showAward = true;
    sound('fanfare');
    triggerConfetti(3200);
@@ -13779,7 +13813,7 @@ function gameLoop(now){
  const dt=Math.min(0.08,(now-lastFrameTs)/1000);
  lastFrameTs=now;
 
- if(session?.role==='student'&&!world?.paused){
+ if(session?.role==='student'&&!world?.paused&&!world?.ended&&!isWaitingForTeacherStart()){
   if((world?.current?.id === 1 || vaState.s1BridgeRestoredOverlay) && document.getElementById('s1ForestViewport')){
    s1Tick(now, dt);
   }
@@ -13797,7 +13831,7 @@ function gameLoop(now){
   }
  }
 
- if(session?.role==='student'&&world?.current&&!world.paused&&!world.me?.completed&&world.me?.stage<5){
+ if(session?.role==='student'&&world?.current&&!world.paused&&!world.ended&&!isWaitingForTeacherStart()&&!world.me?.completed&&world.me?.stage<5){
   const m=world.current;
   const mode = (m.id === 2) ? 'defense' : (m.id === 1 ? 'hunt' : m.gameType);
    if(m.id === 3 && document.getElementById('zdBoard')) zdTick(now, dt, m);
@@ -13995,25 +14029,25 @@ function renderCastleDynamicNodes(now){
 
 function awardScreen(){
  if(!world||world.role!=='teacher')return '';
- const ts=[...world.teams].sort((a,b)=>b.score-a.score||((a.finishedAt||'9999').localeCompare(b.finishedAt||'9999')));
+ const ts=sortTeamsFairly(world.teams||[]);
  const finished=ts.filter(t=>t.completed).length;
  const bestCoop=[...ts].sort((a,b)=>b.bonus-a.bonus)[0];
  return `<div class="award-backdrop"><div class="award-panel">
  <div class="stars">✦ ✧ ★ ✦ ★</div><div class="eyebrow">MATHVERSE OXYZ • LỄ VINH DANH</div>
- <h1>${finished>0?'GIẢI CỨU THÀNH PHỐ OXYZ THÀNH CÔNG!':'BẢNG XẾP HẠNG TẠM THỜI'}</h1>
- <p>${finished>0?'Lõi Trí Tuệ đã được khôi phục. Xin chúc mừng các biệt đội Toán học!':'Các đội đang nỗ lực vượt qua 5 chặng thử thách!'}</p>
+ <h1>${finished>0?'GIẢI CỨU THÀNH PHỐ OXYZ THÀNH CÔNG!':'BẢNG TỔNG KẾT THI ĐẤU'}</h1>
+ <p>${finished>0?'Tâm Thạch Vectơ đã được khôi phục. Xin chúc mừng các biệt đội Toán học!':'Tổng kết điểm và tiến độ của các đội!'}</p>
  <div class="podium">${ts.slice(0,3).map((t,i)=>`<div class="podium-item ${i===0?'gold-podium':''}">
  <div style="font-size:35px">${i===0?'🥇':i===1?'🥈':'🥉'}</div><div class="podium-avatar">${t.avatar}</div>
- <b>${esc(t.name)}</b><strong>${t.score} XP</strong><small>${t.completed?'🔓 Mở kho báu':'Chặng '+t.stage+'/5'}</small></div>`).join('')}</div>
- <div class="winner-bottom">🤝 Giải hợp tác: <b>${bestCoop.bonus>0?esc(bestCoop.name):'Giáo viên công bố'}</b> · 🔐 Đã giải mã: <b>${finished} đội</b></div>
+ <b>${esc(t.name)}</b><strong>${Math.max(0, t.score || 0)} XP</strong><small>${t.completed?'🏆 Đã về đích':'Chặng '+Math.min(5,(t.stage||0)+1)+'/5'}</small></div>`).join('')}</div>
+ <div class="winner-bottom">🤝 Giải hợp tác: <b>${bestCoop?.bonus>0?esc(bestCoop.name):'Giáo viên công bố'}</b> · 🏆 Hoàn thành: <b>${finished} đội</b></div>
  <div class="controls" style="justify-content:center">${btn('⬅ Quay về màn hình giáo viên','awards','gray')}${btn('📥 Tải bảng điểm CSV','exportCSV','gold')}</div>
  </div></div>`;
 }
 
 function exportCSV(){
  const columns=['Thứ hạng','Tên đội','Nhân vật','Số trạm qua','Lượt trong trạm','Số câu sai','Số khiên còn','Vàng tích lũy','Cấp Anh Hùng','Chuỗi Combo','Điểm nhiệm vụ','Điểm hợp tác','Tổng XP','Đã giải mã','Thời điểm hoàn thành'];
- const ordered=[...world.teams].sort((a,b)=>b.score-a.score||((a.finishedAt||'9999').localeCompare(b.finishedAt||'9999')));
- const rows=ordered.map((t,i)=>[i+1,t.name,t.avatar,t.stage,t.round,t.wrong,t.health,t.gold??120,t.heroLevel??1,t.streak||0,t.score-t.bonus,t.bonus,t.score,t.completed?'Có':'Chưa',t.finishedAt?new Date(t.finishedAt).toLocaleString('vi-VN'):'']);
+ const ordered=sortTeamsFairly(world.teams||[]);
+ const rows=ordered.map((t,i)=>[i+1,t.name,t.avatar,t.stage,t.round,t.wrong,t.health,t.gold??120,t.heroLevel??1,t.streak||0,Math.max(0,(t.score||0)-(t.bonus||0)),t.bonus||0,Math.max(0,t.score||0),t.completed?'Có':'Chưa',t.finishedAt?new Date(t.finishedAt).toLocaleString('vi-VN'):'']);
  const quote=v=>'"'+String(v).replace(/"/g,'""')+'"';
  const csv='\ufeff'+[columns,...rows].map(r=>r.map(quote).join(',')).join('\r\n');
  const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});

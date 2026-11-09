@@ -24,6 +24,7 @@ let ROOMS={};
 let LATEST_ROOM_ID='123456';
 let GLOBAL_TEAM_PROGRESS={};
 let GLOBAL_TEAM_RESET_AT={};
+let GLOBAL_ROOM_STATUS={};
 try{if(fs.existsSync(DATA)){ROOMS=JSON.parse(fs.readFileSync(DATA,'utf8')); console.log('Đã nạp',Object.keys(ROOMS).length,'phòng học');}}catch(e){console.error('Không thể nạp dữ liệu phòng:',e.message);}
 let persistPending=false;
 function persist(){
@@ -74,6 +75,7 @@ function createDeterministicRoom(roomId='123456',size=6){
   id:roomId,
   teacherToken:roomId==='123456'?'DEMO_GV':'GV_'+roomId,
   createdAt:new Date().toISOString(),
+  started:false,
   paused:false,
   ended:false,
   clock:{minutes:6,remainingMs:6*60*1000,running:false,startedAt:0},
@@ -93,7 +95,7 @@ function createDeterministicRoom(roomId='123456',size=6){
    lastActiveAt:now,
    stageEnteredAt:now
   })),
-  events:[{at:new Date().toISOString(),text:`Rồng Xanh đã mở sẵn phòng ${roomId} (Thời lượng 6 phút, ${validSize} đội, mã PIN 1111 → ${String(validSize).repeat(4)}).`}]
+  events:[{at:new Date().toISOString(),text:`Phòng ${roomId} đã sẵn sàng (${validSize} đội · 6 phút).`}]
  };
 }
 
@@ -340,9 +342,11 @@ function mergeTeamSnapshot(t,snap){
  }else if(snapStage===curStage && snapRound>curRound){
   t.round=snapRound;
  }
- if(typeof snap.score==='number' && (isNewerProgress || (t.score===20 && snap.score!==20) || snap.score>t.score)){
-  t.score=snap.score;
+ if(typeof snap.score==='number' && (isNewerProgress || (snap.updatedAt||0)>=(t.updatedAt||0) || (t.score===20 && snap.score!==20) || snap.score>t.score)){
+  t.score=Math.max(0, snap.score);
  }
+ t.score=Math.max(0, t.score||0);
+ if(snap.updatedAt && snap.updatedAt>(t.updatedAt||0))t.updatedAt=snap.updatedAt;
  if(typeof snap.gold==='number' && snap.gold>(t.gold||120))t.gold=snap.gold;
  if(typeof snap.bonus==='number' && snap.bonus>(t.bonus||0))t.bonus=snap.bonus;
  if(typeof snap.wrong==='number' && snap.wrong>(t.wrong||0))t.wrong=snap.wrong;
@@ -410,13 +414,33 @@ function recordGlobalTeamProgress(t){
  });
 }
 
+function recordGlobalRoomStatus(room){
+ if(!room||!room.id)return;
+ GLOBAL_ROOM_STATUS[room.id]={
+  started:Boolean(room.started||room.clock?.running),
+  paused:Boolean(room.paused),
+  ended:Boolean(room.ended),
+  clock:{...room.clock},
+  updatedAt:Date.now()
+ };
+}
+
 function syncRoomWithGlobalProgress(room){
  if(!room||!Array.isArray(room.teams))return;
+ const gStatus=GLOBAL_ROOM_STATUS[room.id];
+ if(gStatus && (gStatus.updatedAt||0)>(room.statusUpdatedAt||0)){
+  room.started=Boolean(gStatus.started);
+  room.paused=Boolean(gStatus.paused);
+  room.ended=Boolean(gStatus.ended);
+  if(gStatus.clock)room.clock={...gStatus.clock};
+  room.statusUpdatedAt=gStatus.updatedAt;
+ }
  room.teams.forEach(t=>{
   if(GLOBAL_TEAM_PROGRESS[t.id]){
    mergeTeamSnapshot(t,GLOBAL_TEAM_PROGRESS[t.id]);
   }
   ensureTeamFields(t);
+  t.score=Math.max(0,t.score||0);
  });
 }
 
@@ -427,8 +451,22 @@ function roomState(room,token){
  if(!teacher&&!isDisplay&&!team)throw error('Mã truy cập không hợp lệ.',403);
  syncRoomWithGlobalProgress(room);
  const now=Date.now();
+ const elapsed=room.clock.running?now-room.clock.startedAt:0;
+ const remMs=Math.max(0,room.clock.remainingMs-elapsed);
+ if(room.clock.running && remMs<=0){
+  room.clock.remainingMs=0;
+  room.clock.running=false;
+  room.clock.startedAt=0;
+  room.ended=true;
+  room.paused=false;
+  room.started=true;
+  room.statusUpdatedAt=now;
+  recordGlobalRoomStatus(room);
+  emit(room,'⏰ Đã hết 6 phút! Trò chơi tự động kết thúc và mở Bảng Vinh Danh.');
+  persist();
+ }
  const teams=room.teams.map(t=>({id:t.id,name:t.name,avatar:t.avatar,color:t.color,
-  stage:t.stage,round:t.round,score:t.score,bonus:t.bonus,health:t.health,wrong:t.wrong,
+  stage:t.stage,round:t.round,score:Math.max(0,t.score||0),bonus:t.bonus,health:t.health,wrong:t.wrong,
   gold:t.gold,heroLevel:t.heroLevel,streak:t.streak||0,correctCount:t.correctCount||0,upgrades:t.upgrades,
   cipherReady:Boolean(t.cipherReady),bossReady:Boolean(t.bossReady),
   completed:t.completed,finishedAt:t.finishedAt,
@@ -471,9 +509,10 @@ function roomState(room,token){
   hintsUsed:(teacher||isDisplay)?t.hintsUsed:undefined,
   digits:t.digits||[],
   answerLog:(teacher||isDisplay)?(t.answerLog||[]):undefined}));
- const elapsed=room.clock.running?Date.now()-room.clock.startedAt:0;
- const clock={running:room.clock.running,remainingMs:Math.max(0,room.clock.remainingMs-elapsed),minutes:room.clock.minutes};
- const base={room:room.id,activeRoom:LATEST_ROOM_ID,resetTimestamps:GLOBAL_TEAM_RESET_AT,role:teacher?'teacher':(isDisplay?'display':'student'),teams,paused:room.paused,ended:Boolean(room.ended),clock,
+ const curElapsed=room.clock.running?Date.now()-room.clock.startedAt:0;
+ const clock={running:room.clock.running,remainingMs:Math.max(0,room.clock.remainingMs-curElapsed),minutes:room.clock.minutes};
+ const isStarted=Boolean(room.started || room.clock.running || room.paused || room.ended || clock.remainingMs < (room.clock.minutes||6)*60*1000);
+ const base={room:room.id,activeRoom:LATEST_ROOM_ID,resetTimestamps:GLOBAL_TEAM_RESET_AT,role:teacher?'teacher':(isDisplay?'display':'student'),teams,started:isStarted,paused:room.paused,ended:Boolean(room.ended),clock,
   stages:STAGES.map(x=>({id:x.id,isCipherBridgeQuest:Boolean(x.isCipherBridgeQuest),title:x.title,subtitle:x.subtitle||'',shortName:x.shortName||x.place,place:x.place,icon:x.icon,sealIcon:x.sealIcon||'💠',levelBadge:x.levelBadge,timeSeconds:x.timeSeconds||60,tag:x.tag,time:x.time,biomeColor:x.biomeColor||'#3b82f6',item:x.item||'',gameType:x.gameType,defaultMode:x.defaultMode,totalRounds:3})),
   messageOptions:MESSAGE_OPTIONS,lastEvent:room.events.slice(-15).reverse(),
   createdAt:room.createdAt,joinBaseURL:IS_VERCEL?'':`http://${LAN_IP}:${PORT}`};
@@ -484,7 +523,7 @@ function roomState(room,token){
    cipher:'30524',cipherWords:TOKEN_WORDS};
  team.lastActiveAt=now;
  const cur=STAGES[team.stage];return {...base,me:{id:team.id,name:team.name,avatar:team.avatar,color:team.color,
-  stage:team.stage,round:team.round,health:team.health,wrong:team.wrong,score:team.score,bonus:team.bonus,
+  stage:team.stage,round:team.round,health:team.health,wrong:team.wrong,score:Math.max(0,team.score||0),bonus:team.bonus,
   gold:team.gold,heroLevel:team.heroLevel,streak:team.streak||0,correctCount:team.correctCount||0,upgrades:team.upgrades,
   cipherReady:Boolean(team.cipherReady),bossReady:Boolean(team.bossReady),
   stage1:team.stage1||{pillars:[],cluesFound:0,cipherSolved:false,bridgeOpened:false},
@@ -1248,43 +1287,60 @@ function processAction(endpoint,d){
   emit(r,`🏆 ${t.name} đã khôi phục TÂM THẠCH VECTƠ thành công! +20 XP.`);persist();
   return{correct:true,points:20,message:MESSAGE_OPTIONS[0],score:t.score};
  }
+ if(endpoint==='/api/startRoom'){
+  r.started=true;r.ended=false;r.paused=false;
+  if(!r.clock.running){
+   if(r.clock.remainingMs<=0)r.clock.remainingMs=r.clock.minutes*60*1000;
+   r.clock.startedAt=Date.now();
+   r.clock.running=true;
+  }
+  r.statusUpdatedAt=Date.now();
+  recordGlobalRoomStatus(r);
+  persist();
+  return{ok:true,started:true};
+ }
  if(endpoint==='/api/teacher'){
   requireTeacher(r,d.token);const action=String(d.action||'');
   if(action==='bonus'){
     const t=r.teams.find(t=>t.id===d.team);const b=Number(d.value);
     if(!t||!Number.isInteger(b)||b<0||b>10)throw error('Điểm hợp tác phải là số nguyên từ 0 đến 10.');
-    t.score+=b-t.bonus;t.bonus=b;
+    t.score=Math.max(0,(t.score||0)+b-(t.bonus||0));t.bonus=b;
     recordGlobalTeamProgress(t);
     emit(r,`GV ghi nhận ${t.name}: ${b} điểm hợp tác.`);
   }else if(action==='pause'){
-    r.paused=!r.paused;if(r.paused)clockPause(r);emit(r,r.paused?'Giáo viên đã tạm dừng nhiệm vụ.':'Các nhiệm vụ tiếp tục hoạt động.');
+    r.paused=!r.paused;if(r.paused)clockPause(r);r.statusUpdatedAt=Date.now();recordGlobalRoomStatus(r);emit(r,r.paused?'Giáo viên đã tạm dừng nhiệm vụ.':'Các nhiệm vụ tiếp tục hoạt động.');
   }else if(action==='startContest'){
-    r.ended=false;r.paused=false;
+    r.started=true;r.ended=false;r.paused=false;
     if(!r.clock.running){
      if(r.clock.remainingMs<=0)r.clock.remainingMs=r.clock.minutes*60*1000;
      r.clock.startedAt=Date.now();
      r.clock.running=true;
     }
-    emit(r,'🚀 Giáo viên đã BẮT ĐẦU lượt thi Hành Trình Giải Cứu Lục Địa OXYZ (6 phút)!');
+    r.statusUpdatedAt=Date.now();recordGlobalRoomStatus(r);
+    emit(r,'🚀 Giáo viên đã BẮT ĐẦU lượt thi (6 phút)!');
   }else if(action==='pauseContest'){
-    r.paused=true;clockPause(r);
-    emit(r,'⏸ Giáo viên đã TẠM DỪNG lượt thi và đóng băng đồng hồ chủ.');
+    r.started=true;r.paused=true;clockPause(r);
+    r.statusUpdatedAt=Date.now();recordGlobalRoomStatus(r);
+    emit(r,'⏸ Giáo viên đã TẠM DỪNG lượt thi.');
   }else if(action==='resumeContest'){
-    r.ended=false;r.paused=false;
+    r.started=true;r.ended=false;r.paused=false;
     if(!r.clock.running&&r.clock.remainingMs>0){
      r.clock.startedAt=Date.now();
      r.clock.running=true;
     }
+    r.statusUpdatedAt=Date.now();recordGlobalRoomStatus(r);
     emit(r,'▶ Giáo viên đã TIẾP TỤC lượt thi.');
   }else if(action==='endContest'){
-    r.ended=true;r.paused=false;clockPause(r);
+    r.started=true;r.ended=true;r.paused=false;clockPause(r);
+    r.statusUpdatedAt=Date.now();recordGlobalRoomStatus(r);
     emit(r,'🏁 Giáo viên đã KẾT THÚC lượt thi và công bố bảng tổng kết!');
   }else if(action==='timer'){
-    if(d.value==='start'){r.ended=false;r.paused=false;if(!r.clock.running){r.clock.startedAt=Date.now();r.clock.running=true;}}
+    if(d.value==='start'){r.started=true;r.ended=false;r.paused=false;if(!r.clock.running){r.clock.startedAt=Date.now();r.clock.running=true;}}
     else if(d.value==='pause'){clockPause(r);}
-    else if(d.value==='reset'){r.ended=false;r.paused=false;r.clock.running=false;r.clock.remainingMs=r.clock.minutes*60*1000;r.clock.startedAt=0;}
+    else if(d.value==='reset'){r.started=false;r.ended=false;r.paused=false;r.clock.running=false;r.clock.remainingMs=r.clock.minutes*60*1000;r.clock.startedAt=0;}
     else if(Number.isInteger(Number(d.value))&&[6,10,15,35,40,45,50].includes(Number(d.value))){clockPause(r);r.clock.minutes=Number(d.value);r.clock.remainingMs=r.clock.minutes*60*1000;}
     else throw error('Tác vụ đồng hồ không hợp lệ.');
+    r.statusUpdatedAt=Date.now();recordGlobalRoomStatus(r);
   }else if(action==='broadcast'){
     const msg=String(d.message||'').trim();
     if(!msg)throw error('Nội dung nhắn gửi không được để trống.');
