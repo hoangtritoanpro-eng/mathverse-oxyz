@@ -7106,7 +7106,7 @@ function renderStage3ZombieShooterGame(m) {
           🧟 Tốc độ x${z3SpeedMult()}
         </div>
         <button type="button" class="z3-pill z3-pill-pause" data-action="z3TogglePause" title="Tạm dừng / Chơi tiếp (Phím Space)">
-          ${isPaused ? '▶ Chơi tiếp' : '⏸ Tạm dừng'}
+          ${isPaused ? '▶<span class="ph-hide"> Chơi tiếp</span>' : '⏸<span class="ph-hide"> Tạm dừng</span>'}
         </button>
         <div class="z3-pill z3-pill-hearts" id="z3HeartsPill" title="Mạng năng lượng của đội">
           ${[1, 2, 3].map(h => `<span class="z3-heart-icon ${h <= z3State.hearts ? 'full' : 'lost'}">❤️</span>`).join('')}

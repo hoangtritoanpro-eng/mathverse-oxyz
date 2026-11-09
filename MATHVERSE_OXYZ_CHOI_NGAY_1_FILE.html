@@ -13708,6 +13708,14 @@ body.bk-mode .modal p{color:#4B5185 !important}
 .bk-qr-code{display:flex;align-items:baseline;gap:12px;font-weight:700;color:#4B5185}
 .bk-qr-code b{font-family:var(--bk-display);font-weight:800;font-size:clamp(2.4rem,6vw,3.6rem);color:var(--bk-ink);letter-spacing:.06em;line-height:1}
 .bk-qr-card .bk-btn{font-size:1.1rem;--face:var(--bk-mist);--shade:#C3C9F5}
+@media (max-width:860px){
+  .z3-shooter-shell .z3-pill.z3-pill-pause{font-size:15px !important;padding:5px 10px !important}
+  .z3-shooter-shell .z3-pill.z3-pill-pause::before{content:none !important}
+  .z3-status-cluster{gap:4px !important;padding:0 !important}
+  .z3-shooter-shell .z3-pill-timer{font-size:14px !important;padding:4px 8px !important}
+  .z3-clock-icon,.z3-star-icon{display:none !important}
+  .game-juice-floater{max-width:72vw !important;white-space:normal !important;text-align:center !important;left:50% !important;font-size:15px !important;line-height:1.25 !important}
+}
 </style>
 </head>
 <body>
@@ -21176,7 +21184,7 @@ function renderStage3ZombieShooterGame(m) {
           🧟 Tốc độ x${z3SpeedMult()}
         </div>
         <button type="button" class="z3-pill z3-pill-pause" data-action="z3TogglePause" title="Tạm dừng / Chơi tiếp (Phím Space)">
-          ${isPaused ? '▶ Chơi tiếp' : '⏸ Tạm dừng'}
+          ${isPaused ? '▶<span class="ph-hide"> Chơi tiếp</span>' : '⏸<span class="ph-hide"> Tạm dừng</span>'}
         </button>
         <div class="z3-pill z3-pill-hearts" id="z3HeartsPill" title="Mạng năng lượng của đội">
           ${[1, 2, 3].map(h => `<span class="z3-heart-icon ${h <= z3State.hearts ? 'full' : 'lost'}">❤️</span>`).join('')}
