@@ -1511,96 +1511,22 @@ function renderTeacherQrModal(roomCode) {
 }
 
 function startScreen(msg=''){
- const fRoom=esc(initialRoom || LiveClassroomSync.getActiveRoom() || '123456'),fTeam=esc(initialTeam || 'doi-1');
- const roomJoinUrl = getRoomJoinUrl(fRoom);
- const teamCardsHtml = QUICK_LOGIN_TEAMS.map(t => `
-  <button type="button"
-   class="mv-quick-team-card ${fTeam === t.id ? 'is-selected' : ''}"
-   style="--team-accent:${t.color}"
-   data-action="quickJoinTeam"
-   data-team="${t.id}"
-   title="Nhấn 1 lần để vào ngay Đội ${t.num} – ${t.name}">
-   <span class="mv-qtc-avatar">${t.avatar}</span>
-   <span class="mv-qtc-info">
-    <small>ĐỘI ${t.num}</small>
-    <strong>${t.name}</strong>
-   </span>
-   <span class="mv-qtc-go">Vào ngay →</span>
-  </button>
- `).join('');
-
- app.innerHTML=layout(`
-  ${msg?`<div class="notice error" style="margin-bottom:12px">${esc(msg)}</div>`:''}
-
-  <!-- CỔNG ĐĂNG NHẬP SIÊU TỐC 1–2 BƯỚC ĐẶT NGAY ĐẦU TRANG (ÍT CHỮ, DỄ DÙNG) -->
-  <section class="mv-quick-entry-portal" id="entry">
-   <!-- KHỐI HỌC SINH: CHỈ CẦN CHẠM VÀO ĐỘI ĐỂ VÀO CHƠI NGAY -->
-   <div class="mv-qep-card student-portal">
-    <div class="mv-qep-header">
-     <div>
-      <span class="mv-qep-badge student">🧑‍🚀 HỌC SINH</span>
-      <h2 class="mv-qep-title">Chạm Vào Đội Để Vào Phòng Ngay</h2>
-     </div>
-     <div class="mv-qep-room-box">
-      <label for="roomInput">Mã phòng</label>
-      <input id="roomInput" type="text" inputmode="numeric" maxlength="6" class="mono mv-qep-room-input" value="${fRoom}" placeholder="123456" title="Mã phòng 6 số" />
-     </div>
-    </div>
-
-    <div class="mv-quick-teams-grid" style="margin-top:6px">
-     ${teamCardsHtml}
-    </div>
-   </div>
-
-   <!-- KHỐI GIÁO VIÊN: QUÉT MÃ QR & BẢNG ĐIỀU KHIỂN 1 CHẠM DỄ DÙNG -->
-   <div class="mv-qep-card teacher-portal">
-    <span class="mv-qep-badge teacher">👩‍🏫 GIÁO VIÊN</span>
-    <h2 class="mv-qep-title">Mã QR & Điều Khiển Lớp Học</h2>
-
-    <div class="mv-qep-qr-preview-box">
-     <div class="mv-qep-qr-svg" data-action="openQrModal" title="Nhấn để phóng to Mã QR lên máy chiếu">
-      ${renderRoomQrSvg(roomJoinUrl, 96)}
-     </div>
-     <div class="mv-qep-qr-meta">
-      <small>MÃ PHÒNG</small>
-      <strong class="mono">${fRoom}</strong>
-      <button type="button" class="mv-chip-btn gold" data-action="openQrModal">🔍 Phóng to QR</button>
-     </div>
-    </div>
-
-    <div class="form-field" style="margin:6px 0 8px">
-     <label for="teamCount">Số đội tham gia</label>
-     <select id="teamCount">
-      <option value="4">4 đội</option>
-      <option value="5">5 đội</option>
-      <option value="6" selected>6 đội (Mặc định)</option>
-      <option value="7">7 đội</option>
-      <option value="8">8 đội</option>
-     </select>
-    </div>
-
-    <div class="mv-qep-teacher-actions">
-     ${btn('🖥️ MỞ MÀN HÌNH GIÁO VIÊN','demoTeacher','gold block')}
-     ${btn('✨ TẠO PHÒNG MỚI','create','primary block')}
-    </div>
-   </div>
-  </section>
-
-  ${showTeacherQrModal ? renderTeacherQrModal(fRoom) : ''}
- `);
-
- // Tự động đồng bộ mã phòng mới nhất nếu Giáo viên vừa tạo phòng trên máy chủ
- if(!initialRoom){
-  api('/api/state',{room:fRoom,token:'DISPLAY'}).then(d=>{
-   if(d && d.activeRoom && d.activeRoom !== '123456'){
-    LiveClassroomSync.setActiveRoom(d.activeRoom);
-    const inp = document.getElementById('roomInput');
-    if(inp && (inp.value === '123456' || !inp.value.trim())){
-     inp.value = d.activeRoom;
-    }
-   }
-  }).catch(()=>{});
+ if(msg) bkError = msg;
+ bkStopTeamPoll();
+ document.body.classList.add('bk-mode');
+ $('.award-backdrop')?.remove();
+ if(bkStep==='team' && bkRoom){
+  app.innerHTML = bkTeamPick();
+  bkLoadTeams();
+  bkStartTeamPoll();
+ }else if(bkStep==='host'){
+  app.innerHTML = bkHostSetup();
+ }else{
+  app.innerHTML = bkLanding();
+  const inp = document.getElementById('bkCode');
+  if(inp && !('ontouchstart' in window)) inp.focus();
  }
+ bkError = '';
 }
 function getStageFormulaSafe(stageIdx, currentTeamStage) {
  if (stageIdx === 0) {
@@ -2586,6 +2512,7 @@ function teacherScreen(){
  const roomJoinUrl = getRoomJoinUrl(world.room);
 
  return `<div class="gv-shell">
+  <button type="button" class="bk-back-float" data-action="bkHideDetail">‹ Về màn hình chính</button>
   <!-- 0. THANH ĐIỀU KHIỂN NHANH & MÃ QR ĐƠN GIẢN DÀNH CHO GIÁO VIÊN (GỌN, KHÔNG TRÙNG NÚT) -->
   <section class="gv-easy-command-banner">
    <!-- KHỐI 1: MÃ QR & MÃ PHÒNG LỚP HỌC -->
@@ -11541,6 +11468,20 @@ function runArwesDecrypt(el, targetText, duration = 1100, onComplete = null) {
 function render(){
  if(!session)return startScreen();
  if(!world){app.innerHTML='<div class="loading">Đang lấy dữ liệu phòng học…</div>';return;}
+ if(session.role==='student'){
+  const waitingNow = isWaitingForTeacherStart();
+  if(bkWasWaiting && !waitingNow && world.started && !world.ended){ vaState.stageStartedAt = Date.now() + 2800; bkShowCountdown(); }
+  bkWasWaiting = waitingNow;
+ }
+ const bare = bkBareScreen();
+ document.body.classList.toggle('bk-mode', Boolean(bare));
+ if(bare){
+  app.innerHTML = bare;
+  updateClock();
+  $('.award-backdrop')?.remove();
+  if(modal)showModal();
+  return;
+ }
  const bodyHtml = session.role === 'teacher' ? teacherScreen() : session.role === 'display' ? displayScreen() : studentScreen();
  app.innerHTML=layout(bodyHtml);
  updateClock();
@@ -11974,6 +11915,11 @@ async function refresh(force=false){
   if(d.activeRoom && d.activeRoom !== '123456') LiveClassroomSync.setActiveRoom(d.activeRoom);
   if(session.role==='student' && d.me) LiveClassroomSync.saveTeamSnapshot(d.me);
   world=d;setClock();
+  if((session.role==='teacher' && !bkHostDetail) || session.role==='display'){
+   const hs = bkHostSig(d);
+   if(!force && hs===bkLastHostSig) return;
+   bkLastHostSig = hs;
+  }
   // Đồng bộ vị trí Rồng Xanh cho tất cả thành viên cùng đội & khi tải lại trang (F5)
   if(session.role==='student'&&d.me){
    const curSrvStage = Math.max(0, Math.min(5, d.me.stage ?? 0));
@@ -11992,6 +11938,10 @@ async function refresh(force=false){
    }else{
     lastSyncedTeamStage = curSrvStage;
    }
+  }
+  if(session.role==='student'&&!force){
+   const shownKind = document.querySelector('.bk-student')?.dataset.kind || '';
+   if(shownKind && shownKind===bkStudentKind()){ bkPatchStudent(); return; }
   }
   if(session.role==='student'&&!force){
    const me=d.me||{};
@@ -12170,6 +12120,7 @@ async function submitCipherNotebook(){
 
 async function handle(action,el){
  try{
+  if(action && action.startsWith('bk') && await bkHandle(action,el)) return;
   if(action==='toggleFullscreen'){
    if(!document.fullscreenElement){document.documentElement.requestFullscreen?.();}
    else{document.exitFullscreen?.();}
@@ -12882,7 +12833,7 @@ async function handle(action,el){
    await refresh(true);
    return;
   }
-  if(action==='home'){const yes=confirm('Quay về màn hình đăng nhập? Tiến độ của đội vẫn được lưu an toàn.');if(yes){session=null;world=null;history.replaceState({},'',location.pathname);startScreen();}return;}
+  if(action==='home'){const yes=confirm('Quay về màn hình đăng nhập? Tiến độ của đội vẫn được lưu an toàn.');if(yes){session=null;world=null;bkStep='code';bkRoom='';studentSoloStarted=false;history.replaceState({},'',location.pathname);startScreen();}return;}
   if(action==='setMode'){
    activePlayMode=el.dataset.mode;
    huntState.battleOpen=false;
@@ -13225,15 +13176,14 @@ async function handle(action,el){
    studentSoloStarted = true;
    vaState.stageStartedAt = Date.now();
    sound('powerup');
-   api('/api/startRoom',{room:session.room,token:session.token}).catch(()=>{});
-   LiveClassroomSync.broadcastRoomStatus({ started: true, paused: false, ended: false });
+   bkWasWaiting = false;
    await refresh(true);
    return;
   }
   if(action==='hostStartContest'){
    await submit('/api/teacher',{action:'startContest'});
    LiveClassroomSync.broadcastRoomStatus({ started: true, paused: false, ended: false });
-   sound('win');
+   bkShowCountdown();
    updateAfterAction();
    return;
   }
@@ -13254,7 +13204,7 @@ async function handle(action,el){
    if(!confirm('Xác nhận KẾT THÚC lượt thi của phòng học? Đồng hồ sẽ dừng và mở Bục Vinh Danh.')) return;
    await submit('/api/teacher',{action:'endContest'});
    LiveClassroomSync.broadcastRoomStatus({ started: true, paused: false, ended: true });
-   showAward = true;
+   showAward = bkHostDetail;
    sound('fanfare');
    triggerConfetti(3200);
    updateAfterAction();
@@ -13516,7 +13466,7 @@ window.addEventListener('keydown',e=>{
   if(e.key==='Enter'){
    if(document.activeElement.id==='huntShortInput')handle('attackHuntMonster');
    else if(document.activeElement.id==='cdShortInput')handle('submitShortCastle');
-   else if(!session)$('#entry [data-action="join"]')?.click();
+   else if(!session && document.activeElement.id==='bkCode')handle('bkSubmitCode');
   }
   return;
  }
@@ -14052,6 +14002,421 @@ function exportCSV(){
  const csv='\ufeff'+[columns,...rows].map(r=>r.map(quote).join(',')).join('\r\n');
  const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});
  const link=URL.createObjectURL(blob);const a=document.createElement('a');a.href=link;a.download='MATHVERSE_OXYZ_KET_QUA_'+world.room+'.csv';a.click();setTimeout(()=>URL.revokeObjectURL(link),1500);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   GIAO DIỆN VÀO PHÒNG KIỂU BLOOKET (v5.7.0)
+   Học sinh: nhập mã → chạm chọn đội → sảnh chờ → chơi → kết quả.
+   Giáo viên: tạo phòng → sảnh chờ (mã to + QR + đội hiện dần) → bảng đua → bục vinh danh.
+   ═══════════════════════════════════════════════════════════════════════════ */
+let bkStep = initialRoom ? 'team' : 'code'; // 'code' | 'team' | 'host'
+let bkRoom = initialRoom || '';
+let bkRoomTeams = null;
+let bkError = '';
+let bkHostTeamCount = 6;
+let bkHostDetail = false;
+let bkKnownJoined = new Set();
+let bkLobbyPrimed = false;
+let bkTeamPollTimer = null;
+let bkWasWaiting = false;
+let bkLastHostSig = '';
+
+function bkTeamName(t){ return String(t?.name || '').replace(/^Đội\s*\d+\s*[-–·:]?\s*/i, '') || 'Đội'; }
+function bkIsJoined(t){ return typeof t?.joined === 'boolean' ? t.joined : Boolean(t?.online); }
+function bkJoinHost(){
+ const base = (world && world.joinBaseURL) ? world.joinBaseURL : location.origin;
+ if (!base || base === 'null' || location.protocol === 'file:') return 'máy này';
+ return base.replace(/^https?:\/\//, '') + (location.pathname && location.pathname !== '/' ? location.pathname : '');
+}
+function bkTeamProgressPct(t){
+ if (t.completed) return 100;
+ const s1Clues = t.stage > 0 ? 4 : Math.min(4, (t.stage1?.cluesFound ?? (t.round >= 1 ? 4 : 0)));
+ const seals = Math.max((t.digits || []).length, Math.min(5, t.stage || 0));
+ const byRounds = (((t.stage || 0) * 3 + (t.round || 0) + (t.stage === 0 && t.round === 0 ? (s1Clues / 4) : 0)) / 15) * 100;
+ return Math.max(3, Math.min(99, Math.round(Math.max(seals * 20, byRounds))));
+}
+function bkStageLabel(t){ return t.completed ? 'Về đích' : `Chặng ${Math.min(5, (t.stage || 0) + 1)}/5`; }
+
+/* ─── HỌC SINH: NHẬP MÃ PHÒNG ─── */
+function bkLanding(){
+ return `<div class="bk-page bk-entry">
+  <main class="bk-join">
+   <div class="bk-logo">${DIAMOND_ICON_SVG}<span>MathVerse Oxyz</span></div>
+   <div class="bk-join-card">
+    <label for="bkCode" class="bk-sr">Mã phòng</label>
+    <input id="bkCode" class="bk-code-input" type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="off" maxlength="6" placeholder="Mã phòng" value="${esc(bkRoom)}"/>
+    <button type="button" class="bk-btn bk-btn-sun bk-btn-block" data-action="bkSubmitCode">Vào phòng</button>
+    ${bkError ? `<p class="bk-error" role="alert">${esc(bkError)}</p>` : ''}
+   </div>
+   <p class="bk-help">Nhập mã 6 số trên màn hình máy chiếu, hoặc quét mã QR bằng camera điện thoại.</p>
+   ${window.IS_DEMO_MODE ? `<button type="button" class="bk-text-link" data-action="demoPlay">Chơi thử ngay trên máy này</button>` : ''}
+  </main>
+  <button type="button" class="bk-corner-link" data-action="bkGoHost">Tôi là giáo viên</button>
+ </div>`;
+}
+
+/* ─── HỌC SINH: CHỌN ĐỘI ─── */
+function bkTeamTiles(){
+ const teams = bkRoomTeams || [];
+ if (!teams.length) return `<p class="bk-loading">Đang tải danh sách đội…</p>`;
+ return teams.map(t => `<button type="button" class="bk-team" style="--tc:${esc(t.color || '#36C6E8')}" data-action="bkPickTeam" data-team="${esc(t.id)}">
+   <span class="bk-team-ava" aria-hidden="true">${t.avatar || '🐉'}</span>
+   <span class="bk-team-name">${esc(bkTeamName(t))}</span>
+   ${bkIsJoined(t) ? `<span class="bk-team-state">Đã có bạn vào</span>` : ''}
+  </button>`).join('');
+}
+function bkTeamPick(){
+ return `<div class="bk-page bk-entry">
+  <header class="bk-top">
+   <button type="button" class="bk-back" data-action="bkBackToCode">‹ Đổi mã phòng</button>
+   <span class="bk-room-tag">Phòng <b>${esc(bkRoom)}</b></span>
+  </header>
+  <main class="bk-pick">
+   <h1 class="bk-title">Chọn đội của bạn</h1>
+   ${bkError ? `<p class="bk-error" role="alert">${esc(bkError)}</p>` : ''}
+   <div class="bk-team-grid" id="bkTeamGrid">${bkTeamTiles()}</div>
+   <p class="bk-help">Cả nhóm chọn cùng một đội. Mỗi bạn một máy hay cả nhóm chung một máy đều được.</p>
+  </main>
+ </div>`;
+}
+async function bkLoadTeams(){
+ if (session || bkStep !== 'team' || !bkRoom) return;
+ try{
+  const d = await api('/api/state', { room: bkRoom, token: window.IS_DEMO_MODE ? 'DEMO_GV' : 'DISPLAY' });
+  if (session || bkStep !== 'team') return;
+  bkRoomTeams = d.teams || [];
+  if (d.room && d.room !== bkRoom){ bkRoom = d.room; const tag = $('.bk-room-tag b'); if (tag) tag.textContent = bkRoom; }
+  const grid = document.getElementById('bkTeamGrid');
+  if (grid) grid.innerHTML = bkTeamTiles();
+ }catch(e){
+  if (session || bkStep !== 'team' || bkRoomTeams) return;
+  const grid = document.getElementById('bkTeamGrid');
+  if (grid) grid.innerHTML = `<div class="bk-error" role="alert" style="grid-column:1/-1">${esc(e.message || 'Không tải được danh sách đội.')} <button type="button" class="bk-text-link" style="color:inherit" data-action="bkRetryTeams">Thử lại</button></div>`;
+ }
+}
+function bkStopTeamPoll(){ if (bkTeamPollTimer){ clearInterval(bkTeamPollTimer); bkTeamPollTimer = null; } }
+function bkStartTeamPoll(){ bkStopTeamPoll(); bkTeamPollTimer = setInterval(() => { if (!document.hidden) bkLoadTeams(); }, 3000); }
+
+/* ─── GIÁO VIÊN: TẠO PHÒNG ─── */
+function bkHostSetup(){
+ let last = '';
+ try{ last = LiveClassroomSync.getActiveRoom() || ''; }catch(e){}
+ return `<div class="bk-page bk-entry">
+  <header class="bk-top">
+   <button type="button" class="bk-back" data-action="bkBackToCode">‹ Màn hình học sinh</button>
+  </header>
+  <main class="bk-host-setup">
+   <h1 class="bk-title">Tạo phòng chơi</h1>
+   <div class="bk-setup-card">
+    <p class="bk-setup-q" id="bkCountLabel">Lớp chia thành mấy đội?</p>
+    <div class="bk-count-row" role="radiogroup" aria-labelledby="bkCountLabel">
+     ${[4,5,6,7,8].map(n => `<button type="button" role="radio" aria-checked="${n === bkHostTeamCount}" class="bk-count ${n === bkHostTeamCount ? 'is-on' : ''}" data-action="bkSetCount" data-n="${n}">${n}</button>`).join('')}
+    </div>
+    <button type="button" class="bk-btn bk-btn-sun bk-btn-block" data-action="bkCreateRoom">Tạo phòng ${bkHostTeamCount} đội</button>
+    ${last && last !== '123456' ? `<button type="button" class="bk-btn bk-btn-ghost-ink bk-btn-block" data-action="bkReopenRoom" data-room="${esc(last)}">Mở lại phòng ${esc(last)}</button>` : ''}
+   </div>
+   <p class="bk-help">Sau khi tạo phòng, chiếu màn hình lên cho cả lớp. Học sinh quét QR hoặc nhập mã là vào được.</p>
+  </main>
+ </div>`;
+}
+
+/* ─── HỌC SINH: SẢNH CHỜ ─── */
+function bkJoinedChips(teams, myId){
+ const list = (teams || []);
+ const joined = list.filter(t => bkIsJoined(t) || t.id === myId);
+ return `<p class="bk-joined-count"><b>${joined.length}</b>/${list.length} đội đã vào</p>
+  <ul class="bk-chips">${joined.map(t => `<li class="${t.id === myId ? 'is-me' : ''}" style="--tc:${esc(t.color || '#36C6E8')}"><span aria-hidden="true">${t.avatar || '🐉'}</span>${esc(bkTeamName(t))}</li>`).join('')}</ul>`;
+}
+function bkStudentLobby(){
+ const me = world.me || {};
+ return `<div class="bk-page bk-student" data-kind="lobby" style="--tc:${esc(me.color || '#36C6E8')}">
+  <header class="bk-top">
+   <span class="bk-room-tag">Phòng <b>${esc(world.room)}</b></span>
+   <button type="button" class="bk-icon" data-action="toggleSound" aria-label="${soundEnabled ? 'Tắt âm thanh' : 'Bật âm thanh'}">${soundEnabled ? '🔊' : '🔇'}</button>
+  </header>
+  <main class="bk-wait">
+   <div class="bk-wait-ava" aria-hidden="true">${me.avatar || '🐉'}</div>
+   <h1 class="bk-wait-name">${esc(bkTeamName(me))}</h1>
+   <p class="bk-wait-ok">Bạn đã vào phòng!</p>
+   <p class="bk-wait-msg">Nhìn lên máy chiếu. Trò chơi bắt đầu khi giáo viên bấm nút.</p>
+   <div class="bk-dots" aria-hidden="true"><i></i><i></i><i></i></div>
+   <div class="bk-joined" id="bkLobbyTeams">${bkJoinedChips(world.teams, me.id)}</div>
+  </main>
+  <footer class="bk-wait-foot">
+   <button type="button" class="bk-text-link" data-action="bkChangeTeam">Đổi đội</button>
+   <button type="button" class="bk-text-link" data-action="studentStartNow">Không có giáo viên? Tự chơi luôn</button>
+  </footer>
+ </div>`;
+}
+
+/* ─── HỌC SINH: KẾT QUẢ ─── */
+function bkResultCore(){
+ const me = world.me || {};
+ const ranked = sortTeamsFairly(world.teams || []);
+ const rank = Math.max(1, ranked.findIndex(t => t.id === me.id) + 1);
+ const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : '';
+ const seals = me.completed ? 5 : Math.min(5, (me.digits || []).length);
+ return `<div class="bk-result-rank">${medal ? `<span class="bk-medal" aria-hidden="true">${medal}</span>` : ''}<b>Hạng ${rank}</b><small>trên ${ranked.length} đội</small></div>
+  <dl class="bk-result-stats">
+   <div><dt>Điểm</dt><dd>${Math.max(0, me.score || 0)} XP</dd></div>
+   <div><dt>Ấn vectơ</dt><dd>${seals}/5</dd></div>
+   <div><dt>Tiến độ</dt><dd>${bkStageLabel(me)}</dd></div>
+  </dl>`;
+}
+function bkStudentResult(){
+ const me = world.me || {};
+ const title = me.completed ? 'Về đích!' : 'Hết giờ!';
+ const msg = world.ended ? 'Nhìn lên máy chiếu để xem bục vinh danh.' : 'Đội bạn đã hoàn thành 5 chặng. Chờ các đội khác về đích nhé.';
+ return `<div class="bk-page bk-student" data-kind="result" style="--tc:${esc(me.color || '#36C6E8')}">
+  <header class="bk-top"><span class="bk-room-tag">Phòng <b>${esc(world.room)}</b></span></header>
+  <main class="bk-result">
+   <div class="bk-wait-ava is-still" aria-hidden="true">${me.avatar || '🐉'}</div>
+   <p class="bk-result-team">${esc(bkTeamName(me))}</p>
+   <h1 class="bk-title">${title}</h1>
+   <div class="bk-result-card" id="bkLiveRank">${bkResultCore()}</div>
+   <p class="bk-help">${msg}</p>
+  </main>
+ </div>`;
+}
+function bkStudentKind(){
+ if (session?.role !== 'student' || !world) return '';
+ if (isWaitingForTeacherStart()) return 'lobby';
+ if (world.ended || world.me?.completed) return 'result';
+ return '';
+}
+function bkPatchStudent(){
+ const lob = document.getElementById('bkLobbyTeams');
+ if (lob) lob.innerHTML = bkJoinedChips(world.teams, world.me?.id);
+ const rk = document.getElementById('bkLiveRank');
+ if (rk) rk.innerHTML = bkResultCore();
+}
+
+/* ─── GIÁO VIÊN / MÁY CHIẾU ─── */
+function bkHostSig(d){
+ const teams = (d.teams || []).map(t => [t.id, bkIsJoined(t), t.stage, t.round, t.score, t.completed, (t.digits || []).length, t.stage1?.cluesFound, t.stage2?.solvedCount, t.stage4?.matchedCount, t.stage5?.phase]);
+ return JSON.stringify([d.room, d.started, d.paused, d.ended, d.clock?.running, teams, (d.lastEvent || [])[0]?.at, showTeacherQrModal]);
+}
+function bkHostBand(){
+ const url = getRoomJoinUrl(world.room);
+ return `<header class="bk-band">
+  <div class="bk-band-join">
+   <span>Vào trang</span>
+   <b>${esc(bkJoinHost())}</b>
+   <span>rồi nhập mã phòng</span>
+  </div>
+  <div class="bk-band-code"><span>Mã phòng</span><b>${esc(world.room)}</b></div>
+  <button type="button" class="bk-band-qr" data-action="openQrModal" aria-label="Phóng to mã QR">
+   ${renderRoomQrSvg(url, 132)}
+   <span>Phóng to</span>
+  </button>
+ </header>`;
+}
+function bkHostFoot(controls){
+ if (!controls) return `<footer class="bk-host-foot"><button type="button" class="bk-foot-btn" data-action="exitDisplayMode">Bảng điều khiển</button></footer>`;
+ return `<footer class="bk-host-foot">
+  <button type="button" class="bk-foot-btn" data-action="openQrModal">Mã QR từng đội</button>
+  <button type="button" class="bk-foot-btn" data-action="bkShowDetail">Bảng thống kê chi tiết</button>
+  <button type="button" class="bk-foot-btn" data-action="bkNewRoom">Tạo phòng khác</button>
+  <span class="bk-foot-gap"></span>
+  <button type="button" class="bk-foot-btn" data-action="toggleSound" aria-label="${soundEnabled ? 'Tắt âm thanh' : 'Bật âm thanh'}">${soundEnabled ? '🔊' : '🔇'}</button>
+  <button type="button" class="bk-foot-btn" data-action="toggleFullscreen">Toàn màn hình</button>
+ </footer>`;
+}
+function bkHostLobby(controls){
+ const teams = world.teams || [];
+ const joined = teams.filter(bkIsJoined);
+ const fresh = joined.filter(t => !bkKnownJoined.has(world.room + ':' + t.id));
+ fresh.forEach(t => bkKnownJoined.add(world.room + ':' + t.id));
+ if (fresh.length && bkLobbyPrimed) setTimeout(() => sound('bleep'), 0);
+ bkLobbyPrimed = true;
+ const freshIds = new Set(fresh.map(t => t.id));
+ return `<div class="bk-page bk-host">
+  ${bkHostBand()}
+  <section class="bk-lobby">
+   <div class="bk-lobby-bar">
+    <p class="bk-lobby-count"><b>${joined.length}</b>/${teams.length} đội đã vào</p>
+    ${controls ? `<button type="button" class="bk-btn bk-btn-mint bk-btn-big" data-action="hostStartContest">Bắt đầu</button>` : `<p class="bk-lobby-note">Chờ giáo viên bắt đầu…</p>`}
+   </div>
+   <ul class="bk-slots">
+    ${teams.map(t => {
+     const isIn = bkIsJoined(t);
+     return `<li class="bk-slot ${isIn ? 'is-in' : 'is-empty'} ${freshIds.has(t.id) ? 'is-new' : ''}" style="--tc:${esc(t.color || '#36C6E8')}">
+      <span class="bk-slot-ava" aria-hidden="true">${t.avatar || '🐉'}</span>
+      <b>${esc(bkTeamName(t))}</b>
+      <small>${isIn ? 'Đã vào' : 'Đang chờ'}</small>
+     </li>`;
+    }).join('')}
+   </ul>
+  </section>
+  ${bkHostFoot(controls)}
+  ${showTeacherQrModal ? renderTeacherQrModal(world.room) : ''}
+ </div>`;
+}
+function bkHostLive(controls){
+ const ranked = sortTeamsFairly(world.teams || []);
+ const paused = Boolean(world.paused);
+ const ev = (world.lastEvent || [])[0];
+ return `<div class="bk-page bk-host bk-live">
+  <header class="bk-live-top">
+   <span class="bk-room-tag">Phòng <b>${esc(world.room)}</b></span>
+   <div class="bk-clock ${paused ? 'is-paused' : ''}"><span id="clock">06:00</span></div>
+   ${controls ? `<div class="bk-live-actions">
+    ${paused
+     ? `<button type="button" class="bk-btn bk-btn-mint" data-action="hostResumeContest">Tiếp tục</button>`
+     : `<button type="button" class="bk-btn bk-btn-paper" data-action="hostPauseContest">Tạm dừng</button>`}
+    <button type="button" class="bk-btn bk-btn-coral" data-action="hostEndContest">Kết thúc</button>
+   </div>` : '<span></span>'}
+  </header>
+  ${paused ? `<p class="bk-paused" role="status">Đang tạm dừng. Học sinh tạm thời không làm bài được.</p>` : ''}
+  <ol class="bk-race ${ranked.length > 6 ? 'is-compact' : ''}">
+   ${ranked.map((t, i) => {
+    const pct = bkTeamProgressPct(t);
+    return `<li class="bk-row ${i < 3 ? 'top-' + (i + 1) : ''} ${t.completed ? 'is-done' : ''}" style="--tc:${esc(t.color || '#36C6E8')}">
+     <span class="bk-rank">${i + 1}</span>
+     <span class="bk-row-ava" aria-hidden="true">${t.avatar || '🐉'}</span>
+     <span class="bk-row-name"><b>${esc(bkTeamName(t))}</b><small>${bkStageLabel(t)}</small></span>
+     <span class="bk-track" role="img" aria-label="Tiến độ ${pct}%"><i style="width:${pct}%"></i></span>
+     <span class="bk-xp">${Math.max(0, t.score || 0)}<small> XP</small></span>
+    </li>`;
+   }).join('')}
+  </ol>
+  ${ev ? `<p class="bk-ticker">${esc(ev.text)}</p>` : ''}
+  ${bkHostFoot(controls)}
+  ${showTeacherQrModal ? renderTeacherQrModal(world.room) : ''}
+ </div>`;
+}
+function bkHostPodium(controls){
+ const ranked = sortTeamsFairly(world.teams || []);
+ const top = ranked.slice(0, 3);
+ const order = [top[1], top[0], top[2]];
+ const places = [2, 1, 3];
+ return `<div class="bk-page bk-host bk-podium-page">
+  <h1 class="bk-title bk-podium-title">Bục vinh danh</h1>
+  <div class="bk-podium">
+   ${order.map((t, k) => t ? `<div class="bk-pod place-${places[k]}" style="--tc:${esc(t.color || '#36C6E8')}">
+     <span class="bk-pod-ava" aria-hidden="true">${t.avatar || '🐉'}</span>
+     <b class="bk-pod-name">${esc(bkTeamName(t))}</b>
+     <span class="bk-pod-xp">${Math.max(0, t.score || 0)} XP</span>
+     <div class="bk-pod-block"><span>${places[k]}</span></div>
+    </div>` : '<div class="bk-pod is-void"></div>').join('')}
+  </div>
+  ${ranked.length > 3 ? `<ol class="bk-rest" start="4">${ranked.slice(3).map(t => `<li style="--tc:${esc(t.color || '#36C6E8')}"><span aria-hidden="true">${t.avatar || '🐉'}</span><b>${esc(bkTeamName(t))}</b><em>${Math.max(0, t.score || 0)} XP</em></li>`).join('')}</ol>` : ''}
+  ${controls ? `<div class="bk-podium-actions">
+   <button type="button" class="bk-btn bk-btn-sun" data-action="bkPlayAgain">Chơi lại từ đầu</button>
+   <button type="button" class="bk-btn bk-btn-paper" data-action="exportCSV">Tải bảng điểm (CSV)</button>
+   <button type="button" class="bk-btn bk-btn-paper" data-action="bkShowDetail">Thống kê chi tiết</button>
+  </div>` : ''}
+ </div>`;
+}
+function bkHostScreen(controls){
+ if (world.ended) return bkHostPodium(controls);
+ if (!world.started) return bkHostLobby(controls);
+ return bkHostLive(controls);
+}
+
+/* ─── CHỌN MÀN HÌNH ─── */
+function bkBareScreen(){
+ if (!session || !world) return '';
+ if (session.role === 'teacher') return bkHostDetail ? '' : bkHostScreen(true);
+ if (session.role === 'display') return bkHostScreen(false);
+ const kind = bkStudentKind();
+ if (kind === 'lobby') return bkStudentLobby();
+ if (kind === 'result') return bkStudentResult();
+ return '';
+}
+function bkShowCountdown(){
+ if (document.querySelector('.bk-countdown')) return;
+ const el = document.createElement('div');
+ el.className = 'bk-countdown';
+ el.setAttribute('role', 'status');
+ document.body.appendChild(el);
+ const seq = ['3', '2', '1', 'Bắt đầu!'];
+ let i = 0;
+ const tick = () => {
+  if (i >= seq.length){ el.remove(); return; }
+  el.innerHTML = `<span class="${i === 3 ? 'is-go' : ''}">${seq[i]}</span>`;
+  sound(i === 3 ? 'powerup' : 'bleep');
+  i++;
+  setTimeout(tick, i === 4 ? 900 : 700);
+ };
+ tick();
+}
+async function bkHandle(action, el){
+ if (action === 'bkSubmitCode'){
+  const code = String($('#bkCode')?.value || '').replace(/\s+/g, '');
+  if (!/^\d{4,6}$/.test(code)){ bkRoom = code; bkError = 'Mã phòng gồm 6 chữ số. Hãy nhìn lại màn hình máy chiếu.'; startScreen(); return true; }
+  bkRoom = code; bkStep = 'team'; bkRoomTeams = null; bkError = '';
+  try{ history.replaceState({}, '', location.pathname + '?room=' + encodeURIComponent(code)); }catch(e){}
+  startScreen();
+  return true;
+ }
+ if (action === 'bkPickTeam'){
+  el.disabled = true;
+  const team = el.dataset.team || 'doi-1';
+  mvShowIntroHub = false; mvWorldMapOpen = false;
+  const teamNum = (/^doi-(\d+)$/i.exec(team) || [0, 1])[1];
+  const r = await api('/api/join', { room: bkRoom, team, code: String(teamNum).repeat(4) });
+  bkStopTeamPoll();
+  saveSession({ role: 'student', room: r.room, teamId: r.team, token: r.token });
+  activePlayMode = null;
+  await refresh(true);
+  return true;
+ }
+ if (action === 'bkBackToCode'){
+  bkStep = 'code'; bkRoomTeams = null; bkError = '';
+  try{ history.replaceState({}, '', location.pathname); }catch(e){}
+  startScreen();
+  return true;
+ }
+ if (action === 'bkRetryTeams'){ bkLoadTeams(); return true; }
+ if (action === 'bkGoHost'){ bkStep = 'host'; bkError = ''; startScreen(); return true; }
+ if (action === 'bkSetCount'){ bkHostTeamCount = Number(el.dataset.n) || 6; startScreen(); return true; }
+ if (action === 'bkCreateRoom'){
+  el.disabled = true;
+  const r = await api('/api/create', { teamCount: bkHostTeamCount });
+  bkHostDetail = false; bkLastHostSig = '';
+  saveSession({ role: 'teacher', room: r.room, token: r.teacherToken });
+  await refresh(true);
+  return true;
+ }
+ if (action === 'bkReopenRoom'){
+  const room = el.dataset.room;
+  bkHostDetail = false; bkLastHostSig = '';
+  saveSession({ role: 'teacher', room, token: localStorage.getItem(cacheKey('teacher', room)) || ('GV_' + room) });
+  await refresh(true);
+  return true;
+ }
+ if (action === 'bkNewRoom'){
+  if (!confirm('Rời phòng này để tạo phòng mới?')) return true;
+  session = null; world = null; bkStep = 'host'; showTeacherQrModal = false;
+  try{ history.replaceState({}, '', location.pathname); }catch(e){}
+  startScreen();
+  return true;
+ }
+ if (action === 'bkChangeTeam'){
+  const room = session?.room || bkRoom;
+  session = null; world = null; studentSoloStarted = false;
+  bkRoom = room; bkStep = 'team'; bkRoomTeams = null;
+  try{ history.replaceState({}, '', location.pathname + '?room=' + encodeURIComponent(room)); }catch(e){}
+  startScreen();
+  return true;
+ }
+ if (action === 'bkShowDetail'){ bkHostDetail = true; showAward = false; showTeacherQrModal = false; lastSignature = ''; render(); return true; }
+ if (action === 'bkHideDetail'){ bkHostDetail = false; showAward = false; bkLastHostSig = ''; render(); return true; }
+ if (action === 'bkPlayAgain'){
+  if (!confirm('Xóa điểm của tất cả các đội và đưa cả lớp về sảnh chờ?')) return true;
+  el.disabled = true;
+  for (const t of (world?.teams || [])){
+   try{ LiveClassroomSync.clearTeamSnapshot(t.id); }catch(e){}
+   await submit('/api/teacher', { action: 'resetTeam', team: t.id });
+  }
+  await submit('/api/teacher', { action: 'timer', value: 'reset' });
+  LiveClassroomSync.broadcastRoomStatus({ started: false, paused: false, ended: false });
+  showAward = false; bkLastHostSig = '';
+  updateAfterAction();
+  return true;
+ }
+ return false;
 }
 
 session=restoreSession();

@@ -502,6 +502,7 @@ function roomState(room,token){
    },
    dragon:t.dragon||{state:'PLAYING',fromStage:t.stage,toStage:t.stage,moveMode:'IDLE',transitionId:0},
   online:Boolean((now-(t.lastActiveAt||0))<15*60*1000),
+  joined:isTeamJoined(room,t,now),
   stuckSec:Math.floor((now-(t.stageEnteredAt||now))/1000),
   updatedAt:t.updatedAt||0,
   lastResetAt:GLOBAL_TEAM_RESET_AT[t.id]||t.lastResetAt||0,
@@ -522,6 +523,7 @@ function roomState(room,token){
    pedagogicalStats:computePedagogicalStats(room),
    cipher:'30524',cipherWords:TOKEN_WORDS};
  team.lastActiveAt=now;
+ markTeamSeen(room,team);
  const cur=STAGES[team.stage];return {...base,me:{id:team.id,name:team.name,avatar:team.avatar,color:team.color,
   stage:team.stage,round:team.round,health:team.health,wrong:team.wrong,score:Math.max(0,team.score||0),bonus:team.bonus,
   gold:team.gold,heroLevel:team.heroLevel,streak:team.streak||0,correctCount:team.correctCount||0,upgrades:team.upgrades,
@@ -555,6 +557,11 @@ function getRoom(data){
  }
  return ROOMS[roomId];
 }
+/* Sảnh chờ kiểu Blooket: ghi nhận đội nào đã thực sự vào phòng (theo từng phòng) */
+const LOBBY_SEEN={};
+const LOBBY_SEEN_TTL_MS=3*60*1000;
+function markTeamSeen(room,team){if(room&&team)LOBBY_SEEN[room.id+':'+team.id]=Date.now();}
+function isTeamJoined(room,team,now=Date.now()){const at=LOBBY_SEEN[room.id+':'+team.id];return Boolean(at&&now-at<LOBBY_SEEN_TTL_MS);}
 function requireTeacher(r,token){if(!isTeacherToken(r,token))throw error('Chỉ giáo viên được phép thao tác này.',403);}
 function requireTeam(r,token){const team=findTeamByToken(r,token);if(!team)throw error('Mã đội không hợp lệ. Hãy đăng nhập lại.',403);return ensureTeamFields(team);}
 function emit(r,content){r.events.push({at:new Date().toISOString(),text:content});if(r.events.length>200)r.events.shift();}
@@ -619,6 +626,7 @@ function processAction(endpoint,d){
   if(!t)throw error('Không tìm thấy đội chơi.',404);
   ensureTeamFields(t);
   t.lastActiveAt=Date.now();
+  markTeamSeen(r,t);
   persist();
   return{token:t.token,room:r.id,team:t.id};
  }
@@ -1288,6 +1296,7 @@ function processAction(endpoint,d){
   return{correct:true,points:20,message:MESSAGE_OPTIONS[0],score:t.score};
  }
  if(endpoint==='/api/startRoom'){
+  requireTeacher(r,d.token);
   r.started=true;r.ended=false;r.paused=false;
   if(!r.clock.running){
    if(r.clock.remainingMs<=0)r.clock.remainingMs=r.clock.minutes*60*1000;

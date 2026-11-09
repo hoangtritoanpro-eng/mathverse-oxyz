@@ -9,6 +9,29 @@ Tất cả những thay đổi quan trọng của dự án này sẽ được gh
 
 ---
 
+## [5.7.0] - 2026-11-10
+
+### Changed (Giao Diện Vào Phòng Kiểu Blooket: Đơn Giản, Ít Chữ, Học Sinh Vào Nhanh)
+- **Học sinh (`public/app.js` – `bkLanding`, `bkTeamPick`, `bkStudentLobby`, `bkStudentResult`):**
+  1. Màn hình đầu chỉ còn 1 ô **Mã phòng** + nút **Vào phòng** (giống Blooket). Quét QR (`?room=XXXXXX`) là vào thẳng bước chọn đội.
+  2. Chọn đội bằng thẻ màu lớn, hiện đủ tên đội, báo "Đã có bạn vào" khi nhóm đã có người.
+  3. **Sảnh chờ** riêng: avatar đội, danh sách đội đã vào cập nhật trực tiếp, chờ giáo viên bấm Bắt đầu → đếm ngược **3-2-1** rồi vào Chặng 1.
+  4. Hết giờ / về đích: thẻ kết quả gọn (Hạng, XP, Ấn vectơ, Tiến độ).
+- **Giáo viên (`bkHostSetup`, `bkHostLobby`, `bkHostLive`, `bkHostPodium`):**
+  1. Tạo phòng: chọn số đội 4–8 bằng 1 chạm.
+  2. **Sảnh chờ trên máy chiếu**: địa chỉ web + **mã phòng cỡ lớn** + QR; ô đội sáng lên khi có học sinh vào; nút **Bắt đầu** lớn.
+  3. **Bảng đua trực tiếp**: đồng hồ lớn, thanh tiến độ 5 chặng cho từng đội, nút Tạm dừng / Kết thúc.
+  4. **Bục vinh danh** Top 3 + danh sách còn lại, nút **Chơi lại từ đầu** (xóa điểm tất cả đội, đưa cả lớp về sảnh chờ), **Tải CSV**.
+  5. Bảng điều khiển chi tiết cũ vẫn giữ nguyên, mở bằng nút "Bảng thống kê chi tiết".
+- **Màn hình máy chiếu (`?view=display`)** dùng chung giao diện sảnh chờ / bảng đua / bục vinh danh (không có nút điều khiển).
+- Thanh menu học sinh tự gọn lại trên màn hình hẹp.
+
+### Fixed
+- **Chỉ giáo viên được bắt đầu phòng (`server.js` – `/api/startRoom`):** trước đây nút "Chơi tự luyện ngay" của học sinh khởi động đồng hồ 6 phút của **cả phòng**. Nay nút "Tự chơi luôn" chỉ mở chơi trên máy đó.
+- **Đội đã vào phòng (`server.js` – `LOBBY_SEEN`, trường `joined`):** ghi nhận theo từng phòng khi học sinh vào/đang mở game (3 phút), thay cho cờ `online` luôn bật khi tạo phòng.
+
+---
+
 ## [5.6.1] - 2026-11-09
 
 ### Changed & Fixed (Giao Diện Thân Thiện, Ít Chữ, Dễ Dùng & Chuẩn Hóa Logic Game Lớp Học)

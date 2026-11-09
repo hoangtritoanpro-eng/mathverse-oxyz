@@ -4,6 +4,7 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>MATHVERSE OXYZ – HÀNH TRÌNH GIẢI CỨU LỤC ĐỊA OXYZ (CHƠI THỬ 1 MÁY)</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Montserrat:wght@500;600;700;800;900&display=swap" rel="stylesheet"/>
 <style>
 :root{font-family:'Montserrat','Segoe UI',Arial,'Noto Sans',sans-serif;--mv-bg:#0B1227;--mv-deep-navy:#101B3B;--mv-royal-purple:#5846C9;--mv-electric-cyan:#1AB6B5;--mv-emerald-green:#35C992;--mv-treasure-gold:#F2B94B;--mv-text-white:#F8FAFF;color:#202747;background:#eef5ff;font-synthesis:none;--blue:#4673f1;--purple:#7954e9;--cyan:#18c5d7;--mint:#10bd9b;--pink:#ff6b91;--yellow:#ffc85b;--slate:#263457;--muted:#71809a;--border:#dfe8f4;--shadow:0 15px 36px rgba(65,83,135,.11)}
 *{box-sizing:border-box}html{min-height:100%}body{margin:0;min-height:100vh;background:radial-gradient(circle at 100% 0%,#eedfff 0,transparent 30%),radial-gradient(circle at 0% 60%,#ddfcf7 0,transparent 33%),linear-gradient(135deg,#f7fbff,#f5f3ff);overflow-x:hidden}button,input,select{font:inherit}button{cursor:pointer;transition:transform .16s,filter .16s,box-shadow .16s}button:hover:not(:disabled){transform:translateY(-2px);filter:saturate(1.13);box-shadow:0 6px 20px #273c751a}button:disabled{opacity:.46;cursor:not-allowed}button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #31bdd1;outline-offset:2px}a{color:#4d44d1}small,.muted{color:var(--muted)}h1,h2,h3,p{margin:0}h1,h2,h3{line-height:1.22}h1{font-size:clamp(2rem,4vw,3.8rem);font-weight:900;letter-spacing:-.035em}h2{font-size:clamp(1.4rem,2.4vw,2.05rem);font-weight:850}h3{font-size:1.12rem;font-weight:800}p{line-height:1.58}.wrap{max-width:1380px;margin:0 auto;padding:20px 20px 70px}.navbar{display:flex;justify-content:space-between;align-items:center;gap:15px;margin-bottom:18px}.brand{display:flex;align-items:center;gap:11px;font-size:22px;letter-spacing:.03em;font-weight:900;color:#343771}.brand-mark{display:grid;place-items:center;background:linear-gradient(135deg,#7554ef,#22bdd4);height:43px;width:43px;border-radius:15px;color:white;font-size:24px;box-shadow:0 7px 22px #665cec40}.pills{display:flex;align-items:center;gap:9px;flex-wrap:wrap}.pill{display:inline-flex;align-items:center;gap:5px;border:1px solid #e1e7fa;background:#fff;color:#41537b;border-radius:99px;padding:7px 12px;font-size:12px;font-weight:800;letter-spacing:.045em}.pill.gold{background:#fff2c8;border-color:#ffe1a0;color:#8b520d}.pill.green{background:#d8fff0;border-color:#a2efd5;color:#067a5e}.pill.pink{background:#ffebf3;border-color:#fdd0e0;color:#a83e68}.hero{position:relative;overflow:hidden;min-height:248px;padding:34px 40px;border-radius:28px;box-shadow:0 21px 45px #34438528;background:linear-gradient(112deg,#1c194f,#4f35b8 49%,#0e8ab8);color:#fff}.hero:before{content:'';position:absolute;width:420px;height:420px;border:2px solid #ffffff1e;border-radius:50%;right:-105px;top:-178px;box-shadow:0 0 0 43px #ffffff08,0 0 0 87px #ffffff06}.hero:after{content:'✦ ✧ ✦';font-size:70px;letter-spacing:25px;position:absolute;right:60px;bottom:13px;transform:rotate(-21deg);color:#fdf6b856;pointer-events:none}.hero>*{position:relative;z-index:1}.hero p{max-width:720px;color:#e5eaff}.eyebrow{font-size:12px;letter-spacing:.16em;font-weight:900;text-transform:uppercase;margin-bottom:11px;color:#00eadc}.hero h1{margin-bottom:12px}.hero .subtitle{font-size:17px}.hero-character{position:absolute;right:6%;top:22px;font-size:115px;z-index:0;filter:drop-shadow(0 13px 20px #20116c5e);animation:float 3.8s ease-in-out infinite}.tabs{display:flex;gap:9px;flex-wrap:wrap;margin:20px 0}.tabs button{border:1px solid #dce2f4;background:#fff;color:#4d5c7a;border-radius:13px;padding:12px 19px;font-weight:800}.tabs button.active{background:#6953d9;color:#fff;border-color:#6953d9}.panel{background:rgba(255,255,255,.96);border:1px solid var(--border);border-radius:22px;box-shadow:var(--shadow);padding:22px}.panel+.panel{margin-top:16px}.section-title{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:16px}.section-title small{line-height:1.5}.grid{display:grid;gap:17px}.grid-2{grid-template-columns:repeat(2,minmax(0,1fr))}.grid-3{grid-template-columns:repeat(3,minmax(0,1fr))}.grid-4{grid-template-columns:repeat(4,minmax(0,1fr))}.button{border:0;border-radius:14px;padding:12px 16px;font-weight:850;display:inline-flex;justify-content:center;align-items:center;gap:8px;text-align:center}.button.primary{background:linear-gradient(115deg,#6c55df,#447bfa);color:#fff}.button.teal{background:linear-gradient(115deg,#03bba4,#39c4d7);color:#08383f}.button.gold{background:linear-gradient(115deg,#ffcf55,#ffae63);color:#684009}.button.gray{background:#edf1fb;color:#374c79}.button.red{background:#fff1f4;color:#a72b5d}.button.flat{background:none;color:#4f5dc7}.button.sm{padding:8px 12px;border-radius:10px;font-size:12px}.button.block{width:100%}.button:disabled{box-shadow:none}.controls{display:flex;flex-wrap:wrap;gap:9px;align-items:center}.form-field{display:flex;flex-direction:column;gap:8px;margin:14px 0}.form-field label{font-weight:800;font-size:13px;color:#465476}.form-field input,.form-field select{width:100%;background:#fff;border:1.4px solid #cad7ed;border-radius:12px;padding:12px 14px;color:#283455}.form-field input:focus,.form-field select:focus{border-color:#8064ec}.form-field input.mono{letter-spacing:.18em;text-align:center;font-size:23px;font-weight:800}.setup{max-width:1000px;margin:0 auto}.setup .grid-2>.panel{min-height:275px}.notice{background:#fff8e7;border:1px solid #ffdf9a;color:#775012;padding:12px 15px;border-radius:14px;line-height:1.5;font-size:14px}.notice.error{background:#fff1f5;border-color:#fac0cf;color:#a72f5b}.notice.good{background:#e1fff5;border-color:#9aefd3;color:#0c8061}.dashboard-head{display:flex;justify-content:space-between;gap:20px;align-items:center}.room-number{font-size:clamp(30px,4vw,48px);font-weight:950;letter-spacing:.17em;color:#5844cc}.clock{font-variant-numeric:tabular-nums;font-size:33px;font-weight:950;color:#222f65}.clock.warn{color:#ed6a69}.key{display:inline-block;border-radius:9px;padding:6px 10px;background:#f2f1ff;color:#5649d0;font-weight:800;letter-spacing:.08em}.teacher-main{display:grid;grid-template-columns:1.44fr .95fr;gap:17px;margin-top:18px}.team-join{padding:14px;border-radius:15px;border:1px solid #e1e9f6;background:linear-gradient(135deg,#fff,#f5f8ff);display:flex;align-items:center;gap:11px;margin-bottom:8px}.team-emoji{height:50px;width:50px;display:grid;place-items:center;font-size:29px;background:#f2f4ff;border-radius:14px}.team-details{min-width:0;flex:1}.team-details b{display:block}.team-details small{font-size:12px}.code{font-size:17px;font-weight:900;color:#5144c4;letter-spacing:.12em}.team-controls{display:flex;align-items:center;gap:5px}
@@ -13066,6 +13067,299 @@ body {
   }
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   v5.7.0 · GIAO DIỆN VÀO PHÒNG KIỂU BLOOKET (bk-)
+   Nền giấy kẻ ô xanh (gợi hệ trục Oxyz), nút dày bấm lún, chữ Baloo 2.
+   ═══════════════════════════════════════════════════════════════════════════ */
+:root{
+  --bk-blue:#2B3BD6;
+  --bk-blue-deep:#1A2496;
+  --bk-ink:#1D2150;
+  --bk-paper:#FFFFFF;
+  --bk-mist:#E8EBFF;
+  --bk-sun:#FFC93C;
+  --bk-sun-deep:#D99A0B;
+  --bk-mint:#22C79A;
+  --bk-mint-deep:#12916E;
+  --bk-coral:#FF5F6D;
+  --bk-coral-deep:#C93847;
+  --bk-display:'Baloo 2','Montserrat','Segoe UI',system-ui,sans-serif;
+}
+body.bk-mode{
+  background-color:var(--bk-blue) !important;
+  background-image:
+    linear-gradient(rgba(255,255,255,.075) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.075) 1px, transparent 1px),
+    linear-gradient(rgba(255,255,255,.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.045) 1px, transparent 1px),
+    radial-gradient(ellipse at 50% -10%, #4656F0 0%, transparent 60%) !important;
+  background-size:160px 160px,160px 160px,32px 32px,32px 32px,100% 100% !important;
+  background-attachment:fixed !important;
+  color:#fff;
+}
+body.bk-mode #app.wrap{max-width:none !important;padding:0 !important;margin:0}
+.bk-page{min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;position:relative;font-family:'Montserrat','Segoe UI',system-ui,sans-serif;color:#fff}
+.bk-page *{box-sizing:border-box}
+.bk-page :focus-visible{outline:4px solid var(--bk-sun);outline-offset:3px}
+.bk-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* Nút dày, bấm lún */
+.bk-btn{
+  --face:var(--bk-sun);--shade:var(--bk-sun-deep);--label:var(--bk-ink);
+  font-family:var(--bk-display);font-weight:800;font-size:1.3rem;line-height:1.1;
+  color:var(--label);background:var(--face);border:0;border-radius:14px;
+  padding:.72em 1.4em .62em;cursor:pointer;
+  box-shadow:0 6px 0 var(--shade);transform:translateY(0);
+  transition:transform .07s ease, box-shadow .07s ease, filter .15s ease;
+}
+.bk-btn:hover{filter:brightness(1.05)}
+.bk-btn:active{transform:translateY(4px);box-shadow:0 2px 0 var(--shade)}
+.bk-btn:disabled{filter:grayscale(.6) opacity(.7);cursor:wait}
+.bk-btn-sun{--face:var(--bk-sun);--shade:var(--bk-sun-deep)}
+.bk-btn-mint{--face:var(--bk-mint);--shade:var(--bk-mint-deep);--label:#fff}
+.bk-btn-coral{--face:var(--bk-coral);--shade:var(--bk-coral-deep);--label:#fff}
+.bk-btn-paper{--face:#fff;--shade:#B9C0F2}
+.bk-btn-ghost-ink{--face:var(--bk-mist);--shade:#C3C9F5;font-size:1.05rem}
+.bk-btn-block{display:block;width:100%}
+.bk-btn-big{font-size:clamp(1.5rem,2.4vw,2.2rem);padding:.6em 1.8em .5em}
+
+.bk-text-link{background:none;border:0;color:#fff;font:600 .98rem 'Montserrat',sans-serif;text-decoration:underline;text-underline-offset:3px;cursor:pointer;padding:8px 6px;opacity:.9}
+.bk-text-link:hover{opacity:1}
+.bk-error{margin:12px 0 0;background:#fff;color:var(--bk-coral-deep);border-left:6px solid var(--bk-coral);border-radius:10px;padding:10px 12px;font-weight:700;font-size:.95rem;text-align:left}
+.bk-help{color:rgba(255,255,255,.86);font-size:.98rem;line-height:1.5;max-width:34em;margin:18px auto 0;text-align:center}
+.bk-loading{color:#fff;opacity:.8;grid-column:1/-1;text-align:center;padding:24px}
+.bk-title{font-family:var(--bk-display);font-weight:800;font-size:clamp(2rem,5vw,3rem);line-height:1.05;margin:0 0 18px;text-align:center;color:#fff;text-shadow:0 4px 0 var(--bk-blue-deep)}
+
+/* Thanh trên cùng nhỏ */
+.bk-top{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 16px}
+.bk-back{background:rgba(255,255,255,.14);border:0;color:#fff;font:700 .98rem 'Montserrat',sans-serif;padding:9px 14px;border-radius:999px;cursor:pointer}
+.bk-back:hover{background:rgba(255,255,255,.24)}
+.bk-room-tag{background:var(--bk-blue-deep);color:rgba(255,255,255,.85);font-weight:600;padding:8px 14px;border-radius:999px;font-size:.95rem}
+.bk-room-tag b{color:var(--bk-sun);font-family:var(--bk-display);font-size:1.15rem;letter-spacing:.06em;margin-left:4px}
+.bk-icon{background:rgba(255,255,255,.14);border:0;border-radius:12px;width:44px;height:44px;font-size:1.2rem;cursor:pointer}
+
+/* ─── Nhập mã phòng ─── */
+.bk-entry{justify-content:flex-start}
+.bk-join{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 18px 72px;width:100%;max-width:440px;margin:0 auto}
+.bk-logo{display:flex;align-items:center;gap:10px;margin-bottom:22px;font-family:var(--bk-display);font-weight:800;font-size:clamp(2rem,7vw,2.6rem);color:#fff;text-shadow:0 4px 0 var(--bk-blue-deep)}
+.bk-logo svg{width:40px;height:40px;filter:drop-shadow(0 3px 0 var(--bk-blue-deep))}
+.bk-join-card{width:100%;background:var(--bk-paper);border-radius:22px;padding:18px;box-shadow:0 10px 0 var(--bk-blue-deep)}
+.bk-code-input{
+  display:block;width:100%;border:3px solid var(--bk-mist);border-radius:14px;background:#F7F8FF;
+  font-family:var(--bk-display);font-weight:800;font-size:2.3rem;letter-spacing:.14em;text-align:center;
+  color:var(--bk-ink);padding:12px 8px 6px;margin:0 0 14px;font-variant-numeric:tabular-nums;
+}
+.bk-code-input::placeholder{letter-spacing:.02em;color:#A6ADD8;font-size:1.7rem}
+.bk-code-input:focus{outline:none;border-color:var(--bk-blue);background:#fff}
+.bk-corner-link{position:absolute;right:14px;bottom:14px;background:var(--bk-blue-deep);border:0;color:#fff;font:700 .95rem 'Montserrat',sans-serif;padding:10px 16px;border-radius:999px;cursor:pointer}
+.bk-corner-link:hover{background:#121A78}
+
+/* ─── Chọn đội ─── */
+.bk-pick{width:100%;max-width:760px;margin:0 auto;padding:6px 16px 40px}
+.bk-team-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+@media (min-width:640px){.bk-team-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.bk-team{
+  --tc:#36C6E8;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
+  min-height:128px;padding:14px 8px 12px;border:0;border-radius:18px;cursor:pointer;
+  background:var(--tc);color:var(--bk-ink);
+  box-shadow:0 7px 0 rgba(0,0,0,.28);
+  box-shadow:0 7px 0 color-mix(in srgb, var(--tc) 55%, #10153F);
+  transition:transform .07s ease, box-shadow .07s ease;
+}
+.bk-team:active{transform:translateY(5px);box-shadow:0 2px 0 color-mix(in srgb, var(--tc) 55%, #10153F)}
+.bk-team:disabled{opacity:.7;cursor:wait}
+.bk-team-ava{font-size:2.6rem;line-height:1;background:rgba(255,255,255,.55);width:64px;height:64px;border-radius:50%;display:grid;place-items:center}
+.bk-team-name{font-family:var(--bk-display);font-weight:800;font-size:1.25rem;line-height:1.1;text-align:center}
+.bk-team-state{font-size:.78rem;font-weight:700;background:rgba(255,255,255,.7);border-radius:999px;padding:2px 9px}
+
+/* ─── Giáo viên tạo phòng ─── */
+.bk-host-setup{width:100%;max-width:520px;margin:0 auto;padding:12px 18px 48px;flex:1;display:flex;flex-direction:column;justify-content:center}
+.bk-setup-card{background:#fff;border-radius:22px;padding:22px;box-shadow:0 10px 0 var(--bk-blue-deep);color:var(--bk-ink);display:flex;flex-direction:column;gap:14px}
+.bk-setup-q{margin:0;font-weight:700;font-size:1.1rem;text-align:center}
+.bk-count-row{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-bottom:6px}
+.bk-count{width:58px;height:58px;border-radius:14px;border:0;background:var(--bk-mist);color:var(--bk-ink);font-family:var(--bk-display);font-weight:800;font-size:1.6rem;cursor:pointer;box-shadow:0 5px 0 #C3C9F5;padding-top:4px}
+.bk-count.is-on{background:var(--bk-blue);color:#fff;box-shadow:0 5px 0 var(--bk-blue-deep)}
+
+/* ─── Học sinh: sảnh chờ & kết quả ─── */
+.bk-wait,.bk-result{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:12px 18px 24px;width:100%;max-width:560px;margin:0 auto}
+.bk-wait-ava{
+  width:136px;height:136px;border-radius:50%;display:grid;place-items:center;font-size:4.6rem;
+  background:var(--tc);box-shadow:0 8px 0 rgba(0,0,0,.25), 0 0 0 8px rgba(255,255,255,.18);
+  box-shadow:0 8px 0 color-mix(in srgb, var(--tc) 55%, #10153F), 0 0 0 8px rgba(255,255,255,.18);
+  animation:bkBob 2.4s ease-in-out infinite;margin-bottom:18px
+}
+.bk-wait-ava.is-still{animation:none;width:104px;height:104px;font-size:3.4rem;margin-bottom:10px}
+@keyframes bkBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+.bk-wait-name{font-family:var(--bk-display);font-weight:800;font-size:clamp(2.2rem,8vw,3rem);margin:0;line-height:1;text-shadow:0 4px 0 var(--bk-blue-deep)}
+.bk-wait-ok{margin:10px 0 4px;font-weight:800;font-size:1.2rem;color:var(--bk-sun)}
+.bk-wait-msg{margin:0;font-size:1.02rem;line-height:1.5;color:rgba(255,255,255,.9);max-width:26em}
+.bk-dots{display:flex;gap:8px;margin:18px 0 22px}
+.bk-dots i{width:12px;height:12px;border-radius:50%;background:#fff;opacity:.35;animation:bkDot 1.2s infinite}
+.bk-dots i:nth-child(2){animation-delay:.2s}.bk-dots i:nth-child(3){animation-delay:.4s}
+@keyframes bkDot{0%,100%{opacity:.3;transform:scale(.85)}40%{opacity:1;transform:scale(1.1)}}
+.bk-joined{width:100%;background:rgba(16,21,90,.45);border-radius:18px;padding:12px 12px 14px}
+.bk-joined-count{margin:0 0 10px;font-weight:600;color:rgba(255,255,255,.85)}
+.bk-joined-count b{color:#fff;font-family:var(--bk-display);font-size:1.3rem}
+.bk-chips{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;justify-content:center;gap:8px}
+.bk-chips li{background:var(--tc);color:var(--bk-ink);font-weight:700;font-size:.9rem;border-radius:999px;padding:5px 12px 5px 8px;display:flex;align-items:center;gap:5px}
+.bk-chips li.is-me{outline:3px solid #fff;outline-offset:1px}
+.bk-wait-foot{display:flex;justify-content:center;flex-wrap:wrap;gap:4px 18px;padding:8px 16px 18px}
+.bk-result-team{margin:0 0 2px;font-weight:700;font-size:1.1rem;color:rgba(255,255,255,.9)}
+.bk-result-card{width:100%;background:#fff;color:var(--bk-ink);border-radius:22px;padding:18px 18px 8px;box-shadow:0 10px 0 var(--bk-blue-deep)}
+.bk-result-rank{display:flex;align-items:baseline;justify-content:center;gap:10px;flex-wrap:wrap}
+.bk-result-rank .bk-medal{font-size:2.6rem;align-self:center}
+.bk-result-rank b{font-family:var(--bk-display);font-weight:800;font-size:3rem;line-height:1}
+.bk-result-rank small{font-weight:600;color:#5B618F}
+.bk-result-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:16px 0 10px}
+.bk-result-stats div{background:var(--bk-mist);border-radius:14px;padding:10px 6px}
+.bk-result-stats dt{font-size:.8rem;font-weight:700;color:#5B618F}
+.bk-result-stats dd{margin:2px 0 0;font-family:var(--bk-display);font-weight:800;font-size:1.25rem}
+
+/* ─── Giáo viên: băng mã phòng ─── */
+.bk-host{padding:0 0 64px}
+.bk-band{
+  display:grid;grid-template-columns:1fr auto auto;align-items:center;gap:clamp(12px,2.5vw,36px);
+  background:#fff;color:var(--bk-ink);padding:14px clamp(16px,3vw,40px);
+  box-shadow:0 8px 0 var(--bk-blue-deep);
+}
+.bk-band-join{display:flex;flex-direction:column;gap:2px;font-weight:600;font-size:clamp(.95rem,1.3vw,1.25rem);color:#4B5185}
+.bk-band-join b{font-family:var(--bk-display);font-weight:800;font-size:clamp(1.4rem,2.6vw,2.4rem);color:var(--bk-blue);line-height:1.1;word-break:break-all}
+.bk-band-code{background:var(--bk-sun);border-radius:18px;padding:8px clamp(18px,2.4vw,34px) 4px;box-shadow:0 6px 0 var(--bk-sun-deep);text-align:center}
+.bk-band-code span{display:block;font-weight:700;font-size:clamp(.9rem,1.1vw,1.1rem)}
+.bk-band-code b{display:block;font-family:var(--bk-display);font-weight:800;font-size:clamp(3rem,7vw,6.4rem);line-height:1;letter-spacing:.06em;font-variant-numeric:tabular-nums}
+.bk-band-qr{background:#fff;border:3px solid var(--bk-mist);border-radius:16px;padding:8px 8px 4px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;color:var(--bk-blue);font-weight:700;font-size:.85rem}
+.bk-band-qr svg{display:block;width:clamp(96px,9vw,140px);height:auto}
+
+/* ─── Giáo viên: sảnh chờ ─── */
+.bk-lobby{padding:26px clamp(16px,3vw,40px) 10px;flex:1}
+.bk-lobby-bar{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:22px}
+.bk-lobby-count{margin:0;font-weight:600;font-size:clamp(1.2rem,2vw,1.8rem);color:rgba(255,255,255,.9)}
+.bk-lobby-count b{font-family:var(--bk-display);font-weight:800;font-size:1.6em;color:#fff}
+.bk-lobby-note{margin:0;font-weight:700;font-size:1.2rem}
+.bk-slots{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:18px}
+.bk-slot{border-radius:20px;min-height:150px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:14px 10px;text-align:center}
+.bk-slot b{font-family:var(--bk-display);font-weight:800;font-size:clamp(1.25rem,1.7vw,1.6rem);line-height:1.1}
+.bk-slot small{font-weight:700;font-size:.9rem}
+.bk-slot-ava{font-size:3rem;line-height:1}
+.bk-slot.is-in{background:var(--tc);color:var(--bk-ink);box-shadow:0 7px 0 rgba(0,0,0,.28);box-shadow:0 7px 0 color-mix(in srgb, var(--tc) 55%, #10153F)}
+.bk-slot.is-in small{background:rgba(255,255,255,.7);border-radius:999px;padding:2px 10px}
+.bk-slot.is-empty{border:3px dashed rgba(255,255,255,.35);color:rgba(255,255,255,.62)}
+.bk-slot.is-empty .bk-slot-ava{filter:grayscale(1);opacity:.4}
+.bk-slot.is-new{animation:bkPop .45s cubic-bezier(.2,1.4,.4,1)}
+@keyframes bkPop{0%{transform:scale(.6);opacity:0}100%{transform:scale(1);opacity:1}}
+
+/* ─── Chân trang công cụ giáo viên ─── */
+.bk-host-foot{position:fixed;left:0;right:0;bottom:0;display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:10px clamp(12px,3vw,40px);background:rgba(16,21,90,.82);backdrop-filter:blur(6px);z-index:20}
+.bk-foot-gap{flex:1}
+.bk-foot-btn{background:rgba(255,255,255,.12);border:0;color:#fff;font:700 .92rem 'Montserrat',sans-serif;padding:9px 14px;border-radius:10px;cursor:pointer}
+.bk-foot-btn:hover{background:rgba(255,255,255,.24)}
+
+/* ─── Giáo viên: bảng đua trực tiếp ─── */
+.bk-live-top{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:12px;padding:16px clamp(16px,3vw,40px) 8px}
+.bk-live-top .bk-room-tag{justify-self:start}
+.bk-live-actions{justify-self:end;display:flex;gap:12px}
+.bk-live-actions .bk-btn{font-size:1.1rem}
+.bk-clock{background:#fff;color:var(--bk-ink);border-radius:20px;padding:4px 30px 0;box-shadow:0 7px 0 var(--bk-blue-deep);font-family:var(--bk-display);font-weight:800;font-size:clamp(2.6rem,5vw,4.4rem);line-height:1.15;font-variant-numeric:tabular-nums}
+.bk-clock #clock.warn{color:var(--bk-coral)}
+.bk-clock.is-paused{opacity:.7}
+.bk-paused{margin:10px auto 0;width:max-content;max-width:92%;background:var(--bk-sun);color:var(--bk-ink);font-weight:800;padding:8px 18px;border-radius:999px;text-align:center}
+.bk-race{list-style:none;margin:18px auto 0;padding:0 clamp(16px,3vw,40px);display:flex;flex-direction:column;gap:12px;max-width:1500px;width:100%}
+.bk-row{
+  display:grid;grid-template-columns:52px 60px minmax(150px,1.1fr) 2.4fr 120px;align-items:center;gap:14px;
+  background:#fff;color:var(--bk-ink);border-radius:18px;padding:10px 18px 10px 12px;box-shadow:0 6px 0 #B9C0F2
+}
+.bk-rank{width:46px;height:46px;border-radius:50%;display:grid;place-items:center;background:var(--bk-mist);font-family:var(--bk-display);font-weight:800;font-size:1.5rem;padding-top:3px}
+.bk-row.top-1 .bk-rank{background:var(--bk-sun)}
+.bk-row.top-2 .bk-rank{background:#CDD3EA}
+.bk-row.top-3 .bk-rank{background:#EDB07F}
+.bk-row-ava{width:56px;height:56px;border-radius:50%;display:grid;place-items:center;font-size:2rem;background:var(--tc)}
+.bk-row-name{display:flex;flex-direction:column;min-width:0}
+.bk-row-name b{font-family:var(--bk-display);font-weight:800;font-size:1.45rem;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bk-row-name small{font-weight:700;color:#5B618F;font-size:.92rem}
+.bk-row.is-done .bk-row-name small{color:var(--bk-mint-deep)}
+.bk-track{
+  position:relative;height:22px;border-radius:999px;background:var(--bk-mist);overflow:hidden;
+  background-image:repeating-linear-gradient(90deg, transparent 0 calc(20% - 2px), rgba(29,33,80,.16) calc(20% - 2px) 20%);
+}
+.bk-track i{position:absolute;inset:0 auto 0 0;background:var(--tc);border-radius:999px;transition:width .6s ease;box-shadow:inset 0 -5px 0 rgba(0,0,0,.12)}
+.bk-xp{font-family:var(--bk-display);font-weight:800;font-size:1.7rem;text-align:right;white-space:nowrap}
+.bk-xp small{font-size:.9rem;color:#5B618F}
+.bk-ticker{margin:18px auto 0;max-width:92%;text-align:center;color:rgba(255,255,255,.9);font-weight:600}
+
+/* ─── Bục vinh danh ─── */
+.bk-podium-page{align-items:center;padding-top:22px}
+.bk-podium-title{margin-bottom:8px}
+.bk-podium{display:grid;grid-template-columns:repeat(3,minmax(140px,240px));align-items:end;gap:clamp(10px,2vw,26px);margin-top:10px}
+.bk-pod{display:flex;flex-direction:column;align-items:center;text-align:center;gap:4px}
+.bk-pod-ava{width:92px;height:92px;border-radius:50%;display:grid;place-items:center;font-size:3.2rem;background:#fff;box-shadow:0 6px 0 var(--bk-blue-deep)}
+.bk-pod.place-1 .bk-pod-ava{width:118px;height:118px;font-size:4.2rem;box-shadow:0 6px 0 var(--bk-blue-deep),0 0 0 7px var(--bk-sun)}
+.bk-pod-name{font-family:var(--bk-display);font-weight:800;font-size:1.5rem;line-height:1.1;margin-top:8px}
+.bk-pod-xp{font-weight:800;color:var(--bk-sun);font-size:1.15rem}
+.bk-pod-block{width:100%;margin-top:8px;border-radius:16px 16px 0 0;background:var(--tc);display:flex;justify-content:center;padding-top:10px;box-shadow:inset 0 -10px 0 rgba(0,0,0,.12)}
+.bk-pod-block span{font-family:var(--bk-display);font-weight:800;font-size:3.4rem;color:#fff;text-shadow:0 4px 0 rgba(0,0,0,.2);line-height:1}
+.bk-pod.place-1 .bk-pod-block{height:220px}
+.bk-pod.place-2 .bk-pod-block{height:160px}
+.bk-pod.place-3 .bk-pod-block{height:118px}
+.bk-pod.place-1{animation:bkRise .7s cubic-bezier(.2,1.2,.4,1) .5s both}
+.bk-pod.place-2{animation:bkRise .7s cubic-bezier(.2,1.2,.4,1) .25s both}
+.bk-pod.place-3{animation:bkRise .7s cubic-bezier(.2,1.2,.4,1) 0s both}
+@keyframes bkRise{0%{transform:translateY(60px);opacity:0}100%{transform:none;opacity:1}}
+.bk-rest{list-style:none;margin:0;padding:0;width:min(720px,92%);display:flex;flex-direction:column;gap:8px;counter-reset:bkrest 3}
+.bk-rest li{counter-increment:bkrest;display:grid;grid-template-columns:40px 36px 1fr auto;align-items:center;gap:10px;background:rgba(16,21,90,.5);border-radius:14px;padding:8px 16px;font-size:1.1rem}
+.bk-rest li::before{content:counter(bkrest);font-family:var(--bk-display);font-weight:800;font-size:1.3rem;color:rgba(255,255,255,.7)}
+.bk-rest em{font-style:normal;font-weight:800;color:var(--bk-sun)}
+.bk-podium-actions{display:flex;flex-wrap:wrap;justify-content:center;gap:14px;margin:26px 0 30px}
+.bk-podium-actions .bk-btn{font-size:1.1rem}
+
+/* ─── Nút quay về từ bảng chi tiết ─── */
+.bk-back-float{position:fixed;left:14px;bottom:14px;z-index:60;background:var(--bk-sun);color:var(--bk-ink);border:0;border-radius:999px;font:800 1rem 'Montserrat',sans-serif;padding:11px 18px;box-shadow:0 5px 0 var(--bk-sun-deep);cursor:pointer}
+
+/* ─── Đếm ngược 3-2-1 ─── */
+.bk-countdown{position:fixed;inset:0;z-index:9999;display:grid;place-items:center;background:rgba(26,36,150,.92)}
+.bk-countdown span{font-family:var(--bk-display);font-weight:800;font-size:min(42vw,16rem);color:#fff;line-height:1;text-shadow:0 10px 0 var(--bk-blue-deep);animation:bkCount .7s cubic-bezier(.2,1.4,.4,1)}
+.bk-countdown span.is-go{font-size:min(16vw,7rem);color:var(--bk-sun);text-shadow:0 8px 0 var(--bk-sun-deep)}
+@keyframes bkCount{0%{transform:scale(2.2);opacity:0}100%{transform:scale(1);opacity:1}}
+
+/* ─── Màn hình hẹp ─── */
+@media (max-width:820px){
+  .bk-band{grid-template-columns:1fr auto;grid-template-areas:"code qr" "join join"}
+  .bk-band-code{grid-area:code}.bk-band-qr{grid-area:qr}.bk-band-join{grid-area:join;flex-direction:row;flex-wrap:wrap;gap:6px;align-items:baseline}
+  .bk-band-join b{font-size:1.2rem}
+  .bk-slots{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+  .bk-slot{min-height:120px}
+  .bk-live-top{grid-template-columns:1fr auto;grid-template-areas:"tag clock" "act act"}
+  .bk-live-top .bk-room-tag{grid-area:tag}.bk-clock{grid-area:clock;padding:2px 18px 0}.bk-live-actions{grid-area:act;justify-self:stretch}.bk-live-actions .bk-btn{flex:1}
+  .bk-row{grid-template-columns:38px 1fr auto;grid-template-areas:"rank name xp" "track track track";gap:6px 10px;padding:10px 14px}
+  .bk-rank{grid-area:rank;width:36px;height:36px;font-size:1.15rem}.bk-row-ava{display:none}.bk-row-name{grid-area:name}.bk-track{grid-area:track;height:14px}.bk-xp{grid-area:xp;font-size:1.3rem}
+  .bk-row-name b{font-size:1.2rem}
+  .bk-podium{grid-template-columns:repeat(3,minmax(0,1fr));width:94%}
+  .bk-pod-ava{width:64px;height:64px;font-size:2.2rem}.bk-pod.place-1 .bk-pod-ava{width:80px;height:80px;font-size:2.8rem}
+  .bk-pod-name{font-size:1.1rem}
+  .bk-pod.place-1 .bk-pod-block{height:150px}.bk-pod.place-2 .bk-pod-block{height:110px}.bk-pod.place-3 .bk-pod-block{height:80px}
+  .bk-host-foot{justify-content:center}.bk-foot-gap{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  .bk-wait-ava,.bk-dots i,.bk-slot.is-new,.bk-pod,.bk-countdown span{animation:none !important}
+  .bk-btn,.bk-team,.bk-track i{transition:none}
+}
+.bk-podium{margin-bottom:22px}
+.bk-race.is-compact{gap:8px}
+.bk-race.is-compact .bk-row{padding:6px 16px 6px 10px;box-shadow:0 5px 0 #B9C0F2}
+.bk-race.is-compact .bk-row-ava{width:46px;height:46px;font-size:1.6rem}
+.bk-race.is-compact .bk-rank{width:40px;height:40px;font-size:1.3rem}
+.bk-race.is-compact .bk-row-name b{font-size:1.3rem}
+.bk-race.is-compact .bk-xp{font-size:1.5rem}
+@media (min-width:821px) and (max-height:820px){.bk-live-top{padding-top:10px}.bk-clock{font-size:3.4rem}}
+/* Thanh menu học sinh gọn trên màn hình hẹp */
+@media (max-width:760px){
+  .hs-topnav .hs-nav-center{display:none}
+  .hs-topnav{flex-wrap:wrap;gap:6px}
+  .hs-topnav .hs-brand-text{font-size:1rem}
+}
+.bk-podium-page{padding-bottom:96px}
+.bk-podium-actions{position:fixed;left:0;right:0;bottom:0;margin:0;padding:12px 16px 16px;background:rgba(16,21,90,.82);backdrop-filter:blur(6px);z-index:20}
+@media (max-width:820px){.bk-host{padding-bottom:124px}.bk-podium-page{padding-bottom:150px}}
 </style>
 </head>
 <body>
@@ -14939,96 +15233,22 @@ function renderTeacherQrModal(roomCode) {
 }
 
 function startScreen(msg=''){
- const fRoom=esc(initialRoom || LiveClassroomSync.getActiveRoom() || '123456'),fTeam=esc(initialTeam || 'doi-1');
- const roomJoinUrl = getRoomJoinUrl(fRoom);
- const teamCardsHtml = QUICK_LOGIN_TEAMS.map(t => `
-  <button type="button"
-   class="mv-quick-team-card ${fTeam === t.id ? 'is-selected' : ''}"
-   style="--team-accent:${t.color}"
-   data-action="quickJoinTeam"
-   data-team="${t.id}"
-   title="Nhấn 1 lần để vào ngay Đội ${t.num} – ${t.name}">
-   <span class="mv-qtc-avatar">${t.avatar}</span>
-   <span class="mv-qtc-info">
-    <small>ĐỘI ${t.num}</small>
-    <strong>${t.name}</strong>
-   </span>
-   <span class="mv-qtc-go">Vào ngay →</span>
-  </button>
- `).join('');
-
- app.innerHTML=layout(`
-  ${msg?`<div class="notice error" style="margin-bottom:12px">${esc(msg)}</div>`:''}
-
-  <!-- CỔNG ĐĂNG NHẬP SIÊU TỐC 1–2 BƯỚC ĐẶT NGAY ĐẦU TRANG (ÍT CHỮ, DỄ DÙNG) -->
-  <section class="mv-quick-entry-portal" id="entry">
-   <!-- KHỐI HỌC SINH: CHỈ CẦN CHẠM VÀO ĐỘI ĐỂ VÀO CHƠI NGAY -->
-   <div class="mv-qep-card student-portal">
-    <div class="mv-qep-header">
-     <div>
-      <span class="mv-qep-badge student">🧑‍🚀 HỌC SINH</span>
-      <h2 class="mv-qep-title">Chạm Vào Đội Để Vào Phòng Ngay</h2>
-     </div>
-     <div class="mv-qep-room-box">
-      <label for="roomInput">Mã phòng</label>
-      <input id="roomInput" type="text" inputmode="numeric" maxlength="6" class="mono mv-qep-room-input" value="${fRoom}" placeholder="123456" title="Mã phòng 6 số" />
-     </div>
-    </div>
-
-    <div class="mv-quick-teams-grid" style="margin-top:6px">
-     ${teamCardsHtml}
-    </div>
-   </div>
-
-   <!-- KHỐI GIÁO VIÊN: QUÉT MÃ QR & BẢNG ĐIỀU KHIỂN 1 CHẠM DỄ DÙNG -->
-   <div class="mv-qep-card teacher-portal">
-    <span class="mv-qep-badge teacher">👩‍🏫 GIÁO VIÊN</span>
-    <h2 class="mv-qep-title">Mã QR & Điều Khiển Lớp Học</h2>
-
-    <div class="mv-qep-qr-preview-box">
-     <div class="mv-qep-qr-svg" data-action="openQrModal" title="Nhấn để phóng to Mã QR lên máy chiếu">
-      ${renderRoomQrSvg(roomJoinUrl, 96)}
-     </div>
-     <div class="mv-qep-qr-meta">
-      <small>MÃ PHÒNG</small>
-      <strong class="mono">${fRoom}</strong>
-      <button type="button" class="mv-chip-btn gold" data-action="openQrModal">🔍 Phóng to QR</button>
-     </div>
-    </div>
-
-    <div class="form-field" style="margin:6px 0 8px">
-     <label for="teamCount">Số đội tham gia</label>
-     <select id="teamCount">
-      <option value="4">4 đội</option>
-      <option value="5">5 đội</option>
-      <option value="6" selected>6 đội (Mặc định)</option>
-      <option value="7">7 đội</option>
-      <option value="8">8 đội</option>
-     </select>
-    </div>
-
-    <div class="mv-qep-teacher-actions">
-     ${btn('🖥️ MỞ MÀN HÌNH GIÁO VIÊN','demoTeacher','gold block')}
-     ${btn('✨ TẠO PHÒNG MỚI','create','primary block')}
-    </div>
-   </div>
-  </section>
-
-  ${showTeacherQrModal ? renderTeacherQrModal(fRoom) : ''}
- `);
-
- // Tự động đồng bộ mã phòng mới nhất nếu Giáo viên vừa tạo phòng trên máy chủ
- if(!initialRoom){
-  api('/api/state',{room:fRoom,token:'DISPLAY'}).then(d=>{
-   if(d && d.activeRoom && d.activeRoom !== '123456'){
-    LiveClassroomSync.setActiveRoom(d.activeRoom);
-    const inp = document.getElementById('roomInput');
-    if(inp && (inp.value === '123456' || !inp.value.trim())){
-     inp.value = d.activeRoom;
-    }
-   }
-  }).catch(()=>{});
+ if(msg) bkError = msg;
+ bkStopTeamPoll();
+ document.body.classList.add('bk-mode');
+ $('.award-backdrop')?.remove();
+ if(bkStep==='team' && bkRoom){
+  app.innerHTML = bkTeamPick();
+  bkLoadTeams();
+  bkStartTeamPoll();
+ }else if(bkStep==='host'){
+  app.innerHTML = bkHostSetup();
+ }else{
+  app.innerHTML = bkLanding();
+  const inp = document.getElementById('bkCode');
+  if(inp && !('ontouchstart' in window)) inp.focus();
  }
+ bkError = '';
 }
 function getStageFormulaSafe(stageIdx, currentTeamStage) {
  if (stageIdx === 0) {
@@ -16014,6 +16234,7 @@ function teacherScreen(){
  const roomJoinUrl = getRoomJoinUrl(world.room);
 
  return `<div class="gv-shell">
+  <button type="button" class="bk-back-float" data-action="bkHideDetail">‹ Về màn hình chính</button>
   <!-- 0. THANH ĐIỀU KHIỂN NHANH & MÃ QR ĐƠN GIẢN DÀNH CHO GIÁO VIÊN (GỌN, KHÔNG TRÙNG NÚT) -->
   <section class="gv-easy-command-banner">
    <!-- KHỐI 1: MÃ QR & MÃ PHÒNG LỚP HỌC -->
@@ -24969,6 +25190,20 @@ function runArwesDecrypt(el, targetText, duration = 1100, onComplete = null) {
 function render(){
  if(!session)return startScreen();
  if(!world){app.innerHTML='<div class="loading">Đang lấy dữ liệu phòng học…</div>';return;}
+ if(session.role==='student'){
+  const waitingNow = isWaitingForTeacherStart();
+  if(bkWasWaiting && !waitingNow && world.started && !world.ended){ vaState.stageStartedAt = Date.now() + 2800; bkShowCountdown(); }
+  bkWasWaiting = waitingNow;
+ }
+ const bare = bkBareScreen();
+ document.body.classList.toggle('bk-mode', Boolean(bare));
+ if(bare){
+  app.innerHTML = bare;
+  updateClock();
+  $('.award-backdrop')?.remove();
+  if(modal)showModal();
+  return;
+ }
  const bodyHtml = session.role === 'teacher' ? teacherScreen() : session.role === 'display' ? displayScreen() : studentScreen();
  app.innerHTML=layout(bodyHtml);
  updateClock();
@@ -25402,6 +25637,11 @@ async function refresh(force=false){
   if(d.activeRoom && d.activeRoom !== '123456') LiveClassroomSync.setActiveRoom(d.activeRoom);
   if(session.role==='student' && d.me) LiveClassroomSync.saveTeamSnapshot(d.me);
   world=d;setClock();
+  if((session.role==='teacher' && !bkHostDetail) || session.role==='display'){
+   const hs = bkHostSig(d);
+   if(!force && hs===bkLastHostSig) return;
+   bkLastHostSig = hs;
+  }
   // Đồng bộ vị trí Rồng Xanh cho tất cả thành viên cùng đội & khi tải lại trang (F5)
   if(session.role==='student'&&d.me){
    const curSrvStage = Math.max(0, Math.min(5, d.me.stage ?? 0));
@@ -25420,6 +25660,10 @@ async function refresh(force=false){
    }else{
     lastSyncedTeamStage = curSrvStage;
    }
+  }
+  if(session.role==='student'&&!force){
+   const shownKind = document.querySelector('.bk-student')?.dataset.kind || '';
+   if(shownKind && shownKind===bkStudentKind()){ bkPatchStudent(); return; }
   }
   if(session.role==='student'&&!force){
    const me=d.me||{};
@@ -25598,6 +25842,7 @@ async function submitCipherNotebook(){
 
 async function handle(action,el){
  try{
+  if(action && action.startsWith('bk') && await bkHandle(action,el)) return;
   if(action==='toggleFullscreen'){
    if(!document.fullscreenElement){document.documentElement.requestFullscreen?.();}
    else{document.exitFullscreen?.();}
@@ -26310,7 +26555,7 @@ async function handle(action,el){
    await refresh(true);
    return;
   }
-  if(action==='home'){const yes=confirm('Quay về màn hình đăng nhập? Tiến độ của đội vẫn được lưu an toàn.');if(yes){session=null;world=null;history.replaceState({},'',location.pathname);startScreen();}return;}
+  if(action==='home'){const yes=confirm('Quay về màn hình đăng nhập? Tiến độ của đội vẫn được lưu an toàn.');if(yes){session=null;world=null;bkStep='code';bkRoom='';studentSoloStarted=false;history.replaceState({},'',location.pathname);startScreen();}return;}
   if(action==='setMode'){
    activePlayMode=el.dataset.mode;
    huntState.battleOpen=false;
@@ -26653,15 +26898,14 @@ async function handle(action,el){
    studentSoloStarted = true;
    vaState.stageStartedAt = Date.now();
    sound('powerup');
-   api('/api/startRoom',{room:session.room,token:session.token}).catch(()=>{});
-   LiveClassroomSync.broadcastRoomStatus({ started: true, paused: false, ended: false });
+   bkWasWaiting = false;
    await refresh(true);
    return;
   }
   if(action==='hostStartContest'){
    await submit('/api/teacher',{action:'startContest'});
    LiveClassroomSync.broadcastRoomStatus({ started: true, paused: false, ended: false });
-   sound('win');
+   bkShowCountdown();
    updateAfterAction();
    return;
   }
@@ -26682,7 +26926,7 @@ async function handle(action,el){
    if(!confirm('Xác nhận KẾT THÚC lượt thi của phòng học? Đồng hồ sẽ dừng và mở Bục Vinh Danh.')) return;
    await submit('/api/teacher',{action:'endContest'});
    LiveClassroomSync.broadcastRoomStatus({ started: true, paused: false, ended: true });
-   showAward = true;
+   showAward = bkHostDetail;
    sound('fanfare');
    triggerConfetti(3200);
    updateAfterAction();
@@ -26944,7 +27188,7 @@ window.addEventListener('keydown',e=>{
   if(e.key==='Enter'){
    if(document.activeElement.id==='huntShortInput')handle('attackHuntMonster');
    else if(document.activeElement.id==='cdShortInput')handle('submitShortCastle');
-   else if(!session)$('#entry [data-action="join"]')?.click();
+   else if(!session && document.activeElement.id==='bkCode')handle('bkSubmitCode');
   }
   return;
  }
@@ -27482,12 +27726,426 @@ function exportCSV(){
  const link=URL.createObjectURL(blob);const a=document.createElement('a');a.href=link;a.download='MATHVERSE_OXYZ_KET_QUA_'+world.room+'.csv';a.click();setTimeout(()=>URL.revokeObjectURL(link),1500);
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   GIAO DIỆN VÀO PHÒNG KIỂU BLOOKET (v5.7.0)
+   Học sinh: nhập mã → chạm chọn đội → sảnh chờ → chơi → kết quả.
+   Giáo viên: tạo phòng → sảnh chờ (mã to + QR + đội hiện dần) → bảng đua → bục vinh danh.
+   ═══════════════════════════════════════════════════════════════════════════ */
+let bkStep = initialRoom ? 'team' : 'code'; // 'code' | 'team' | 'host'
+let bkRoom = initialRoom || '';
+let bkRoomTeams = null;
+let bkError = '';
+let bkHostTeamCount = 6;
+let bkHostDetail = false;
+let bkKnownJoined = new Set();
+let bkLobbyPrimed = false;
+let bkTeamPollTimer = null;
+let bkWasWaiting = false;
+let bkLastHostSig = '';
+
+function bkTeamName(t){ return String(t?.name || '').replace(/^Đội\s*\d+\s*[-–·:]?\s*/i, '') || 'Đội'; }
+function bkIsJoined(t){ return typeof t?.joined === 'boolean' ? t.joined : Boolean(t?.online); }
+function bkJoinHost(){
+ const base = (world && world.joinBaseURL) ? world.joinBaseURL : location.origin;
+ if (!base || base === 'null' || location.protocol === 'file:') return 'máy này';
+ return base.replace(/^https?:\/\//, '') + (location.pathname && location.pathname !== '/' ? location.pathname : '');
+}
+function bkTeamProgressPct(t){
+ if (t.completed) return 100;
+ const s1Clues = t.stage > 0 ? 4 : Math.min(4, (t.stage1?.cluesFound ?? (t.round >= 1 ? 4 : 0)));
+ const seals = Math.max((t.digits || []).length, Math.min(5, t.stage || 0));
+ const byRounds = (((t.stage || 0) * 3 + (t.round || 0) + (t.stage === 0 && t.round === 0 ? (s1Clues / 4) : 0)) / 15) * 100;
+ return Math.max(3, Math.min(99, Math.round(Math.max(seals * 20, byRounds))));
+}
+function bkStageLabel(t){ return t.completed ? 'Về đích' : `Chặng ${Math.min(5, (t.stage || 0) + 1)}/5`; }
+
+/* ─── HỌC SINH: NHẬP MÃ PHÒNG ─── */
+function bkLanding(){
+ return `<div class="bk-page bk-entry">
+  <main class="bk-join">
+   <div class="bk-logo">${DIAMOND_ICON_SVG}<span>MathVerse Oxyz</span></div>
+   <div class="bk-join-card">
+    <label for="bkCode" class="bk-sr">Mã phòng</label>
+    <input id="bkCode" class="bk-code-input" type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="off" maxlength="6" placeholder="Mã phòng" value="${esc(bkRoom)}"/>
+    <button type="button" class="bk-btn bk-btn-sun bk-btn-block" data-action="bkSubmitCode">Vào phòng</button>
+    ${bkError ? `<p class="bk-error" role="alert">${esc(bkError)}</p>` : ''}
+   </div>
+   <p class="bk-help">Nhập mã 6 số trên màn hình máy chiếu, hoặc quét mã QR bằng camera điện thoại.</p>
+   ${window.IS_DEMO_MODE ? `<button type="button" class="bk-text-link" data-action="demoPlay">Chơi thử ngay trên máy này</button>` : ''}
+  </main>
+  <button type="button" class="bk-corner-link" data-action="bkGoHost">Tôi là giáo viên</button>
+ </div>`;
+}
+
+/* ─── HỌC SINH: CHỌN ĐỘI ─── */
+function bkTeamTiles(){
+ const teams = bkRoomTeams || [];
+ if (!teams.length) return `<p class="bk-loading">Đang tải danh sách đội…</p>`;
+ return teams.map(t => `<button type="button" class="bk-team" style="--tc:${esc(t.color || '#36C6E8')}" data-action="bkPickTeam" data-team="${esc(t.id)}">
+   <span class="bk-team-ava" aria-hidden="true">${t.avatar || '🐉'}</span>
+   <span class="bk-team-name">${esc(bkTeamName(t))}</span>
+   ${bkIsJoined(t) ? `<span class="bk-team-state">Đã có bạn vào</span>` : ''}
+  </button>`).join('');
+}
+function bkTeamPick(){
+ return `<div class="bk-page bk-entry">
+  <header class="bk-top">
+   <button type="button" class="bk-back" data-action="bkBackToCode">‹ Đổi mã phòng</button>
+   <span class="bk-room-tag">Phòng <b>${esc(bkRoom)}</b></span>
+  </header>
+  <main class="bk-pick">
+   <h1 class="bk-title">Chọn đội của bạn</h1>
+   ${bkError ? `<p class="bk-error" role="alert">${esc(bkError)}</p>` : ''}
+   <div class="bk-team-grid" id="bkTeamGrid">${bkTeamTiles()}</div>
+   <p class="bk-help">Cả nhóm chọn cùng một đội. Mỗi bạn một máy hay cả nhóm chung một máy đều được.</p>
+  </main>
+ </div>`;
+}
+async function bkLoadTeams(){
+ if (session || bkStep !== 'team' || !bkRoom) return;
+ try{
+  const d = await api('/api/state', { room: bkRoom, token: window.IS_DEMO_MODE ? 'DEMO_GV' : 'DISPLAY' });
+  if (session || bkStep !== 'team') return;
+  bkRoomTeams = d.teams || [];
+  if (d.room && d.room !== bkRoom){ bkRoom = d.room; const tag = $('.bk-room-tag b'); if (tag) tag.textContent = bkRoom; }
+  const grid = document.getElementById('bkTeamGrid');
+  if (grid) grid.innerHTML = bkTeamTiles();
+ }catch(e){
+  if (session || bkStep !== 'team' || bkRoomTeams) return;
+  const grid = document.getElementById('bkTeamGrid');
+  if (grid) grid.innerHTML = `<div class="bk-error" role="alert" style="grid-column:1/-1">${esc(e.message || 'Không tải được danh sách đội.')} <button type="button" class="bk-text-link" style="color:inherit" data-action="bkRetryTeams">Thử lại</button></div>`;
+ }
+}
+function bkStopTeamPoll(){ if (bkTeamPollTimer){ clearInterval(bkTeamPollTimer); bkTeamPollTimer = null; } }
+function bkStartTeamPoll(){ bkStopTeamPoll(); bkTeamPollTimer = setInterval(() => { if (!document.hidden) bkLoadTeams(); }, 3000); }
+
+/* ─── GIÁO VIÊN: TẠO PHÒNG ─── */
+function bkHostSetup(){
+ let last = '';
+ try{ last = LiveClassroomSync.getActiveRoom() || ''; }catch(e){}
+ return `<div class="bk-page bk-entry">
+  <header class="bk-top">
+   <button type="button" class="bk-back" data-action="bkBackToCode">‹ Màn hình học sinh</button>
+  </header>
+  <main class="bk-host-setup">
+   <h1 class="bk-title">Tạo phòng chơi</h1>
+   <div class="bk-setup-card">
+    <p class="bk-setup-q" id="bkCountLabel">Lớp chia thành mấy đội?</p>
+    <div class="bk-count-row" role="radiogroup" aria-labelledby="bkCountLabel">
+     ${[4,5,6,7,8].map(n => `<button type="button" role="radio" aria-checked="${n === bkHostTeamCount}" class="bk-count ${n === bkHostTeamCount ? 'is-on' : ''}" data-action="bkSetCount" data-n="${n}">${n}</button>`).join('')}
+    </div>
+    <button type="button" class="bk-btn bk-btn-sun bk-btn-block" data-action="bkCreateRoom">Tạo phòng ${bkHostTeamCount} đội</button>
+    ${last && last !== '123456' ? `<button type="button" class="bk-btn bk-btn-ghost-ink bk-btn-block" data-action="bkReopenRoom" data-room="${esc(last)}">Mở lại phòng ${esc(last)}</button>` : ''}
+   </div>
+   <p class="bk-help">Sau khi tạo phòng, chiếu màn hình lên cho cả lớp. Học sinh quét QR hoặc nhập mã là vào được.</p>
+  </main>
+ </div>`;
+}
+
+/* ─── HỌC SINH: SẢNH CHỜ ─── */
+function bkJoinedChips(teams, myId){
+ const list = (teams || []);
+ const joined = list.filter(t => bkIsJoined(t) || t.id === myId);
+ return `<p class="bk-joined-count"><b>${joined.length}</b>/${list.length} đội đã vào</p>
+  <ul class="bk-chips">${joined.map(t => `<li class="${t.id === myId ? 'is-me' : ''}" style="--tc:${esc(t.color || '#36C6E8')}"><span aria-hidden="true">${t.avatar || '🐉'}</span>${esc(bkTeamName(t))}</li>`).join('')}</ul>`;
+}
+function bkStudentLobby(){
+ const me = world.me || {};
+ return `<div class="bk-page bk-student" data-kind="lobby" style="--tc:${esc(me.color || '#36C6E8')}">
+  <header class="bk-top">
+   <span class="bk-room-tag">Phòng <b>${esc(world.room)}</b></span>
+   <button type="button" class="bk-icon" data-action="toggleSound" aria-label="${soundEnabled ? 'Tắt âm thanh' : 'Bật âm thanh'}">${soundEnabled ? '🔊' : '🔇'}</button>
+  </header>
+  <main class="bk-wait">
+   <div class="bk-wait-ava" aria-hidden="true">${me.avatar || '🐉'}</div>
+   <h1 class="bk-wait-name">${esc(bkTeamName(me))}</h1>
+   <p class="bk-wait-ok">Bạn đã vào phòng!</p>
+   <p class="bk-wait-msg">Nhìn lên máy chiếu. Trò chơi bắt đầu khi giáo viên bấm nút.</p>
+   <div class="bk-dots" aria-hidden="true"><i></i><i></i><i></i></div>
+   <div class="bk-joined" id="bkLobbyTeams">${bkJoinedChips(world.teams, me.id)}</div>
+  </main>
+  <footer class="bk-wait-foot">
+   <button type="button" class="bk-text-link" data-action="bkChangeTeam">Đổi đội</button>
+   <button type="button" class="bk-text-link" data-action="studentStartNow">Không có giáo viên? Tự chơi luôn</button>
+  </footer>
+ </div>`;
+}
+
+/* ─── HỌC SINH: KẾT QUẢ ─── */
+function bkResultCore(){
+ const me = world.me || {};
+ const ranked = sortTeamsFairly(world.teams || []);
+ const rank = Math.max(1, ranked.findIndex(t => t.id === me.id) + 1);
+ const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : '';
+ const seals = me.completed ? 5 : Math.min(5, (me.digits || []).length);
+ return `<div class="bk-result-rank">${medal ? `<span class="bk-medal" aria-hidden="true">${medal}</span>` : ''}<b>Hạng ${rank}</b><small>trên ${ranked.length} đội</small></div>
+  <dl class="bk-result-stats">
+   <div><dt>Điểm</dt><dd>${Math.max(0, me.score || 0)} XP</dd></div>
+   <div><dt>Ấn vectơ</dt><dd>${seals}/5</dd></div>
+   <div><dt>Tiến độ</dt><dd>${bkStageLabel(me)}</dd></div>
+  </dl>`;
+}
+function bkStudentResult(){
+ const me = world.me || {};
+ const title = me.completed ? 'Về đích!' : 'Hết giờ!';
+ const msg = world.ended ? 'Nhìn lên máy chiếu để xem bục vinh danh.' : 'Đội bạn đã hoàn thành 5 chặng. Chờ các đội khác về đích nhé.';
+ return `<div class="bk-page bk-student" data-kind="result" style="--tc:${esc(me.color || '#36C6E8')}">
+  <header class="bk-top"><span class="bk-room-tag">Phòng <b>${esc(world.room)}</b></span></header>
+  <main class="bk-result">
+   <div class="bk-wait-ava is-still" aria-hidden="true">${me.avatar || '🐉'}</div>
+   <p class="bk-result-team">${esc(bkTeamName(me))}</p>
+   <h1 class="bk-title">${title}</h1>
+   <div class="bk-result-card" id="bkLiveRank">${bkResultCore()}</div>
+   <p class="bk-help">${msg}</p>
+  </main>
+ </div>`;
+}
+function bkStudentKind(){
+ if (session?.role !== 'student' || !world) return '';
+ if (isWaitingForTeacherStart()) return 'lobby';
+ if (world.ended || world.me?.completed) return 'result';
+ return '';
+}
+function bkPatchStudent(){
+ const lob = document.getElementById('bkLobbyTeams');
+ if (lob) lob.innerHTML = bkJoinedChips(world.teams, world.me?.id);
+ const rk = document.getElementById('bkLiveRank');
+ if (rk) rk.innerHTML = bkResultCore();
+}
+
+/* ─── GIÁO VIÊN / MÁY CHIẾU ─── */
+function bkHostSig(d){
+ const teams = (d.teams || []).map(t => [t.id, bkIsJoined(t), t.stage, t.round, t.score, t.completed, (t.digits || []).length, t.stage1?.cluesFound, t.stage2?.solvedCount, t.stage4?.matchedCount, t.stage5?.phase]);
+ return JSON.stringify([d.room, d.started, d.paused, d.ended, d.clock?.running, teams, (d.lastEvent || [])[0]?.at, showTeacherQrModal]);
+}
+function bkHostBand(){
+ const url = getRoomJoinUrl(world.room);
+ return `<header class="bk-band">
+  <div class="bk-band-join">
+   <span>Vào trang</span>
+   <b>${esc(bkJoinHost())}</b>
+   <span>rồi nhập mã phòng</span>
+  </div>
+  <div class="bk-band-code"><span>Mã phòng</span><b>${esc(world.room)}</b></div>
+  <button type="button" class="bk-band-qr" data-action="openQrModal" aria-label="Phóng to mã QR">
+   ${renderRoomQrSvg(url, 132)}
+   <span>Phóng to</span>
+  </button>
+ </header>`;
+}
+function bkHostFoot(controls){
+ if (!controls) return `<footer class="bk-host-foot"><button type="button" class="bk-foot-btn" data-action="exitDisplayMode">Bảng điều khiển</button></footer>`;
+ return `<footer class="bk-host-foot">
+  <button type="button" class="bk-foot-btn" data-action="openQrModal">Mã QR từng đội</button>
+  <button type="button" class="bk-foot-btn" data-action="bkShowDetail">Bảng thống kê chi tiết</button>
+  <button type="button" class="bk-foot-btn" data-action="bkNewRoom">Tạo phòng khác</button>
+  <span class="bk-foot-gap"></span>
+  <button type="button" class="bk-foot-btn" data-action="toggleSound" aria-label="${soundEnabled ? 'Tắt âm thanh' : 'Bật âm thanh'}">${soundEnabled ? '🔊' : '🔇'}</button>
+  <button type="button" class="bk-foot-btn" data-action="toggleFullscreen">Toàn màn hình</button>
+ </footer>`;
+}
+function bkHostLobby(controls){
+ const teams = world.teams || [];
+ const joined = teams.filter(bkIsJoined);
+ const fresh = joined.filter(t => !bkKnownJoined.has(world.room + ':' + t.id));
+ fresh.forEach(t => bkKnownJoined.add(world.room + ':' + t.id));
+ if (fresh.length && bkLobbyPrimed) setTimeout(() => sound('bleep'), 0);
+ bkLobbyPrimed = true;
+ const freshIds = new Set(fresh.map(t => t.id));
+ return `<div class="bk-page bk-host">
+  ${bkHostBand()}
+  <section class="bk-lobby">
+   <div class="bk-lobby-bar">
+    <p class="bk-lobby-count"><b>${joined.length}</b>/${teams.length} đội đã vào</p>
+    ${controls ? `<button type="button" class="bk-btn bk-btn-mint bk-btn-big" data-action="hostStartContest">Bắt đầu</button>` : `<p class="bk-lobby-note">Chờ giáo viên bắt đầu…</p>`}
+   </div>
+   <ul class="bk-slots">
+    ${teams.map(t => {
+     const isIn = bkIsJoined(t);
+     return `<li class="bk-slot ${isIn ? 'is-in' : 'is-empty'} ${freshIds.has(t.id) ? 'is-new' : ''}" style="--tc:${esc(t.color || '#36C6E8')}">
+      <span class="bk-slot-ava" aria-hidden="true">${t.avatar || '🐉'}</span>
+      <b>${esc(bkTeamName(t))}</b>
+      <small>${isIn ? 'Đã vào' : 'Đang chờ'}</small>
+     </li>`;
+    }).join('')}
+   </ul>
+  </section>
+  ${bkHostFoot(controls)}
+  ${showTeacherQrModal ? renderTeacherQrModal(world.room) : ''}
+ </div>`;
+}
+function bkHostLive(controls){
+ const ranked = sortTeamsFairly(world.teams || []);
+ const paused = Boolean(world.paused);
+ const ev = (world.lastEvent || [])[0];
+ return `<div class="bk-page bk-host bk-live">
+  <header class="bk-live-top">
+   <span class="bk-room-tag">Phòng <b>${esc(world.room)}</b></span>
+   <div class="bk-clock ${paused ? 'is-paused' : ''}"><span id="clock">06:00</span></div>
+   ${controls ? `<div class="bk-live-actions">
+    ${paused
+     ? `<button type="button" class="bk-btn bk-btn-mint" data-action="hostResumeContest">Tiếp tục</button>`
+     : `<button type="button" class="bk-btn bk-btn-paper" data-action="hostPauseContest">Tạm dừng</button>`}
+    <button type="button" class="bk-btn bk-btn-coral" data-action="hostEndContest">Kết thúc</button>
+   </div>` : '<span></span>'}
+  </header>
+  ${paused ? `<p class="bk-paused" role="status">Đang tạm dừng. Học sinh tạm thời không làm bài được.</p>` : ''}
+  <ol class="bk-race ${ranked.length > 6 ? 'is-compact' : ''}">
+   ${ranked.map((t, i) => {
+    const pct = bkTeamProgressPct(t);
+    return `<li class="bk-row ${i < 3 ? 'top-' + (i + 1) : ''} ${t.completed ? 'is-done' : ''}" style="--tc:${esc(t.color || '#36C6E8')}">
+     <span class="bk-rank">${i + 1}</span>
+     <span class="bk-row-ava" aria-hidden="true">${t.avatar || '🐉'}</span>
+     <span class="bk-row-name"><b>${esc(bkTeamName(t))}</b><small>${bkStageLabel(t)}</small></span>
+     <span class="bk-track" role="img" aria-label="Tiến độ ${pct}%"><i style="width:${pct}%"></i></span>
+     <span class="bk-xp">${Math.max(0, t.score || 0)}<small> XP</small></span>
+    </li>`;
+   }).join('')}
+  </ol>
+  ${ev ? `<p class="bk-ticker">${esc(ev.text)}</p>` : ''}
+  ${bkHostFoot(controls)}
+  ${showTeacherQrModal ? renderTeacherQrModal(world.room) : ''}
+ </div>`;
+}
+function bkHostPodium(controls){
+ const ranked = sortTeamsFairly(world.teams || []);
+ const top = ranked.slice(0, 3);
+ const order = [top[1], top[0], top[2]];
+ const places = [2, 1, 3];
+ return `<div class="bk-page bk-host bk-podium-page">
+  <h1 class="bk-title bk-podium-title">Bục vinh danh</h1>
+  <div class="bk-podium">
+   ${order.map((t, k) => t ? `<div class="bk-pod place-${places[k]}" style="--tc:${esc(t.color || '#36C6E8')}">
+     <span class="bk-pod-ava" aria-hidden="true">${t.avatar || '🐉'}</span>
+     <b class="bk-pod-name">${esc(bkTeamName(t))}</b>
+     <span class="bk-pod-xp">${Math.max(0, t.score || 0)} XP</span>
+     <div class="bk-pod-block"><span>${places[k]}</span></div>
+    </div>` : '<div class="bk-pod is-void"></div>').join('')}
+  </div>
+  ${ranked.length > 3 ? `<ol class="bk-rest" start="4">${ranked.slice(3).map(t => `<li style="--tc:${esc(t.color || '#36C6E8')}"><span aria-hidden="true">${t.avatar || '🐉'}</span><b>${esc(bkTeamName(t))}</b><em>${Math.max(0, t.score || 0)} XP</em></li>`).join('')}</ol>` : ''}
+  ${controls ? `<div class="bk-podium-actions">
+   <button type="button" class="bk-btn bk-btn-sun" data-action="bkPlayAgain">Chơi lại từ đầu</button>
+   <button type="button" class="bk-btn bk-btn-paper" data-action="exportCSV">Tải bảng điểm (CSV)</button>
+   <button type="button" class="bk-btn bk-btn-paper" data-action="bkShowDetail">Thống kê chi tiết</button>
+  </div>` : ''}
+ </div>`;
+}
+function bkHostScreen(controls){
+ if (world.ended) return bkHostPodium(controls);
+ if (!world.started) return bkHostLobby(controls);
+ return bkHostLive(controls);
+}
+
+/* ─── CHỌN MÀN HÌNH ─── */
+function bkBareScreen(){
+ if (!session || !world) return '';
+ if (session.role === 'teacher') return bkHostDetail ? '' : bkHostScreen(true);
+ if (session.role === 'display') return bkHostScreen(false);
+ const kind = bkStudentKind();
+ if (kind === 'lobby') return bkStudentLobby();
+ if (kind === 'result') return bkStudentResult();
+ return '';
+}
+function bkShowCountdown(){
+ if (document.querySelector('.bk-countdown')) return;
+ const el = document.createElement('div');
+ el.className = 'bk-countdown';
+ el.setAttribute('role', 'status');
+ document.body.appendChild(el);
+ const seq = ['3', '2', '1', 'Bắt đầu!'];
+ let i = 0;
+ const tick = () => {
+  if (i >= seq.length){ el.remove(); return; }
+  el.innerHTML = `<span class="${i === 3 ? 'is-go' : ''}">${seq[i]}</span>`;
+  sound(i === 3 ? 'powerup' : 'bleep');
+  i++;
+  setTimeout(tick, i === 4 ? 900 : 700);
+ };
+ tick();
+}
+async function bkHandle(action, el){
+ if (action === 'bkSubmitCode'){
+  const code = String($('#bkCode')?.value || '').replace(/\s+/g, '');
+  if (!/^\d{4,6}$/.test(code)){ bkRoom = code; bkError = 'Mã phòng gồm 6 chữ số. Hãy nhìn lại màn hình máy chiếu.'; startScreen(); return true; }
+  bkRoom = code; bkStep = 'team'; bkRoomTeams = null; bkError = '';
+  try{ history.replaceState({}, '', location.pathname + '?room=' + encodeURIComponent(code)); }catch(e){}
+  startScreen();
+  return true;
+ }
+ if (action === 'bkPickTeam'){
+  el.disabled = true;
+  const team = el.dataset.team || 'doi-1';
+  mvShowIntroHub = false; mvWorldMapOpen = false;
+  const teamNum = (/^doi-(\d+)$/i.exec(team) || [0, 1])[1];
+  const r = await api('/api/join', { room: bkRoom, team, code: String(teamNum).repeat(4) });
+  bkStopTeamPoll();
+  saveSession({ role: 'student', room: r.room, teamId: r.team, token: r.token });
+  activePlayMode = null;
+  await refresh(true);
+  return true;
+ }
+ if (action === 'bkBackToCode'){
+  bkStep = 'code'; bkRoomTeams = null; bkError = '';
+  try{ history.replaceState({}, '', location.pathname); }catch(e){}
+  startScreen();
+  return true;
+ }
+ if (action === 'bkRetryTeams'){ bkLoadTeams(); return true; }
+ if (action === 'bkGoHost'){ bkStep = 'host'; bkError = ''; startScreen(); return true; }
+ if (action === 'bkSetCount'){ bkHostTeamCount = Number(el.dataset.n) || 6; startScreen(); return true; }
+ if (action === 'bkCreateRoom'){
+  el.disabled = true;
+  const r = await api('/api/create', { teamCount: bkHostTeamCount });
+  bkHostDetail = false; bkLastHostSig = '';
+  saveSession({ role: 'teacher', room: r.room, token: r.teacherToken });
+  await refresh(true);
+  return true;
+ }
+ if (action === 'bkReopenRoom'){
+  const room = el.dataset.room;
+  bkHostDetail = false; bkLastHostSig = '';
+  saveSession({ role: 'teacher', room, token: localStorage.getItem(cacheKey('teacher', room)) || ('GV_' + room) });
+  await refresh(true);
+  return true;
+ }
+ if (action === 'bkNewRoom'){
+  if (!confirm('Rời phòng này để tạo phòng mới?')) return true;
+  session = null; world = null; bkStep = 'host'; showTeacherQrModal = false;
+  try{ history.replaceState({}, '', location.pathname); }catch(e){}
+  startScreen();
+  return true;
+ }
+ if (action === 'bkChangeTeam'){
+  const room = session?.room || bkRoom;
+  session = null; world = null; studentSoloStarted = false;
+  bkRoom = room; bkStep = 'team'; bkRoomTeams = null;
+  try{ history.replaceState({}, '', location.pathname + '?room=' + encodeURIComponent(room)); }catch(e){}
+  startScreen();
+  return true;
+ }
+ if (action === 'bkShowDetail'){ bkHostDetail = true; showAward = false; showTeacherQrModal = false; lastSignature = ''; render(); return true; }
+ if (action === 'bkHideDetail'){ bkHostDetail = false; showAward = false; bkLastHostSig = ''; render(); return true; }
+ if (action === 'bkPlayAgain'){
+  if (!confirm('Xóa điểm của tất cả các đội và đưa cả lớp về sảnh chờ?')) return true;
+  el.disabled = true;
+  for (const t of (world?.teams || [])){
+   try{ LiveClassroomSync.clearTeamSnapshot(t.id); }catch(e){}
+   await submit('/api/teacher', { action: 'resetTeam', team: t.id });
+  }
+  await submit('/api/teacher', { action: 'timer', value: 'reset' });
+  LiveClassroomSync.broadcastRoomStatus({ started: false, paused: false, ended: false });
+  showAward = false; bkLastHostSig = '';
+  updateAfterAction();
+  return true;
+ }
+ return false;
+}
+
 session=restoreSession();
 if(session){refresh(true);}else{startScreen();}
 setInterval(()=>{if(session&&!document.hidden)refresh(false);},2500);
 setInterval(updateClock,400);
 requestAnimationFrame(gameLoop);
-
 </script>
 </body>
 </html>
