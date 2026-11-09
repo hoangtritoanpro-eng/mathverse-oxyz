@@ -9,6 +9,23 @@ Tất cả những thay đổi quan trọng của dự án này sẽ được gh
 
 ---
 
+## [5.7.1] - 2026-11-10
+
+### Changed (Màn Thống Kê Chi Tiết Của Giáo Viên Gọn Như Blooket)
+- **`bkHostStats` thay cho "Trung tâm chỉ huy" cũ:** bỏ các nút trùng với màn hình chính (Bắt đầu, QR, Phòng mới, Máy chiếu…). Chỉ còn:
+  1. 3 ô tóm tắt: đội đã vào, tỉ lệ trả lời đúng, đội về đích.
+  2. Bảng các đội: hạng, 5 ô chặng (xanh = đã qua, vàng = đang làm), số câu đúng/sai, điểm. Đội sai từ 3 lần trở lên hoặc đứng quá 90 giây ở một chặng được đánh dấu **Cần giúp**.
+  3. Cột phải: Mức độ đạt được (Nhận biết / Thông hiểu), Đáp án từng chặng (nút 1–5), Hỗ trợ cả lớp (Nhắn cả lớp, Hồi đầy khiên, Thưởng +5 XP).
+- **Bảng chi tiết một đội (`bkTeamSheet`):** câu trả lời gần đây (đúng/sai, giờ), điểm hợp tác chọn 1 chạm (0 → +10), nút cho đội chơi lại.
+- **Bảng đáp án (`bkAnswersSheet`):** chuyển nhanh giữa 5 chặng, mỗi câu hiện đáp án đúng và % đội làm đúng; mô hình 3D thu gọn trong mục "Mô hình 3D để giảng giải".
+- Phím Esc đóng bảng bật lên; thông báo ngắn gọn hơn.
+
+### Fixed
+- Nút "✕ Đóng" và "Sao chép link" trong bảng **Mã QR phóng to** trước đây không bấm được (sự kiện click bị chặn) – nay hoạt động.
+- Thống kê % đúng từng câu đọc đúng dữ liệu `byQuestion` (trước đây luôn trống).
+
+---
+
 ## [5.7.0] - 2026-11-10
 
 ### Changed (Giao Diện Vào Phòng Kiểu Blooket: Đơn Giản, Ít Chữ, Học Sinh Vào Nhanh)
