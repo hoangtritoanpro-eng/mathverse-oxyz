@@ -13844,3 +13844,79 @@ body:has(.z3v2) #app.wrap{padding:0 !important;max-width:none !important}
   .z3v2-top{gap:5px}
   .z3v2-chip{gap:3px}
 }
+
+/* ═══ v5.9.1 · CHẶNG 3: RỒNG XANH PHUN CHIÊU (lửa ở miệng → cầu lửa bay → nổ) ═══ */
+.z3v2 .z3-energy-beam-layer{position:absolute;inset:0;z-index:10;pointer-events:none;overflow:hidden}
+/* Tư thế phun: rồng lùi nhẹ & phát sáng cam */
+.z3v2 .z3-dragon-hero.is-recoil .z3-dragon-shooter-img{animation:z3Spit .34s ease-out;filter:drop-shadow(0 0 16px rgba(255,170,40,.95)) drop-shadow(0 10px 16px rgba(0,0,0,.6))}
+@keyframes z3Spit{0%{transform:translateX(0) scale(1)}25%{transform:translateX(-7%) scale(1.04,.97)}60%{transform:translateX(2%) scale(.99,1.02)}100%{transform:none}}
+
+/* Lửa phun ra từ miệng rồng */
+.z3-breath{position:absolute;width:0;height:0}
+.z3-breath-cone{position:absolute;left:-6px;top:0;width:clamp(70px,9vw,150px);height:clamp(40px,5.4vw,86px);transform:translateY(-50%) scaleX(0);transform-origin:0 50%;
+  border-radius:20% 70% 70% 20% / 50%;
+  background:radial-gradient(ellipse at 6% 50%,#FFFFFF 0%,#FFF6B0 16%,#FFC23A 36%,rgba(255,110,20,.85) 58%,rgba(255,60,0,0) 78%);
+  filter:blur(1.5px);animation:z3Cone .42s ease-out forwards}
+@keyframes z3Cone{0%{transform:translateY(-50%) scaleX(.1) scaleY(.4);opacity:1}35%{transform:translateY(-50%) scaleX(1) scaleY(1);opacity:1}100%{transform:translateY(-50%) scaleX(1.25) scaleY(.6);opacity:0}}
+.z3-breath-glow{position:absolute;left:-30px;top:-30px;width:60px;height:60px;border-radius:50%;background:radial-gradient(circle,rgba(255,240,170,.95) 0%,rgba(255,170,40,.6) 40%,rgba(255,120,0,0) 70%);animation:z3Glow .42s ease-out forwards}
+@keyframes z3Glow{0%{transform:scale(.3);opacity:1}40%{transform:scale(1.3);opacity:1}100%{transform:scale(1.6);opacity:0}}
+.z3-breath .s,.z3-impact .s{position:absolute;left:0;top:0;width:7px;height:7px;margin:-3.5px;border-radius:50%;background:#FFE27A;box-shadow:0 0 8px #FF9A1F}
+.z3-breath .s1{animation:z3Spark1 .42s ease-out forwards}
+.z3-breath .s2{animation:z3Spark2 .42s ease-out forwards}
+.z3-breath .s3{animation:z3Spark3 .42s ease-out forwards}
+.z3-breath .s4{animation:z3Spark4 .42s ease-out forwards}
+@keyframes z3Spark1{to{transform:translate(70px,-26px) scale(.3);opacity:0}}
+@keyframes z3Spark2{to{transform:translate(90px,18px) scale(.3);opacity:0}}
+@keyframes z3Spark3{to{transform:translate(52px,32px) scale(.2);opacity:0}}
+@keyframes z3Spark4{to{transform:translate(60px,-40px) scale(.2);opacity:0}}
+
+/* Quả cầu lửa bay theo làn */
+.z3-fireball{position:absolute;width:clamp(30px,3.4vw,54px);height:clamp(30px,3.4vw,54px);transform:translate(-50%,-50%) rotate(var(--ang,0deg))}
+.z3-fireball-core{position:absolute;inset:0;border-radius:50%;
+  background:radial-gradient(circle at 60% 45%,#FFFFFF 0%,#FFF4A8 22%,#FFC23A 46%,#FF7A18 68%,rgba(255,60,0,0) 74%);
+  box-shadow:0 0 18px 6px rgba(255,150,30,.75),0 0 40px 12px rgba(255,90,0,.35);animation:z3Flicker .12s linear infinite alternate}
+@keyframes z3Flicker{from{transform:scale(.94)}to{transform:scale(1.06)}}
+.z3-fireball-trail{position:absolute;right:42%;top:50%;width:330%;height:72%;transform:translateY(-50%);border-radius:50% 0 0 50%;
+  background:linear-gradient(90deg,rgba(255,60,0,0) 0%,rgba(255,110,20,.45) 45%,rgba(255,200,60,.85) 85%,rgba(255,250,200,.95) 100%);filter:blur(2px)}
+
+/* Nổ khi trúng: xanh-vàng (đúng), đỏ (sai), lan ra cả cột */
+.z3-impact{position:absolute;width:0;height:0}
+.z3-impact .ring{position:absolute;left:-50px;top:-50px;width:100px;height:100px;border-radius:50%;border:5px solid #FFE27A;animation:z3Ring .6s ease-out forwards}
+.z3-impact .core{position:absolute;left:-40px;top:-40px;width:80px;height:80px;border-radius:50%;background:radial-gradient(circle,#FFFFFF 0%,#FFF2A0 30%,rgba(255,170,40,.8) 55%,rgba(255,120,0,0) 72%);animation:z3Core .5s ease-out forwards}
+.z3-impact.good .ring{border-color:#7CFFB2;box-shadow:0 0 22px #34D399}
+.z3-impact.good .core{background:radial-gradient(circle,#FFFFFF 0%,#EAFFC8 30%,rgba(110,240,150,.85) 55%,rgba(40,200,120,0) 72%)}
+.z3-impact.bad .ring{border-color:#FF6B6B;box-shadow:0 0 22px #FF1744}
+.z3-impact.bad .core{background:radial-gradient(circle,#FFFFFF 0%,#FFD2C2 25%,rgba(255,80,60,.85) 55%,rgba(255,20,20,0) 72%)}
+.z3-impact.chain .ring{border-color:#A7F3D0;border-width:3px}
+.z3-impact.chain .core{background:radial-gradient(circle,#FFFFFF 0%,rgba(167,243,208,.85) 45%,rgba(16,185,129,0) 70%)}
+@keyframes z3Ring{0%{transform:scale(.2);opacity:1}100%{transform:scale(1.5);opacity:0}}
+@keyframes z3Core{0%{transform:scale(.3);opacity:1}40%{transform:scale(1.15);opacity:1}100%{transform:scale(1.3);opacity:0}}
+.z3-impact .s1{animation:z3Burst1 .55s ease-out forwards}
+.z3-impact .s2{animation:z3Burst2 .55s ease-out forwards}
+.z3-impact .s3{animation:z3Burst3 .55s ease-out forwards}
+.z3-impact .s4{animation:z3Burst4 .55s ease-out forwards}
+.z3-impact .s5{animation:z3Burst5 .55s ease-out forwards}
+.z3-impact .s6{animation:z3Burst6 .55s ease-out forwards}
+.z3-impact.bad .s{background:#FFB4A8;box-shadow:0 0 8px #FF3B3B}
+.z3-impact.good .s,.z3-impact.chain .s{background:#D9FFB0;box-shadow:0 0 8px #34D399}
+@keyframes z3Burst1{to{transform:translate(58px,-30px);opacity:0}}
+@keyframes z3Burst2{to{transform:translate(-50px,-42px);opacity:0}}
+@keyframes z3Burst3{to{transform:translate(48px,40px);opacity:0}}
+@keyframes z3Burst4{to{transform:translate(-56px,30px);opacity:0}}
+@keyframes z3Burst5{to{transform:translate(4px,-62px);opacity:0}}
+@keyframes z3Burst6{to{transform:translate(-6px,60px);opacity:0}}
+
+/* Cột sáng quét dọc cả cột zombie khi bắn đúng */
+.z3-col-blast{position:absolute;top:0 !important;bottom:0;width:clamp(60px,7vw,120px);transform:translateX(-50%);
+  background:linear-gradient(90deg,rgba(124,255,178,0) 0%,rgba(190,255,210,.75) 42%,#FFFFFF 50%,rgba(190,255,210,.75) 58%,rgba(124,255,178,0) 100%);
+  filter:blur(2px);animation:z3Blast .62s ease-out forwards}
+@keyframes z3Blast{0%{transform:translateX(-50%) scaleX(.15);opacity:0}25%{transform:translateX(-50%) scaleX(1);opacity:1}100%{transform:translateX(-50%) scaleX(1.4);opacity:0}}
+
+@media (max-width:860px){
+  .z3-impact .ring{left:-34px;top:-34px;width:68px;height:68px;border-width:4px}
+  .z3-impact .core{left:-28px;top:-28px;width:56px;height:56px}
+}
+@media (prefers-reduced-motion:reduce){
+  .z3-fireball-core{animation:none}
+  .z3v2 .z3-dragon-hero.is-recoil .z3-dragon-shooter-img{animation:none}
+}

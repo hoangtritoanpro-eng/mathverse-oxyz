@@ -9,6 +9,20 @@ Tất cả những thay đổi quan trọng của dự án này sẽ được gh
 
 ---
 
+## [5.9.1] - 2026-11-10
+
+### Fixed (Chặng 3: Rồng Xanh Bắn Được Khi Bấm Vào Zombie)
+- **Bấm chuột vào zombie không bắn:** trước đây cả lớp zombie bị vẽ lại mỗi khung hình (`innerHTML`), nên khi nhấn–nhả chuột (~0,1 giây) phần tử đã bị thay, trình duyệt bỏ qua cú bấm. Nay mỗi zombie/thẻ câu hỏi được giữ nguyên và chỉ cập nhật vị trí (`z3SyncZombiesLayer`), bấm chuột hay chạm đều bắn ngay.
+- Hoạt ảnh zombie đi bộ / tan biến trước đây bị khởi động lại mỗi khung hình (trông đứng yên) – nay chạy liền mạch.
+
+### Added (Hiệu Ứng Phun Chiêu)
+- **Rồng Xanh phun lửa:** mỗi phát bắn có luồng lửa phụt ra từ miệng rồng kèm tia lửa, rồng lùi nhẹ và phát sáng cam.
+- **Quả cầu lửa có đuôi** bay theo làn tới đúng con zombie (bay vòng cung nếu có cột khác chắn phía trước).
+- **Nổ khi trúng:** bắn sai nổ đỏ tại con zombie; bắn đúng nổ xanh và **cột sáng quét dọc** cả cột, 3 con còn lại nổ dây chuyền.
+- Bỏ tia sáng xanh đứng yên trước mặt rồng (trông như đang bắn liên tục).
+
+---
+
 ## [5.9.0] - 2026-11-10
 
 ### Changed (Chặng 3 Chơi Như "Chặn Zombie" – Giữ Nguyên Hình Rồng Xanh, Zombie & Sân Thành)

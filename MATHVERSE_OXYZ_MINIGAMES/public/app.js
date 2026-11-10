@@ -6309,6 +6309,7 @@ const z3State = {
   columns: [],      // Mỗi cột tương ứng 1 câu hỏi gồm 4 zombie ở 4 làn A, B, C, D
   bullets: [],      // Các quả cầu năng lượng đang bay theo làn
   popups: [],       // Hiệu ứng chữ nổi ✓ Chính xác / ✗ Sai! Zombie tăng tốc
+  fx: [],           // Hiệu ứng phun lửa / nổ / cột sáng
   results: [],      // Kết quả từng câu hỏi: { selectedIdx, cleared, wrongShots }
   mascotMsg: 'Bấm vào zombie mang <b>đáp án đúng (A/B/C/D)</b> để tiêu diệt cả cột!',
   mascotMood: 'normal',
@@ -6441,6 +6442,7 @@ function ensureZ3State(m, forceReset = false) {
     z3State.columns = [z3CreateColumn(0, 0)];
     z3State.bullets = [];
     z3State.popups = [];
+    z3State.fx = [];
     z3State.results = Z3_QUESTIONS.map(() => ({ selectedIdx: null, cleared: false, wrongShots: 0 }));
     z3State.mascotMsg = `❓ Mỗi cột zombie mang 1 câu hỏi, mỗi con giữ 1 bảng đáp án <b>A, B, C, D</b>. Bấm vào zombie mang <b>đáp án đúng</b> để tiêu diệt cả cột!`;
     z3State.mascotMood = 'normal';
@@ -6531,9 +6533,14 @@ function z3ResolveBulletHit(bullet) {
 
   const res = z3State.results[col.qIdx];
 
+  const hitX = z3ColX(col.p);
+  const hitY = Z3_LANE_Y[bullet.lane] ?? 50;
   if (bullet.lane === q.correctIdx) {
     // 🎯 BẮN ĐÚNG: Cả cột 4 zombie của câu hỏi đó bị tiêu diệt đồng loạt!
     playZ3Sfx('hit');
+    z3AddFx('good', hitX, hitY, 700);
+    z3AddFx('blast', hitX, 50, 650);
+    [0, 1, 2, 3].filter(l => l !== bullet.lane).forEach((l, i) => z3AddFx('chain', hitX, Z3_LANE_Y[l], 600, z3State.simTime + 60 + i * 50));
     if (res && res.selectedIdx === null) res.selectedIdx = bullet.lane;
     col.cleared = true;
     col.clearedAt = z3State.simTime;
@@ -6584,6 +6591,7 @@ function z3ResolveBulletHit(bullet) {
   } else {
     // ⚡ BẮN SAI: Trừ điểm XP ngay lập tức, chỉ con zombie sai đó bị hạ, cả đàn zombie bứt tốc lao nhanh hơn!
     playZ3Sfx('miss');
+    z3AddFx('bad', hitX, hitY, 600);
     z.alive = false;
     z.dyingAt = z3State.simTime;
     z.wrongHit = true;
@@ -6660,6 +6668,7 @@ function z3ShootColumnLane(colId = null, laneIdx = null) {
   );
 
   sound('laser');
+  z3AddFx('breath', 0, 0, 420, z3State.simTime + moveDelay);
   z3State.bullets.push({
     id: ++z3State.seq,
     colId: targetCol.id,
@@ -6820,50 +6829,10 @@ function z3Tick(now, dt) {
   z3SyncDOM();
 }
 
-function z3RenderColumnsLayerHtml() {
-  const sprinting = z3IsSprinting();
-  const frontCol = z3GetFrontColumn();
-
-  // Render từng cột câu hỏi: gồm Thẻ câu hỏi ở đầu cột + 4 Zombie ở 4 làn A, B, C, D
-  const colsHtml = z3State.columns.map(col => {
-    const q = Z3_QUESTIONS[col.qIdx] || Z3_QUESTIONS[0];
-    const colLeftPct = z3ColX(col.p);
-    const cardLeftPct = colLeftPct;
-    const isDanger = !col.cleared && col.p > 0.72;
-    const isFront = frontCol && frontCol.id === col.id;
-
-    const unitsHtml = col.zombies.map(z => {
-      const dyingElapsed = z.dyingAt !== null ? (z3State.simTime - z.dyingAt) : -1;
-      if (!z.alive && (z.dyingAt === null || dyingElapsed > Z3_DYING_MS)) {
-        return '';
-      }
-      const isDying = !z.alive;
-      const isWrongDying = isDying && !col.cleared;
-      const isTargeted = isFront && z.alive && z.lane === z3State.dragonLane;
-      const laneTopPct = Z3_LANE_Y[z.lane];
-
-      return `<button type="button"
-        class="z3-zombie-unit ${isDying ? 'is-dying' : ''} ${isWrongDying ? 'is-wrong' : ''} ${isTargeted ? 'is-targeted' : ''} ${sprinting ? 'is-rushing' : ''} ${isDanger ? 'is-at-fence' : ''}"
-        style="left:${colLeftPct.toFixed(2)}%;top:${laneTopPct.toFixed(2)}%"
-        data-action="z3ClickZombie"
-        data-col="${col.id}"
-        data-lane="${z.lane}"
-        title="Bấm (hoặc phím ${z.key}) để bắn Zombie làn ${z.key}: vectơ ${z.vec}">
-        <span class="z3-target-aura" aria-hidden="true"></span>
-        <span class="z3-target-ring" aria-hidden="true"></span>
-        <img src="/assets/s3_zombie/s3_zombie_blank_sign.png" alt="Zombie ${z.key} ${z.vec}" class="z3-zombie-sprite" draggable="false"/>
-        <span class="z3-lane-key-chip">${z.key}</span>
-        <div class="z3-zombie-board-label">
-          <span class="z3-vec-arrow">→</span>
-          <span class="z3-vec-letters">${z.vec}</span>
-        </div>
-      </button>`;
-    }).join('');
-
-    return `
-      <!-- Thẻ câu hỏi di chuyển theo cột zombie (chuẩn giao diện Chặn Zombie) -->
-      <div class="z3-column-question-card ${col.cleared ? 'is-cleared' : ''} ${isDanger ? 'is-danger' : ''} ${isFront ? 'is-front' : ''}"
-           style="left:${cardLeftPct.toFixed(2)}%;--x:${cardLeftPct.toFixed(2)}%">
+/* ─── VẼ SÂN CHẶNG 3: giữ nguyên phần tử zombie giữa các khung hình (bấm chuột mới ăn) ─── */
+function z3CardHtml(col) {
+  const q = Z3_QUESTIONS[col.qIdx] || Z3_QUESTIONS[0];
+  return `<div class="z3-column-question-card" data-k="c${col.id}">
         <span class="z3-col-card-num">${esc(q.cardTitle)}</span>
         <div class="z3-col-card-body">
           <span class="z3-col-card-prompt">${esc(q.cardPrompt)}</span>
@@ -6873,55 +6842,216 @@ function z3RenderColumnsLayerHtml() {
             <span class="z3-inline-vec"><span class="v-arr">→</span>${q.v2}</span> = ?
           </span>
         </div>
-      </div>
-      ${unitsHtml}
-    `;
-  }).join('');
+      </div>`;
+}
 
-  // Render hiệu ứng chữ nổi ✓ Chính xác / ✗ Sai! Zombie tăng tốc tại làn bắn
-  const popupsHtml = z3State.popups.map(p => {
+function z3ZombieHtml(col, z) {
+  return `<button type="button" class="z3-zombie-unit" data-k="z${col.id}_${z.lane}"
+        data-action="z3ClickZombie" data-col="${col.id}" data-lane="${z.lane}"
+        aria-label="Bắn zombie ${z.key}: vectơ ${z.vec}">
+        <span class="z3-target-aura" aria-hidden="true"></span>
+        <span class="z3-target-ring" aria-hidden="true"></span>
+        <img src="/assets/s3_zombie/s3_zombie_blank_sign.png" alt="" class="z3-zombie-sprite" draggable="false"/>
+        <span class="z3-lane-key-chip">${z.key}</span>
+        <div class="z3-zombie-board-label">
+          <span class="z3-vec-arrow">→</span>
+          <span class="z3-vec-letters">${z.vec}</span>
+        </div>
+      </button>`;
+}
+
+function z3HtmlToEl(html) {
+  const t = document.createElement('template');
+  t.innerHTML = html.trim();
+  return t.content.firstElementChild;
+}
+
+// Vị trí miệng Rồng Xanh (theo % khung sân) để làm điểm phun chiêu
+function z3MouthPct() {
+  const vp = document.getElementById('z3CourtyardViewport');
+  const img = document.querySelector('#z3DragonHero .z3-dragon-shooter-img');
+  if (vp && img) {
+    const v = vp.getBoundingClientRect();
+    const r = img.getBoundingClientRect();
+    if (v.width > 0 && r.width > 0) {
+      return {
+        x: ((r.left + r.width * 0.86) - v.left) / v.width * 100,
+        y: ((r.top + r.height * 0.47) - v.top) / v.height * 100
+      };
+    }
+  }
+  return { x: z3State.dragonX + 6, y: z3State.dragonY - 3 };
+}
+
+function z3AddFx(kind, x, y, dur, at = z3State.simTime) {
+  z3State.fx = z3State.fx || [];
+  z3State.fx.push({ id: ++z3State.seq, kind, x, y, dur, at });
+}
+
+function z3SyncZombiesLayer() {
+  const layer = document.getElementById('z3ZombiesLayer');
+  if (!layer) return;
+  const sprinting = z3IsSprinting();
+  const frontCol = z3GetFrontColumn();
+  const keep = new Set();
+  const byKey = {};
+  layer.querySelectorAll(':scope > [data-k]').forEach(el => { byKey[el.dataset.k] = el; });
+
+  z3State.columns.forEach(col => {
+    const x = z3ColX(col.p);
+    const isDanger = !col.cleared && col.p > 0.72;
+    const isFront = frontCol && frontCol.id === col.id;
+
+    const ck = 'c' + col.id;
+    keep.add(ck);
+    let card = byKey[ck];
+    if (!card) { card = z3HtmlToEl(z3CardHtml(col)); layer.appendChild(card); }
+    card.style.left = x.toFixed(2) + '%';
+    card.style.setProperty('--x', x.toFixed(2) + '%');
+    card.classList.toggle('is-cleared', col.cleared);
+    card.classList.toggle('is-danger', isDanger);
+    card.classList.toggle('is-front', Boolean(isFront));
+
+    col.zombies.forEach(z => {
+      const dyingElapsed = z.dyingAt !== null ? (z3State.simTime - z.dyingAt) : -1;
+      if (!z.alive && (z.dyingAt === null || dyingElapsed > Z3_DYING_MS)) return;
+      const zk = 'z' + col.id + '_' + z.lane;
+      keep.add(zk);
+      let el = byKey[zk];
+      if (!el) { el = z3HtmlToEl(z3ZombieHtml(col, z)); layer.appendChild(el); }
+      el.style.left = x.toFixed(2) + '%';
+      el.style.top = Z3_LANE_Y[z.lane].toFixed(2) + '%';
+      const isDying = !z.alive;
+      el.classList.toggle('is-dying', isDying);
+      el.classList.toggle('is-wrong', isDying && !col.cleared);
+      el.classList.toggle('is-targeted', Boolean(isFront && z.alive && z.lane === z3State.dragonLane));
+      el.classList.toggle('is-rushing', sprinting && z.alive);
+      el.classList.toggle('is-at-fence', isDanger && z.alive);
+      el.disabled = isDying;
+    });
+  });
+
+  // Chữ nổi ✓ Chính xác / ✗ Sai cạnh Rồng Xanh
+  z3State.popups.forEach(p => {
+    const pk = 'p' + p.id;
+    keep.add(pk);
+    let el = byKey[pk];
+    if (!el) {
+      el = document.createElement('div');
+      el.className = `z3-lane-popup ${p.kind}`;
+      el.dataset.k = pk;
+      el.textContent = p.text;
+      layer.appendChild(el);
+    }
     const laneY = Z3_LANE_Y[p.lane] ?? 50;
     const age = Math.max(0, z3State.simTime - p.at) / 1300;
-    const op = age < 0.7 ? 1 : Math.max(0, 1 - (age - 0.7) / 0.3);
-    return `<div class="z3-lane-popup ${p.kind}" style="left:2%;top:${Math.max(2, laneY - 19 - age * 5).toFixed(1)}%;opacity:${op.toFixed(2)}">${esc(p.text)}</div>`;
-  }).join('');
+    el.style.left = '2%';
+    el.style.top = Math.max(2, laneY - 19 - age * 5).toFixed(1) + '%';
+    el.style.opacity = (age < 0.7 ? 1 : Math.max(0, 1 - (age - 0.7) / 0.3)).toFixed(2);
+  });
 
-  return colsHtml + popupsHtml;
+  Object.keys(byKey).forEach(k => { if (!keep.has(k)) byKey[k].remove(); });
+  layer.querySelectorAll(':scope > :not([data-k])').forEach(el => el.remove());
+}
+
+function z3SyncFxLayer() {
+  const layer = document.getElementById('z3EnergyBeamLayer');
+  if (!layer) return;
+  const keep = new Set();
+  const byKey = {};
+  layer.querySelectorAll(':scope > [data-k]').forEach(el => { byKey[el.dataset.k] = el; });
+  const mouth = z3MouthPct();
+  const vp = document.getElementById('z3CourtyardViewport');
+  const aspect = vp ? (vp.clientHeight / Math.max(1, vp.clientWidth)) : 0.56;
+
+  // Quả cầu lửa bay từ miệng rồng tới zombie
+  z3State.bullets.forEach(b => {
+    const prog = (z3State.simTime - b.start) / Z3_BULLET_MS;
+    if (prog < 0) return;
+    const p = Math.min(1, prog);
+    const col = z3State.columns.find(c => c.id === b.colId);
+    const tx = (col ? z3ColX(col.p) : mouth.x + 40) - 2.5;
+    const ty = Z3_LANE_Y[b.lane] ?? mouth.y;
+    const sx = b.sx ?? (b.sx = mouth.x);
+    const sy = b.sy ?? (b.sy = mouth.y);
+    const ease = p;
+    const arcH = b.arc ? 9 : 0;
+    const x = sx + (tx - sx) * ease;
+    const y = sy + (ty - sy) * ease - Math.sin(Math.PI * ease) * arcH;
+    const dx = (tx - sx);
+    const dy = (ty - sy) - Math.cos(Math.PI * ease) * Math.PI * arcH;
+    const ang = Math.atan2(dy * aspect, dx) * 180 / Math.PI;
+    const bk = 'b' + b.id;
+    keep.add(bk);
+    let el = byKey[bk];
+    if (!el) {
+      el = document.createElement('div');
+      el.className = 'z3-fireball';
+      el.dataset.k = bk;
+      el.innerHTML = '<i class="z3-fireball-trail"></i><i class="z3-fireball-core"></i>';
+      layer.appendChild(el);
+    }
+    el.style.left = x.toFixed(2) + '%';
+    el.style.top = y.toFixed(2) + '%';
+    el.style.setProperty('--ang', ang.toFixed(1) + 'deg');
+  });
+
+  // Hiệu ứng phun lửa ở miệng, nổ khi trúng, cột sáng khi diệt cả cột
+  z3State.fx = (z3State.fx || []).filter(f => z3State.simTime - f.at < f.dur);
+  z3State.fx.forEach(f => {
+    if (z3State.simTime < f.at) return;
+    const fk = 'f' + f.id;
+    keep.add(fk);
+    let el = byKey[fk];
+    if (!el) {
+      el = document.createElement('div');
+      el.dataset.k = fk;
+      if (f.kind === 'breath') {
+        el.className = 'z3-breath';
+        el.innerHTML = '<i class="z3-breath-cone"></i><i class="z3-breath-glow"></i><i class="s s1"></i><i class="s s2"></i><i class="s s3"></i><i class="s s4"></i>';
+        const m = z3MouthPct();
+        f.x = m.x; f.y = m.y;
+      } else if (f.kind === 'blast') {
+        el.className = 'z3-col-blast';
+      } else {
+        el.className = `z3-impact ${f.kind}`;
+        el.innerHTML = '<i class="ring"></i><i class="core"></i><i class="s s1"></i><i class="s s2"></i><i class="s s3"></i><i class="s s4"></i><i class="s s5"></i><i class="s s6"></i>';
+      }
+      layer.appendChild(el);
+    }
+    if (f.kind === 'breath') {
+      const m = z3MouthPct();
+      el.style.left = m.x.toFixed(2) + '%';
+      el.style.top = m.y.toFixed(2) + '%';
+    } else {
+      el.style.left = f.x.toFixed(2) + '%';
+      el.style.top = f.y.toFixed(2) + '%';
+    }
+  });
+
+  Object.keys(byKey).forEach(k => { if (!keep.has(k)) byKey[k].remove(); });
+  layer.querySelectorAll(':scope > :not([data-k])').forEach(el => el.remove());
+}
+
+function z3RenderColumnsLayerHtml() {
+  // Lần vẽ đầu: tạo khung; các khung hình sau do z3SyncZombiesLayer cập nhật vị trí
+  return z3State.columns.map(col => {
+    const x = z3ColX(col.p);
+    const zs = col.zombies.filter(z => z.alive).map(z =>
+      z3ZombieHtml(col, z).replace('class="z3-zombie-unit"', `class="z3-zombie-unit" style="left:${x.toFixed(2)}%;top:${Z3_LANE_Y[z.lane].toFixed(2)}%"`)
+    ).join('');
+    return z3CardHtml(col).replace('class="z3-column-question-card"', `class="z3-column-question-card" style="left:${x.toFixed(2)}%;--x:${x.toFixed(2)}%"`) + zs;
+  }).join('');
 }
 
 function z3RenderBeamAndBulletsHtml() {
-  const startX = z3State.dragonX + 6.2;
-  const startY = z3State.dragonY - 1.0;
-  const frontCol = z3GetFrontColumn();
-  const aimX = frontCol ? Math.min(z3ColX(frontCol.p) - 5, startX + 11.5) : (startX + 10.5);
-  const distPct = Math.max(5.5, Math.min(13.0, aimX - startX));
-
-  const bulletsHtml = z3State.bullets.map(b => {
-    const progress = (z3State.simTime - b.start) / Z3_BULLET_MS;
-    if (progress < 0) return '';
-    const clampedP = Math.min(1, progress);
-    const col = z3State.columns.find(c => c.id === b.colId);
-    const targetX = col ? z3ColX(col.p) : (startX + 35);
-    const laneY = Z3_LANE_Y[b.lane] ?? startY;
-    const curX = startX + (targetX - startX) * clampedP;
-    const arcOffset = b.arc ? -Math.sin(Math.PI * clampedP) * 7.5 : 0;
-    const curY = laneY + arcOffset;
-    return `<div class="z3-flying-orb" style="left:${curX.toFixed(2)}%;top:${curY.toFixed(2)}%"></div>`;
-  }).join('');
-
-  return `
-    <div class="z3-dragon-energy-beam" style="left:${startX}%;top:${startY}%;width:${distPct.toFixed(1)}%;transform:translateY(-50%)">
-      <span class="z3-beam-core"></span>
-      <span class="z3-beam-orb"></span>
-    </div>
-    ${bulletsHtml}
-  `;
+  return '';
 }
 
 function z3SyncDOM() {
   const now = performance.now();
   const sprinting = z3IsSprinting();
-  const isFiring = Math.abs(now - (z3State.firedAt || 0)) < 260;
+  const isFiring = (now - (z3State.firedAt || 0)) > -20 && (now - (z3State.firedAt || 0)) < 340;
   const isHurt = now < (z3State.playerHitUntil || 0);
 
   const vp = document.getElementById('z3CourtyardViewport');
@@ -6949,15 +7079,8 @@ function z3SyncDOM() {
     }
   }
 
-  const zombiesLayer = document.getElementById('z3ZombiesLayer');
-  if (zombiesLayer) {
-    zombiesLayer.innerHTML = z3RenderColumnsLayerHtml();
-  }
-
-  const beamLayer = document.getElementById('z3EnergyBeamLayer');
-  if (beamLayer) {
-    beamLayer.innerHTML = z3RenderBeamAndBulletsHtml();
-  }
+  z3SyncZombiesLayer();
+  z3SyncFxLayer();
 
   // Cập nhật thanh tiến độ số cột đã diệt
   const killText = document.getElementById('z3ProgText');
