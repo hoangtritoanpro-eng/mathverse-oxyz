@@ -9,6 +9,19 @@ Tất cả những thay đổi quan trọng của dự án này sẽ được gh
 
 ---
 
+## [5.9.2] - 2026-11-10
+
+### Changed (Chặng 4 Lật Thẻ Trên Điện Thoại)
+- Lưới thẻ **2 cột**, thẻ nằm ngang (16:10) thay vì 4 cột hẹp: công thức vectơ hiển thị **trên một dòng** (`IA + IB = 0`, `MA + MB = 2MI`, `AI = IB = ½AB`), hình vẽ đoạn thẳng/tam giác to rõ, thẻ định nghĩa chữ 13–15px.
+- Màn "Cổng Mê Cung Trung Điểm Đã Mở!" phủ toàn màn hình điện thoại (trước bị lưới thẻ che), lời chúc ngắn gọn.
+
+### Fixed (Chuyển Chặng 3 → 4 → 5)
+- Hoàn thành Chặng 4: Chặng 5 hiện ra ngay lập tức, che mất màn chúc mừng Chặng 4 rồi mới chạy hiệu ứng bản đồ. Nay giữ màn chúc mừng Chặng 4 cho tới khi bắt đầu hiệu ứng chuyển sang Chặng 5 (`s4VictoryHold`).
+- Đồng hồ hết giờ của chặng cũ không còn có thể tự đánh dấu "hết giờ" cho chặng mới trong lúc đang chuyển chặng / đang hiện màn chúc mừng.
+- Đã kiểm tra trọn chuỗi trên máy tính và điện thoại: Chặng 3 thắng → chúc mừng → bản đồ → Chặng 4 → ghép đủ thẻ → chúc mừng → bản đồ → Chặng 5.
+
+---
+
 ## [5.9.1] - 2026-11-10
 
 ### Fixed (Chặng 3: Rồng Xanh Bắn Được Khi Bấm Vào Zombie)

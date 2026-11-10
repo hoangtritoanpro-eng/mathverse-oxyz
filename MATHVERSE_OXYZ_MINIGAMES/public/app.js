@@ -9028,8 +9028,12 @@ const CardMatchingController = {
   }
 };
 
+let s4VictoryHold = false;
+let s4LastMission = null;
 async function s4TriggerMazeVictory() {
   s4State.gateOpened = true;
+  s4VictoryHold = true;
+  setTimeout(() => { if (s4VictoryHold) { s4VictoryHold = false; render(); } }, 8000);
   s4State.fsm = 'COMPLETED';
   s4State.dragonMood = 'runToGate';
   s4State.dragonSpeech = 'Tuyệt vời! Sáu cặp thẻ phép thuật đã tạo thành vòng tròn ánh sáng mở cổng Mê Cung Trung Điểm!';
@@ -9055,6 +9059,7 @@ async function s4TriggerMazeVictory() {
       lastSyncedTeamStage = nextStageIdx;
 
       setTimeout(() => {
+        s4VictoryHold = false;
         if (s4State.gateOpened && !StageTransitionController.isTransitioning()) {
           StageTransitionController.beginStageTransition(prevStageIdx, nextStageIdx, {
             sealName: res?.item || 'Ấn Cân Xứng',
@@ -9064,6 +9069,7 @@ async function s4TriggerMazeVictory() {
         }
       }, 2200);
     } catch (e) {
+      s4VictoryHold = false;
       console.warn('Stage 4 completion sync error:', e);
     }
   }
@@ -9323,7 +9329,7 @@ function renderStage4MidpointMemoryGame(m) {
                 <div class="s4-victory-seal-badge">⚖️✨</div>
                 <span class="s4-victory-kicker">ĐÃ GIẢI MÃ HOÀN TẤT ${totalPairs}/${totalPairs} CẶP THẺ TRUNG ĐIỂM!</span>
                 <h2>Cổng Mê Cung Trung Điểm Đã Mở!</h2>
-                <p>Sáu cặp thẻ phép thuật đã hợp nhất thành vòng tròn ánh sáng! Đội nhận được <b>⚖️ Ấn Cân Xứng</b> (Mảnh mật mã: <b>2</b>). Rồng Xanh đang bay tới <b>Chặng 5 – Thành Trì Lõi Trí Tuệ</b>!</p>
+                <p>Đội nhận được <b>⚖️ Ấn Cân Xứng</b>. Rồng Xanh đang bay tới <b>Chặng 5</b>!</p>
                 <div class="s4-victory-stats-row">
                   <span>🃏 Đã ghép: <b>${matchedCount}/${totalPairs} cặp</b></span>
                   <span>🔄 Số lượt lật: <b>${s4State.flipCount} lượt</b></span>
@@ -10921,7 +10927,12 @@ function renderVectorAdventureStage(m) {
     return renderStage3ZombieShooterGame(m.id === 3 ? m : (world?.missions?.[2] || { id: 3 }));
   }
   if (m.id === 4) {
+    s4LastMission = m;
     return renderStage4MidpointMemoryGame(m);
+  }
+  if (s4VictoryHold && s4LastMission) {
+    // Giữ màn chiến thắng Chặng 4 cho tới khi hiệu ứng chuyển sang Chặng 5 bắt đầu
+    return renderStage4MidpointMemoryGame(s4LastMission);
   }
   if (m.id === 5) {
     return renderStage5CentroidRescueGame(m);
@@ -11894,7 +11905,7 @@ function updateClock(){
    if(sp) sp.innerHTML = formatMath(vaState.dragonMsg);
   }
   // Khi hết thời gian chặng (0s): tự động ghi nhận và chuyển sang chặng tiếp theo trên Bản đồ Thế giới
-  if(remSec <= 0 && !vaState.stageTimeoutTriggered && !vaState.s1BridgeRestoredOverlay && !busy){
+  if(remSec <= 0 && !vaState.stageTimeoutTriggered && !vaState.s1BridgeRestoredOverlay && !busy && !s4VictoryHold && !z3State.victoryOverlay && !StageTransitionController.isTransitioning() && vaState.stageId === world.current.id){
    vaState.stageTimeoutTriggered = true;
    const prevStage = Math.max(0, Math.min(4, world?.me?.stage ?? 0));
    submit('/api/stageTimeout', {}).then(res => {
@@ -12473,6 +12484,7 @@ async function handle(action,el){
   }
   if(action==='s4ProceedNextStage'){
    s4State.gateOpeningWalk = false;
+   s4VictoryHold = false;
    StageTransitionController.beginStageTransition(3, 4, {
     sealName: 'Ấn Cân Xứng',
     points: 20,

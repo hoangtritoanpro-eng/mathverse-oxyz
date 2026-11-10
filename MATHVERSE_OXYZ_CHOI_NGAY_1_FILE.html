@@ -13928,6 +13928,44 @@ body:has(.z3v2) #app.wrap{padding:0 !important;max-width:none !important}
   .z3-fireball-core{animation:none}
   .z3v2 .z3-dragon-hero.is-recoil .z3-dragon-shooter-img{animation:none}
 }
+
+/* ═══ v5.9.2 · CHẶNG 4 TRÊN ĐIỆN THOẠI: lưới 2 cột, thẻ nằm ngang, công thức một dòng ═══ */
+@media (max-width:860px){
+  .s4-memory-shell{min-height:100dvh !important}
+  .s4-cards-grid,.s4-cards-grid.grid-8{grid-template-columns:repeat(2,minmax(0,1fr)) !important;gap:8px !important}
+  .s4-cards-grid.grid-12{grid-template-columns:repeat(3,minmax(0,1fr)) !important;gap:6px !important}
+  .s4-memory-card{aspect-ratio:16/10 !important}
+  .s4-cards-grid.grid-12 .s4-memory-card{aspect-ratio:1/1 !important}
+  .s4-card-front{padding:6px !important;display:flex !important;flex-direction:column !important}
+  .s4-card-front-top{position:absolute !important;top:5px;left:5px;padding:0 !important}
+  .s4-card-front-content{flex:1 !important;display:flex !important;align-items:center !important;justify-content:center !important;padding:4px 2px !important;font-size:15px !important;overflow:visible !important;min-height:0 !important}
+  .s4-card-math-equation{display:flex !important;flex-wrap:nowrap !important;align-items:flex-end !important;justify-content:center !important;gap:4px !important;white-space:nowrap !important;font-size:17px !important;line-height:1.1 !important;max-width:100%}
+  .s4-card-math-equation .s4-card-vec{display:inline-flex !important;flex-direction:column !important;align-items:center !important;font-size:17px !important;min-width:0 !important}
+  .s4-card-math-equation .s2-vec-overarrow{width:100% !important;min-width:18px;height:7px !important}
+  .s4-card-math-equation .s2-vec-letters{font-size:17px !important}
+  .s4-math-op{font-size:17px !important;padding:0 1px !important}
+  .s4-card-math-equation .frac,.s4-card-math-equation .s4-frac{font-size:13px !important}
+  .s4-card-text-formula{font-size:13px !important;line-height:1.3 !important;text-align:center}
+  .s4-card-text-formula .s4-card-main-line{font-size:13.5px !important}
+  .s4-card-text-formula .s4-card-iff-arrow{font-size:15px !important;margin:1px 0 !important}
+  .s4-card-text-formula small{display:none !important}
+  .s4-card-diagram-wrap{width:100% !important;height:100% !important;display:flex !important;align-items:center !important;justify-content:center !important}
+  .s4-geom-svg{width:100% !important;height:auto !important;max-height:100% !important}
+  .s4-cards-grid.grid-12 .s4-card-math-equation,.s4-cards-grid.grid-12 .s4-card-math-equation .s2-vec-letters,.s4-cards-grid.grid-12 .s4-math-op{font-size:12px !important}
+}
+@media (max-width:860px){
+  .s4-victory-overlay{position:fixed !important;inset:0 !important;z-index:600 !important;display:flex !important;align-items:center !important;justify-content:center !important;padding:14px !important;background:rgba(6,20,30,.72) !important}
+  .s4-magic-circle-ring{display:none !important}
+  .s4-victory-modal-card{position:relative !important;z-index:2 !important;width:100% !important;max-width:420px !important;padding:18px 16px !important;opacity:1 !important}
+  .s4-victory-modal-card h2{font-size:1.45rem !important}
+  .s4-victory-kicker{font-size:11px !important}
+  .s4-victory-stats-row{flex-direction:column !important;gap:6px !important}
+  .s4-victory-next-btn{width:100% !important;font-size:1rem !important;padding:12px !important}
+}
+@media (max-width:860px){
+  .s4-board-frame.board-completed .s4-cards-grid,.s4-board-frame.board-completed .s4-board-top-hud{visibility:hidden !important}
+  .s4-board-frame.board-completed{transform:none !important;filter:none !important}
+}
 </style>
 </head>
 <body>
@@ -23318,8 +23356,12 @@ const CardMatchingController = {
   }
 };
 
+let s4VictoryHold = false;
+let s4LastMission = null;
 async function s4TriggerMazeVictory() {
   s4State.gateOpened = true;
+  s4VictoryHold = true;
+  setTimeout(() => { if (s4VictoryHold) { s4VictoryHold = false; render(); } }, 8000);
   s4State.fsm = 'COMPLETED';
   s4State.dragonMood = 'runToGate';
   s4State.dragonSpeech = 'Tuyệt vời! Sáu cặp thẻ phép thuật đã tạo thành vòng tròn ánh sáng mở cổng Mê Cung Trung Điểm!';
@@ -23345,6 +23387,7 @@ async function s4TriggerMazeVictory() {
       lastSyncedTeamStage = nextStageIdx;
 
       setTimeout(() => {
+        s4VictoryHold = false;
         if (s4State.gateOpened && !StageTransitionController.isTransitioning()) {
           StageTransitionController.beginStageTransition(prevStageIdx, nextStageIdx, {
             sealName: res?.item || 'Ấn Cân Xứng',
@@ -23354,6 +23397,7 @@ async function s4TriggerMazeVictory() {
         }
       }, 2200);
     } catch (e) {
+      s4VictoryHold = false;
       console.warn('Stage 4 completion sync error:', e);
     }
   }
@@ -23613,7 +23657,7 @@ function renderStage4MidpointMemoryGame(m) {
                 <div class="s4-victory-seal-badge">⚖️✨</div>
                 <span class="s4-victory-kicker">ĐÃ GIẢI MÃ HOÀN TẤT ${totalPairs}/${totalPairs} CẶP THẺ TRUNG ĐIỂM!</span>
                 <h2>Cổng Mê Cung Trung Điểm Đã Mở!</h2>
-                <p>Sáu cặp thẻ phép thuật đã hợp nhất thành vòng tròn ánh sáng! Đội nhận được <b>⚖️ Ấn Cân Xứng</b> (Mảnh mật mã: <b>2</b>). Rồng Xanh đang bay tới <b>Chặng 5 – Thành Trì Lõi Trí Tuệ</b>!</p>
+                <p>Đội nhận được <b>⚖️ Ấn Cân Xứng</b>. Rồng Xanh đang bay tới <b>Chặng 5</b>!</p>
                 <div class="s4-victory-stats-row">
                   <span>🃏 Đã ghép: <b>${matchedCount}/${totalPairs} cặp</b></span>
                   <span>🔄 Số lượt lật: <b>${s4State.flipCount} lượt</b></span>
@@ -25211,7 +25255,12 @@ function renderVectorAdventureStage(m) {
     return renderStage3ZombieShooterGame(m.id === 3 ? m : (world?.missions?.[2] || { id: 3 }));
   }
   if (m.id === 4) {
+    s4LastMission = m;
     return renderStage4MidpointMemoryGame(m);
+  }
+  if (s4VictoryHold && s4LastMission) {
+    // Giữ màn chiến thắng Chặng 4 cho tới khi hiệu ứng chuyển sang Chặng 5 bắt đầu
+    return renderStage4MidpointMemoryGame(s4LastMission);
   }
   if (m.id === 5) {
     return renderStage5CentroidRescueGame(m);
@@ -26184,7 +26233,7 @@ function updateClock(){
    if(sp) sp.innerHTML = formatMath(vaState.dragonMsg);
   }
   // Khi hết thời gian chặng (0s): tự động ghi nhận và chuyển sang chặng tiếp theo trên Bản đồ Thế giới
-  if(remSec <= 0 && !vaState.stageTimeoutTriggered && !vaState.s1BridgeRestoredOverlay && !busy){
+  if(remSec <= 0 && !vaState.stageTimeoutTriggered && !vaState.s1BridgeRestoredOverlay && !busy && !s4VictoryHold && !z3State.victoryOverlay && !StageTransitionController.isTransitioning() && vaState.stageId === world.current.id){
    vaState.stageTimeoutTriggered = true;
    const prevStage = Math.max(0, Math.min(4, world?.me?.stage ?? 0));
    submit('/api/stageTimeout', {}).then(res => {
@@ -26763,6 +26812,7 @@ async function handle(action,el){
   }
   if(action==='s4ProceedNextStage'){
    s4State.gateOpeningWalk = false;
+   s4VictoryHold = false;
    StageTransitionController.beginStageTransition(3, 4, {
     sealName: 'Ấn Cân Xứng',
     points: 20,
