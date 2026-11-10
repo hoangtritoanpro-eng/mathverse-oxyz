@@ -20881,7 +20881,7 @@ function z3ShootColumnLane(colId = null, laneIdx = null) {
     start: z3State.simTime + moveDelay,
     arc: hasFrontBlocker
   });
-  z3State.lockedUntil = z3State.simTime + moveDelay + Z3_BULLET_MS + 90;
+  z3State.lockedUntil = z3State.simTime + moveDelay + 150;
   z3SyncDOM();
 }
 

@@ -24,7 +24,8 @@ Tất cả những thay đổi quan trọng của dự án này sẽ được gh
 ### Fixed
 - Bắn sai bị trừ XP 2 lần trên màn hình (−6 thay vì −3).
 - Màn chúc mừng chặng 3 bị chặng 4 che mất ngay khi máy chủ ghi nhận hoàn thành.
-- Bản chơi 1 file nay được dựng lại bằng cách nhúng ảnh trực tiếp từ `public/` (`scratch`-free), đảm bảo ảnh chặng 3 mới hiển thị khi chơi offline.
+- Bắn liên tiếp nhanh hơn (bỏ khoảng khóa 0,5 giây giữa hai phát bắn).
+- Bản chơi 1 file nay được dựng lại bằng cách nhúng ảnh trực tiếp từ `public/`, đảm bảo ảnh chặng 3 mới hiển thị khi chơi offline.
 
 ---
 
