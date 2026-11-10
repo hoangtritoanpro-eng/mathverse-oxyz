@@ -9,6 +9,25 @@ Tất cả những thay đổi quan trọng của dự án này sẽ được gh
 
 ---
 
+## [5.9.0] - 2026-11-10
+
+### Changed (Chặng 3 Chơi Như "Chặn Zombie" – Giữ Nguyên Hình Rồng Xanh, Zombie & Sân Thành)
+- **Luật chơi theo trò Chặn Zombie (giaoviendoimoi.com):**
+  1. Màn **Cách chơi** trước khi vào (4 dòng luật + nút **Bắt đầu**); đồng hồ chặng đứng yên khi xem luật, tạm dừng hoặc ở màn thua.
+  2. Mỗi cột zombie mang 1 câu hỏi, thẻ câu hỏi đi theo cột; cột sau xuất hiện khi diệt xong cột trước hoặc sau 12 giây.
+  3. Bắn đúng → cả cột bị diệt, hiện "✓ Chính xác". Bắn sai → chỉ con đó ngã, **cả đàn đỏ lên & tăng tốc x3 trong 2,5 giây**, viền sân đỏ, hiện "✗ Sai! Zombie tăng tốc" (không còn tăng tốc vĩnh viễn).
+  4. **Zombie chạm hàng rào là thua:** hàng rào vỡ, cả đàn tràn qua Rồng Xanh → màn "Zombie đã vượt hàng rào!" với 3 chỉ số **Điểm /100 · Đúng ngay · Cột đã diệt** và nút **Chơi lại** / **Thoát**.
+  5. Thắng: "Đã chặn đứng đàn zombie!" cùng 3 chỉ số, nút **Sang chặng 4**.
+- **Bố cục gọn:** bỏ thanh 5 chặng, bảng nhiệm vụ/gợi ý, bảng phím tắt, khung thoại; chỉ còn thanh trên mỏng (Thoát · thời gian · XP · tiến độ x/3 · Tạm dừng · âm thanh · toàn màn hình) và sân chơi rộng toàn màn hình; hàng rào đặt sát Rồng Xanh bên trái, zombie đi từ mép phải.
+- **Điện thoại:** sân dọc, 4 nút A/B/C/D lớn ở dưới, thẻ câu hỏi không bị cắt mép.
+
+### Fixed
+- Bắn sai bị trừ XP 2 lần trên màn hình (−6 thay vì −3).
+- Màn chúc mừng chặng 3 bị chặng 4 che mất ngay khi máy chủ ghi nhận hoàn thành.
+- Bản chơi 1 file nay được dựng lại bằng cách nhúng ảnh trực tiếp từ `public/` (`scratch`-free), đảm bảo ảnh chặng 3 mới hiển thị khi chơi offline.
+
+---
+
 ## [5.8.0] - 2026-11-10
 
 ### Changed (Chơi Tốt Trên Điện Thoại, Ít Chữ, Dễ Chơi)
