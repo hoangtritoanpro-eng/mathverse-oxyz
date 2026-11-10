@@ -9,6 +9,14 @@ Tất cả những thay đổi quan trọng của dự án này sẽ được gh
 
 ---
 
+## [6.3.0] - 2026-11-10
+
+### Changed
+- **Trang chủ chỉ còn bài về nhà** (khi đã đặt `HW_DEFAULT_KEY`): học sinh nhập tên → "Vào làm bài"; giáo viên chỉ có nút "📊 Xem báo cáo bài làm". Bỏ nút tạo phòng chơi trên lớp và link nhập mã phòng khỏi trang chủ (phòng lớp học vẫn mở được bằng link `?room=` nếu cần).
+- Giáo viên nhập **mật khẩu báo cáo** (chính là khóa `HW_DEFAULT_KEY`) một lần trên mỗi máy; lần sau bấm nút là mở thẳng báo cáo. Sai mật khẩu bị từ chối.
+
+---
+
 ## [6.2.0] - 2026-11-10
 
 ### Added

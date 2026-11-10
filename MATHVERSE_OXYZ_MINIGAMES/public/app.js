@@ -1484,6 +1484,9 @@ function startScreen(msg=''){
   if(hi && !('ontouchstart' in window)) hi.focus();
  }else if(bkStep==='hwhost'){
   app.innerHTML = bkHwHost();
+ }else if(bkStep==='hwlogin'){
+  app.innerHTML = bkHwLogin();
+  const pi=document.getElementById('hwPass'); if(pi && !('ontouchstart' in window)) pi.focus();
  }else if(bkStep==='hwreports'){
   app.innerHTML = bkHwReports();
   hwLoadHub();
@@ -13532,6 +13535,7 @@ window.addEventListener('keydown',e=>{
    else if(!session && document.activeElement.id==='bkCode')handle('bkSubmitCode');
    else if(!session && document.activeElement.id==='hwName')handle('hwStart');
    else if(!session && document.activeElement.id==='hwKeyInput')handle('hwAddKey');
+   else if(!session && document.activeElement.id==='hwPass')handle('hwLogin');
   }
   return;
  }
@@ -14112,7 +14116,7 @@ function bkLanding(){
     <label for="hwName" class="bk-sr">Họ và tên</label>
     <input id="hwName" class="hw-name-input" type="text" autocomplete="name" maxlength="40" placeholder="Nhập họ và tên của em" value="${esc(hwNameDraft)}"/>
     <button type="button" class="bk-btn bk-btn-sun bk-btn-block" data-action="hwStart">Vào làm bài</button>
-    <button type="button" class="bk-role-link" data-action="bkStudentCode">Lớp đang chơi trực tiếp? Nhập mã phòng</button>` : `
+` : `
     <p class="bk-role-sub">Nhập mã phòng trên máy chiếu</p>
     <label for="bkCode" class="bk-sr">Mã phòng</label>
     <input id="bkCode" class="bk-code-input" type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="off" maxlength="6" placeholder="Mã phòng" value="${esc(bkRoom)}"/>
@@ -14128,13 +14132,17 @@ function bkLanding(){
      ${studentBody}
      ${bkError ? `<p class="bk-error" role="alert">${esc(bkError)}</p>` : ''}
     </section>
-    <section class="bk-join-card bk-role bk-role-teacher" aria-labelledby="bkRoleT">
+    ${hwMode ? `<section class="bk-join-card bk-role bk-role-teacher" aria-labelledby="bkRoleT">
+     <div class="bk-role-head"><span class="bk-role-ico" aria-hidden="true">👩‍🏫</span><h2 id="bkRoleT">Giáo viên</h2></div>
+     <p class="bk-role-sub">Xem kết quả học sinh đã làm</p>
+     <button type="button" class="bk-btn bk-btn-mint bk-btn-block" data-action="hwTeacherReport">📊 Xem báo cáo bài làm</button>
+    </section>` : `<section class="bk-join-card bk-role bk-role-teacher" aria-labelledby="bkRoleT">
      <div class="bk-role-head"><span class="bk-role-ico" aria-hidden="true">👩‍🏫</span><h2 id="bkRoleT">Giáo viên</h2></div>
      <p class="bk-role-sub">Tổ chức trò chơi cho lớp</p>
      <button type="button" class="bk-btn bk-btn-sun bk-btn-block" data-action="bkGoHost">Tạo phòng chơi trên lớp</button>
      ${window.IS_DEMO_MODE ? '' : `<button type="button" class="bk-btn bk-btn-mint bk-btn-block" data-action="hwGoHost">Giao bài về nhà</button>
      <button type="button" class="bk-btn bk-btn-paper bk-btn-block bk-btn-report" data-action="hwGoReports">📊 Xem báo cáo bài làm</button>`}
-    </section>
+    </section>`}
    </div>
   </main>
  </div>`;
@@ -14889,6 +14897,22 @@ function bkHwHost(){
 }
 
 
+function bkHwLogin(){
+ return `<div class="bk-page bk-entry">
+  <header class="bk-top"><button type="button" class="bk-back" data-action="bkBackToCode">‹ Trang chủ</button></header>
+  <main class="bk-join">
+   <div class="bk-join-card bk-role">
+    <div class="bk-role-head"><span class="bk-role-ico" aria-hidden="true">🔒</span><h2>Giáo viên</h2></div>
+    <p class="bk-role-sub">Nhập mật khẩu báo cáo (chỉ cần một lần trên máy này)</p>
+    <label for="hwPass" class="bk-sr">Mật khẩu</label>
+    <input id="hwPass" class="hw-name-input" type="password" autocomplete="current-password" maxlength="200" placeholder="Mật khẩu"/>
+    <button type="button" class="bk-btn bk-btn-mint bk-btn-block" data-action="hwLogin">Xem báo cáo</button>
+    ${bkError?`<p class="bk-error" role="alert">${esc(bkError)}</p>`:''}
+   </div>
+  </main>
+ </div>`;
+}
+
 /* ── Giáo viên: tổng hợp báo cáo tất cả bài đã giao (v6.2.0) ── */
 let hwHubData={};
 function bkHwReports(){
@@ -15023,6 +15047,25 @@ async function hwHandle(action,el){
   startScreen();return true;
  }
  if(action==='hwToRoom'){hwCode='';hwIsDefault=false;bkStep='code';bkError='';startScreen();return true;}
+ if(action==='hwTeacherReport'){
+  const it=hwList().find(x=>x.code===hwCode);
+  if(it){location.href=hwReportLink(it.key);return true;}
+  bkStep='hwlogin';bkError='';startScreen();return true;
+ }
+ if(action==='hwLogin'){
+  const raw=String($('#hwPass')?.value||'');
+  const m=/report=([A-Za-z2-9]{12})/.exec(raw)||/^\s*([A-Za-z2-9]{12})\s*$/.exec(raw);
+  if(!m){bkError='Mật khẩu gồm 12 ký tự (chữ in hoa và số).';startScreen();return true;}
+  const key=m[1].toUpperCase();
+  el.disabled=true;
+  try{
+   const d=await hwPost('/api/hwReport',{key});
+   if(hwCode&&d.code!==hwCode)throw new Error('Mật khẩu không đúng với bài đang giao.');
+   hwSaveList([{key,code:d.code,title:d.title||hwTitle||'',at:new Date().toISOString()},...hwList().filter(x=>x.key!==key)]);
+   location.href=hwReportLink(key);
+  }catch(e){bkError=e.message||'Mật khẩu không đúng.';startScreen();}
+  return true;
+ }
  if(action==='hwGoReports'){bkStep='hwreports';bkError='';hwHubData={};startScreen();return true;}
  if(action==='hwAddKey'){
   const raw=String($('#hwKeyInput')?.value||'');
