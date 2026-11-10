@@ -9,6 +9,16 @@ Tất cả những thay đổi quan trọng của dự án này sẽ được gh
 
 ---
 
+## [6.1.0] - 2026-11-10
+
+### Changed
+- **Trang chủ chia 2 khung: Học sinh | Giáo viên** (cạnh nhau trên máy tính, xếp dọc trên điện thoại).
+  - Học sinh: nếu có bài mặc định (`HW_DEFAULT_KEY`) thì nhập tên → "Vào làm bài"; có link chuyển sang nhập mã phòng lớp học trực tiếp. Nếu không có, ô nhập mã phòng như cũ.
+  - Giáo viên: hai nút "Tạo phòng chơi trên lớp" và "Giao bài về nhà".
+- Nút quay lại ở màn tạo phòng / giao bài nay về "Trang chủ".
+
+---
+
 ## [6.0.1] - 2026-11-10
 
 ### Added

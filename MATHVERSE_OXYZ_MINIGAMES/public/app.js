@@ -1478,7 +1478,7 @@ function startScreen(msg=''){
  $('.award-backdrop')?.remove();
  if(hwReportKey){
   hwReportInit();
- }else if(hwCode && bkStep!=='host' && bkStep!=='hwhost'){
+ }else if(hwCode && !hwIsDefault && bkStep!=='host' && bkStep!=='hwhost'){
   app.innerHTML = bkHwLanding();
   const hi = document.getElementById('hwName');
   if(hi && !('ontouchstart' in window)) hi.focus();
@@ -1492,7 +1492,7 @@ function startScreen(msg=''){
   app.innerHTML = bkHostSetup();
  }else{
   app.innerHTML = bkLanding();
-  const inp = document.getElementById('bkCode');
+  const inp = document.getElementById('hwName') || document.getElementById('bkCode');
   if(inp && !('ontouchstart' in window)) inp.focus();
  }
  bkError = '';
@@ -14100,20 +14100,38 @@ function bkTeamProgressPct(t){
 function bkStageLabel(t){ return t.completed ? 'Về đích' : `Chặng ${Math.min(5, (t.stage || 0) + 1)}/5`; }
 
 /* ─── HỌC SINH: NHẬP MÃ PHÒNG ─── */
+let bkStudentByCode=false; // trên trang chủ có bài mặc định: học sinh chuyển sang nhập mã phòng
 function bkLanding(){
- return `<div class="bk-page bk-entry">
-  <main class="bk-join">
-   <div class="bk-logo">${DIAMOND_ICON_SVG}<span>MathVerse Oxyz</span></div>
-   <div class="bk-join-card">
+ const hwMode = hwIsDefault && hwCode && !bkStudentByCode;
+ const studentBody = hwMode ? `
+    <p class="bk-role-sub">${esc(hwTitle||'Bài về nhà · Ôn tập Toán 12 Oxyz')}</p>
+    <label for="hwName" class="bk-sr">Họ và tên</label>
+    <input id="hwName" class="hw-name-input" type="text" autocomplete="name" maxlength="40" placeholder="Nhập họ và tên của em" value="${esc(hwNameDraft)}"/>
+    <button type="button" class="bk-btn bk-btn-sun bk-btn-block" data-action="hwStart">Vào làm bài</button>
+    <button type="button" class="bk-role-link" data-action="bkStudentCode">Lớp đang chơi trực tiếp? Nhập mã phòng</button>` : `
+    <p class="bk-role-sub">Nhập mã phòng trên máy chiếu</p>
     <label for="bkCode" class="bk-sr">Mã phòng</label>
     <input id="bkCode" class="bk-code-input" type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="off" maxlength="6" placeholder="Mã phòng" value="${esc(bkRoom)}"/>
     <button type="button" class="bk-btn bk-btn-sun bk-btn-block" data-action="bkSubmitCode">Vào phòng</button>
-    ${bkError ? `<p class="bk-error" role="alert">${esc(bkError)}</p>` : ''}
+    ${hwIsDefault && hwCode ? `<button type="button" class="bk-role-link" data-action="bkStudentHw">Làm bài về nhà</button>` : ''}
+    ${window.IS_DEMO_MODE ? `<button type="button" class="bk-role-link" data-action="demoPlay">Chơi thử ngay trên máy này</button>` : ''}`;
+ return `<div class="bk-page bk-entry">
+  <main class="bk-home">
+   <div class="bk-logo">${DIAMOND_ICON_SVG}<span>MathVerse Oxyz</span></div>
+   <div class="bk-roles">
+    <section class="bk-join-card bk-role bk-role-student" aria-labelledby="bkRoleS">
+     <div class="bk-role-head"><span class="bk-role-ico" aria-hidden="true">🎒</span><h2 id="bkRoleS">Học sinh</h2></div>
+     ${studentBody}
+     ${bkError ? `<p class="bk-error" role="alert">${esc(bkError)}</p>` : ''}
+    </section>
+    <section class="bk-join-card bk-role bk-role-teacher" aria-labelledby="bkRoleT">
+     <div class="bk-role-head"><span class="bk-role-ico" aria-hidden="true">👩‍🏫</span><h2 id="bkRoleT">Giáo viên</h2></div>
+     <p class="bk-role-sub">Tổ chức trò chơi cho lớp</p>
+     <button type="button" class="bk-btn bk-btn-sun bk-btn-block" data-action="bkGoHost">Tạo phòng chơi trên lớp</button>
+     ${window.IS_DEMO_MODE ? '' : `<button type="button" class="bk-btn bk-btn-mint bk-btn-block" data-action="hwGoHost">Giao bài về nhà</button>`}
+    </section>
    </div>
-   <p class="bk-help">Nhập mã 6 số trên màn hình máy chiếu, hoặc quét mã QR bằng camera điện thoại.</p>
-   ${window.IS_DEMO_MODE ? `<button type="button" class="bk-text-link" data-action="demoPlay">Chơi thử ngay trên máy này</button>` : ''}
   </main>
-  <button type="button" class="bk-corner-link" data-action="bkGoHost">Tôi là giáo viên</button>
  </div>`;
 }
 
@@ -14165,7 +14183,7 @@ function bkHostSetup(){
  try{ last = LiveClassroomSync.getActiveRoom() || ''; }catch(e){}
  return `<div class="bk-page bk-entry">
   <header class="bk-top">
-   <button type="button" class="bk-back" data-action="bkBackToCode">‹ Màn hình học sinh</button>
+   <button type="button" class="bk-back" data-action="bkBackToCode">‹ Trang chủ</button>
   </header>
   <main class="bk-host-setup">
    <h1 class="bk-title">Tạo phòng chơi</h1>
@@ -14632,6 +14650,9 @@ async function bkHandle(action, el){
   return true;
  }
  if (action === 'bkRetryTeams'){ bkLoadTeams(); return true; }
+ if(action==='bkStudentCode'){bkStudentByCode=true;bkError='';startScreen();return true;}
+ if(action==='bkStudentHw'){bkStudentByCode=false;bkError='';startScreen();return true;}
+
  if (action === 'bkGoHost'){ bkStep = 'host'; bkError = ''; startScreen(); return true; }
  if (action === 'bkSetCount'){ bkHostTeamCount = Number(el.dataset.n) || 6; startScreen(); return true; }
  if (action === 'bkCreateRoom'){
@@ -14835,7 +14856,7 @@ function bkHwHost(){
  const list=hwList();
  const cur=hwJustMade||list[0];
  return `<div class="bk-page bk-entry">
-  <header class="bk-top"><button type="button" class="bk-back" data-action="bkGoHost">‹ Tạo phòng chơi</button></header>
+  <header class="bk-top"><button type="button" class="bk-back" data-action="bkBackToCode">‹ Trang chủ</button></header>
   <main class="bk-host-setup hw-host">
    <h1 class="bk-title">Giao bài về nhà</h1>
    <div class="bk-setup-card">

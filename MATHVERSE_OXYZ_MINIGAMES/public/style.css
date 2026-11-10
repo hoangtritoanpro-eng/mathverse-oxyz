@@ -14045,3 +14045,23 @@ body.hw-report-mode #app{min-height:100vh}
 .hw-default{margin-top:12px;font-size:.85rem;color:var(--bk-ink);text-align:left}
 .hw-default summary{cursor:pointer;font-weight:800}
 .hw-default p{margin:8px 0 0;line-height:1.5}
+
+/* v6.1.0 — trang chủ 2 vai: Học sinh | Giáo viên */
+.bk-home{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:28px 16px 40px;width:100%;max-width:880px;margin:0 auto;box-sizing:border-box}
+.bk-roles{display:grid;grid-template-columns:1fr 1fr;gap:20px;width:100%;align-items:start}
+.bk-role{box-sizing:border-box;display:flex;flex-direction:column;gap:12px;text-align:center}
+.bk-role .bk-code-input,.bk-role .hw-name-input{margin:0}
+.bk-role .bk-btn{margin:0}
+.bk-role-head{display:flex;align-items:center;justify-content:center;gap:10px}
+.bk-role-head h2{margin:0;font:800 1.8rem/1 var(--bk-display);color:var(--bk-ink)}
+.bk-role-ico{font-size:2rem;line-height:1}
+.bk-role-sub{margin:-4px 0 2px;font-weight:700;font-size:.95rem;color:#5A6199}
+.bk-role-student{border-top:8px solid var(--bk-sun)}
+.bk-role-teacher{border-top:8px solid var(--bk-mint)}
+.bk-role-link{background:none;border:0;color:var(--bk-blue);font:700 .9rem 'Montserrat',sans-serif;text-decoration:underline;text-underline-offset:3px;cursor:pointer;padding:4px}
+.bk-role .bk-error{margin:0}
+@media (max-width:700px){
+ .bk-roles{grid-template-columns:1fr;gap:16px}
+ .bk-home{justify-content:flex-start;padding-top:28px}
+ .bk-role-head h2{font-size:1.5rem}
+}
