@@ -9,6 +9,13 @@ Tất cả những thay đổi quan trọng của dự án này sẽ được gh
 
 ---
 
+## [6.0.1] - 2026-11-10
+
+### Added
+- **Trang chủ = bài về nhà:** đặt biến môi trường `HW_DEFAULT_KEY` (và tuỳ chọn `HW_DEFAULT_TITLE`) trên Vercel thì ai mở `mathverse-oxyz.vercel.app` chỉ cần nhập tên là vào chơi ngay. Giáo viên vẫn vào bằng nút "Tôi là giáo viên", học sinh lớp học trực tiếp dùng "Vào phòng học trực tiếp bằng mã phòng". API `/api/hwDefault`.
+
+---
+
 ## [6.0.0] - 2026-11-10
 
 ### Added (Chế độ Bài về nhà)

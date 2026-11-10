@@ -1522,6 +1522,11 @@ function hwBuild(code,store){
  };
 }
 async function processHw(endpoint,d){
+ if(endpoint==='/api/hwDefault'){
+  const k=String(process.env.HW_DEFAULT_KEY||'').toUpperCase();
+  if(!/^[A-Z2-9]{12}$/.test(k))return{};
+  return{code:hwCodeFromKey(k),title:String(process.env.HW_DEFAULT_TITLE||'').slice(0,60)};
+ }
  if(endpoint==='/api/hwCreate'){
   const key=hwNewKey();const code=hwCodeFromKey(key);
   if(!HW[code]){HW[code]={};hwPersist();}

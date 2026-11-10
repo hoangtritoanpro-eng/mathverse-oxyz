@@ -23,3 +23,6 @@ Chạy `node server.js` như thường. Bài nộp lưu ở `MATHVERSE_OXYZ_MINI
 
 ## Lưu ý riêng tư
 Báo cáo chứa họ tên học sinh. Ai có link báo cáo đều xem được; mã bài (link học sinh) không xem được báo cáo. Dữ liệu trong kho tự xoá sau 180 ngày.
+
+## Cho học sinh chỉ cần mở trang chủ là chơi
+Sau khi tạo bài, bấm "Muốn học sinh chỉ cần mở trang chủ…" để xem giá trị khóa. Trên Vercel: **Settings → Environment Variables** → thêm `HW_DEFAULT_KEY` = khóa đó (tuỳ chọn thêm `HW_DEFAULT_TITLE` = tên bài) → **Redeploy**. Muốn đổi sang bài mới: đổi giá trị biến rồi Redeploy.

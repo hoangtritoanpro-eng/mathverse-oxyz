@@ -345,10 +345,10 @@ const initialRoom=(qs.get('room')||'').trim().toUpperCase();
 const initialTeam=qs.get('team')||'';
 const initialView=qs.get('view')||'';
 /* Bài về nhà (v6.0.0): ?hw=MÃ cho học sinh · ?report=KHÓA cho giáo viên */
-const hwCode=/^[0-9A-Fa-f]{6}$/.test(qs.get('hw')||'')?String(qs.get('hw')).toUpperCase():'';
+let hwCode=/^[0-9A-Fa-f]{6}$/.test(qs.get('hw')||'')?String(qs.get('hw')).toUpperCase():'';
 const hwReportKey=String(qs.get('report')||'').toUpperCase().replace(/[^A-Z2-9]/g,'');
-const hwTitle=String(qs.get('t')||'').replace(/[<>]/g,'').slice(0,60);
-let hwLocal=null,hwSubmitState='',hwLastSig='',hwLastAt=0,hwSending=false,hwNameDraft='',hwJustMade=null;
+let hwTitle=String(qs.get('t')||'').replace(/[<>]/g,'').slice(0,60);
+let hwIsDefault=false,hwLocal=null,hwSubmitState='',hwLastSig='',hwLastAt=0,hwSending=false,hwNameDraft='',hwJustMade=null;
 
 /* ─── TRẠNG THÁI ENGINE 1: SĂN KHO BÁU 2D (HUNT MAP) ─── */
 const cipherState = {
@@ -14782,7 +14782,9 @@ function bkHwLanding(){
     ${L?`<p class="hw-old">Máy này đã có bài của <b>${esc(L.name)}</b>. <button type="button" class="hw-link" data-action="hwResume">Làm tiếp</button></p>`:''}
    </div>
    <p class="bk-help">Em làm một mình qua 5 chặng, sai thì thử lại. Cuối bài, kết quả được gửi tự động cho thầy cô.</p>
+   ${hwIsDefault?`<button type="button" class="bk-text-link" data-action="hwToRoom">Vào phòng học trực tiếp bằng mã phòng</button>`:''}
   </main>
+  ${hwIsDefault?`<button type="button" class="bk-corner-link" data-action="bkGoHost">Tôi là giáo viên</button>`:''}
  </div>`;
 }
 
@@ -14850,6 +14852,9 @@ function bkHwHost(){
     <label class="hw-lab">Báo cáo của thầy cô (giữ riêng, đừng gửi học sinh)</label>
     <div class="hw-copy"><input readonly value="${esc(hwReportLink(cur.key))}" onclick="this.select()"/><button type="button" class="bk-btn bk-btn-ghost-ink" data-action="hwCopy" data-text="${esc(hwReportLink(cur.key))}">Chép</button></div>
     <a class="bk-btn bk-btn-mint bk-btn-block hw-open" href="${esc(hwReportLink(cur.key))}" target="_blank" rel="noopener">Mở báo cáo</a>
+    <details class="hw-default"><summary>Muốn học sinh chỉ cần mở ${esc(location.host)} là chơi luôn?</summary>
+     <p>Vào Vercel → dự án → <b>Settings → Environment Variables</b>, thêm biến <b>HW_DEFAULT_KEY</b> với giá trị <b>${esc(cur.key)}</b> rồi <b>Redeploy</b>. Từ đó trang chủ tự mở bài này (học sinh chỉ nhập tên). Giáo viên vẫn vào bằng nút "Tôi là giáo viên" ở góc.</p>
+    </details>
    </div>`:''}
    ${list.length>1?`<div class="bk-setup-card"><p class="bk-setup-q">Các bài đã giao</p>${list.map(x=>`<a class="hw-prev" href="${esc(hwReportLink(x.key))}" target="_blank" rel="noopener"><b>${esc(x.title||'Bài về nhà')}</b><span>mã ${esc(x.code)} · ${esc(new Date(x.at).toLocaleDateString('vi-VN'))}</span></a>`).join('')}</div>`:''}
    <p class="bk-help">Học sinh mở đường dẫn, nhập tên và làm bài. Bấm "Mở báo cáo" bất cứ lúc nào để xem tiến độ.</p>
@@ -14936,6 +14941,7 @@ async function hwHandle(action,el){
   try{history.replaceState({},'',location.pathname+'?hw='+hwCode+(hwTitle?'&t='+encodeURIComponent(hwTitle):''));}catch(e){}
   startScreen();return true;
  }
+ if(action==='hwToRoom'){hwCode='';hwIsDefault=false;bkStep='code';bkError='';startScreen();return true;}
  if(action==='hwGoHost'){bkStep='hwhost';bkError='';startScreen();return true;}
  if(action==='hwCreate'){
   const title=String($('#hwTitleInput')?.value||'').trim().slice(0,60);
@@ -14976,8 +14982,18 @@ async function hwEnter(){
  return true;
 }
 
-session=restoreSession();
-if(hwReportKey){hwReportInit();}else if(session){refresh(true);}else{startScreen();}
+async function hwBoot(){
+ app.innerHTML='<div class="loading">Đang tải…</div>';
+ try{
+  const d=await hwPost('/api/hwDefault',{});
+  if(d&&d.code){hwCode=d.code;hwTitle=String(d.title||'').slice(0,60);hwIsDefault=true;}
+ }catch(e){}
+ session=restoreSession();
+ if(session){refresh(true);}else{startScreen();}
+}
+if(hwReportKey){hwReportInit();}
+else if(!hwCode&&!initialRoom&&!initialView&&!initialTeam&&qs.get('demo')!=='1'&&!window.IS_DEMO_MODE){hwBoot();}
+else{session=restoreSession();if(session){refresh(true);}else{startScreen();}}
 setInterval(()=>{if(session&&!document.hidden)refresh(false);},2500);
 setInterval(updateClock,400);
 requestAnimationFrame(gameLoop);

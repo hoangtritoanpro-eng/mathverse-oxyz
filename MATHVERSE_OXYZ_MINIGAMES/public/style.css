@@ -14041,3 +14041,7 @@ body.hw-report-mode #app{min-height:100vh}
  .hw-actions,.hw-import,.hw-warn{display:none!important}
  .hw-card,.hw-tile{box-shadow:none;border:1px solid #ccd}
 }
+
+.hw-default{margin-top:12px;font-size:.85rem;color:var(--bk-ink);text-align:left}
+.hw-default summary{cursor:pointer;font-weight:800}
+.hw-default p{margin:8px 0 0;line-height:1.5}
