@@ -1397,7 +1397,17 @@ const HW_FILE=IS_VERCEL?path.join(os.tmpdir(),'mathverse_oxyz_hw.json'):path.joi
 const REDIS_URL=process.env.UPSTASH_REDIS_REST_URL||process.env.KV_REST_API_URL||'';
 const REDIS_TOKEN=process.env.UPSTASH_REDIS_REST_TOKEN||process.env.KV_REST_API_TOKEN||'';
 const HW_TTL_SEC=60*60*24*180;
-let HW={};
+let HW={};let HW_META={};
+const HW_META_FILE=HW_FILE.replace(/\.json$/,'_meta.json');
+try{if(fs.existsSync(HW_META_FILE))HW_META=JSON.parse(fs.readFileSync(HW_META_FILE,'utf8'));}catch(e){HW_META={};}
+async function hwSetTitle(code,title){
+ HW_META[code]={title};try{fs.mkdirSync(path.dirname(HW_META_FILE),{recursive:true});fs.writeFile(HW_META_FILE,JSON.stringify(HW_META),()=>{});}catch(e){}
+ if(REDIS_URL&&REDIS_TOKEN){try{await redisCmd(['SET','mv:hwmeta:'+code,JSON.stringify({title}),'EX',String(HW_TTL_SEC)]);}catch(e){}}
+}
+async function hwGetTitle(code){
+ if(REDIS_URL&&REDIS_TOKEN){try{const v=await redisCmd(['GET','mv:hwmeta:'+code]);if(v)return JSON.parse(v).title||'';}catch(e){}}
+ return (HW_META[code]||{}).title||'';
+}
 try{if(fs.existsSync(HW_FILE))HW=JSON.parse(fs.readFileSync(HW_FILE,'utf8'));}catch(e){HW={};}
 let hwPending=false;
 function hwPersist(){
@@ -1530,6 +1540,8 @@ async function processHw(endpoint,d){
  if(endpoint==='/api/hwCreate'){
   const key=hwNewKey();const code=hwCodeFromKey(key);
   if(!HW[code]){HW[code]={};hwPersist();}
+  const title=hwStr(d.title,60).trim();
+  if(title)await hwSetTitle(code,title);
   return{code,key,durable:Boolean(REDIS_URL&&REDIS_TOKEN)};
  }
  if(endpoint==='/api/hwSubmit'){
@@ -1545,7 +1557,7 @@ async function processHw(endpoint,d){
   if(!/^[A-Z2-9]{12}$/.test(key))throw error('Khóa báo cáo không hợp lệ.');
   const code=hwCodeFromKey(key);
   const store=await hwLoad(code);
-  return{...hwBuild(code,store),durable:Boolean(REDIS_URL&&REDIS_TOKEN)};
+  return{...hwBuild(code,store),title:await hwGetTitle(code),durable:Boolean(REDIS_URL&&REDIS_TOKEN)};
  }
  throw error('Không tìm thấy chức năng.',404);
 }

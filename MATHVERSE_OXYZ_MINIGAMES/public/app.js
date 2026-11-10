@@ -1478,12 +1478,15 @@ function startScreen(msg=''){
  $('.award-backdrop')?.remove();
  if(hwReportKey){
   hwReportInit();
- }else if(hwCode && !hwIsDefault && bkStep!=='host' && bkStep!=='hwhost'){
+ }else if(hwCode && !hwIsDefault && bkStep!=='host' && bkStep!=='hwhost' && bkStep!=='hwreports'){
   app.innerHTML = bkHwLanding();
   const hi = document.getElementById('hwName');
   if(hi && !('ontouchstart' in window)) hi.focus();
  }else if(bkStep==='hwhost'){
   app.innerHTML = bkHwHost();
+ }else if(bkStep==='hwreports'){
+  app.innerHTML = bkHwReports();
+  hwLoadHub();
  }else if(bkStep==='team' && bkRoom){
   app.innerHTML = bkTeamPick();
   bkLoadTeams();
@@ -13528,6 +13531,7 @@ window.addEventListener('keydown',e=>{
    else if(document.activeElement.id==='cdShortInput')handle('submitShortCastle');
    else if(!session && document.activeElement.id==='bkCode')handle('bkSubmitCode');
    else if(!session && document.activeElement.id==='hwName')handle('hwStart');
+   else if(!session && document.activeElement.id==='hwKeyInput')handle('hwAddKey');
   }
   return;
  }
@@ -14128,7 +14132,8 @@ function bkLanding(){
      <div class="bk-role-head"><span class="bk-role-ico" aria-hidden="true">👩‍🏫</span><h2 id="bkRoleT">Giáo viên</h2></div>
      <p class="bk-role-sub">Tổ chức trò chơi cho lớp</p>
      <button type="button" class="bk-btn bk-btn-sun bk-btn-block" data-action="bkGoHost">Tạo phòng chơi trên lớp</button>
-     ${window.IS_DEMO_MODE ? '' : `<button type="button" class="bk-btn bk-btn-mint bk-btn-block" data-action="hwGoHost">Giao bài về nhà</button>`}
+     ${window.IS_DEMO_MODE ? '' : `<button type="button" class="bk-btn bk-btn-mint bk-btn-block" data-action="hwGoHost">Giao bài về nhà</button>
+     <button type="button" class="bk-btn bk-btn-paper bk-btn-block bk-btn-report" data-action="hwGoReports">📊 Xem báo cáo bài làm</button>`}
     </section>
    </div>
   </main>
@@ -14883,6 +14888,59 @@ function bkHwHost(){
  </div>`;
 }
 
+
+/* ── Giáo viên: tổng hợp báo cáo tất cả bài đã giao (v6.2.0) ── */
+let hwHubData={};
+function bkHwReports(){
+ const list=hwList();
+ const tot={students:0,completed:0,pcts:[]};
+ Object.values(hwHubData).forEach(d=>{if(d&&d.summary){tot.students+=d.summary.students;tot.completed+=d.summary.completed;if(d.summary.students)tot.pcts.push(d.summary.avgPct);}});
+ const avg=tot.pcts.length?Math.round(tot.pcts.reduce((a,b)=>a+b,0)/tot.pcts.length):null;
+ const loaded=list.length&&list.every(x=>hwHubData[x.key]);
+ const row=x=>{
+  const d=hwHubData[x.key];
+  const sm=d&&d.summary;
+  const stat=!d?'<span class="hw-sub">Đang tải…</span>':d.error?`<span class="hw-sub">${esc(d.error)}</span>`:
+   `<span class="hw-hub-stat"><b>${sm.students}</b> em</span><span class="hw-hub-stat"><b>${sm.completed}</b> xong</span><span class="hw-pct ${hwPctClass(sm.students?sm.avgPct:null)}">${sm.students?sm.avgPct+'% đúng':'chưa có bài'}</span>${d.needHelp&&d.needHelp.length?`<span class="hw-hub-help">${d.needHelp.length} em cần hỗ trợ</span>`:''}`;
+  return `<div class="hw-hub-row">
+   <div class="hw-hub-main"><b>${esc(x.title||'Bài về nhà')}</b><small>mã ${esc(x.code||'')} · giao ${esc(new Date(x.at).toLocaleDateString('vi-VN'))}</small><div class="hw-hub-stats">${stat}</div></div>
+   <div class="hw-hub-act"><a class="bk-btn bk-btn-mint" href="${esc(hwReportLink(x.key))}" target="_blank" rel="noopener">Xem chi tiết</a><button type="button" class="hw-link hw-forget" data-action="hwForget" data-key="${esc(x.key)}" title="Bỏ khỏi danh sách">Bỏ</button></div>
+  </div>`;
+ };
+ return `<div class="bk-page bk-entry">
+  <header class="bk-top"><button type="button" class="bk-back" data-action="bkBackToCode">‹ Trang chủ</button></header>
+  <main class="bk-host-setup hw-hub">
+   <h1 class="bk-title">Báo cáo bài làm</h1>
+   ${list.length?`<div class="hw-tiles hw-hub-tiles">
+     <div class="hw-tile"><b>${list.length}</b><span>bài đã giao</span></div>
+     <div class="hw-tile"><b>${loaded?tot.students:'…'}</b><span>lượt học sinh làm</span></div>
+     <div class="hw-tile"><b>${loaded?tot.completed:'…'}</b><span>lượt hoàn thành</span></div>
+     <div class="hw-tile"><b>${loaded&&avg!==null?avg+'%':'–'}</b><span>đúng trung bình</span></div>
+    </div>
+    <div class="bk-setup-card hw-hub-list">${list.map(row).join('')}</div>`:
+    `<div class="bk-setup-card"><p class="hw-empty">Máy này chưa lưu bài nào. Bấm "Giao bài về nhà" để tạo bài, hoặc dán link báo cáo bên dưới.</p></div>`}
+   <div class="bk-setup-card">
+    <p class="bk-setup-q">Thêm bài từ link báo cáo</p>
+    <p class="hw-sub" style="text-align:center">Dùng khi mở trên máy khác: dán link <b>…/?report=…</b> hoặc khóa 12 ký tự.</p>
+    <div class="hw-copy"><input id="hwKeyInput" placeholder="https://…/?report=XXXXXXXXXXXX"/><button type="button" class="bk-btn bk-btn-ghost-ink" data-action="hwAddKey">Thêm</button></div>
+    ${bkError?`<p class="bk-error" role="alert">${esc(bkError)}</p>`:''}
+   </div>
+  </main>
+ </div>`;
+}
+async function hwLoadHub(){
+ const list=hwList();
+ await Promise.all(list.map(async x=>{
+  if(hwHubData[x.key])return;
+  try{const d=await hwPost('/api/hwReport',{key:x.key});hwHubData[x.key]={summary:d.summary,needHelp:d.needHelp};
+   if(!x.code||x.code!==d.code){x.code=d.code;}
+   if(!x.title&&d.title)x.title=d.title;
+  }catch(e){hwHubData[x.key]={error:e.message||'Lỗi tải'};}
+ }));
+ hwSaveList(list);
+ if(bkStep==='hwreports'&&!session&&!document.activeElement?.matches('input')){app.innerHTML=bkHwReports();}
+}
+
 /* ── Giáo viên: trang báo cáo ── */
 let hwReportData=null,hwReportErr='',hwReportTimer=null,hwReportSort='default';
 function hwPctClass(p){return p===null||p===undefined?'na':p>=75?'good':p>=50?'mid':'bad';}
@@ -14900,8 +14958,8 @@ function hwReportHtml(){
  const lv=d.levels;
  return `<div class="hw-rp">
   <header class="hw-rp-head">
-   <div><p class="hw-kicker">📊 Báo cáo bài về nhà · mã ${esc(d.code)}</p><h1>Kết quả ôn tập của lớp</h1><p class="hw-sub">Cập nhật ${esc(new Date(d.generatedAt).toLocaleTimeString('vi-VN'))} · tự làm mới mỗi 20 giây</p></div>
-   <div class="hw-actions"><button type="button" class="bk-btn bk-btn-ghost-ink" data-action="hwReportReload">Làm mới</button><button type="button" class="bk-btn bk-btn-mint" data-action="hwCsv">Tải CSV</button><button type="button" class="bk-btn bk-btn-paper" data-action="hwPrint">In / PDF</button></div>
+   <div><p class="hw-kicker">📊 Báo cáo bài về nhà · mã ${esc(d.code)}</p><h1>${esc(d.title||'Kết quả ôn tập của lớp')}</h1><p class="hw-sub">Cập nhật ${esc(new Date(d.generatedAt).toLocaleTimeString('vi-VN'))} · tự làm mới mỗi 20 giây</p></div>
+   <div class="hw-actions"><a class="bk-btn bk-btn-paper" href="${esc(location.origin+location.pathname)}">‹ Trang chủ</a><button type="button" class="bk-btn bk-btn-ghost-ink" data-action="hwReportReload">Làm mới</button><button type="button" class="bk-btn bk-btn-mint" data-action="hwCsv">Tải CSV</button><button type="button" class="bk-btn bk-btn-paper" data-action="hwPrint">In / PDF</button></div>
   </header>
   ${d.durable?'':`<div class="hw-warn">⚠️ Máy chủ chưa có kho lưu trữ chung nên báo cáo có thể thiếu bài của một số em. Cách khắc phục: xem <b>HUONG_DAN_BAI_VE_NHA.md</b>, hoặc dán "mã nộp bài" của học sinh vào ô cuối trang.</div>`}
   <section class="hw-tiles">${tile(s.students,'học sinh đã vào')}${tile(s.completed,'đã hoàn thành')}${tile(s.avgPct+'%','đúng trung bình')}${tile(s.avgScore,'điểm XP trung bình')}${tile(Math.round(s.avgMin)+'′','thời gian trung bình')}</section>
@@ -14918,12 +14976,14 @@ function hwReportHtml(){
  </div>`;
 }
 async function hwLoadReport(){
- try{hwReportData=await hwPost('/api/hwReport',{key:hwReportKey});hwReportErr='';}
+ try{hwReportData=await hwPost('/api/hwReport',{key:hwReportKey});hwReportErr='';
+  try{const l=hwList();const it=l.find(x=>x.key===hwReportKey);if(it&&(!it.code||!it.title)){it.code=hwReportData.code;it.title=it.title||hwReportData.title||'';hwSaveList(l);}}catch(e){}}
  catch(e){hwReportErr=e.message||'Không tải được báo cáo.';}
  const root=document.getElementById('hwReportRoot');
  if(root&&!document.activeElement?.matches('textarea'))root.innerHTML=hwReportHtml();
 }
 function hwReportInit(){
+ try{const l=hwList();if(!l.some(x=>x.key===hwReportKey)){hwSaveList([{key:hwReportKey,code:'',title:'',at:new Date().toISOString()},...l]);}}catch(e){}
  document.body.classList.add('bk-mode','hw-report-mode');
  app.innerHTML=`<div id="hwReportRoot">${hwReportHtml()}</div>`;
  hwLoadReport();
@@ -14963,12 +15023,31 @@ async function hwHandle(action,el){
   startScreen();return true;
  }
  if(action==='hwToRoom'){hwCode='';hwIsDefault=false;bkStep='code';bkError='';startScreen();return true;}
+ if(action==='hwGoReports'){bkStep='hwreports';bkError='';hwHubData={};startScreen();return true;}
+ if(action==='hwAddKey'){
+  const raw=String($('#hwKeyInput')?.value||'');
+  const m=/report=([A-Za-z2-9]{12})/.exec(raw)||/^\s*([A-Za-z2-9]{12})\s*$/.exec(raw);
+  if(!m){bkError='Dán link báo cáo (có chữ ?report=…) hoặc khóa 12 ký tự.';startScreen();return true;}
+  const key=m[1].toUpperCase();
+  el.disabled=true;
+  try{
+   const d=await hwPost('/api/hwReport',{key});
+   const l=hwList().filter(x=>x.key!==key);
+   hwSaveList([{key,code:d.code,title:d.title||'',at:new Date().toISOString()},...l]);
+   bkError='';
+  }catch(e){bkError=e.message||'Khóa không đúng.';}
+  startScreen();return true;
+ }
+ if(action==='hwForget'){
+  if(!confirm('Bỏ bài này khỏi danh sách trên máy này? (Không xoá bài làm của học sinh.)'))return true;
+  hwSaveList(hwList().filter(x=>x.key!==el.dataset.key));startScreen();return true;
+ }
  if(action==='hwGoHost'){bkStep='hwhost';bkError='';startScreen();return true;}
  if(action==='hwCreate'){
   const title=String($('#hwTitleInput')?.value||'').trim().slice(0,60);
   el.disabled=true;
   try{
-   const r=await hwPost('/api/hwCreate',{});
+   const r=await hwPost('/api/hwCreate',{title});
    const item={key:r.key,code:r.code,title,at:new Date().toISOString()};
    hwSaveList([item,...hwList()]);hwJustMade=item;bkError='';
   }catch(e){bkError=e.message||'Không tạo được bài.';}

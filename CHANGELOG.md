@@ -9,6 +9,15 @@ Tất cả những thay đổi quan trọng của dự án này sẽ được gh
 
 ---
 
+## [6.2.0] - 2026-11-10
+
+### Added
+- **Báo cáo bài làm (tổng hợp):** nút "📊 Xem báo cáo bài làm" trong khung Giáo viên ở trang chủ. Hiện tất cả bài đã giao với số bài, lượt học sinh làm, lượt hoàn thành, % đúng trung bình; mỗi bài có số em, số em xong, % đúng, số em cần hỗ trợ và nút "Xem chi tiết".
+- Thêm bài vào danh sách bằng cách dán link báo cáo (dùng khi mở trên máy khác). Mở link báo cáo một lần cũng tự thêm vào danh sách.
+- Tên bài được lưu trên máy chủ, hiện cả trên máy khác và làm tiêu đề trang báo cáo. Trang báo cáo có nút về trang chủ.
+
+---
+
 ## [6.1.0] - 2026-11-10
 
 ### Changed
