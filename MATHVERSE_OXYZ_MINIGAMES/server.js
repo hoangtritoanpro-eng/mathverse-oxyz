@@ -68,8 +68,10 @@ function getTeamChallenges(s,team){
  ];
 }
 
+function isHwRoom(id){return /^HW[0-9A-F]{6}-[A-Z0-9]{6,40}$/.test(String(id||''));}
 function createDeterministicRoom(roomId='123456',size=6){
- const validSize=(Number.isInteger(size)&&size>=4&&size<=8)?size:6;
+ const solo=isHwRoom(roomId);
+ const validSize=solo?1:((Number.isInteger(size)&&size>=4&&size<=8)?size:6);
  const now=Date.now();
  return {
   id:roomId,
@@ -81,9 +83,9 @@ function createDeterministicRoom(roomId='123456',size=6){
   clock:{minutes:6,remainingMs:6*60*1000,running:false,startedAt:0},
   teams:TEAM_POOL.slice(0,validSize).map((t,i)=>({
    ...t,
-   id:'doi-'+(i+1),
-   code:String(i+1).repeat(4),
-   token:'DEMO_DOI_'+(i+1),
+   id:solo?'hw-'+roomId.split('-')[1].toLowerCase():'doi-'+(i+1),
+   code:solo?'0000':String(i+1).repeat(4),
+   token:solo?'HWT_'+roomId.split('-')[1]:'DEMO_DOI_'+(i+1),
    stage:0,round:0,health:3,wrong:0,score:20,bonus:0,
    gold:120,heroLevel:1,upgrades:{damage:1,speed:1,hp:1,regen:1},
    completed:false,finishedAt:null,
@@ -95,7 +97,7 @@ function createDeterministicRoom(roomId='123456',size=6){
    lastActiveAt:now,
    stageEnteredAt:now
   })),
-  events:[{at:new Date().toISOString(),text:`Phòng ${roomId} đã sẵn sàng (${validSize} đội · 6 phút).`}]
+  events:[{at:new Date().toISOString(),text:solo?`Bài về nhà ${roomId} đã sẵn sàng.`:`Phòng ${roomId} đã sẵn sàng (${validSize} đội · 6 phút).`}]
  };
 }
 
@@ -533,7 +535,7 @@ function roomState(room,token){
   stage4:team.stage4||{modePairs:4,matchedPairs:[],matchedCount:0,totalPairs:4,flipCount:0,wrongMatches:0,hintsUsedCount:0,controllerRoleIdx:0,deckOrder:[],gateOpened:false,completedTimeSec:null},
   stage5:team.stage5||{phase:1,mpBC:false,mpAC:false,midpointsFound:0,medA:false,medB:false,mediansConnected:0,crystalPlaced:false,quizSolvedCount:0,vectorsActivated:false,wrongAttempts:0,hintsUsedCount:0,controllerRoleIdx:0,completedTimeSec:null,timedOut:false},
   dragon:team.dragon||{state:'PLAYING',fromStage:team.stage,toStage:team.stage,moveMode:'IDLE',transitionId:0},
-  completed:team.completed,attempts:team.attempts,hintsUsed:team.hintsUsed,digits:team.digits,finishedAt:team.finishedAt},
+  completed:team.completed,attempts:team.attempts,hintsUsed:team.hintsUsed,digits:team.digits,finishedAt:team.finishedAt,answerLog:isHwRoom(room.id)?(team.answerLog||[]):undefined},
   current:cur?publicStage(cur,team.round,team):null,cipherWords:team.stage>=5?TOKEN_WORDS:null};
 }
 
@@ -545,7 +547,9 @@ function getRoom(data){
  }
  const roomId=rawId||'123456';
  if(!ROOMS[roomId]){
-  if(/^\d{4,6}$/.test(roomId)){
+  if(isHwRoom(roomId)){
+   ROOMS[roomId]=createDeterministicRoom(roomId,1);
+  }else if(/^\d{4,6}$/.test(roomId)){
    const lastDigit=Number(roomId[roomId.length-1]);
    const size=(lastDigit>=4&&lastDigit<=8)?lastDigit:6;
    ROOMS[roomId]=createDeterministicRoom(roomId,size);
@@ -599,7 +603,7 @@ function processAction(endpoint,d){
   ROOMS[roomId]=r;persist();return{room:roomId,teacherToken:r.teacherToken};
  }
  const r=getRoom(d);
- if(r.id && r.id!=='123456')LATEST_ROOM_ID=r.id;
+ if(r.id && r.id!=='123456' && !isHwRoom(r.id))LATEST_ROOM_ID=r.id;
  if(d && d.clientTeamsSync && typeof d.clientTeamsSync==='object'){
   for(const [tid,snap] of Object.entries(d.clientTeamsSync)){
    const tm=r.teams.find(x=>x.id===tid);
@@ -615,6 +619,10 @@ function processAction(endpoint,d){
    mergeTeamSnapshot(tm,d._meSync);
    recordGlobalTeamProgress(tm);
   }
+ }
+ if(isHwRoom(r.id) && r.teams[0] && typeof d.hwName==='string'){
+  const nm=d.hwName.replace(/[<>&"]/g,'').trim().slice(0,40);
+  if(nm)r.teams[0].name=nm;
  }
  if(endpoint==='/api/join'){
   let t=r.teams.find(x=>x.id===d.team);
@@ -1380,6 +1388,163 @@ function processAction(endpoint,d){
 }
 
 const MIME={'.html':'text/html; charset=utf-8','.css':'text/css; charset=utf-8','.js':'text/javascript; charset=utf-8','.svg':'image/svg+xml','.png':'image/png','.jpg':'image/jpeg','.ico':'image/x-icon','.mp3':'audio/mpeg','.wav':'audio/wav'};
+/* ═══════════ BÀI VỀ NHÀ (ôn tập cá nhân) ═══════════
+   - Giáo viên tạo bài → nhận 2 đường dẫn: dành cho học sinh (?hw=MÃ) và dành cho giáo viên (?report=KHÓA).
+   - Mỗi học sinh chơi một mình, bài nộp được lưu theo MÃ. Giáo viên xem báo cáo bằng KHÓA.
+   - Lưu trữ: Upstash Redis/Vercel KV nếu có biến môi trường (bền vững, dùng chung); nếu không thì file cục bộ
+     (chạy trên máy giáo viên thì đủ) hoặc /tmp trên Vercel (không bền – khi đó dùng "mã nộp bài" dự phòng). */
+const HW_FILE=IS_VERCEL?path.join(os.tmpdir(),'mathverse_oxyz_hw.json'):path.join(ROOT,'data','homework.json');
+const REDIS_URL=process.env.UPSTASH_REDIS_REST_URL||process.env.KV_REST_API_URL||'';
+const REDIS_TOKEN=process.env.UPSTASH_REDIS_REST_TOKEN||process.env.KV_REST_API_TOKEN||'';
+const HW_TTL_SEC=60*60*24*180;
+let HW={};
+try{if(fs.existsSync(HW_FILE))HW=JSON.parse(fs.readFileSync(HW_FILE,'utf8'));}catch(e){HW={};}
+let hwPending=false;
+function hwPersist(){
+ if(hwPending)return;hwPending=true;
+ setTimeout(()=>{hwPending=false;try{fs.mkdirSync(path.dirname(HW_FILE),{recursive:true});fs.writeFile(HW_FILE,JSON.stringify(HW),()=>{});}catch(e){}},150);
+}
+async function redisCmd(cmd){
+ const r=await fetch(REDIS_URL,{method:'POST',headers:{Authorization:'Bearer '+REDIS_TOKEN,'Content-Type':'application/json'},body:JSON.stringify(cmd)});
+ const j=await r.json();
+ if(j.error)throw new Error(j.error);
+ return j.result;
+}
+function hwCodeFromKey(key){return crypto.createHash('sha256').update('mv-hw|'+String(key)).digest('hex').slice(0,6).toUpperCase();}
+const HW_ALPHA='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+function hwNewKey(){const b=crypto.randomBytes(12);let k='';for(const x of b)k+=HW_ALPHA[x%HW_ALPHA.length];return k;}
+function hwStr(v,n){return String(v??'').replace(/[<>]/g,'').slice(0,n);}
+function hwNum(v,lo,hi){v=Number(v);if(!Number.isFinite(v))v=0;return Math.max(lo,Math.min(hi,v));}
+function hwClean(d){
+ const log=Array.isArray(d.answerLog)?d.answerLog.slice(-300):[];
+ const attempts=Array.isArray(d.attempts)?d.attempts.slice(0,5):[];
+ while(attempts.length<5)attempts.push(0);
+ return{
+  name:hwStr(d.name,40).trim()||'Học sinh',
+  stage:hwNum(d.stage,0,5),
+  completed:Boolean(d.completed),
+  score:Math.round(hwNum(d.score,0,99999)),
+  hints:hwNum(d.hints,0,99),
+  activeSec:Math.round(hwNum(d.activeSec,0,86400*3)),
+  startedAt:hwStr(d.startedAt,30),
+  finishedAt:hwStr(d.finishedAt,30),
+  updatedAt:new Date().toISOString(),
+  attempts:attempts.map(x=>hwNum(x,0,999)),
+  answerLog:log.filter(e=>e&&typeof e==='object').map(e=>({
+   stage:hwNum(e.stage,1,5),
+   qId:hwStr(e.qId||e.questionId,24),
+   level:hwStr(e.level,20),
+   correct:Boolean(e.correct),
+   at:hwStr(e.at,30),
+   ...(e.correct?{}:{chosen:hwStr(e.chosenText,90)})
+  }))
+ };
+}
+async function hwSave(code,sid,rep){
+ if(!HW[code])HW[code]={};
+ if(Object.keys(HW[code]).length>=600&&!HW[code][sid])throw error('Bài này đã đủ số học sinh tối đa.',429);
+ HW[code][sid]=rep;hwPersist();
+ if(REDIS_URL&&REDIS_TOKEN){
+  const k='mv:hw:'+code;
+  await redisCmd(['HSET',k,sid,JSON.stringify(rep)]);
+  await redisCmd(['EXPIRE',k,String(HW_TTL_SEC)]);
+ }
+}
+async function hwLoad(code){
+ if(REDIS_URL&&REDIS_TOKEN){
+  try{
+   const res=await redisCmd(['HGETALL','mv:hw:'+code]);
+   const out={};
+   if(Array.isArray(res)){for(let i=0;i+1<res.length;i+=2){try{out[res[i]]=JSON.parse(res[i+1]);}catch(e){}}}
+   else if(res&&typeof res==='object'){for(const [k,v] of Object.entries(res)){try{out[k]=typeof v==='string'?JSON.parse(v):v;}catch(e){}}}
+   return out;
+  }catch(e){console.error('Redis lỗi:',e.message);}
+ }
+ return HW[code]||{};
+}
+const HW_QINFO=(()=>{
+ const m={};
+ STAGES.forEach(s=>{
+  (s.questionBank||[]).forEach(q=>{m[q.id]={stage:s.id,prompt:q.prompt,level:s.id<=3?'NHẬN BIẾT':'THÔNG HIỂU'};});
+ });
+ return m;
+})();
+const HW_STAGE_NAMES=STAGES.map(s=>String(s.shortName||s.title||('Chặng '+s.id)));
+function hwQLabel(qId,stage){
+ const m=/^1\.P(\d)/.exec(qId);
+ if(m)return 'Chặng 1 · Giải mã mảnh mật thư số '+m[1];
+ if(/^5\.[123]$/.test(qId))return 'Chặng 5 · Thao tác hình học giai đoạn '+qId.slice(2);
+ return 'Chặng '+stage+' · '+(HW_STAGE_NAMES[stage-1]||'')+' · nhiệm vụ '+qId;
+}
+function hwBuild(code,store){
+ const list=Object.entries(store).map(([sid,r])=>{
+  const total=r.answerLog.length;
+  const right=r.answerLog.filter(e=>e.correct).length;
+  const byStage=[1,2,3,4,5].map(n=>{
+   const es=r.answerLog.filter(e=>e.stage===n);
+   return{stage:n,total:es.length,correct:es.filter(e=>e.correct).length};
+  });
+  return{sid,name:r.name,stage:r.stage,completed:r.completed,score:r.score,total,correct:right,wrong:total-right,
+   pct:total?Math.round(right/total*100):null,activeSec:r.activeSec,hints:r.hints,updatedAt:r.updatedAt,startedAt:r.startedAt,finishedAt:r.finishedAt,byStage};
+ }).sort((a,b)=>(b.completed-a.completed)||(b.score-a.score)||a.name.localeCompare(b.name,'vi'));
+ const q={};
+ const stageAgg=[1,2,3,4,5].map(n=>({stage:n,name:HW_STAGE_NAMES[n-1],reached:0,total:0,correct:0}));
+ Object.values(store).forEach(r=>{
+  for(let n=1;n<=5;n++)if(r.stage>=n-1||r.completed)stageAgg[n-1].reached++;
+  const seen={};
+  r.answerLog.forEach(e=>{
+   const sa=stageAgg[e.stage-1];sa.total++;if(e.correct)sa.correct++;
+   if(!e.qId)return;
+   const o=q[e.qId]||(q[e.qId]={qId:e.qId,stage:e.stage,level:e.level||(e.stage<=3?'NHẬN BIẾT':'THÔNG HIỂU'),total:0,correct:0,students:new Set(),missed:new Set(),wrongChoices:{}});
+   o.total++;if(e.correct)o.correct++;else{o.missed.add(r.name);if(e.chosen)o.wrongChoices[e.chosen]=(o.wrongChoices[e.chosen]||0)+1;}
+   o.students.add(r.name);
+  });
+ });
+ const byQuestion=Object.values(q).map(o=>({
+  qId:o.qId,stage:o.stage,level:o.level,total:o.total,correct:o.correct,pct:o.total?Math.round(o.correct/o.total*100):null,
+  prompt:(HW_QINFO[o.qId]||{}).prompt||hwQLabel(o.qId,o.stage),
+  missedBy:[...o.missed].slice(0,30),
+  topWrong:Object.entries(o.wrongChoices).sort((a,b)=>b[1]-a[1]).slice(0,2).map(x=>x[0])
+ })).sort((a,b)=>(a.pct??101)-(b.pct??101)||b.total-a.total);
+ const withAns=list.filter(x=>x.total>0);
+ const lv=(name)=>{let t=0,c=0;Object.values(store).forEach(r=>r.answerLog.forEach(e=>{const L=e.level||(e.stage<=3?'NHẬN BIẾT':'THÔNG HIỂU');if(L===name){t++;if(e.correct)c++;}}));return{total:t,correct:c,pct:t?Math.round(c/t*100):null};};
+ const avg=(a)=>a.length?Math.round(a.reduce((x,y)=>x+y,0)/a.length):0;
+ return{
+  code,generatedAt:new Date().toISOString(),
+  summary:{
+   students:list.length,completed:list.filter(x=>x.completed).length,
+   avgScore:avg(list.map(x=>x.score)),avgPct:avg(withAns.map(x=>x.pct)),avgMin:avg(list.map(x=>x.activeSec/60))
+  },
+  levels:{nhanBiet:lv('NHẬN BIẾT'),thongHieu:lv('THÔNG HIỂU')},
+  stages:stageAgg.map(s=>({...s,pct:s.total?Math.round(s.correct/s.total*100):null})),
+  students:list,byQuestion,
+  needHelp:list.filter(x=>x.total>=3&&x.pct!==null&&x.pct<60).map(x=>x.name)
+ };
+}
+async function processHw(endpoint,d){
+ if(endpoint==='/api/hwCreate'){
+  const key=hwNewKey();const code=hwCodeFromKey(key);
+  if(!HW[code]){HW[code]={};hwPersist();}
+  return{code,key,durable:Boolean(REDIS_URL&&REDIS_TOKEN)};
+ }
+ if(endpoint==='/api/hwSubmit'){
+  const code=String(d.code||'').toUpperCase(),sid=String(d.sid||'');
+  if(!/^[0-9A-F]{6}$/.test(code))throw error('Mã bài không hợp lệ.');
+  if(!/^[A-Za-z0-9]{6,40}$/.test(sid))throw error('Mã học sinh không hợp lệ.');
+  const rep=hwClean(d.report||{});
+  await hwSave(code,sid,rep);
+  return{ok:true};
+ }
+ if(endpoint==='/api/hwReport'){
+  const key=String(d.key||'').toUpperCase();
+  if(!/^[A-Z2-9]{12}$/.test(key))throw error('Khóa báo cáo không hợp lệ.');
+  const code=hwCodeFromKey(key);
+  const store=await hwLoad(code);
+  return{...hwBuild(code,store),durable:Boolean(REDIS_URL&&REDIS_TOKEN)};
+ }
+ throw error('Không tìm thấy chức năng.',404);
+}
+
 function send(res,status,data,type='application/json; charset=utf-8'){
  res.writeHead(status,{'Content-Type':type,'Cache-Control':'no-store','X-Content-Type-Options':'nosniff','X-Frame-Options':'DENY'});
  res.end(typeof data==='string'||Buffer.isBuffer(data)?data:JSON.stringify(data));
@@ -1422,14 +1587,15 @@ function requestHandler(req,res){
    try{
     const d=typeof req.body==='string'?JSON.parse(req.body||'{}'):req.body;
     const ep=resolveApiEndpoint(pathname,parsedUrl,d);
+    if(ep.startsWith('/api/hw'))return processHw(ep,d).then(r=>send(res,200,r),e=>send(res,e.status||400,{error:e.message||'Đã có lỗi xảy ra.'}));
     const result=processAction(ep,d);
     return send(res,200,result);
    }catch(e){
     return send(res,e.status||400,{error:e.message||'Đã có lỗi xảy ra.'});
    }
   }
-  let content='';req.on('data',b=>{content+=b;if(content.length>32000)req.destroy();});
-  req.on('end',()=>{try{const d=JSON.parse(content||'{}');const ep=resolveApiEndpoint(pathname,parsedUrl,d);const result=processAction(ep,d);send(res,200,result);}catch(e){send(res,e.status||400,{error:e.message||'Đã có lỗi xảy ra.'});}});return;
+  let content='';req.on('data',b=>{content+=b;if(content.length>96000)req.destroy();});
+  req.on('end',()=>{try{const d=JSON.parse(content||'{}');const ep=resolveApiEndpoint(pathname,parsedUrl,d);if(ep.startsWith('/api/hw')){processHw(ep,d).then(r=>send(res,200,r),e=>send(res,e.status||400,{error:e.message||'Đã có lỗi xảy ra.'}));return;}const result=processAction(ep,d);send(res,200,result);}catch(e){send(res,e.status||400,{error:e.message||'Đã có lỗi xảy ra.'});}});return;
  }
  if(req.method!=='GET')return send(res,405,'Method not allowed','text/plain');
  if(pathname.startsWith('/images/') || pathname.startsWith('/sounds/') || pathname.startsWith('/assets/')){

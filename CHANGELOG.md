@@ -9,6 +9,18 @@ Tất cả những thay đổi quan trọng của dự án này sẽ được gh
 
 ---
 
+## [6.0.0] - 2026-11-10
+
+### Added (Chế độ Bài về nhà)
+- Giáo viên bấm **Giao bài về nhà** → nhận **link học sinh** (`?hw=MÃ`, kèm QR) và **link báo cáo riêng** (`?report=KHÓA`). Không cần tạo phòng, không cần chờ giờ học.
+- Học sinh mở link, **nhập họ tên**, tự chơi 5 chặng một mình (mỗi chặng 10 phút, không bị đẩy qua chặng khi hết giờ 60 giây). Tải lại trang vẫn làm tiếp được; có nút **Làm lại bài**.
+- Bài được **tự gửi** cho giáo viên sau mỗi lần đổi tiến độ và khi về đích. Màn kết quả cuối bài: % đúng, điểm, thời gian, kết quả từng chặng, chặng nên ôn lại; có **mã nộp bài dự phòng**.
+- Trang **báo cáo giáo viên**: số em vào/hoàn thành, % đúng, điểm, thời gian, kết quả theo chặng, nhận biết/thông hiểu, **câu cả lớp hay sai nhất** (kèm em sai và đáp án sai phổ biến), danh sách em cần hỗ trợ, tải CSV, in/PDF, tự làm mới 20 giây.
+- Kho lưu trữ chung: dùng Upstash Redis / Vercel KV nếu có biến môi trường (xem `HUONG_DAN_BAI_VE_NHA.md`); không có thì lưu file cục bộ.
+- API mới: `/api/hwCreate`, `/api/hwSubmit`, `/api/hwReport`. Phòng cá nhân `HW<MÃ>-<MÃ HS>` chỉ có 1 đội, không lẫn với phòng lớp.
+
+---
+
 ## [5.9.2] - 2026-11-10
 
 ### Changed (Chặng 4 Lật Thẻ Trên Điện Thoại)

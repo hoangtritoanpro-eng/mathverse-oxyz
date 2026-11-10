@@ -344,6 +344,11 @@ const labels=['A','B','C','D'];
 const initialRoom=(qs.get('room')||'').trim().toUpperCase();
 const initialTeam=qs.get('team')||'';
 const initialView=qs.get('view')||'';
+/* Bài về nhà (v6.0.0): ?hw=MÃ cho học sinh · ?report=KHÓA cho giáo viên */
+const hwCode=/^[0-9A-Fa-f]{6}$/.test(qs.get('hw')||'')?String(qs.get('hw')).toUpperCase():'';
+const hwReportKey=String(qs.get('report')||'').toUpperCase().replace(/[^A-Z2-9]/g,'');
+const hwTitle=String(qs.get('t')||'').replace(/[<>]/g,'').slice(0,60);
+let hwLocal=null,hwSubmitState='',hwLastSig='',hwLastAt=0,hwSending=false,hwNameDraft='',hwJustMade=null;
 
 /* ─── TRẠNG THÁI ENGINE 1: SĂN KHO BÁU 2D (HUNT MAP) ─── */
 const cipherState = {
@@ -714,6 +719,10 @@ function saveSession(d){
  session=d;
  if(d?.room) LiveClassroomSync.setActiveRoom(d.room);
  try{localStorage.setItem(cacheKey(d.role,d.room,d.teamId),d.token);}catch(e){}
+ if(hwCode&&hwLocal&&d.room===hwRoomId(hwLocal.sid)){
+  try{history.replaceState({},'',location.pathname+'?hw='+hwCode+(hwTitle?'&t='+encodeURIComponent(hwTitle):''));}catch(e){}
+  return;
+ }
  const par=new URLSearchParams({
   room:d.room,
   ...(d.role==='teacher'?{view:'teacher'}:d.role==='display'?{view:'display'}:{team:d.teamId})
@@ -721,6 +730,11 @@ function saveSession(d){
  try{history.replaceState({},'',location.pathname+'?'+par.toString());}catch(e){}
 }
 function restoreSession(){
+ if(hwCode){
+  const L=hwLoadLocal();
+  if(L&&L.sid&&qs.get('fresh')!=='1'){hwLocal=L;studentSoloStarted=true;return hwSessionFor(L);}
+  return null;
+ }
  if(qs.get('demo')==='1'){
   const rId = initialRoom || LiveClassroomSync.getActiveRoom() || '123456';
   return{role:'student',room:rId,teamId:'doi-1',token:'DEMO_DOI_1'};
@@ -744,6 +758,7 @@ async function api(route,payload){
   LiveClassroomSync.saveTeamSnapshot(world.me);
   bodyObj._meSync={...world.me, updatedAt: Date.now()};
  }
+ if(hwLocal&&session?.role==='student'&&session.room===hwRoomId(hwLocal.sid))bodyObj.hwName=hwLocal.name;
  const sharedTeams = LiveClassroomSync.getAllTeamsSnapshot(world?.resetTimestamps);
  if(sharedTeams){
   bodyObj.clientTeamsSync = sharedTeams;
@@ -1461,7 +1476,15 @@ function startScreen(msg=''){
  bkStopTeamPoll();
  document.body.classList.add('bk-mode');
  $('.award-backdrop')?.remove();
- if(bkStep==='team' && bkRoom){
+ if(hwReportKey){
+  hwReportInit();
+ }else if(hwCode && bkStep!=='host' && bkStep!=='hwhost'){
+  app.innerHTML = bkHwLanding();
+  const hi = document.getElementById('hwName');
+  if(hi && !('ontouchstart' in window)) hi.focus();
+ }else if(bkStep==='hwhost'){
+  app.innerHTML = bkHwHost();
+ }else if(bkStep==='team' && bkRoom){
   app.innerHTML = bkTeamPick();
   bkLoadTeams();
   bkStartTeamPoll();
@@ -4635,7 +4658,7 @@ const vaState = {
 
 function ensureVaStateForStage(m) {
   if (!m || !m.id) return;
-  const dur = m.timeSeconds || (m.id <= 2 ? 60 : m.id <= 4 ? 65 : 70);
+  const dur = hwIsActive() ? 600 : (m.timeSeconds || (m.id <= 2 ? 60 : m.id <= 4 ? 65 : 70)); // bài về nhà: không ép thời gian chặng
   // Đồng bộ 4 mảnh mật thư Chặng 1 từ server nếu có
   const srvPillars = world?.me?.stage1?.pillars;
   if (m.id === 1 && Array.isArray(srvPillars)) {
@@ -11929,6 +11952,7 @@ async function refresh(force=false){
   if(d.activeRoom && d.activeRoom !== '123456') LiveClassroomSync.setActiveRoom(d.activeRoom);
   if(session.role==='student' && d.me) LiveClassroomSync.saveTeamSnapshot(d.me);
   world=d;setClock();
+  hwMaybeSubmit();
   if(session.role==='teacher' || session.role==='display'){
    const hs = bkHostSig(d);
    if(!force && hs===bkLastHostSig) return;
@@ -12135,6 +12159,7 @@ async function submitCipherNotebook(){
 async function handle(action,el){
  try{
   if(action && action.startsWith('bk') && await bkHandle(action,el)) return;
+  if(action && action.startsWith('hw') && await hwHandle(action,el)) return;
   if(action==='toggleFullscreen'){
    if(!document.fullscreenElement){document.documentElement.requestFullscreen?.();}
    else{document.exitFullscreen?.();}
@@ -13502,6 +13527,7 @@ window.addEventListener('keydown',e=>{
    if(document.activeElement.id==='huntShortInput')handle('attackHuntMonster');
    else if(document.activeElement.id==='cdShortInput')handle('submitShortCastle');
    else if(!session && document.activeElement.id==='bkCode')handle('bkSubmitCode');
+   else if(!session && document.activeElement.id==='hwName')handle('hwStart');
   }
   return;
  }
@@ -14151,6 +14177,7 @@ function bkHostSetup(){
     <button type="button" class="bk-btn bk-btn-sun bk-btn-block" data-action="bkCreateRoom">Tạo phòng ${bkHostTeamCount} đội</button>
     ${last && last !== '123456' ? `<button type="button" class="bk-btn bk-btn-ghost-ink bk-btn-block" data-action="bkReopenRoom" data-room="${esc(last)}">Mở lại phòng ${esc(last)}</button>` : ''}
    </div>
+   ${window.IS_DEMO_MODE ? '' : `<button type="button" class="bk-btn bk-btn-mint bk-btn-block hw-entry-btn" data-action="hwGoHost">📚 Giao bài về nhà cho học sinh</button>`}
    <p class="bk-help">Sau khi tạo phòng, chiếu màn hình lên cho cả lớp. Học sinh quét QR hoặc nhập mã là vào được.</p>
   </main>
  </div>`;
@@ -14200,6 +14227,7 @@ function bkResultCore(){
   </dl>`;
 }
 function bkStudentResult(){
+ if (hwIsActive()) return bkHwResult();
  const me = world.me || {};
  const title = me.completed ? 'Về đích!' : 'Hết giờ!';
  const msg = world.ended ? 'Nhìn lên máy chiếu để xem bục vinh danh.' : 'Đội bạn đã hoàn thành 5 chặng. Chờ các đội khác về đích nhé.';
@@ -14216,6 +14244,7 @@ function bkStudentResult(){
 }
 function bkStudentKind(){
  if (session?.role !== 'student' || !world) return '';
+ if (hwIsActive()) return world.me?.completed ? 'result' : '';
  if (isWaitingForTeacherStart()) return 'lobby';
  if (world.ended || world.me?.completed) return 'result';
  return '';
@@ -14664,8 +14693,291 @@ async function bkHandle(action, el){
  return false;
 }
 
+/* ═══════════ BÀI VỀ NHÀ — ôn tập cá nhân, có báo cáo cho giáo viên (v6.0.0) ═══════════ */
+function hwNewSid(){
+ const a='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';let s='';
+ try{const b=new Uint8Array(10);crypto.getRandomValues(b);for(const x of b)s+=a[x%a.length];}
+ catch(e){for(let i=0;i<10;i++)s+=a[Math.floor(Math.random()*a.length)];}
+ return s;
+}
+function hwRoomId(sid){return 'HW'+hwCode+'-'+String(sid).toUpperCase();}
+function hwLoadLocal(){try{return JSON.parse(localStorage.getItem('mv_hw_'+hwCode)||'null');}catch(e){return null;}}
+function hwSaveLocal(){try{if(hwLocal)localStorage.setItem('mv_hw_'+hwCode,JSON.stringify(hwLocal));}catch(e){}}
+function hwIsActive(){return Boolean(hwCode&&hwLocal&&session?.role==='student'&&session.room===hwRoomId(hwLocal.sid));}
+function hwDisplayName(){return hwLocal?(hwLocal.name+((hwLocal.attempt||1)>1?` (lần ${hwLocal.attempt})`:'')):'';}
+function hwSessionFor(L){return{role:'student',room:hwRoomId(L.sid),teamId:'hw-'+L.sid.toLowerCase(),token:'HWT_'+L.sid};}
+async function hwPost(route,payload){
+ const r=await fetch(`${route}?endpoint=${encodeURIComponent(route)}`,{method:'POST',headers:{'Content-Type':'application/json'},keepalive:true,body:JSON.stringify({...payload,_endpoint:route})});
+ let d={};try{d=await r.json();}catch(e){}
+ if(!r.ok)throw new Error(d.error||'Không gửi được.');
+ return d;
+}
+function hwBuildReport(me){
+ const log=(me.answerLog||[]).map(e=>({stage:e.stage,qId:e.qId||e.questionId,level:e.level,correct:Boolean(e.correct),at:e.at,chosenText:e.correct?'':String(e.chosenText||'').slice(0,90)}));
+ return{
+  name:hwDisplayName(),stage:me.stage||0,completed:Boolean(me.completed),score:Math.max(0,me.score||0),
+  hints:(me.hintsUsed||[]).filter(Boolean).length,activeSec:Math.round(hwLocal.activeSec||0),
+  startedAt:hwLocal.startedAt||'',finishedAt:hwLocal.finishedAt||'',attempts:me.attempts||[0,0,0,0,0],answerLog:log
+ };
+}
+/* Mã nộp bài dự phòng: học sinh gửi cho giáo viên (Zalo…) nếu máy chủ không lưu chung được */
+function hwEncode(rep){
+ const c={...rep,answerLog:rep.answerLog.map(e=>[e.stage,e.qId,e.correct?1:0,e.chosenText||''])};
+ return 'MVHW1.'+hwCode+'.'+hwLocal.sid+'.'+btoa(unescape(encodeURIComponent(JSON.stringify(c)))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+}
+function hwDecode(text){
+ const m=/MVHW1\.([0-9A-F]{6})\.([A-Z0-9]{6,40})\.([A-Za-z0-9_-]+)/.exec(String(text||'').replace(/\s+/g,''));
+ if(!m)return null;
+ try{
+  let b=m[3].replace(/-/g,'+').replace(/_/g,'/');while(b.length%4)b+='=';
+  const c=JSON.parse(decodeURIComponent(escape(atob(b))));
+  c.answerLog=(c.answerLog||[]).map(a=>({stage:a[0],qId:a[1],correct:Boolean(a[2]),chosenText:a[3]||''}));
+  return{code:m[1],sid:m[2],report:c};
+ }catch(e){return null;}
+}
+function hwMaybeSubmit(force){
+ if(!hwIsActive()||!world?.me)return;
+ const me=world.me;
+ if(me.completed&&!hwLocal.finishedAt){hwLocal.finishedAt=new Date().toISOString();hwSaveLocal();}
+ const sig=[me.stage,me.completed?1:0,(me.answerLog||[]).length,me.score,me.correctCount].join('|');
+ const now=Date.now();
+ if(!force&&sig===hwLastSig&&hwSubmitState==='ok')return;
+ if(!force&&!me.completed&&now-hwLastAt<4000)return;
+ if(hwSending)return;
+ hwSending=true;hwLastAt=now;
+ const rep=hwBuildReport(me);
+ hwPost('/api/hwSubmit',{code:hwCode,sid:hwLocal.sid,report:rep})
+  .then(()=>{hwSubmitState='ok';hwLastSig=sig;})
+  .catch(()=>{hwSubmitState='err';})
+  .finally(()=>{hwSending=false;if(session&&bkStudentKind()==='result'){const el=document.getElementById('hwSendState');if(el)el.outerHTML=hwSendStateHtml();}});
+}
+function hwSendStateHtml(){
+ if(hwSubmitState==='ok')return `<p class="hw-send is-ok" id="hwSendState">✅ Bài làm đã được gửi cho giáo viên.</p>`;
+ if(hwSubmitState==='err')return `<p class="hw-send is-err" id="hwSendState">⚠️ Chưa gửi được cho giáo viên. <button type="button" class="hw-link" data-action="hwRetry">Gửi lại</button></p>`;
+ return `<p class="hw-send" id="hwSendState">Đang gửi bài cho giáo viên…</p>`;
+}
+setInterval(()=>{
+ if(!hwIsActive()||document.hidden)return;
+ hwLocal.activeSec=(hwLocal.activeSec||0)+1;
+ if(hwLocal.activeSec%10===0)hwSaveLocal();
+},1000);
+document.addEventListener('visibilitychange',()=>{if(document.hidden&&hwIsActive()){hwSaveLocal();hwMaybeSubmit(true);}});
+
+function hwFmtTime(sec){sec=Math.round(sec||0);if(sec<60)return sec+' giây';const m=Math.round(sec/60);return m+' phút';}
+function hwStageName(n){return ['Hiệu vectơ','Mật trận vectơ','Hình bình hành','Lật thẻ trung điểm','Trọng tâm'][n-1]||('Chặng '+n);}
+
+/* ── Học sinh: màn nhập tên ── */
+function bkHwLanding(){
+ const L=hwLoadLocal();
+ return `<div class="bk-page bk-entry">
+  <main class="bk-join">
+   <div class="bk-logo">${DIAMOND_ICON_SVG}<span>MathVerse Oxyz</span></div>
+   <div class="bk-join-card hw-card">
+    <p class="hw-kicker">📚 Bài về nhà · Ôn tập Toán 12 Oxyz</p>
+    <h1 class="hw-h1">${esc(hwTitle||'Ôn bài cùng Rồng Xanh')}</h1>
+    <label for="hwName" class="bk-sr">Họ và tên</label>
+    <input id="hwName" class="hw-name-input" type="text" autocomplete="name" maxlength="40" placeholder="Nhập họ và tên của em" value="${esc(hwNameDraft)}"/>
+    <button type="button" class="bk-btn bk-btn-sun bk-btn-block" data-action="hwStart">Bắt đầu làm bài</button>
+    ${bkError?`<p class="bk-error" role="alert">${esc(bkError)}</p>`:''}
+    ${L?`<p class="hw-old">Máy này đã có bài của <b>${esc(L.name)}</b>. <button type="button" class="hw-link" data-action="hwResume">Làm tiếp</button></p>`:''}
+   </div>
+   <p class="bk-help">Em làm một mình qua 5 chặng, sai thì thử lại. Cuối bài, kết quả được gửi tự động cho thầy cô.</p>
+  </main>
+ </div>`;
+}
+
+/* ── Học sinh: màn kết quả cuối bài ── */
+function bkHwResult(){
+ const me=world.me||{};
+ const log=me.answerLog||[];
+ const total=log.length,right=log.filter(e=>e.correct).length;
+ const pct=total?Math.round(right/total*100):0;
+ const stages=[1,2,3,4,5].map(n=>{const es=log.filter(e=>e.stage===n);const c=es.filter(e=>e.correct).length;return{n,t:es.length,c,p:es.length?Math.round(c/es.length*100):null};});
+ const weak=stages.filter(s=>s.t>0&&s.p<70).sort((a,b)=>a.p-b.p);
+ const medal=pct>=85?'🏆':pct>=60?'🌟':'💪';
+ const msg=pct>=85?'Xuất sắc! Em nắm bài rất vững.':pct>=60?'Khá tốt! Ôn thêm vài chỗ nữa là chắc.':'Cố gắng lên! Em hãy xem lại phần dưới rồi thử lại nhé.';
+ const code=hwEncode(hwBuildReport(me));
+ return `<div class="bk-page bk-student hw-result-page" data-kind="result" style="--tc:#36C6E8">
+  <main class="bk-result hw-result">
+   <div class="hw-medal" aria-hidden="true">${medal}</div>
+   <p class="bk-result-team">${esc(hwDisplayName())}</p>
+   <h1 class="bk-title">Hoàn thành bài về nhà!</h1>
+   <div class="bk-result-card">
+    <dl class="bk-result-stats">
+     <div><dt>Đúng</dt><dd>${pct}%</dd></div>
+     <div><dt>Điểm</dt><dd>${Math.max(0,me.score||0)} XP</dd></div>
+     <div><dt>Thời gian</dt><dd>${esc(hwFmtTime(hwLocal.activeSec))}</dd></div>
+    </dl>
+    <p class="hw-msg">${msg}</p>
+    <ul class="hw-stagebars">
+     ${stages.map(s=>`<li><span>Chặng ${s.n} · ${esc(hwStageName(s.n))}</span><i class="hw-bar"><b style="width:${s.p??0}%;background:${s.p===null?'#cfd3ee':s.p>=70?'#22C79A':s.p>=40?'#FFC93C':'#FF5F6D'}"></b></i><em>${s.p===null?'–':s.p+'%'}</em></li>`).join('')}
+    </ul>
+    ${weak.length?`<p class="hw-weak">📌 Nên ôn lại: ${weak.map(s=>`Chặng ${s.n} (${esc(hwStageName(s.n))})`).join(', ')}</p>`:''}
+   </div>
+   ${hwSendStateHtml()}
+   <details class="hw-backup"><summary>Không gửi được? Gửi bằng mã cho thầy cô</summary>
+    <textarea readonly id="hwBackupCode" rows="3" onclick="this.select()">${esc(code)}</textarea>
+    <button type="button" class="bk-btn bk-btn-paper" data-action="hwCopyCode">Sao chép mã</button>
+   </details>
+   <button type="button" class="bk-btn bk-btn-sun" data-action="hwAgain">Làm lại bài</button>
+  </main>
+ </div>`;
+}
+
+/* ── Giáo viên: giao bài, lấy đường dẫn ── */
+function hwList(){try{return JSON.parse(localStorage.getItem('mv_hw_list')||'[]');}catch(e){return [];}}
+function hwSaveList(l){try{localStorage.setItem('mv_hw_list',JSON.stringify(l.slice(0,30)));}catch(e){}}
+function hwStudentLink(code,title){return location.origin+location.pathname+'?hw='+code+(title?'&t='+encodeURIComponent(title):'');}
+function hwReportLink(key){return location.origin+location.pathname+'?report='+key;}
+function bkHwHost(){
+ const list=hwList();
+ const cur=hwJustMade||list[0];
+ return `<div class="bk-page bk-entry">
+  <header class="bk-top"><button type="button" class="bk-back" data-action="bkGoHost">‹ Tạo phòng chơi</button></header>
+  <main class="bk-host-setup hw-host">
+   <h1 class="bk-title">Giao bài về nhà</h1>
+   <div class="bk-setup-card">
+    <p class="bk-setup-q">Tên bài (không bắt buộc)</p>
+    <input id="hwTitleInput" class="hw-name-input" type="text" maxlength="60" placeholder="VD: Ôn tập Vectơ – tuần 12"/>
+    <button type="button" class="bk-btn bk-btn-sun bk-btn-block" data-action="hwCreate">Tạo đường dẫn bài về nhà</button>
+    ${bkError?`<p class="bk-error" role="alert">${esc(bkError)}</p>`:''}
+   </div>
+   ${cur?`<div class="bk-setup-card hw-links">
+    <p class="bk-setup-q">${esc(cur.title||'Bài về nhà')} <small>· mã ${esc(cur.code)}</small></p>
+    <label class="hw-lab">Gửi cho học sinh (Zalo, lớp học…)</label>
+    <div class="hw-copy"><input readonly value="${esc(hwStudentLink(cur.code,cur.title))}" onclick="this.select()"/><button type="button" class="bk-btn bk-btn-ghost-ink" data-action="hwCopy" data-text="${esc(hwStudentLink(cur.code,cur.title))}">Chép</button></div>
+    <div class="hw-qr">${renderRoomQrSvg(hwStudentLink(cur.code,cur.title),150)}</div>
+    <label class="hw-lab">Báo cáo của thầy cô (giữ riêng, đừng gửi học sinh)</label>
+    <div class="hw-copy"><input readonly value="${esc(hwReportLink(cur.key))}" onclick="this.select()"/><button type="button" class="bk-btn bk-btn-ghost-ink" data-action="hwCopy" data-text="${esc(hwReportLink(cur.key))}">Chép</button></div>
+    <a class="bk-btn bk-btn-mint bk-btn-block hw-open" href="${esc(hwReportLink(cur.key))}" target="_blank" rel="noopener">Mở báo cáo</a>
+   </div>`:''}
+   ${list.length>1?`<div class="bk-setup-card"><p class="bk-setup-q">Các bài đã giao</p>${list.map(x=>`<a class="hw-prev" href="${esc(hwReportLink(x.key))}" target="_blank" rel="noopener"><b>${esc(x.title||'Bài về nhà')}</b><span>mã ${esc(x.code)} · ${esc(new Date(x.at).toLocaleDateString('vi-VN'))}</span></a>`).join('')}</div>`:''}
+   <p class="bk-help">Học sinh mở đường dẫn, nhập tên và làm bài. Bấm "Mở báo cáo" bất cứ lúc nào để xem tiến độ.</p>
+  </main>
+ </div>`;
+}
+
+/* ── Giáo viên: trang báo cáo ── */
+let hwReportData=null,hwReportErr='',hwReportTimer=null,hwReportSort='default';
+function hwPctClass(p){return p===null||p===undefined?'na':p>=75?'good':p>=50?'mid':'bad';}
+function hwReportHtml(){
+ const d=hwReportData;
+ if(!d)return `<div class="hw-rp"><div class="hw-rp-load">${hwReportErr?esc(hwReportErr):'Đang tải báo cáo…'}</div></div>`;
+ const s=d.summary;
+ const tile=(v,l)=>`<div class="hw-tile"><b>${v}</b><span>${l}</span></div>`;
+ const rows=d.students.map(x=>{
+  const prog=x.completed?'<span class="hw-done">Hoàn thành</span>':`Chặng ${Math.min(5,(x.stage||0)+1)}/5`;
+  const pips=x.byStage.map(b=>`<i class="hw-pip ${hwPctClass(b.total?Math.round(b.correct/b.total*100):null)}" title="Chặng ${b.stage}: ${b.total?b.correct+'/'+b.total:'chưa làm'}"></i>`).join('');
+  return `<tr class="${d.needHelp.includes(x.name)?'is-help':''}"><td class="hw-nm">${esc(x.name)}</td><td>${prog}<div class="hw-pips">${pips}</div></td><td><span class="hw-pct ${hwPctClass(x.pct)}">${x.pct===null?'–':x.pct+'%'}</span></td><td>${x.correct}/${x.total}</td><td>${x.score}</td><td>${esc(hwFmtTime(x.activeSec))}</td><td class="hw-up">${esc(new Date(x.updatedAt).toLocaleString('vi-VN',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}))}</td></tr>`;
+ }).join('');
+ const qs=d.byQuestion.slice(0,8).filter(q=>q.total>0&&q.pct<100);
+ const lv=d.levels;
+ return `<div class="hw-rp">
+  <header class="hw-rp-head">
+   <div><p class="hw-kicker">📊 Báo cáo bài về nhà · mã ${esc(d.code)}</p><h1>Kết quả ôn tập của lớp</h1><p class="hw-sub">Cập nhật ${esc(new Date(d.generatedAt).toLocaleTimeString('vi-VN'))} · tự làm mới mỗi 20 giây</p></div>
+   <div class="hw-actions"><button type="button" class="bk-btn bk-btn-ghost-ink" data-action="hwReportReload">Làm mới</button><button type="button" class="bk-btn bk-btn-mint" data-action="hwCsv">Tải CSV</button><button type="button" class="bk-btn bk-btn-paper" data-action="hwPrint">In / PDF</button></div>
+  </header>
+  ${d.durable?'':`<div class="hw-warn">⚠️ Máy chủ chưa có kho lưu trữ chung nên báo cáo có thể thiếu bài của một số em. Cách khắc phục: xem <b>HUONG_DAN_BAI_VE_NHA.md</b>, hoặc dán "mã nộp bài" của học sinh vào ô cuối trang.</div>`}
+  <section class="hw-tiles">${tile(s.students,'học sinh đã vào')}${tile(s.completed,'đã hoàn thành')}${tile(s.avgPct+'%','đúng trung bình')}${tile(s.avgScore,'điểm XP trung bình')}${tile(Math.round(s.avgMin)+'′','thời gian trung bình')}</section>
+  ${d.needHelp.length?`<section class="hw-card"><h2>🆘 Cần hỗ trợ (đúng dưới 60%)</h2><p class="hw-chips">${d.needHelp.map(n=>`<span>${esc(n)}</span>`).join('')}</p></section>`:''}
+  <div class="hw-grid2">
+   <section class="hw-card"><h2>Kết quả theo chặng</h2><ul class="hw-stagebars">${d.stages.map(st=>`<li><span>Chặng ${st.stage} · ${esc(hwStageName(st.stage))}<small>${st.reached} em đến chặng này</small></span><i class="hw-bar"><b style="width:${st.pct??0}%;background:${st.pct===null?'#cfd3ee':st.pct>=70?'#22C79A':st.pct>=40?'#FFC93C':'#FF5F6D'}"></b></i><em>${st.pct===null?'–':st.pct+'%'}</em></li>`).join('')}</ul></section>
+   <section class="hw-card"><h2>Mức độ nhận thức</h2><ul class="hw-stagebars"><li><span>Nhận biết<small>${lv.nhanBiet.correct}/${lv.nhanBiet.total} câu đúng</small></span><i class="hw-bar"><b style="width:${lv.nhanBiet.pct??0}%;background:#22C79A"></b></i><em>${lv.nhanBiet.pct===null?'–':lv.nhanBiet.pct+'%'}</em></li><li><span>Thông hiểu<small>${lv.thongHieu.correct}/${lv.thongHieu.total} câu đúng</small></span><i class="hw-bar"><b style="width:${lv.thongHieu.pct??0}%;background:#7c83ff"></b></i><em>${lv.thongHieu.pct===null?'–':lv.thongHieu.pct+'%'}</em></li></ul></section>
+  </div>
+  ${qs.length?`<section class="hw-card"><h2>Câu cả lớp hay sai nhất</h2><ol class="hw-q">${qs.map(q=>`<li><div class="hw-q-top"><span class="hw-pct ${hwPctClass(q.pct)}">${q.pct}% đúng</span><small>Chặng ${q.stage} · ${esc(q.level)} · ${q.correct}/${q.total} lượt</small></div><p>${esc(String(q.prompt).slice(0,160))}</p>${q.missedBy.length?`<small class="hw-miss">Em sai: ${esc(q.missedBy.slice(0,8).join(', '))}${q.missedBy.length>8?'…':''}</small>`:''}</li>`).join('')}</ol></section>`:''}
+  <section class="hw-card"><h2>Danh sách học sinh</h2>
+   ${d.students.length?`<div class="hw-tablewrap"><table class="hw-table"><thead><tr><th>Họ tên</th><th>Tiến độ</th><th>Đúng</th><th>Đúng/Tổng</th><th>Điểm</th><th>Thời gian</th><th>Cập nhật</th></tr></thead><tbody>${rows}</tbody></table></div>`:'<p class="hw-empty">Chưa có học sinh nào nộp bài. Gửi đường dẫn bài về nhà cho lớp nhé.</p>'}
+  </section>
+  <section class="hw-card hw-import"><h2>Dán mã nộp bài của học sinh</h2><p class="hw-sub">Dùng khi một em không gửi được tự động.</p><textarea id="hwImportBox" rows="3" placeholder="MVHW1.…"></textarea><button type="button" class="bk-btn bk-btn-ghost-ink" data-action="hwImport">Thêm vào báo cáo</button><span id="hwImportMsg" class="hw-sub"></span></section>
+ </div>`;
+}
+async function hwLoadReport(){
+ try{hwReportData=await hwPost('/api/hwReport',{key:hwReportKey});hwReportErr='';}
+ catch(e){hwReportErr=e.message||'Không tải được báo cáo.';}
+ const root=document.getElementById('hwReportRoot');
+ if(root&&!document.activeElement?.matches('textarea'))root.innerHTML=hwReportHtml();
+}
+function hwReportInit(){
+ document.body.classList.add('bk-mode','hw-report-mode');
+ app.innerHTML=`<div id="hwReportRoot">${hwReportHtml()}</div>`;
+ hwLoadReport();
+ clearInterval(hwReportTimer);
+ hwReportTimer=setInterval(()=>{if(!document.hidden)hwLoadReport();},20000);
+}
+function hwCsv(){
+ const d=hwReportData;if(!d)return;
+ const q=v=>'"'+String(v??'').replace(/"/g,'""')+'"';
+ const lines=[['Họ tên','Hoàn thành','Chặng hiện tại','Điểm XP','Số câu đúng','Số câu sai','% đúng','Thời gian (phút)','Cập nhật'].map(q).join(',')];
+ d.students.forEach(x=>lines.push([x.name,x.completed?'Có':'Chưa',x.completed?5:Math.min(5,x.stage+1),x.score,x.correct,x.wrong,x.pct??'',Math.round(x.activeSec/60),x.updatedAt].map(q).join(',')));
+ lines.push('');lines.push(['Câu hỏi/nhiệm vụ','Chặng','Mức độ','Lượt trả lời','Lượt đúng','% đúng','Em sai'].map(q).join(','));
+ d.byQuestion.forEach(x=>lines.push([x.prompt,x.stage,x.level,x.total,x.correct,x.pct??'',x.missedBy.join('; ')].map(q).join(',')));
+ const blob=new Blob(['﻿'+lines.join('\r\n')],{type:'text/csv;charset=utf-8'});
+ const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='bao-cao-bai-ve-nha-'+d.code+'.csv';document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},500);
+}
+
+async function hwHandle(action,el){
+ if(action==='hwStart'){
+  const name=String($('#hwName')?.value||'').trim().replace(/\s+/g,' ').slice(0,40);
+  hwNameDraft=name;
+  if(name.length<2){bkError='Em hãy nhập họ và tên nhé.';startScreen();return true;}
+  const prev=hwLoadLocal();
+  const attempt=(prev&&prev.name.toLowerCase()===name.toLowerCase())?(prev.attempt||1)+1:1;
+  hwLocal={sid:hwNewSid(),name,attempt,startedAt:new Date().toISOString(),activeSec:0,finishedAt:''};
+  hwSaveLocal();
+  return hwEnter();
+ }
+ if(action==='hwResume'){hwLocal=hwLoadLocal();if(!hwLocal)return true;return hwEnter();}
+ if(action==='hwRetry'){hwSubmitState='';hwMaybeSubmit(true);const e=document.getElementById('hwSendState');if(e)e.outerHTML=hwSendStateHtml();return true;}
+ if(action==='hwCopyCode'){const t=$('#hwBackupCode');if(t){t.select();try{await navigator.clipboard.writeText(t.value);}catch(e){document.execCommand('copy');}el.textContent='Đã sao chép ✓';}return true;}
+ if(action==='hwAgain'){
+  if(!confirm('Làm lại từ đầu? Kết quả lần này vẫn được giữ trong báo cáo.'))return true;
+  session=null;world=null;studentSoloStarted=false;hwSubmitState='';hwLastSig='';
+  hwNameDraft=hwLocal?.name||'';
+  try{history.replaceState({},'',location.pathname+'?hw='+hwCode+(hwTitle?'&t='+encodeURIComponent(hwTitle):''));}catch(e){}
+  startScreen();return true;
+ }
+ if(action==='hwGoHost'){bkStep='hwhost';bkError='';startScreen();return true;}
+ if(action==='hwCreate'){
+  const title=String($('#hwTitleInput')?.value||'').trim().slice(0,60);
+  el.disabled=true;
+  try{
+   const r=await hwPost('/api/hwCreate',{});
+   const item={key:r.key,code:r.code,title,at:new Date().toISOString()};
+   hwSaveList([item,...hwList()]);hwJustMade=item;bkError='';
+  }catch(e){bkError=e.message||'Không tạo được bài.';}
+  startScreen();return true;
+ }
+ if(action==='hwCopy'){
+  const t=el.dataset.text||'';
+  try{await navigator.clipboard.writeText(t);}catch(e){const i=el.previousElementSibling;if(i){i.select();document.execCommand('copy');}}
+  el.textContent='Đã chép ✓';setTimeout(()=>{el.textContent='Chép';},1500);return true;
+ }
+ if(action==='hwReportReload'){hwLoadReport();return true;}
+ if(action==='hwCsv'){hwCsv();return true;}
+ if(action==='hwPrint'){window.print();return true;}
+ if(action==='hwImport'){
+  const msg=document.getElementById('hwImportMsg');
+  const dec=hwDecode($('#hwImportBox')?.value);
+  if(!dec){if(msg)msg.textContent=' Mã không đúng định dạng.';return true;}
+  try{await hwPost('/api/hwSubmit',{code:dec.code,sid:dec.sid,report:dec.report});if(msg)msg.textContent=' Đã thêm ✓';await hwLoadReport();}
+  catch(e){if(msg)msg.textContent=' '+(e.message||'Lỗi');}
+  return true;
+ }
+ return false;
+}
+async function hwEnter(){
+ studentSoloStarted=true;mvShowIntroHub=false;mvWorldMapOpen=false;
+ try{
+  const r=await api('/api/join',{room:hwRoomId(hwLocal.sid),team:'hw',hwName:hwLocal.name});
+  saveSession({role:'student',room:r.room,teamId:r.team,token:r.token});
+  activePlayMode=null;hwSubmitState='';hwLastSig='';
+  await refresh(true);
+ }catch(e){bkError=e.message||'Không vào được bài.';startScreen();}
+ return true;
+}
+
 session=restoreSession();
-if(session){refresh(true);}else{startScreen();}
+if(hwReportKey){hwReportInit();}else if(session){refresh(true);}else{startScreen();}
 setInterval(()=>{if(session&&!document.hidden)refresh(false);},2500);
 setInterval(updateClock,400);
 requestAnimationFrame(gameLoop);
