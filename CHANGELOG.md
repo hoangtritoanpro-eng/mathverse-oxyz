@@ -9,6 +9,24 @@ Tất cả những thay đổi quan trọng của dự án này sẽ được gh
 
 ---
 
+## [6.5.0] - 2026-11-10
+
+Rà soát logic bằng cách tự động chơi trọn 6 chặng (44 bước kiểm điểm, 2 lượt chơi: có sai và toàn đúng).
+
+### Fixed
+- **Điểm bị tính hai lần** ở Chặng 1, 2, 4, 5: màn hình ghi −2 XP nhưng trừ 4, ghi +5 XP nhưng cộng 10 (máy học sinh tự tính rồi máy chủ tính thêm lần nữa). Nay điểm thay đổi đúng bằng con số hiển thị. Điểm tối đa một bài: 205 XP.
+- **Chặng 5:** nút XÁC NHẬN ở Bước 2 tự nối hộ trung tuyến và cho +5 XP dù học sinh không làm gì → nay chỉ nhắc học sinh tự kéo. Thả lệch trung điểm rồi bấm XÁC NHẬN không còn bị trừ điểm lần hai; bấm XÁC NHẬN khi chưa kéo Tâm Thạch không bị trừ điểm.
+- **Chặng 3** tên là "Hình bình hành" nhưng 2/3 câu lại là quy tắc ba điểm, trùng y hệt Chặng 2 → đổi thành 3 câu quy tắc hình bình hành (AB + AD = AC, DA + DC = DB, BA + BC = BD).
+- **Chặng 4:** thẻ đã xem bị ghi sẵn "Cặp 2", "Cặp 4" ở mặt sau và thẻ cùng cặp tự phát sáng → học sinh ghép theo số, không cần hiểu toán. Nay chỉ ghi "Đã xem".
+- **Chặng 1:** bỏ chi tiết lộ đáp án (đáp án đúng dài hơn hẳn; bảng mở cầu hiện sẵn "C → B").
+- **Báo cáo:** bắn đúng ở Chặng 3 bị ghi thiếu và sai câu; sai ở cầu Chặng 1 và câu hỏi Chặng 5 bị ghi nhầm câu; tên câu Chặng 3, 4, 5 trong "câu hay sai" không khớp nội dung thật. Nay ghi đúng từng câu.
+- Bản đồ chuyển chặng (bài về nhà): bỏ dòng "+10 XP" không có thật, bỏ mã phòng kỹ thuật, hiện đủ 6 chặng.
+
+### Added
+- Màn giới thiệu Chặng 6 (luật chơi, cách tính điểm) trước khi vào 4 câu tự luận.
+
+---
+
 ## [6.4.0] - 2026-11-10
 
 ### Added (Chặng 6 · Tích vô hướng — câu trả lời ngắn, chế độ bài về nhà)

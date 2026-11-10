@@ -702,8 +702,8 @@ function processAction(endpoint,d){
    t.score=Math.max(0,(t.score||0)-penalty);
    t.answerLog.push({
     stage:1,
-    qId:`1.P${d.pillar||1}`,
-    questionId:`1.P${d.pillar||1}`,
+    qId:d.pillar?`1.P${d.pillar}`:'1.2',
+    questionId:d.pillar?`1.P${d.pillar}`:'1.2',
     isQuiz:true,
     level:'NHẬN BIẾT',
     choice:1,
@@ -810,6 +810,14 @@ function processAction(endpoint,d){
     at:new Date().toISOString()
    });
    emit(r,`⚡ ${t.avatar} ${t.name} bắn nhầm Zombie (Vectơ ${vec}) tại Chặng 3 (−${penalty} XP, còn ${t.score} XP)!`);
+  }
+  if(d.killCol){
+   const qIdx=Math.max(0,Math.min(2,Number(d.qIdx)||0));
+   const qId=`3.${qIdx+1}`;
+   if(!t.answerLog.some(e=>e.stage===3&&e.qId===qId&&e.correct)){
+    t.correctCount=(t.correctCount||0)+1;
+    t.answerLog.push({stage:3,qId,questionId:qId,isQuiz:true,level:'NHẬN BIẾT',choice:0,chosenText:`Bắn đúng Zombie mang vectơ ${String(d.chosenVec||'').slice(0,6)}`,correct:true,at:new Date().toISOString()});
+   }
   }
   if(d.fenceBreach){
    penalty=4;
@@ -982,7 +990,8 @@ function processAction(endpoint,d){
    t.attempts[4]=(t.attempts[4]||0)+1;
    t.streak=0;
    t.score=Math.max(0,(t.score||0)-penalty);
-   t.answerLog.push({stage:5,qId:`5.${t.stage5.phase||1}`,questionId:`5.${t.stage5.phase||1}`,isQuiz:true,level:'THÔNG HIỂU',choice:1,chosenText:String(d.reason||'Thao tác sai vị trí hình học tại Chặng 5'),correct:false,at:new Date().toISOString()});
+   const s5q=d.isQuiz?`5.Q${Math.max(1,Math.min(3,Number(d.quizNo)||((t.stage5.quizSolvedCount||0)+1)))}`:`5.${t.stage5.phase||1}`;
+   t.answerLog.push({stage:5,qId:s5q,questionId:s5q,isQuiz:true,level:'THÔNG HIỂU',choice:1,chosenText:String(d.reason||'Thao tác sai vị trí hình học tại Chặng 5'),correct:false,at:new Date().toISOString()});
    emit(r,`⚠️ ${t.avatar} ${t.name} thao tác chưa đúng tại Chặng 5: ${d.reason||'Thử lại'} (−${penalty} XP, còn ${t.score} XP).`);
   }
   if(d.timedOut){
@@ -1211,7 +1220,7 @@ function processAction(endpoint,d){
    if(!Number.isInteger(choice)||choice<0||choice>3)throw error('Vui lòng chọn một đáp án rồi nhấn Xác nhận.');
    isCorrect=(choice===q.correct);
   }
-  if(!q.isInteractive){
+  if(!q.isInteractive && !d.zombieTargetCleared){
    t.answerLog.push({
     stage:idx+1,
     qId:q.id||`${idx+1}.${round}`,
@@ -1519,12 +1528,33 @@ const HW_QINFO=(()=>{
 })();
 const HW_STAGE_NAMES=[...STAGES.map(s=>String(s.shortName||s.title||('Chặng '+s.id))),'Tích vô hướng'];
 const HW_LEVEL=(st)=>st<=3?'NHẬN BIẾT':st<=5?'THÔNG HIỂU':'VẬN DỤNG';
+const HW_QLABEL={
+ '1.1':'Chặng 1 · Ghép mật thư: lập biểu thức AB − AC',
+ '1.2':'Chặng 1 · Mở Cầu Ánh Sáng: AB − AC = CB',
+ '3.1':'Chặng 3 · Hình bình hành ABCD: AB + AD = AC',
+ '3.2':'Chặng 3 · Hình bình hành ABCD: DA + DC = DB',
+ '3.3':'Chặng 3 · Hình bình hành ABCD: BA + BC = BD',
+ '4.1':'Chặng 4 · Ghép cặp: I là trung điểm của AB ↔ AI = IB',
+ '4.2':'Chặng 4 · Ghép cặp: IA + IB = vectơ 0',
+ '4.3':'Chặng 4 · Ghép cặp: MA + MB = 2MI',
+ '4.4':'Chặng 4 · Ghép cặp: AI = IB = 1/2 AB',
+ '5.1':'Chặng 5 · Bước 1: kéo tìm trung điểm cạnh BC và AC',
+ '5.2':'Chặng 5 · Bước 2: nối hai đường trung tuyến',
+ '5.3':'Chặng 5 · Bước 3: đặt Tâm Thạch vào trọng tâm G',
+ '5.4':'Chặng 5 · Câu hỏi về trọng tâm',
+ '5.Q1':'Chặng 5 · Câu 1: AG = 2/3 AM (tỉ số 2:1 trên trung tuyến)',
+ '5.Q2':'Chặng 5 · Câu 2: GA + GB + GC = vectơ 0',
+ '5.Q3':'Chặng 5 · Câu 3: MA + MB + MC = 3MG',
+ '6.1':'Chặng 6 · Lập phương ABCD.EFGH: góc giữa vectơ AF và EG (đáp án 60°)',
+ '6.2':'Chặng 6 · Tứ diện đều ABCD, H trung điểm AB: góc giữa vectơ CH và AC (đáp án 150°)',
+ '6.3':'Chặng 6 · Tam giác ABC, BA = 5, BC = 4, góc B = 60°: AB·BC (đáp án −10)',
+ '6.4':'Chặng 6 · |a| = |b| = 4, góc 60°: (a + 2b)(a − 3b) (đáp án −88)'
+};
 function hwQLabel(qId,stage){
+ if(HW_QLABEL[qId])return HW_QLABEL[qId];
  const m=/^1\.P(\d)/.exec(qId);
  if(m)return 'Chặng 1 · Giải mã mảnh mật thư số '+m[1];
- if(/^5\.[123]$/.test(qId))return 'Chặng 5 · Thao tác hình học giai đoạn '+qId.slice(2);
- const s6={'6.1':'Lập phương ABCD.EFGH: góc giữa vectơ AF và EG (đáp án 60°)','6.2':'Tứ diện đều ABCD, H trung điểm AB: góc giữa vectơ CH và AC (đáp án 150°)','6.3':'Tam giác ABC, BA = 5, BC = 4, góc B = 60°: AB·BC (đáp án −10)','6.4':'|a| = |b| = 4, góc 60°: (a + 2b)(a − 3b) (đáp án −88)'};
- if(s6[qId])return 'Chặng 6 · '+s6[qId];
+ if(HW_QINFO[qId])return 'Chặng '+stage+' · '+HW_QINFO[qId].prompt;
  return 'Chặng '+stage+' · '+(HW_STAGE_NAMES[stage-1]||'')+' · nhiệm vụ '+qId;
 }
 function hwBuild(code,store){
@@ -1553,7 +1583,7 @@ function hwBuild(code,store){
  });
  const byQuestion=Object.values(q).map(o=>({
   qId:o.qId,stage:o.stage,level:o.level,total:o.total,correct:o.correct,pct:o.total?Math.round(o.correct/o.total*100):null,
-  prompt:(HW_QINFO[o.qId]||{}).prompt||hwQLabel(o.qId,o.stage),
+  prompt:hwQLabel(o.qId,o.stage),
   missedBy:[...o.missed].slice(0,30),
   topWrong:Object.entries(o.wrongChoices).sort((a,b)=>b[1]-a[1]).slice(0,2).map(x=>x[0])
  })).sort((a,b)=>(a.pct??101)-(b.pct??101)||b.total-a.total);

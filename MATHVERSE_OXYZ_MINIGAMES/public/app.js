@@ -755,8 +755,10 @@ async function api(route,payload){
  let r;
  const bodyObj={...(payload||{}),_endpoint:route};
  if(session?.role==='student' && world?.me){
-  LiveClassroomSync.saveTeamSnapshot(world.me);
-  bodyObj._meSync={...world.me, updatedAt: Date.now()};
+  const pend=mvPendingPen; mvPendingPen={score:0,wrong:0};
+  const meSnap=(pend.score||pend.wrong)?{...world.me,score:(world.me.score||0)+pend.score,wrong:Math.max(0,(world.me.wrong||0)-pend.wrong)}:world.me;
+  LiveClassroomSync.saveTeamSnapshot(meSnap);
+  bodyObj._meSync={...meSnap, updatedAt: Date.now()};
  }
  if(hwLocal&&session?.role==='student'&&session.room===hwRoomId(hwLocal.sid))bodyObj.hwName=hwLocal.name;
  const sharedTeams = LiveClassroomSync.getAllTeamsSnapshot(world?.resetTimestamps);
@@ -5040,7 +5042,7 @@ const S1_PILLAR_META = {
     wrongHint: 'Gợi ý: Kí hiệu \\vec{AB} và \\vec{AC} đều có chữ cái đầu tiên là A — đó chính là điểm gốc chung!',
     options: [
       { text: 'Cùng xuất phát từ điểm B', correct: false },
-      { text: 'Cùng xuất phát từ điểm gốc A (vectơ \\vec{AB} và \\vec{AC})', correct: true },
+      { text: 'Cùng xuất phát từ điểm A', correct: true },
       { text: 'Cùng xuất phát từ điểm C', correct: false },
       { text: 'Một vectơ xuất phát từ B, một vectơ xuất phát từ C', correct: false }
     ]
@@ -5514,6 +5516,7 @@ async function s1ActivateDestinationPillar(targetPid = 'B') {
   } else {
     sound('wrong');
     applyWrongAnswerPenalty(res?.penalty || 2, 'Chọn sai chiều vectơ');
+    mvPendingPen = { score: 0, wrong: 0 };
     if (res && typeof res.score === 'number' && world?.me) {
       world.me.score = res.score;
     }
@@ -5926,7 +5929,7 @@ function renderStage1UnlockBridgeModal() {
         <div class="s1-unlock-formula-banner">
           <span class="s1-formula-chip">${formatMath('\\vec{AB}')}</span>
           <span class="s1-formula-chip">${formatMath('- \\vec{AC}')}</span>
-          <span class="s1-formula-chip">C → B</span>
+          <span class="s1-formula-chip">=</span>
           <span class="s1-formula-chip highlight">?</span>
         </div>
 
@@ -6267,30 +6270,30 @@ const Z3_QUESTIONS = [
     badge: 'Câu 1/3',
     shortLabel: 'Câu 1',
     cardTitle: 'CÂU 1',
-    promptText: 'Tiêu diệt zombie đang giữ vectơ kết quả của',
-    cardPrompt: 'Tìm vectơ kết quả của',
-    contextNote: '',
+    promptText: 'Cho hình bình hành ABCD, tìm vectơ kết quả của',
+    cardPrompt: 'Cho HBH ABCD, tìm',
+    contextNote: 'Hình bình hành ABCD',
     v1: 'AB',
-    v2: 'BC',
+    v2: 'AD',
     targetVec: 'AC',
     correctIdx: 2, // Đáp án C: AC
-    options: ['BA', 'CB', 'AC', 'AB'],
-    hintText: 'Tổng của hai vectơ nối tiếp bằng vectơ nối điểm đầu với điểm cuối (Quy tắc 3 điểm: A → B → C).'
+    options: ['BD', 'CA', 'AC', 'DB'],
+    hintText: 'Quy tắc hình bình hành: tổng hai vectơ cạnh cùng xuất phát từ đỉnh A bằng vectơ đường chéo xuất phát từ A.'
   },
   {
     qIdx: 1,
     badge: 'Câu 2/3',
     shortLabel: 'Câu 2',
     cardTitle: 'CÂU 2',
-    promptText: 'Tiêu diệt zombie đang giữ vectơ kết quả của',
-    cardPrompt: 'Tìm vectơ kết quả của',
-    contextNote: '',
-    v1: 'MN',
-    v2: 'NP',
-    targetVec: 'MP',
-    correctIdx: 1, // Đáp án B: MP
-    options: ['PM', 'MP', 'NP', 'MN'],
-    hintText: 'Hai vectơ nối tiếp tại điểm trung gian N: tổng bằng vectơ nối điểm đầu M với điểm cuối P.'
+    promptText: 'Cho hình bình hành ABCD, tìm vectơ kết quả của',
+    cardPrompt: 'Cho HBH ABCD, tìm',
+    contextNote: 'Hình bình hành ABCD',
+    v1: 'DA',
+    v2: 'DC',
+    targetVec: 'DB',
+    correctIdx: 1, // Đáp án B: DB
+    options: ['BD', 'DB', 'AC', 'CA'],
+    hintText: 'Quy tắc hình bình hành: tổng hai vectơ cạnh cùng xuất phát từ đỉnh D bằng vectơ đường chéo xuất phát từ D.'
   },
   {
     qIdx: 2,
@@ -6505,6 +6508,11 @@ function z3RetryStage() {
   render();
 }
 
+// Ghi nhận đúng câu hỏi vừa bắn trúng vào nhật ký bài làm (cho báo cáo giáo viên)
+function z3ReportKill(qIdx, vec) {
+  if (!session?.room || !session?.token || session.role !== 'student') return Promise.resolve();
+  return api('/api/stage3Progress', { room: session.room, token: session.token, killCol: true, qIdx, chosenVec: vec }).catch(() => {});
+}
 async function z3SyncServerProgress() {
   if (z3State.submittingServer || !session || session.role !== 'student' || !world?.me) return;
   const neededRound = Math.min(3, z3State.kills);
@@ -6584,7 +6592,7 @@ function z3ResolveBulletHit(bullet) {
     const earnedScore = col.wrongShots === 0 ? fullPts : fullPts / 2;
     z3State.score = Math.min(100, z3State.score + earnedScore);
     z3State.xpBonus += col.wrongShots === 0 ? 10 : 5;
-    applyCorrectScoreReward(col.wrongShots === 0 ? 10 : 5);
+    applyCorrectScoreReward(col.wrongShots === 0 ? 10 : 5, false);
     if (res) {
       res.cleared = true;
       res.wrongShots = col.wrongShots;
@@ -6611,11 +6619,11 @@ function z3ResolveBulletHit(bullet) {
     if (z3State.kills >= z3State.targetKills) {
       z3State.mascotMood = 'win';
       z3State.mascotMsg = `🏆 Đã chặn đứng đàn zombie! Đội đã diệt gọn cả ${z3State.targetKills}/${z3State.targetKills} cột câu hỏi!`;
-      z3SyncServerProgress();
+      z3ReportKill(col.qIdx, q.targetVec).finally(() => z3SyncServerProgress());
     } else {
       z3State.mascotMood = 'win';
       z3State.mascotMsg = `💥 Chính xác (<span class="z3-inline-vec"><span class="v-arr">→</span>${q.v1}</span> + <span class="z3-inline-vec"><span class="v-arr">→</span>${q.v2}</span> = <span class="z3-inline-vec"><span class="v-arr">→</span>${q.targetVec}</span>)! Cả cột ${q.shortLabel} đã bị tiêu diệt! Tiếp tục chặn <b>${nextActiveQ.cardTitle}</b>!`;
-      z3SyncServerProgress();
+      z3ReportKill(col.qIdx, q.targetVec).finally(() => z3SyncServerProgress());
     }
   } else {
     // ⚡ BẮN SAI: Trừ điểm XP ngay lập tức, chỉ con zombie sai đó bị hạ, cả đàn zombie bứt tốc lao nhanh hơn!
@@ -8884,14 +8892,8 @@ const CardMatchingController = {
 
     if (s4State.flippedIndices.length === 1) {
       s4State.fsm = 'PLAYING';
-      // Hỗ trợ thông minh: Nếu thẻ còn lại của cặp này đã từng được lật (seen = true), làm sáng nhẹ thẻ đó để học sinh ghép ngay!
-      const partner = s4State.deck.find(c => c.pairId === card.pairId && c.index !== card.index && !c.matched);
-      if (partner && partner.seen) {
-        partner.hintGlow = true;
-        DragonGuide.setFeedback('cheer', `💡 Gợi nhớ nhanh: Bạn đã từng mở thẻ còn lại của <b>${card.badge}</b> ở ô số <b>#${partner.index + 1}</b> (đang phát sáng)!`);
-      } else {
-        DragonGuide.setFeedback('idle', `Đang mở <b>${card.badge}</b> (${card.typeLabel}). Hãy tìm thẻ có nội dung toán học tương ứng thuộc <b>Cặp ${card.pairNum}</b>!`);
-      }
+      // Không tự làm sáng thẻ còn lại, không lộ số cặp: học sinh phải tự nhận ra hai thẻ cùng ý nghĩa toán học.
+      DragonGuide.setFeedback('idle', `Đang mở một thẻ <b>${card.typeLabel}</b>. Hãy tìm thẻ có <b>cùng ý nghĩa toán học</b> để ghép cặp! (Cần trợ giúp: bấm 💡 Gợi ý cặp thẻ.)`);
       render();
       return;
     }
@@ -8976,7 +8978,7 @@ const CardMatchingController = {
 
       DragonGuide.setFeedback(
         'think',
-        `Chưa khớp (<b>−2 XP</b>)! Hai thẻ này thuộc <b>Cặp ${cardA.pairNum}</b> và <b>Cặp ${cardB.pairNum}</b>. Mặt sau của chúng đã được gắn nhãn <b>Cặp ${cardA.pairNum}</b> & <b>Cặp ${cardB.pairNum}</b> để bạn dễ ghép ở lượt sau!`
+        `Chưa khớp (<b>−2 XP</b>)! Hãy ghi nhớ nội dung hai thẻ vừa mở: mặt sau của chúng đã được đánh dấu <b>Đã xem</b>. Tìm thẻ có cùng ý nghĩa toán học để ghép cặp!`
       );
 
       Stage4Progress.save();
@@ -9319,8 +9321,8 @@ function renderStage4MidpointMemoryGame(m) {
                       <div class="s4-card-back-shimmer"></div>
                       <span class="s4-card-num-corner">#${idx + 1}</span>
                       ${card.seen && !card.matched ? `
-                        <span class="s4-card-seen-tag" style="--pair-color:${card.badgeColor}">
-                          👁️ Cặp ${card.pairNum} · ${card.role === 'visual' ? 'Hình vẽ' : 'Công thức'}
+                        <span class="s4-card-seen-tag" style="--pair-color:#94A3B8">
+                          👁️ Đã xem · ${card.role === 'visual' ? 'Hình vẽ' : 'Công thức'}
                         </span>
                       ` : ''}
                     </div>
@@ -10088,23 +10090,30 @@ const CentroidStage5 = {
 
   async confirmCurrentAction() {
     if (s5State.timedOut) return;
+    const remind = (html) => { s5State.dragonMood = 'hint'; s5State.dragonSpeech = html; sound('bleep'); if (window.spawnJuiceFloater) window.spawnJuiceFloater(html.replace(/<[^>]+>/g, ''), 'gold'); render(); };
     if (s5State.phase === 1) {
       const target = !s5State.mpBC_done ? 'mpBC' : 'mpAC';
+      // Vị trí này vừa bị chấm sai khi thả tay → không trừ điểm lần hai, chỉ nhắc kéo lại
+      if ((target === 'mpBC' && s5State.mpBC_wrong) || (target === 'mpAC' && s5State.mpAC_wrong)) {
+        remind(`Hãy kéo lại điểm sáng trên cạnh <b>${target === 'mpBC' ? 'BC' : 'AC'}</b> về chính giữa cạnh rồi thả tay.`);
+        return;
+      }
       MidpointDragController.finishDrag(target);
       return;
     }
     if (s5State.phase === 2) {
-      // Nếu học sinh bấm XÁC NHẬN khi đang chọn đỉnh bằng bàn phím
-      if (!s5State.medA_done) {
-        MedianConnectionController.startConnection('A');
-        MedianConnectionController.finishConnection(null, 'mpBC');
-      } else if (!s5State.medB_done) {
-        MedianConnectionController.startConnection('B');
-        MedianConnectionController.finishConnection(null, 'mpAC');
-      }
+      // Không tự nối hộ: học sinh phải tự kéo từ đỉnh tới trung điểm cạnh đối diện
+      remind(!s5State.medA_done
+        ? 'Hãy <b>kéo từ đỉnh A</b> tới trung điểm của cạnh đối diện để vẽ trung tuyến.'
+        : 'Hãy <b>kéo từ đỉnh B</b> tới trung điểm của cạnh đối diện để vẽ trung tuyến.');
       return;
     }
     if (s5State.phase === 3) {
+      const sp = TriangleGeometry.crystalSpawn;
+      if (Math.abs(s5State.crystalX - sp.x) < 1 && Math.abs(s5State.crystalY - sp.y) < 1) {
+        remind('Hãy <b>kéo viên Tâm Thạch</b> vào giao điểm của hai đường trung tuyến.');
+        return;
+      }
       CrystalDragController.finishDrag();
       return;
     }
@@ -10187,6 +10196,7 @@ const CentroidStage5 = {
           token: session.token,
           wrongAttempt: true,
           isQuiz: true,
+          quizNo: s5State.quizIdx + 1,
           reason: `Chọn sai Câu ${s5State.quizIdx + 1}/3 (${curQ.plainOptions[chosen] || 'Đáp án ' + (chosen + 1)})`
         }).then(srv => {
           if (srv && typeof srv.score === 'number' && world?.me) {
@@ -12036,22 +12046,30 @@ function syncLiveScoreBadges() {
   });
 }
 
-function applyCorrectScoreReward(rewardPts = 5) {
+/* serverAdds=true: máy chủ sẽ tự cộng điểm này ở lệnh gọi ngay sau → chỉ hiển thị tạm, không gửi lên (tránh cộng 2 lần).
+   serverAdds=false: điểm chỉ có ở máy (Chặng 3) → lưu snapshot để đồng bộ lên máy chủ. */
+function applyCorrectScoreReward(rewardPts = 5, serverAdds = true) {
   const pts = Math.max(1, Number(rewardPts) || 5);
   if (world?.me) {
     world.me.score = Math.max(0, (world.me.score ?? 20) + pts);
-    LiveClassroomSync.saveTeamSnapshot(world.me);
+    if (serverAdds && session?.room && session?.token && typeof demoApi !== 'function') mvPendingPen.score -= pts;
+    else LiveClassroomSync.saveTeamSnapshot(world.me);
   }
   syncLiveScoreBadges();
 }
 
+/* Điểm phạt hiển thị ngay trên máy; máy chủ mới là nơi trừ thật. mvPendingPen ghi phần đã trừ tạm
+   để api() gửi lên điểm CHƯA trừ — tránh bị trừ hai lần (máy trừ rồi máy chủ trừ tiếp). */
+let mvPendingPen = { score: 0, wrong: 0 };
 function applyWrongAnswerPenalty(penaltyPts = 2, reasonText = 'Trả lời sai') {
   const pen = Math.max(1, Number(penaltyPts) || 2);
   if (world?.me) {
-    world.me.score = Math.max(0, (world.me.score ?? 20) - pen);
+    const before = world.me.score ?? 20;
+    world.me.score = Math.max(0, before - pen);
     world.me.wrong = (world.me.wrong || 0) + 1;
     world.me.streak = 0;
-    LiveClassroomSync.saveTeamSnapshot(world.me);
+    if (typeof demoApi === 'function') LiveClassroomSync.saveTeamSnapshot(world.me);
+    else { mvPendingPen.score += before - world.me.score; mvPendingPen.wrong += 1; }
   }
   syncLiveScoreBadges();
   if (window.spawnJuiceFloater) {
@@ -12106,6 +12124,7 @@ async function submitStageAnswer(payload){
   sound('wrong');
   const pen = result.penalty || 3;
   applyWrongAnswerPenalty(pen, 'Trả lời chưa đúng');
+  mvPendingPen = { score: 0, wrong: 0 };
   if(typeof result.score === 'number' && world?.me){
    world.me.score = result.score;
    syncLiveScoreBadges();
@@ -14585,7 +14604,8 @@ function bkPhoneMap(){
  const cur = tr ? StageTransitionController.toStage : Math.min(5, me.stage || 0);
  const done = me.completed ? 5 : cur;
  const passed = tr ? StageTransitionController.fromStage : -1;
- const list = BK_STAGE_SHORT.map((name, i) => {
+ const names = hwIsActive() ? [...BK_STAGE_SHORT, 'Tích vô hướng'] : BK_STAGE_SHORT;
+ const list = names.map((name, i) => {
   const st = i < done ? 'is-done' : i === done ? 'is-now' : 'is-lock';
   return `<li class="bk-mstage ${st} ${i === passed ? 'just-done' : ''}">
    <span class="bk-mnum">${i < done ? '✓' : i + 1}</span>
@@ -14594,13 +14614,13 @@ function bkPhoneMap(){
   </li>`;
  }).join('');
  const head = tr
-  ? `<div class="bk-mhead"><span class="bk-mbig">Qua chặng ${passed + 1}!</span><span class="bk-mreward">+10 XP · ${esc(missionMeta[passed]?.mode || '')}</span></div>`
+  ? `<div class="bk-mhead"><span class="bk-mbig">Qua chặng ${passed + 1}!</span><span class="bk-mreward">${Math.max(0, me.score || 0)} XP · ${esc(missionMeta[passed]?.mode || '')}</span></div>`
   : `<div class="bk-mhead"><span class="bk-mbig">Hành trình</span><span class="bk-mreward">${Math.max(0, me.score || 0)} XP</span></div>`;
  const cta = tr
-  ? `<p class="bk-mnext">${done >= 5 ? 'Sắp tới đích…' : `Đang tới chặng ${done + 1}…`}</p>`
+  ? `<p class="bk-mnext">${done >= 5 ? (hwIsActive() ? 'Đang tới chặng 6…' : 'Sắp tới đích…') : `Đang tới chặng ${done + 1}…`}</p>`
   : done >= 5 ? '' : `<button type="button" class="ph-big-btn" data-action="hubStartCurrentStage">Chơi chặng ${done + 1}</button>`;
  return `<div class="bk-page bk-student bk-mapph" style="--tc:${esc(me.color || '#36C6E8')}">
-  <header class="bk-top"><span class="bk-room-tag">Phòng <b>${esc(world.room)}</b></span><span class="bk-room-tag">${me.avatar || '🐉'} ${esc(bkTeamName(me))}</span></header>
+  <header class="bk-top"><span class="bk-room-tag">${hwIsActive() ? '📚 <b>Bài về nhà</b>' : `Phòng <b>${esc(world.room)}</b>`}</span><span class="bk-room-tag">${me.avatar || '🐉'} ${esc(bkTeamName(me))}</span></header>
   <main class="bk-mmain">
    ${head}
    <ol class="bk-mlist">${list}</ol>
@@ -14782,8 +14802,26 @@ function s6Fig(kind){
   ${L(208,150,'a',R)}${L(135,28,'b',B)}${L(96,145,'60°','#5A6199')}${L(130,182,'|a| = |b| = 4','#5A6199')}</svg>`;
 }
 function s6Math(str){return esc(str).replace(/\\vec\{([A-Za-z0-9]+)\}/g,'<span class="s6v">$1</span>');}
+let s6Started=false;
+function bkS6Intro(){
+ return `<div class="bk-page bk-student s6-page" data-kind="s6">
+  <header class="s6-top"><span class="s6-badge">Chặng 6 · Tích vô hướng</span><span class="s6-xp">⭐ ${Math.max(0,world.me.score||0)} XP</span></header>
+  <main class="s6-main"><section class="s6-card s6-intro">
+   <div class="s6-intro-ico" aria-hidden="true">🏁</div>
+   <h1>Thử thách cuối cùng!</h1>
+   <p>Em đã qua 5 chặng. Còn <b>4 câu tự luận</b> về góc và tích vô hướng của hai vectơ.</p>
+   <ul>
+    <li>✍️ Tính ra giấy nháp rồi <b>nhập đáp số</b> (chỉ nhập số).</li>
+    <li>🔁 Mỗi câu được trả lời <b>3 lần</b>. Sai lần đầu sẽ có gợi ý.</li>
+    <li>⭐ Đúng ngay lần đầu <b>+10 XP</b>, đúng ở lần sau <b>+5 XP</b>, mỗi lần sai <b>−2 XP</b>.</li>
+   </ul>
+   <button type="button" class="bk-btn bk-btn-sun bk-btn-block" data-action="s6Start">Bắt đầu Chặng 6</button>
+  </section></main>
+ </div>`;
+}
 function bkS6Screen(){
  const st=s6State();
+ if(!s6Started && !Object.keys(st.tries||{}).length) return bkS6Intro();
  if(s6Idx===null){const f=S6_QUESTIONS.findIndex(q=>!s6Answered(st,q));s6Idx=f<0?0:f;}
  const q=S6_QUESTIONS[s6Idx];
  const done=s6Answered(st,q);
@@ -14817,6 +14855,7 @@ function bkS6Screen(){
  </div>`;
 }
 async function s6Handle(action,el){
+ if(action==='s6Start'){s6Started=true;render();setTimeout(()=>$('#s6Input')?.focus(),50);return true;}
  if(action==='s6Key'){const i=$('#s6Input');if(i){i.value=i.value.startsWith('-')?i.value.slice(1):'-'+i.value;i.focus();}return true;}
  if(action==='s6Check'){
   const q=S6_QUESTIONS[s6Idx];const v=String($('#s6Input')?.value||'').trim();
@@ -15165,7 +15204,7 @@ async function hwHandle(action,el){
  if(action==='hwCopyCode'){const t=$('#hwBackupCode');if(t){t.select();try{await navigator.clipboard.writeText(t.value);}catch(e){document.execCommand('copy');}el.textContent='Đã sao chép ✓';}return true;}
  if(action==='hwAgain'){
   if(!confirm('Làm lại từ đầu? Kết quả lần này vẫn được giữ trong báo cáo.'))return true;
-  session=null;world=null;studentSoloStarted=false;hwSubmitState='';hwLastSig='';
+  session=null;world=null;studentSoloStarted=false;hwSubmitState='';hwLastSig='';s6Started=false;s6Idx=null;s6Feedback=null;s6Last=null;
   hwNameDraft=hwLocal?.name||'';
   try{history.replaceState({},'',location.pathname+'?hw='+hwCode+(hwTitle?'&t='+encodeURIComponent(hwTitle):''));}catch(e){}
   startScreen();return true;

@@ -14118,3 +14118,19 @@ body.hw-report-mode #app{min-height:100vh}
 .s6v{position:relative;display:inline-block;padding-top:.15em;font-style:italic}
 .s6v::before{content:"";position:absolute;left:5%;right:5%;top:.05em;border-top:2px solid currentColor}
 .s6v::after{content:"";position:absolute;right:2%;top:-.12em;border:solid currentColor;border-width:2px 2px 0 0;width:.28em;height:.28em;transform:rotate(45deg)}
+
+/* v6.5.0 — màn giới thiệu Chặng 6 */
+.s6-intro{text-align:center;align-self:center}
+.s6-intro-ico{font-size:3.2rem;line-height:1}
+.s6-intro h1{margin:0;font:800 1.7rem var(--bk-display);color:var(--bk-ink)}
+.s6-intro p{margin:0;font-weight:600;line-height:1.5}
+.s6-intro ul{list-style:none;margin:0;padding:0;display:grid;gap:8px;text-align:left}
+.s6-intro li{background:#F3F5FF;border-radius:12px;padding:10px 12px;font-weight:600;line-height:1.45}
+
+/* v6.5.0 — màn giới thiệu Chặng 6 */
+.s6-intro{text-align:center;align-self:center}
+.s6-intro-ico{font-size:3.2rem;line-height:1}
+.s6-intro h1{margin:0;font:800 1.7rem var(--bk-display);color:var(--bk-ink)}
+.s6-intro p{margin:0;font-weight:600;line-height:1.5}
+.s6-intro ul{list-style:none;margin:0;padding:0;display:grid;gap:8px;text-align:left}
+.s6-intro li{background:#F3F5FF;border-radius:12px;padding:10px 12px;font-weight:600;line-height:1.45}
