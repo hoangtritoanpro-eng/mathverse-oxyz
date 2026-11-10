@@ -68,6 +68,18 @@ function getTeamChallenges(s,team){
  ];
 }
 
+/* Chặng 6 (bài về nhà): câu trả lời ngắn — đáp án kiểm tra trên máy chủ */
+const STAGE6=[
+ {id:'6.1',answer:60,unit:'°',solution:'Vì \\vec{EG} = \\vec{AC} nên góc(\\vec{AF}, \\vec{EG}) = góc(\\vec{AF}, \\vec{AC}) = ∠FAC. Tam giác AFC có 3 cạnh đều là đường chéo của mặt hình lập phương nên là tam giác đều ⇒ 60°.'},
+ {id:'6.2',answer:150,unit:'°',solution:'Gọi cạnh là a. \\vec{CH} = ½(\\vec{CA} + \\vec{CB}), \\vec{AC} = −\\vec{CA}. Tích vô hướng = −½(a² + a²/2) = −3a²/4. |\\vec{CH}| = a√3/2, |\\vec{AC}| = a ⇒ cos = −√3/2 ⇒ 150°.'},
+ {id:'6.3',answer:-10,unit:'',solution:'\\vec{AB} = −\\vec{BA} nên \\vec{AB}·\\vec{BC} = −\\vec{BA}·\\vec{BC} = −5·4·cos60° = −10.'},
+ {id:'6.4',answer:-88,unit:'',solution:'Khai triển: a² − a·b − 6b². Có a² = b² = 16, a·b = 4·4·cos60° = 8 ⇒ 16 − 8 − 96 = −88.'}
+];
+function parseShortAnswer(v){
+ const t=String(v??'').trim().toLowerCase().replace(/[−–—]/g,'-').replace(/,/g,'.').replace(/°|độ|do|deg/g,'').replace(/\s+/g,'');
+ if(!/^[-+]?\d+(\.\d+)?$/.test(t))return null;
+ return Number(t);
+}
 function isHwRoom(id){return /^HW[0-9A-F]{6}-[A-Z0-9]{6,40}$/.test(String(id||''));}
 function createDeterministicRoom(roomId='123456',size=6){
  const solo=isHwRoom(roomId);
@@ -533,6 +545,7 @@ function roomState(room,token){
   stage1:team.stage1||{pillars:[],cluesFound:0,cipherSolved:false,bridgeOpened:false},
   stage2:team.stage2||{solvedCount:0,totalCount:6,shields:3,wrongAttempts:0,controllerRoleIdx:0,gateOpened:false,completedTimeSec:null},
   stage4:team.stage4||{modePairs:4,matchedPairs:[],matchedCount:0,totalPairs:4,flipCount:0,wrongMatches:0,hintsUsedCount:0,controllerRoleIdx:0,deckOrder:[],gateOpened:false,completedTimeSec:null},
+  stage6:team.stage6||{solved:[],tries:{},done:false},
   stage5:team.stage5||{phase:1,mpBC:false,mpAC:false,midpointsFound:0,medA:false,medB:false,mediansConnected:0,crystalPlaced:false,quizSolvedCount:0,vectorsActivated:false,wrongAttempts:0,hintsUsedCount:0,controllerRoleIdx:0,completedTimeSec:null,timedOut:false},
   dragon:team.dragon||{state:'PLAYING',fromStage:team.stage,toStage:team.stage,moveMode:'IDLE',transitionId:0},
   completed:team.completed,attempts:team.attempts,hintsUsed:team.hintsUsed,digits:team.digits,finishedAt:team.finishedAt,answerLog:isHwRoom(room.id)?(team.answerLog||[]):undefined},
@@ -1023,6 +1036,31 @@ function processAction(endpoint,d){
   recordGlobalTeamProgress(t);
   persist();return{ok:true,dragon:t.dragon};
  }
+ if(endpoint==='/api/stage6Answer'){
+  const t=requireTeam(r,d.token);
+  if(!t.stage6||typeof t.stage6!=='object')t.stage6={solved:[],tries:{},done:false};
+  const q=STAGE6.find(x=>x.id===String(d.qId));
+  if(!q)throw error('Không có câu hỏi này.');
+  if(d.skip){
+   const answered=STAGE6.filter(x=>t.stage6.solved.includes(x.id)||(t.stage6.tries[x.id]||0)>=3).length;
+   if(answered<STAGE6.length)throw error('Em hãy trả lời hết 4 câu nhé.');
+   t.stage6.done=true;recordGlobalTeamProgress(t);persist();
+   return{ok:true,stage6:t.stage6,score:t.score};
+  }
+  if(t.stage6.solved.includes(q.id)||(t.stage6.tries[q.id]||0)>=3)return{correct:t.stage6.solved.includes(q.id),answer:q.answer,unit:q.unit,solution:q.solution,stage6:t.stage6,score:t.score};
+  const val=parseShortAnswer(d.value);
+  if(val===null)throw error('Hãy nhập một số, ví dụ 60 hoặc -12.');
+  const ok=Math.abs(val-q.answer)<1e-9;
+  t.stage6.tries[q.id]=(t.stage6.tries[q.id]||0)+1;
+  const tries=t.stage6.tries[q.id];
+  if(ok){t.stage6.solved.push(q.id);t.score=(t.score||0)+(tries===1?10:5);t.correctCount=(t.correctCount||0)+1;}
+  else{t.score=Math.max(0,(t.score||0)-2);t.wrong=(t.wrong||0)+1;}
+  t.answerLog.push({stage:6,qId:q.id,questionId:q.id,isQuiz:true,level:'VẬN DỤNG',choice:ok?0:1,chosenText:String(d.value).slice(0,40),correct:ok,at:new Date().toISOString()});
+  const reveal=ok||tries>=3;
+  t.lastActiveAt=Date.now();
+  recordGlobalTeamProgress(t);persist();
+  return{correct:ok,tries,triesLeft:Math.max(0,3-tries),...(reveal?{answer:q.answer,unit:q.unit,solution:q.solution}:{}),stage6:t.stage6,score:t.score};
+ }
  if(endpoint==='/api/stageTimeout'){
   const t=requireTeam(r,d.token);
   if(t.stage<5&&!r.paused&&!r.ended){
@@ -1431,7 +1469,7 @@ function hwClean(d){
  while(attempts.length<5)attempts.push(0);
  return{
   name:hwStr(d.name,40).trim()||'Học sinh',
-  stage:hwNum(d.stage,0,5),
+  stage:hwNum(d.stage,0,6),
   completed:Boolean(d.completed),
   score:Math.round(hwNum(d.score,0,99999)),
   hints:hwNum(d.hints,0,99),
@@ -1441,7 +1479,7 @@ function hwClean(d){
   updatedAt:new Date().toISOString(),
   attempts:attempts.map(x=>hwNum(x,0,999)),
   answerLog:log.filter(e=>e&&typeof e==='object').map(e=>({
-   stage:hwNum(e.stage,1,5),
+   stage:hwNum(e.stage,1,6),
    qId:hwStr(e.qId||e.questionId,24),
    level:hwStr(e.level,20),
    correct:Boolean(e.correct),
@@ -1479,18 +1517,21 @@ const HW_QINFO=(()=>{
  });
  return m;
 })();
-const HW_STAGE_NAMES=STAGES.map(s=>String(s.shortName||s.title||('Chặng '+s.id)));
+const HW_STAGE_NAMES=[...STAGES.map(s=>String(s.shortName||s.title||('Chặng '+s.id))),'Tích vô hướng'];
+const HW_LEVEL=(st)=>st<=3?'NHẬN BIẾT':st<=5?'THÔNG HIỂU':'VẬN DỤNG';
 function hwQLabel(qId,stage){
  const m=/^1\.P(\d)/.exec(qId);
  if(m)return 'Chặng 1 · Giải mã mảnh mật thư số '+m[1];
  if(/^5\.[123]$/.test(qId))return 'Chặng 5 · Thao tác hình học giai đoạn '+qId.slice(2);
+ const s6={'6.1':'Lập phương ABCD.EFGH: góc giữa vectơ AF và EG (đáp án 60°)','6.2':'Tứ diện đều ABCD, H trung điểm AB: góc giữa vectơ CH và AC (đáp án 150°)','6.3':'Tam giác ABC, BA = 5, BC = 4, góc B = 60°: AB·BC (đáp án −10)','6.4':'|a| = |b| = 4, góc 60°: (a + 2b)(a − 3b) (đáp án −88)'};
+ if(s6[qId])return 'Chặng 6 · '+s6[qId];
  return 'Chặng '+stage+' · '+(HW_STAGE_NAMES[stage-1]||'')+' · nhiệm vụ '+qId;
 }
 function hwBuild(code,store){
  const list=Object.entries(store).map(([sid,r])=>{
   const total=r.answerLog.length;
   const right=r.answerLog.filter(e=>e.correct).length;
-  const byStage=[1,2,3,4,5].map(n=>{
+  const byStage=[1,2,3,4,5,6].map(n=>{
    const es=r.answerLog.filter(e=>e.stage===n);
    return{stage:n,total:es.length,correct:es.filter(e=>e.correct).length};
   });
@@ -1498,14 +1539,14 @@ function hwBuild(code,store){
    pct:total?Math.round(right/total*100):null,activeSec:r.activeSec,hints:r.hints,updatedAt:r.updatedAt,startedAt:r.startedAt,finishedAt:r.finishedAt,byStage};
  }).sort((a,b)=>(b.completed-a.completed)||(b.score-a.score)||a.name.localeCompare(b.name,'vi'));
  const q={};
- const stageAgg=[1,2,3,4,5].map(n=>({stage:n,name:HW_STAGE_NAMES[n-1],reached:0,total:0,correct:0}));
+ const stageAgg=[1,2,3,4,5,6].map(n=>({stage:n,name:HW_STAGE_NAMES[n-1],reached:0,total:0,correct:0}));
  Object.values(store).forEach(r=>{
-  for(let n=1;n<=5;n++)if(r.stage>=n-1||r.completed)stageAgg[n-1].reached++;
+  for(let n=1;n<=6;n++)if(r.stage>=n-1||r.completed)stageAgg[n-1].reached++;
   const seen={};
   r.answerLog.forEach(e=>{
    const sa=stageAgg[e.stage-1];sa.total++;if(e.correct)sa.correct++;
    if(!e.qId)return;
-   const o=q[e.qId]||(q[e.qId]={qId:e.qId,stage:e.stage,level:e.level||(e.stage<=3?'NHẬN BIẾT':'THÔNG HIỂU'),total:0,correct:0,students:new Set(),missed:new Set(),wrongChoices:{}});
+   const o=q[e.qId]||(q[e.qId]={qId:e.qId,stage:e.stage,level:e.level||HW_LEVEL(e.stage),total:0,correct:0,students:new Set(),missed:new Set(),wrongChoices:{}});
    o.total++;if(e.correct)o.correct++;else{o.missed.add(r.name);if(e.chosen)o.wrongChoices[e.chosen]=(o.wrongChoices[e.chosen]||0)+1;}
    o.students.add(r.name);
   });
@@ -1517,7 +1558,7 @@ function hwBuild(code,store){
   topWrong:Object.entries(o.wrongChoices).sort((a,b)=>b[1]-a[1]).slice(0,2).map(x=>x[0])
  })).sort((a,b)=>(a.pct??101)-(b.pct??101)||b.total-a.total);
  const withAns=list.filter(x=>x.total>0);
- const lv=(name)=>{let t=0,c=0;Object.values(store).forEach(r=>r.answerLog.forEach(e=>{const L=e.level||(e.stage<=3?'NHẬN BIẾT':'THÔNG HIỂU');if(L===name){t++;if(e.correct)c++;}}));return{total:t,correct:c,pct:t?Math.round(c/t*100):null};};
+ const lv=(name)=>{let t=0,c=0;Object.values(store).forEach(r=>r.answerLog.forEach(e=>{const L=e.level||HW_LEVEL(e.stage);if(L===name){t++;if(e.correct)c++;}}));return{total:t,correct:c,pct:t?Math.round(c/t*100):null};};
  const avg=(a)=>a.length?Math.round(a.reduce((x,y)=>x+y,0)/a.length):0;
  return{
   code,generatedAt:new Date().toISOString(),
@@ -1525,7 +1566,7 @@ function hwBuild(code,store){
    students:list.length,completed:list.filter(x=>x.completed).length,
    avgScore:avg(list.map(x=>x.score)),avgPct:avg(withAns.map(x=>x.pct)),avgMin:avg(list.map(x=>x.activeSec/60))
   },
-  levels:{nhanBiet:lv('NHẬN BIẾT'),thongHieu:lv('THÔNG HIỂU')},
+  levels:{nhanBiet:lv('NHẬN BIẾT'),thongHieu:lv('THÔNG HIỂU'),vanDung:lv('VẬN DỤNG')},
   stages:stageAgg.map(s=>({...s,pct:s.total?Math.round(s.correct/s.total*100):null})),
   students:list,byQuestion,
   needHelp:list.filter(x=>x.total>=3&&x.pct!==null&&x.pct<60).map(x=>x.name)

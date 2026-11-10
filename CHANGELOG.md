@@ -9,6 +9,15 @@ Tất cả những thay đổi quan trọng của dự án này sẽ được gh
 
 ---
 
+## [6.4.0] - 2026-11-10
+
+### Added (Chặng 6 · Tích vô hướng — câu trả lời ngắn, chế độ bài về nhà)
+- Sau Chặng 5, học sinh làm thêm 4 câu tự luận dạng **nhập đáp số**: góc AF–EG trong lập phương (60°), góc CH–AC trong tứ diện đều (150°), AB·BC trong tam giác (−10), (a+2b)(a−3b) (−88). Mỗi câu có hình vẽ, ô nhập số (nhận "60", "60°", "-10", "−10"), nút đổi dấu.
+- Mỗi câu 3 lần trả lời: sai lần đầu hiện gợi ý; đúng hoặc hết 3 lần thì hiện đáp án và lời giải. Đúng lần đầu +10 XP, lần sau +5 XP, sai −2 XP. Đáp án kiểm tra trên máy chủ (`/api/stage6Answer`).
+- Báo cáo: thêm Chặng 6, mức **Vận dụng**, câu hay sai của Chặng 6 kèm đáp án; tiến độ tính trên 6 chặng. Học sinh chỉ "Hoàn thành" khi xong cả Chặng 6.
+
+---
+
 ## [6.3.0] - 2026-11-10
 
 ### Changed

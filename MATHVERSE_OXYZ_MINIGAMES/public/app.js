@@ -12166,6 +12166,7 @@ async function handle(action,el){
  try{
   if(action && action.startsWith('bk') && await bkHandle(action,el)) return;
   if(action && action.startsWith('hw') && await hwHandle(action,el)) return;
+  if(action && action.startsWith('s6') && await s6Handle(action,el)) return;
   if(action==='toggleFullscreen'){
    if(!document.fullscreenElement){document.documentElement.requestFullscreen?.();}
    else{document.exitFullscreen?.();}
@@ -13536,6 +13537,7 @@ window.addEventListener('keydown',e=>{
    else if(!session && document.activeElement.id==='hwName')handle('hwStart');
    else if(!session && document.activeElement.id==='hwKeyInput')handle('hwAddKey');
    else if(!session && document.activeElement.id==='hwPass')handle('hwLogin');
+   else if(document.activeElement.id==='s6Input')handle('s6Check');
   }
   return;
  }
@@ -14275,7 +14277,7 @@ function bkStudentResult(){
 }
 function bkStudentKind(){
  if (session?.role !== 'student' || !world) return '';
- if (hwIsActive()) return world.me?.completed ? 'result' : '';
+ if (hwIsActive()) return world.me?.completed ? (s6IsPending() ? 's6' : 'result') : '';
  if (isWaitingForTeacherStart()) return 'lobby';
  if (world.ended || world.me?.completed) return 'result';
  return '';
@@ -14616,6 +14618,7 @@ function bkBareScreen(){
  if (kind === 'lobby') return bkStudentLobby();
  if (!kind && bkIsPhone() && !world.me?.completed && (mvWorldMapOpen || mvShowIntroHub || StageTransitionController.isTransitioning())) return bkPhoneMap();
  if (kind === 'result') return bkStudentResult();
+ if (kind === 's6') return bkS6Screen();
  return '';
 }
 function bkShowCountdown(){
@@ -14727,6 +14730,126 @@ async function bkHandle(action, el){
  return false;
 }
 
+/* ═══════════ CHẶNG 6 · THỬ THÁCH TÍCH VÔ HƯỚNG (bài về nhà, câu trả lời ngắn) ═══════════ */
+const S6_QUESTIONS=[
+ {id:'6.1',title:'Hình lập phương',prompt:'Cho hình lập phương ABCD.EFGH. Góc giữa cặp vectơ \\vec{AF} và \\vec{EG} bằng bao nhiêu độ?',unit:'°',hint:'\\vec{EG} bằng vectơ nào nằm ở mặt đáy? Đưa hai vectơ về chung gốc A.',fig:'cube'},
+ {id:'6.2',title:'Tứ diện đều',prompt:'Cho tứ diện ABCD có tất cả các cạnh bằng nhau, H là trung điểm cạnh AB. Góc giữa hai vectơ \\vec{CH} và \\vec{AC} bằng bao nhiêu độ?',unit:'°',hint:'Viết \\vec{CH} = ½(\\vec{CA} + \\vec{CB}) và \\vec{AC} = −\\vec{CA}, rồi tính cos bằng tích vô hướng.',fig:'tetra'},
+ {id:'6.3',title:'Tam giác',prompt:'Cho tam giác ABC có BA = 5, BC = 4, góc B = 60°. Tích vô hướng \\vec{AB} · \\vec{BC} bằng bao nhiêu?',unit:'',hint:'Góc giữa \\vec{AB} và \\vec{BC} không phải là góc B! Dùng \\vec{AB} = −\\vec{BA}.',fig:'tri'},
+ {id:'6.4',title:'Hai vectơ',prompt:'Hai vectơ \\vec{a}, \\vec{b} đều có độ dài 4, góc giữa chúng là 60°. Tính (\\vec{a} + 2\\vec{b}) · (\\vec{a} − 3\\vec{b}).',unit:'',hint:'Khai triển thành a² − a·b − 6b². Nhớ a² = |a|² = 16 và a·b = |a|·|b|·cos60°.',fig:'ab'}
+];
+let s6Idx=null,s6Feedback=null,s6Busy=false,s6Last=null;
+function s6Weight(st){return st?Object.values(st.tries||{}).reduce((a,b)=>a+b,0)+(st.solved||[]).length*10+(st.done?1000:0):-1;}
+function s6State(){
+ const a=world?.me?.stage6;
+ const st=(s6Last&&s6Last.room===session?.room&&s6Weight(s6Last.st)>s6Weight(a))?s6Last.st:a;
+ return st||{solved:[],tries:{},done:false};
+}
+function s6Answered(st,q){return st.solved.includes(q.id)||(st.tries?.[q.id]||0)>=3;}
+function s6IsPending(){return Boolean(hwIsActive()&&world?.me?.completed&&!s6State().done);}
+function s6Fig(kind){
+ const L=(x,y,t,c='#1D2150')=>`<text x="${x}" y="${y}" font-size="15" font-weight="800" fill="${c}" text-anchor="middle" font-family="Montserrat,sans-serif">${t}</text>`;
+ const ln=(a,b,c='#9aa1d6',w=2,dash='')=>`<line x1="${a[0]}" y1="${a[1]}" x2="${b[0]}" y2="${b[1]}" stroke="${c}" stroke-width="${w}" ${dash?`stroke-dasharray="${dash}"`:''} stroke-linecap="round"/>`;
+ const ar=(a,b,c)=>`<line x1="${a[0]}" y1="${a[1]}" x2="${b[0]}" y2="${b[1]}" stroke="${c}" stroke-width="3.5" marker-end="url(#s6h_${c.slice(1)})" stroke-linecap="round"/>`;
+ const mk=(c)=>`<marker id="s6h_${c.slice(1)}" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="${c}"/></marker>`;
+ const R='#E8434F',B='#2B3BD6';
+ if(kind==='cube'){
+  const A=[50,170],Bp=[150,170],C=[190,135],D=[90,135],E=[50,70],F=[150,70],G=[190,35],H=[90,35];
+  return `<svg viewBox="0 0 240 200" class="s6-fig" role="img" aria-label="Hình lập phương ABCD.EFGH"><defs>${mk(R)}${mk(B)}</defs>
+   ${ln(A,Bp)}${ln(Bp,C)}${ln(C,D,'#9aa1d6',2,'5 5')}${ln(D,A,'#9aa1d6',2,'5 5')}${ln(E,F)}${ln(F,G)}${ln(G,H)}${ln(H,E)}${ln(A,E)}${ln(Bp,F)}${ln(C,G)}${ln(D,H,'#9aa1d6',2,'5 5')}
+   ${ar(A,F,R)}${ar(E,G,B)}
+   ${L(38,186,'A')}${L(152,190,'B')}${L(204,140,'C')}${L(84,128,'D',)}${L(38,66,'E')}${L(150,62,'F')}${L(204,36,'G')}${L(86,26,'H')}</svg>`;
+ }
+ if(kind==='tetra'){
+  const A=[40,165],Bp=[200,165],C=[140,120],D=[115,25],Hm=[120,165];
+  return `<svg viewBox="0 0 240 200" class="s6-fig" role="img" aria-label="Tứ diện đều ABCD"><defs>${mk(R)}${mk(B)}</defs>
+   ${ln(A,Bp)}${ln(A,D)}${ln(Bp,D)}${ln(C,D)}${ln(A,C,'#9aa1d6',2,'5 5')}${ln(Bp,C,'#9aa1d6',2,'5 5')}
+   ${ar(C,Hm,R)}${ar(A,C,B)}
+   <circle cx="${Hm[0]}" cy="${Hm[1]}" r="4" fill="${R}"/>
+   ${L(28,180,'A')}${L(212,180,'B')}${L(156,118,'C')}${L(115,16,'D')}${L(120,188,'H')}</svg>`;
+ }
+ if(kind==='tri'){
+  const Bp=[40,165],C=[200,165],A=[115,35];
+  return `<svg viewBox="0 0 240 200" class="s6-fig" role="img" aria-label="Tam giác ABC, góc B bằng 60 độ"><defs>${mk(R)}${mk(B)}</defs>
+   ${ln(Bp,C)}${ln(A,C)}${ln(Bp,A)}
+   ${ar(A,Bp,R)}${ar(Bp,C,B)}
+   <path d="M66 165 A26 26 0 0 0 53 142" fill="none" stroke="#1D2150" stroke-width="2"/>
+   ${L(115,26,'A')}${L(28,180,'B')}${L(212,180,'C')}${L(80,150,'60°','#5A6199')}${L(62,100,'5','#5A6199')}${L(120,188,'4','#5A6199')}</svg>`;
+ }
+ const O=[50,160];
+ return `<svg viewBox="0 0 240 200" class="s6-fig" role="img" aria-label="Hai vectơ a và b tạo góc 60 độ"><defs>${mk(R)}${mk(B)}</defs>
+  ${ar(O,[200,160],R)}${ar(O,[125,30],B)}
+  <path d="M82 160 A32 32 0 0 0 66 132" fill="none" stroke="#1D2150" stroke-width="2"/>
+  ${L(208,150,'a',R)}${L(135,28,'b',B)}${L(96,145,'60°','#5A6199')}${L(130,182,'|a| = |b| = 4','#5A6199')}</svg>`;
+}
+function s6Math(str){return esc(str).replace(/\\vec\{([A-Za-z0-9]+)\}/g,'<span class="s6v">$1</span>');}
+function bkS6Screen(){
+ const st=s6State();
+ if(s6Idx===null){const f=S6_QUESTIONS.findIndex(q=>!s6Answered(st,q));s6Idx=f<0?0:f;}
+ const q=S6_QUESTIONS[s6Idx];
+ const done=s6Answered(st,q);
+ const tries=st.tries?.[q.id]||0;
+ const pips=S6_QUESTIONS.map((x,i)=>{const ok=st.solved.includes(x.id),fail=!ok&&(st.tries?.[x.id]||0)>=3;return `<i class="s6-pip ${ok?'ok':fail?'bad':''} ${i===s6Idx?'cur':''}"></i>`;}).join('');
+ const fb=s6Feedback&&s6Feedback.qId===q.id?s6Feedback:null;
+ const last=S6_QUESTIONS.every(x=>s6Answered(st,x));
+ return `<div class="bk-page bk-student s6-page" data-kind="s6">
+  <header class="s6-top"><span class="s6-badge">Chặng 6 · Tích vô hướng</span><span class="s6-pips">${pips}</span><span class="s6-xp">⭐ ${Math.max(0,world.me.score||0)} XP</span></header>
+  <main class="s6-main">
+   <section class="s6-card">
+    <p class="s6-num">Câu ${s6Idx+1}/4 · ${esc(q.title)}</p>
+    <div class="s6-figwrap">${s6Fig(q.fig)}</div>
+    <p class="s6-prompt">${s6Math(q.prompt)}</p>
+    ${done?`
+     <div class="s6-result ${st.solved.includes(q.id)?'ok':'bad'}">
+      <b>${st.solved.includes(q.id)?'✅ Chính xác!':'Đáp án đúng là'} ${fb&&fb.answer!==undefined?`${fb.answer}${fb.unit||''}`:''}</b>
+      ${fb&&fb.solution?`<p>${s6Math(fb.solution)}</p>`:''}
+     </div>
+     <button type="button" class="bk-btn bk-btn-sun bk-btn-block" data-action="s6Next">${last?'Xem kết quả bài làm':'Câu tiếp theo →'}</button>`:`
+     <div class="s6-answer">
+      <input id="s6Input" class="s6-input" type="text" inputmode="decimal" autocomplete="off" placeholder="Nhập đáp số" aria-label="Đáp số"/>${q.unit?`<span class="s6-unit">${q.unit}</span>`:''}
+     </div>
+     <div class="s6-keys"><button type="button" class="s6-key" data-action="s6Key">Đổi dấu ±</button></div>
+     <button type="button" class="bk-btn bk-btn-sun bk-btn-block" data-action="s6Check" ${s6Busy?'disabled':''}>Kiểm tra</button>
+     ${fb&&fb.msg?`<p class="s6-msg ${fb.good?'ok':'bad'}" role="alert">${esc(fb.msg)}</p>`:''}
+     ${tries>=1?`<p class="s6-hint">💡 ${s6Math(q.hint)}</p>`:''}
+     <p class="s6-tries">Còn ${3-tries} lần trả lời</p>`}
+   </section>
+  </main>
+ </div>`;
+}
+async function s6Handle(action,el){
+ if(action==='s6Key'){const i=$('#s6Input');if(i){i.value=i.value.startsWith('-')?i.value.slice(1):'-'+i.value;i.focus();}return true;}
+ if(action==='s6Check'){
+  const q=S6_QUESTIONS[s6Idx];const v=String($('#s6Input')?.value||'').trim();
+  if(!v){s6Feedback={qId:q.id,msg:'Em hãy nhập đáp số nhé.',good:false};render();return true;}
+  s6Busy=true;
+  try{
+   const r=await api('/api/stage6Answer',{room:session.room,token:session.token,qId:q.id,value:v});
+   world.me.stage6=r.stage6;world.me.score=r.score;s6Last={room:session.room,st:r.stage6};
+   s6Feedback={qId:q.id,answer:r.answer,unit:r.unit,solution:r.solution,good:r.correct,
+    msg:r.correct?'':(r.triesLeft>0?`Chưa đúng. Xem gợi ý và thử lại (còn ${r.triesLeft} lần).`:'')};
+   sound(r.correct?'correct':'wrong');
+   if(r.correct)triggerConfetti(1200);
+  }catch(e){s6Feedback={qId:q.id,msg:e.message||'Có lỗi, thử lại.',good:false};}
+  s6Busy=false;
+  document.activeElement?.blur?.();
+  render();
+  refresh(false);
+  return true;
+ }
+ if(action==='s6Next'){
+  const st=s6State();
+  const n=S6_QUESTIONS.findIndex(x=>!s6Answered(st,x));
+  if(n<0){
+   if(!st.done){try{const r=await api('/api/stage6Answer',{room:session.room,token:session.token,qId:'6.4',skip:true});s6Last={room:session.room,st:r.stage6};}catch(e){}}
+   s6Idx=null;s6Feedback=null;hwLastSig='';await refresh(true);hwMaybeSubmit(true);return true;
+  }
+  s6Idx=n;s6Feedback=null;render();
+  setTimeout(()=>$('#s6Input')?.focus(),50);
+  return true;
+ }
+ return false;
+}
+
 /* ═══════════ BÀI VỀ NHÀ — ôn tập cá nhân, có báo cáo cho giáo viên (v6.0.0) ═══════════ */
 function hwNewSid(){
  const a='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';let s='';
@@ -14748,8 +14871,9 @@ async function hwPost(route,payload){
 }
 function hwBuildReport(me){
  const log=(me.answerLog||[]).map(e=>({stage:e.stage,qId:e.qId||e.questionId,level:e.level,correct:Boolean(e.correct),at:e.at,chosenText:e.correct?'':String(e.chosenText||'').slice(0,90)}));
+ const s6done=Boolean(s6State().done);
  return{
-  name:hwDisplayName(),stage:me.stage||0,completed:Boolean(me.completed),score:Math.max(0,me.score||0),
+  name:hwDisplayName(),stage:me.completed?(s6done?6:5):(me.stage||0),completed:Boolean(me.completed&&s6done),score:Math.max(0,me.score||0),
   hints:(me.hintsUsed||[]).filter(Boolean).length,activeSec:Math.round(hwLocal.activeSec||0),
   startedAt:hwLocal.startedAt||'',finishedAt:hwLocal.finishedAt||'',attempts:me.attempts||[0,0,0,0,0],answerLog:log
  };
@@ -14772,11 +14896,11 @@ function hwDecode(text){
 function hwMaybeSubmit(force){
  if(!hwIsActive()||!world?.me)return;
  const me=world.me;
- if(me.completed&&!hwLocal.finishedAt){hwLocal.finishedAt=new Date().toISOString();hwSaveLocal();}
- const sig=[me.stage,me.completed?1:0,(me.answerLog||[]).length,me.score,me.correctCount].join('|');
+ if(me.completed&&s6State().done&&!hwLocal.finishedAt){hwLocal.finishedAt=new Date().toISOString();hwSaveLocal();}
+ const sig=[me.stage,me.completed?1:0,s6State().done?1:0,(me.answerLog||[]).length,me.score,me.correctCount].join('|');
  const now=Date.now();
  if(!force&&sig===hwLastSig&&hwSubmitState==='ok')return;
- if(!force&&!me.completed&&now-hwLastAt<4000)return;
+ if(!force&&!(me.completed&&s6State().done)&&now-hwLastAt<4000)return;
  if(hwSending)return;
  hwSending=true;hwLastAt=now;
  const rep=hwBuildReport(me);
@@ -14798,7 +14922,7 @@ setInterval(()=>{
 document.addEventListener('visibilitychange',()=>{if(document.hidden&&hwIsActive()){hwSaveLocal();hwMaybeSubmit(true);}});
 
 function hwFmtTime(sec){sec=Math.round(sec||0);if(sec<60)return sec+' giây';const m=Math.round(sec/60);return m+' phút';}
-function hwStageName(n){return ['Hiệu vectơ','Mật trận vectơ','Hình bình hành','Lật thẻ trung điểm','Trọng tâm'][n-1]||('Chặng '+n);}
+function hwStageName(n){return ['Hiệu vectơ','Mật trận vectơ','Hình bình hành','Lật thẻ trung điểm','Trọng tâm','Tích vô hướng'][n-1]||('Chặng '+n);}
 
 /* ── Học sinh: màn nhập tên ── */
 function bkHwLanding(){
@@ -14815,7 +14939,7 @@ function bkHwLanding(){
     ${bkError?`<p class="bk-error" role="alert">${esc(bkError)}</p>`:''}
     ${L?`<p class="hw-old">Máy này đã có bài của <b>${esc(L.name)}</b>. <button type="button" class="hw-link" data-action="hwResume">Làm tiếp</button></p>`:''}
    </div>
-   <p class="bk-help">Em làm một mình qua 5 chặng, sai thì thử lại. Cuối bài, kết quả được gửi tự động cho thầy cô.</p>
+   <p class="bk-help">Em làm một mình qua 6 chặng, sai thì thử lại. Cuối bài, kết quả được gửi tự động cho thầy cô.</p>
    ${hwIsDefault?`<button type="button" class="bk-text-link" data-action="hwToRoom">Vào phòng học trực tiếp bằng mã phòng</button>`:''}
   </main>
   ${hwIsDefault?`<button type="button" class="bk-corner-link" data-action="bkGoHost">Tôi là giáo viên</button>`:''}
@@ -14828,7 +14952,7 @@ function bkHwResult(){
  const log=me.answerLog||[];
  const total=log.length,right=log.filter(e=>e.correct).length;
  const pct=total?Math.round(right/total*100):0;
- const stages=[1,2,3,4,5].map(n=>{const es=log.filter(e=>e.stage===n);const c=es.filter(e=>e.correct).length;return{n,t:es.length,c,p:es.length?Math.round(c/es.length*100):null};});
+ const stages=[1,2,3,4,5,6].map(n=>{const es=log.filter(e=>e.stage===n);const c=es.filter(e=>e.correct).length;return{n,t:es.length,c,p:es.length?Math.round(c/es.length*100):null};});
  const weak=stages.filter(s=>s.t>0&&s.p<70).sort((a,b)=>a.p-b.p);
  const medal=pct>=85?'🏆':pct>=60?'🌟':'💪';
  const msg=pct>=85?'Xuất sắc! Em nắm bài rất vững.':pct>=60?'Khá tốt! Ôn thêm vài chỗ nữa là chắc.':'Cố gắng lên! Em hãy xem lại phần dưới rồi thử lại nhé.';
@@ -14974,7 +15098,7 @@ function hwReportHtml(){
  const s=d.summary;
  const tile=(v,l)=>`<div class="hw-tile"><b>${v}</b><span>${l}</span></div>`;
  const rows=d.students.map(x=>{
-  const prog=x.completed?'<span class="hw-done">Hoàn thành</span>':`Chặng ${Math.min(5,(x.stage||0)+1)}/5`;
+  const prog=x.completed?'<span class="hw-done">Hoàn thành</span>':`Chặng ${Math.min(6,(x.stage||0)+1)}/6`;
   const pips=x.byStage.map(b=>`<i class="hw-pip ${hwPctClass(b.total?Math.round(b.correct/b.total*100):null)}" title="Chặng ${b.stage}: ${b.total?b.correct+'/'+b.total:'chưa làm'}"></i>`).join('');
   return `<tr class="${d.needHelp.includes(x.name)?'is-help':''}"><td class="hw-nm">${esc(x.name)}</td><td>${prog}<div class="hw-pips">${pips}</div></td><td><span class="hw-pct ${hwPctClass(x.pct)}">${x.pct===null?'–':x.pct+'%'}</span></td><td>${x.correct}/${x.total}</td><td>${x.score}</td><td>${esc(hwFmtTime(x.activeSec))}</td><td class="hw-up">${esc(new Date(x.updatedAt).toLocaleString('vi-VN',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}))}</td></tr>`;
  }).join('');
@@ -14990,7 +15114,7 @@ function hwReportHtml(){
   ${d.needHelp.length?`<section class="hw-card"><h2>🆘 Cần hỗ trợ (đúng dưới 60%)</h2><p class="hw-chips">${d.needHelp.map(n=>`<span>${esc(n)}</span>`).join('')}</p></section>`:''}
   <div class="hw-grid2">
    <section class="hw-card"><h2>Kết quả theo chặng</h2><ul class="hw-stagebars">${d.stages.map(st=>`<li><span>Chặng ${st.stage} · ${esc(hwStageName(st.stage))}<small>${st.reached} em đến chặng này</small></span><i class="hw-bar"><b style="width:${st.pct??0}%;background:${st.pct===null?'#cfd3ee':st.pct>=70?'#22C79A':st.pct>=40?'#FFC93C':'#FF5F6D'}"></b></i><em>${st.pct===null?'–':st.pct+'%'}</em></li>`).join('')}</ul></section>
-   <section class="hw-card"><h2>Mức độ nhận thức</h2><ul class="hw-stagebars"><li><span>Nhận biết<small>${lv.nhanBiet.correct}/${lv.nhanBiet.total} câu đúng</small></span><i class="hw-bar"><b style="width:${lv.nhanBiet.pct??0}%;background:#22C79A"></b></i><em>${lv.nhanBiet.pct===null?'–':lv.nhanBiet.pct+'%'}</em></li><li><span>Thông hiểu<small>${lv.thongHieu.correct}/${lv.thongHieu.total} câu đúng</small></span><i class="hw-bar"><b style="width:${lv.thongHieu.pct??0}%;background:#7c83ff"></b></i><em>${lv.thongHieu.pct===null?'–':lv.thongHieu.pct+'%'}</em></li></ul></section>
+   <section class="hw-card"><h2>Mức độ nhận thức</h2><ul class="hw-stagebars"><li><span>Nhận biết<small>${lv.nhanBiet.correct}/${lv.nhanBiet.total} câu đúng</small></span><i class="hw-bar"><b style="width:${lv.nhanBiet.pct??0}%;background:#22C79A"></b></i><em>${lv.nhanBiet.pct===null?'–':lv.nhanBiet.pct+'%'}</em></li><li><span>Thông hiểu<small>${lv.thongHieu.correct}/${lv.thongHieu.total} câu đúng</small></span><i class="hw-bar"><b style="width:${lv.thongHieu.pct??0}%;background:#7c83ff"></b></i><em>${lv.thongHieu.pct===null?'–':lv.thongHieu.pct+'%'}</em></li>${lv.vanDung?`<li><span>Vận dụng<small>${lv.vanDung.correct}/${lv.vanDung.total} câu đúng</small></span><i class="hw-bar"><b style="width:${lv.vanDung.pct??0}%;background:#FF9B57"></b></i><em>${lv.vanDung.pct===null?'–':lv.vanDung.pct+'%'}</em></li>`:''}</ul></section>
   </div>
   ${qs.length?`<section class="hw-card"><h2>Câu cả lớp hay sai nhất</h2><ol class="hw-q">${qs.map(q=>`<li><div class="hw-q-top"><span class="hw-pct ${hwPctClass(q.pct)}">${q.pct}% đúng</span><small>Chặng ${q.stage} · ${esc(q.level)} · ${q.correct}/${q.total} lượt</small></div><p>${esc(String(q.prompt).slice(0,160))}</p>${q.missedBy.length?`<small class="hw-miss">Em sai: ${esc(q.missedBy.slice(0,8).join(', '))}${q.missedBy.length>8?'…':''}</small>`:''}</li>`).join('')}</ol></section>`:''}
   <section class="hw-card"><h2>Danh sách học sinh</h2>
@@ -15018,7 +15142,7 @@ function hwCsv(){
  const d=hwReportData;if(!d)return;
  const q=v=>'"'+String(v??'').replace(/"/g,'""')+'"';
  const lines=[['Họ tên','Hoàn thành','Chặng hiện tại','Điểm XP','Số câu đúng','Số câu sai','% đúng','Thời gian (phút)','Cập nhật'].map(q).join(',')];
- d.students.forEach(x=>lines.push([x.name,x.completed?'Có':'Chưa',x.completed?5:Math.min(5,x.stage+1),x.score,x.correct,x.wrong,x.pct??'',Math.round(x.activeSec/60),x.updatedAt].map(q).join(',')));
+ d.students.forEach(x=>lines.push([x.name,x.completed?'Có':'Chưa',x.completed?6:Math.min(6,x.stage+1),x.score,x.correct,x.wrong,x.pct??'',Math.round(x.activeSec/60),x.updatedAt].map(q).join(',')));
  lines.push('');lines.push(['Câu hỏi/nhiệm vụ','Chặng','Mức độ','Lượt trả lời','Lượt đúng','% đúng','Em sai'].map(q).join(','));
  d.byQuestion.forEach(x=>lines.push([x.prompt,x.stage,x.level,x.total,x.correct,x.pct??'',x.missedBy.join('; ')].map(q).join(',')));
  const blob=new Blob(['﻿'+lines.join('\r\n')],{type:'text/csv;charset=utf-8'});
