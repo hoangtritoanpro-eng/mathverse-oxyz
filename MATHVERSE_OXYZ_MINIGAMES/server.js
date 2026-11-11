@@ -1624,6 +1624,16 @@ async function processHw(endpoint,d){
   await hwSave(code,sid,rep);
   return{ok:true};
  }
+ if(endpoint==='/api/hwClear'){
+  // v6.7.0: giáo viên làm trống toàn bộ kết quả của một bài (giữ nguyên mã bài và tên bài).
+  const key=String(d.key||'').toUpperCase();
+  if(!/^[A-Z2-9]{12}$/.test(key))throw error('Khóa báo cáo không hợp lệ.');
+  if(String(d.confirm||'')!=='XOA')throw error('Chưa xác nhận xoá dữ liệu.');
+  const code=hwCodeFromKey(key);
+  HW[code]={};hwPersist();
+  if(REDIS_URL&&REDIS_TOKEN)await redisCmd(['DEL','mv:hw:'+code]);
+  return{ok:true,code};
+ }
  if(endpoint==='/api/hwReport'){
   const key=String(d.key||'').toUpperCase();
   if(!/^[A-Z2-9]{12}$/.test(key))throw error('Khóa báo cáo không hợp lệ.');

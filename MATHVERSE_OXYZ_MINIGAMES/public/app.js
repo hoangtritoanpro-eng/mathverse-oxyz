@@ -15146,7 +15146,7 @@ function hwReportHtml(){
  return `<div class="hw-rp">
   <header class="hw-rp-head">
    <div><p class="hw-kicker">📊 Báo cáo bài về nhà · mã ${esc(d.code)}</p><h1>${esc(d.title||'Kết quả ôn tập của lớp')}</h1><p class="hw-sub">Cập nhật ${esc(new Date(d.generatedAt).toLocaleTimeString('vi-VN'))} · tự làm mới mỗi 20 giây</p></div>
-   <div class="hw-actions"><a class="bk-btn bk-btn-paper" href="${esc(location.origin+location.pathname)}">‹ Trang chủ</a><button type="button" class="bk-btn bk-btn-ghost-ink" data-action="hwReportReload">Làm mới</button><button type="button" class="bk-btn bk-btn-mint" data-action="hwCsv">Tải CSV</button><button type="button" class="bk-btn bk-btn-paper" data-action="hwPrint">In / PDF</button></div>
+   <div class="hw-actions"><a class="bk-btn bk-btn-paper" href="${esc(location.origin+location.pathname)}">‹ Trang chủ</a><button type="button" class="bk-btn bk-btn-ghost-ink" data-action="hwReportReload">Làm mới</button><button type="button" class="bk-btn bk-btn-mint" data-action="hwCsv">Tải CSV</button><button type="button" class="bk-btn bk-btn-paper" data-action="hwPrint">In / PDF</button><button type="button" class="bk-btn hw-clear-btn" data-action="hwClear">🗑 Xoá dữ liệu</button></div>
   </header>
   ${d.durable?'':`<div class="hw-warn">⚠️ Máy chủ chưa có kho lưu trữ chung nên báo cáo có thể thiếu bài của một số em. Cách khắc phục: xem <b>HUONG_DAN_BAI_VE_NHA.md</b>, hoặc dán "mã nộp bài" của học sinh vào ô cuối trang.</div>`}
   <section class="hw-tiles">${tile(s.students,'học sinh đã vào')}${tile(s.completed,'đã hoàn thành')}${tile(s.avgPct+'%','đúng trung bình')}${tile(s.avgScore,'điểm XP trung bình')}${tile(Math.round(s.avgMin)+'′','thời gian trung bình')}</section>
@@ -15214,7 +15214,8 @@ async function hwHandle(action,el){
   if(hwDefaultKey){location.href=hwReportLink(hwDefaultKey);return true;}
   const it=hwList().find(x=>x.code===hwCode);
   if(it){location.href=hwReportLink(it.key);return true;}
-  bkStep='hwlogin';bkError='';startScreen();return true;
+  // Không còn màn nhập mật khẩu: chưa có bài mặc định thì mở trang tổng hợp báo cáo
+  bkStep='hwreports';bkError='';hwHubData={};startScreen();return true;
  }
  if(action==='hwLogin'){
   const raw=String($('#hwPass')?.value||'');
@@ -15268,6 +15269,16 @@ async function hwHandle(action,el){
  if(action==='hwReportReload'){hwLoadReport();return true;}
  if(action==='hwCsv'){hwCsv();return true;}
  if(action==='hwPrint'){window.print();return true;}
+ if(action==='hwClear'){
+  const n=hwReportData?.summary?.students||0;
+  if(!confirm('Xoá TOÀN BỘ kết quả của '+n+' học sinh trong bài này?\nDữ liệu đã xoá sẽ KHÔNG khôi phục được. Link và mã bài vẫn giữ nguyên.'))return true;
+  const t=prompt('Để chắc chắn, hãy gõ chữ XOA (viết hoa, không dấu) rồi bấm OK:');
+  if(String(t||'').trim().toUpperCase()!=='XOA'){alert('Đã huỷ – dữ liệu vẫn được giữ nguyên.');return true;}
+  el.disabled=true;el.textContent='Đang xoá…';
+  try{await hwPost('/api/hwClear',{key:hwReportKey,confirm:'XOA'});await hwLoadReport();alert('Đã làm trống dữ liệu. Báo cáo bắt đầu lại từ đầu.');}
+  catch(e){alert(e.message||'Không xoá được.');el.disabled=false;el.textContent='🗑 Xoá dữ liệu';}
+  return true;
+ }
  if(action==='hwImport'){
   const msg=document.getElementById('hwImportMsg');
   const dec=hwDecode($('#hwImportBox')?.value);
