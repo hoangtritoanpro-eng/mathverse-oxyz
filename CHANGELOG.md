@@ -9,6 +9,13 @@ Tất cả những thay đổi quan trọng của dự án này sẽ được gh
 
 ---
 
+## [6.6.0] - 2026-11-11
+
+### Changed
+- **Bỏ mật khẩu báo cáo:** ở trang chủ, bấm "📊 Xem báo cáo bài làm" là mở thẳng báo cáo của bài mặc định. Lưu ý: bất kỳ ai mở trang chủ (kể cả học sinh) đều xem được báo cáo.
+
+---
+
 ## [6.5.0] - 2026-11-10
 
 Rà soát logic bằng cách tự động chơi trọn 6 chặng (44 bước kiểm điểm, 2 lượt chơi: có sai và toàn đúng).

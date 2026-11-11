@@ -348,7 +348,7 @@ const initialView=qs.get('view')||'';
 let hwCode=/^[0-9A-Fa-f]{6}$/.test(qs.get('hw')||'')?String(qs.get('hw')).toUpperCase():'';
 const hwReportKey=String(qs.get('report')||'').toUpperCase().replace(/[^A-Z2-9]/g,'');
 let hwTitle=String(qs.get('t')||'').replace(/[<>]/g,'').slice(0,60);
-let hwIsDefault=false,hwLocal=null,hwSubmitState='',hwLastSig='',hwLastAt=0,hwSending=false,hwNameDraft='',hwJustMade=null;
+let hwDefaultKey='',hwIsDefault=false,hwLocal=null,hwSubmitState='',hwLastSig='',hwLastAt=0,hwSending=false,hwNameDraft='',hwJustMade=null;
 
 /* ─── TRẠNG THÁI ENGINE 1: SĂN KHO BÁU 2D (HUNT MAP) ─── */
 const cipherState = {
@@ -15211,6 +15211,7 @@ async function hwHandle(action,el){
  }
  if(action==='hwToRoom'){hwCode='';hwIsDefault=false;bkStep='code';bkError='';startScreen();return true;}
  if(action==='hwTeacherReport'){
+  if(hwDefaultKey){location.href=hwReportLink(hwDefaultKey);return true;}
   const it=hwList().find(x=>x.code===hwCode);
   if(it){location.href=hwReportLink(it.key);return true;}
   bkStep='hwlogin';bkError='';startScreen();return true;
@@ -15292,7 +15293,7 @@ async function hwBoot(){
  app.innerHTML='<div class="loading">Đang tải…</div>';
  try{
   const d=await hwPost('/api/hwDefault',{});
-  if(d&&d.code){hwCode=d.code;hwTitle=String(d.title||'').slice(0,60);hwIsDefault=true;}
+  if(d&&d.code){hwCode=d.code;hwTitle=String(d.title||'').slice(0,60);hwIsDefault=true;hwDefaultKey=String(d.key||'');}
  }catch(e){}
  session=restoreSession();
  if(session){refresh(true);}else{startScreen();}

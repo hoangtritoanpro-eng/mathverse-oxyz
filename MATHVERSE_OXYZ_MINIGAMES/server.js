@@ -1606,7 +1606,8 @@ async function processHw(endpoint,d){
  if(endpoint==='/api/hwDefault'){
   const k=String(process.env.HW_DEFAULT_KEY||'').toUpperCase();
   if(!/^[A-Z2-9]{12}$/.test(k))return{};
-  return{code:hwCodeFromKey(k),title:String(process.env.HW_DEFAULT_TITLE||'').slice(0,60)};
+  // v6.6.0: giáo viên yêu cầu mở báo cáo không cần mật khẩu → trả luôn khóa báo cáo của bài mặc định.
+  return{code:hwCodeFromKey(k),key:k,title:String(process.env.HW_DEFAULT_TITLE||'').slice(0,60)};
  }
  if(endpoint==='/api/hwCreate'){
   const key=hwNewKey();const code=hwCodeFromKey(key);
