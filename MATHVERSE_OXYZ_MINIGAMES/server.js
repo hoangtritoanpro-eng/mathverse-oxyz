@@ -1603,6 +1603,14 @@ function hwBuild(code,store){
  };
 }
 async function processHw(endpoint,d){
+ // v6.9.0: mật khẩu giáo viên (đổi bằng biến môi trường TEACHER_PASS trên Vercel).
+ const TEACHER_PASS=String(process.env.TEACHER_PASS||'DUYEN').trim().toUpperCase();
+ const teacherOk=()=>String(d.tp||'').trim().toUpperCase()===TEACHER_PASS;
+ if(endpoint==='/api/hwTeacherCheck'){
+  if(!teacherOk())throw error('Mật khẩu không đúng.',401);
+  return{ok:true};
+ }
+ if(['/api/hwCreate','/api/hwClear','/api/hwReport'].includes(endpoint)&&!teacherOk())throw error('Cần mật khẩu giáo viên.',401);
  if(endpoint==='/api/hwDefault'){
   const k=String(process.env.HW_DEFAULT_KEY||'').toUpperCase();
   if(!/^[A-Z2-9]{12}$/.test(k))return{};

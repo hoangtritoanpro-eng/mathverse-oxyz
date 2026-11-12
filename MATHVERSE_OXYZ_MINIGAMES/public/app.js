@@ -1486,10 +1486,13 @@ function startScreen(msg=''){
  $('.award-backdrop')?.remove();
  if(hwReportKey){
   hwReportInit();
- }else if(hwCode && !hwIsDefault && bkStep!=='host' && bkStep!=='hwhost' && bkStep!=='hwreports'){
+ }else if(hwCode && !hwIsDefault && bkStep!=='host' && bkStep!=='hwhost' && bkStep!=='hwreports' && bkStep!=='tlogin'){
   app.innerHTML = bkHwLanding();
   const hi = document.getElementById('hwName');
   if(hi && !('ontouchstart' in window)) hi.focus();
+ }else if(bkStep==='tlogin'){
+  app.innerHTML = bkTeacherLogin();
+  const tp=document.getElementById('tPass'); if(tp && !('ontouchstart' in window)) tp.focus();
  }else if(bkStep==='hwhost'){
   app.innerHTML = bkHwHost();
  }else if(bkStep==='hwlogin'){
@@ -12189,6 +12192,7 @@ async function submitCipherNotebook(){
 
 async function handle(action,el){
  try{
+  if(action && await tHandle(action,el)) return;
   if(action && action.startsWith('bk') && await bkHandle(action,el)) return;
   if(action && action.startsWith('hw') && await hwHandle(action,el)) return;
   if(action && action.startsWith('s6') && await s6Handle(action,el)) return;
@@ -13562,6 +13566,7 @@ window.addEventListener('keydown',e=>{
    else if(!session && document.activeElement.id==='hwName')handle('hwStart');
    else if(!session && document.activeElement.id==='hwKeyInput')handle('hwAddKey');
    else if(!session && document.activeElement.id==='hwPass')handle('hwLogin');
+   else if(document.activeElement.id==='tPass')handle('tLogin');
    else if(document.activeElement.id==='s6Input')handle('s6Check');
   }
   return;
@@ -14908,11 +14913,67 @@ function hwSaveLocal(){try{if(hwLocal)localStorage.setItem('mv_hw_'+hwCode,JSON.
 function hwIsActive(){return Boolean(hwCode&&hwLocal&&session?.role==='student'&&session.room===hwRoomId(hwLocal.sid));}
 function hwDisplayName(){return hwLocal?(hwLocal.name+((hwLocal.attempt||1)>1?` (lần ${hwLocal.attempt})`:'')):'';}
 function hwSessionFor(L){return{role:'student',room:hwRoomId(L.sid),teamId:'hw-'+L.sid.toLowerCase(),token:'HWT_'+L.sid};}
+/* v6.9.0: mật khẩu giáo viên — nhớ trong tab đang mở, đóng trình duyệt là phải nhập lại */
+const T_PASS_KEY='mv_teacher_pass';
+function tpGet(){try{return sessionStorage.getItem(T_PASS_KEY)||'';}catch(e){return '';}}
+function tpSet(v){try{if(v)sessionStorage.setItem(T_PASS_KEY,v);else sessionStorage.removeItem(T_PASS_KEY);}catch(e){}}
+const T_ACTIONS=new Set(['bkGoHost','hwGoHost','hwGoReports','hwTeacherReport']);
+let tPending='';
 async function hwPost(route,payload){
- const r=await fetch(`${route}?endpoint=${encodeURIComponent(route)}`,{method:'POST',headers:{'Content-Type':'application/json'},keepalive:true,body:JSON.stringify({...payload,_endpoint:route})});
+ const r=await fetch(`${route}?endpoint=${encodeURIComponent(route)}`,{method:'POST',headers:{'Content-Type':'application/json'},keepalive:true,body:JSON.stringify({...payload,tp:tpGet(),_endpoint:route})});
  let d={};try{d=await r.json();}catch(e){}
+ if(r.status===401&&route!=='/api/hwTeacherCheck'){tpSet('');tAskAgain();}
  if(!r.ok)throw new Error(d.error||'Không gửi được.');
  return d;
+}
+function bkTeacherLogin(){
+ return `<div class="bk-page bk-entry">
+  ${hwReportKey?'':`<header class="bk-top"><button type="button" class="bk-back" data-action="tBack">‹ Trang chủ</button></header>`}
+  <main class="bk-join">
+   <div class="bk-join-card bk-role">
+    <div class="bk-role-head"><span class="bk-role-ico" aria-hidden="true">🔒</span><h2>Giáo viên</h2></div>
+    <p class="bk-role-sub">Nhập mật khẩu giáo viên để tiếp tục</p>
+    <label for="tPass" class="bk-sr">Mật khẩu</label>
+    <input id="tPass" class="hw-name-input" type="password" autocomplete="current-password" maxlength="60" placeholder="Mật khẩu"/>
+    <button type="button" class="bk-btn bk-btn-mint bk-btn-block" data-action="tLogin">Vào</button>
+    ${bkError?`<p class="bk-error" role="alert">${esc(bkError)}</p>`:''}
+   </div>
+  </main>
+ </div>`;
+}
+function tShowLogin(){
+ document.body.classList.add('bk-mode');
+ app.innerHTML=bkTeacherLogin();
+ const pi=document.getElementById('tPass'); if(pi&&!('ontouchstart' in window))pi.focus();
+}
+let tAsking=false;
+function tAskAgain(){
+ if(tAsking)return; tAsking=true;
+ clearInterval(hwReportTimer);
+ bkError='Mật khẩu đã thay đổi, vui lòng nhập lại.';
+ if(hwReportKey){tPending='__report';tShowLogin();}
+ else{tPending='';bkStep='tlogin';startScreen();}
+ tAsking=false;
+}
+async function tHandle(action,el){
+ if(T_ACTIONS.has(action)&&!tpGet()){tPending=action;bkError='';bkStep='tlogin';startScreen();return true;}
+ if(action==='tBack'){tPending='';bkError='';bkStep='code';startScreen();return true;}
+ if(action==='tLogin'){
+  const v=String($('#tPass')?.value||'').trim();
+  if(!v){bkError='Vui lòng nhập mật khẩu.';tPending==='__report'?tShowLogin():startScreen();return true;}
+  if(el)el.disabled=true;
+  try{
+   const r=await fetch('/api/hwTeacherCheck?endpoint=%2Fapi%2FhwTeacherCheck',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({tp:v,_endpoint:'/api/hwTeacherCheck'})});
+   if(!r.ok)throw new Error('Mật khẩu không đúng.');
+   tpSet(v);bkError='';
+   const next=tPending;tPending='';
+   if(next==='__report'){hwReportInit();return true;}
+   bkStep='code';
+   if(next){await handle(next,null);}else{startScreen();}
+  }catch(e){bkError=e.message||'Mật khẩu không đúng.';tPending==='__report'?tShowLogin():startScreen();}
+  return true;
+ }
+ return false;
 }
 function hwBuildReport(me){
  const log=(me.answerLog||[]).map(e=>({stage:e.stage,qId:e.qId||e.questionId,level:e.level,correct:Boolean(e.correct),at:e.at,chosenText:e.correct?'':String(e.chosenText||'').slice(0,90)}));
@@ -15174,6 +15235,7 @@ async function hwLoadReport(){
  if(root&&!document.activeElement?.matches('textarea'))root.innerHTML=hwReportHtml();
 }
 function hwReportInit(){
+ if(!tpGet()){tPending='__report';bkError='';tShowLogin();return;}
  try{const l=hwList();if(!l.some(x=>x.key===hwReportKey)){hwSaveList([{key:hwReportKey,code:'',title:'',at:new Date().toISOString()},...l]);}}catch(e){}
  document.body.classList.add('bk-mode','hw-report-mode');
  app.innerHTML=`<div id="hwReportRoot">${hwReportHtml()}</div>`;
