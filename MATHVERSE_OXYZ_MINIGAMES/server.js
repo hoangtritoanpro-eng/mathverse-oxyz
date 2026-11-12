@@ -1604,7 +1604,7 @@ function hwBuild(code,store){
 }
 async function processHw(endpoint,d){
  // v6.9.0: mật khẩu giáo viên (đổi bằng biến môi trường TEACHER_PASS trên Vercel).
- const TEACHER_PASS=String(process.env.TEACHER_PASS||'DUYEN').trim().toUpperCase();
+ const TEACHER_PASS=String(process.env.TEACHER_PASS||'NGUYEN').trim().toUpperCase();
  const teacherOk=()=>String(d.tp||'').trim().toUpperCase()===TEACHER_PASS;
  if(endpoint==='/api/hwTeacherCheck'){
   if(!teacherOk())throw error('Mật khẩu không đúng.',401);
