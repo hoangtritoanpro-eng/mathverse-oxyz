@@ -731,8 +731,14 @@ function saveSession(d){
 }
 function restoreSession(){
  if(hwCode){
+  // v6.8.0: mỗi lần mở link là bắt đầu lại từ màn nhập tên.
+  // Chỉ giữ bài đang làm khi em lỡ bấm tải lại (F5) đúng tab đang chơi.
   const L=hwLoadLocal();
-  if(L&&L.sid&&qs.get('fresh')!=='1'){hwLocal=L;studentSoloStarted=true;return hwSessionFor(L);}
+  let isReload=false;
+  try{isReload=(performance.getEntriesByType('navigation')[0]||{}).type==='reload';}catch(e){}
+  let tabSid='';try{tabSid=sessionStorage.getItem('mv_hw_tab_'+hwCode)||'';}catch(e){}
+  if(isReload&&L&&L.sid&&tabSid===L.sid&&!L.finishedAt){hwLocal=L;studentSoloStarted=true;return hwSessionFor(L);}
+  try{sessionStorage.removeItem('mv_hw_tab_'+hwCode);}catch(e){}
   return null;
  }
  if(qs.get('demo')==='1'){
@@ -14965,7 +14971,6 @@ function hwStageName(n){return ['Hiệu vectơ','Mật trận vectơ','Hình bì
 
 /* ── Học sinh: màn nhập tên ── */
 function bkHwLanding(){
- const L=hwLoadLocal();
  return `<div class="bk-page bk-entry">
   <main class="bk-join">
    <div class="bk-logo">${DIAMOND_ICON_SVG}<span>MathVerse Oxyz</span></div>
@@ -14976,7 +14981,6 @@ function bkHwLanding(){
     <input id="hwName" class="hw-name-input" type="text" autocomplete="name" maxlength="40" placeholder="Nhập họ và tên của em" value="${esc(hwNameDraft)}"/>
     <button type="button" class="bk-btn bk-btn-sun bk-btn-block" data-action="hwStart">Bắt đầu làm bài</button>
     ${bkError?`<p class="bk-error" role="alert">${esc(bkError)}</p>`:''}
-    ${L?`<p class="hw-old">Máy này đã có bài của <b>${esc(L.name)}</b>. <button type="button" class="hw-link" data-action="hwResume">Làm tiếp</button></p>`:''}
    </div>
    <p class="bk-help">Em làm một mình qua 6 chặng, sai thì thử lại. Cuối bài, kết quả được gửi tự động cho thầy cô.</p>
    ${hwIsDefault?`<button type="button" class="bk-text-link" data-action="hwToRoom">Vào phòng học trực tiếp bằng mã phòng</button>`:''}
@@ -15205,6 +15209,7 @@ async function hwHandle(action,el){
  if(action==='hwAgain'){
   if(!confirm('Làm lại từ đầu? Kết quả lần này vẫn được giữ trong báo cáo.'))return true;
   session=null;world=null;studentSoloStarted=false;hwSubmitState='';hwLastSig='';s6Started=false;s6Idx=null;s6Feedback=null;s6Last=null;
+  try{sessionStorage.removeItem('mv_hw_tab_'+hwCode);}catch(e){}
   hwNameDraft=hwLocal?.name||'';
   try{history.replaceState({},'',location.pathname+'?hw='+hwCode+(hwTitle?'&t='+encodeURIComponent(hwTitle):''));}catch(e){}
   startScreen();return true;
@@ -15294,6 +15299,7 @@ async function hwEnter(){
  try{
   const r=await api('/api/join',{room:hwRoomId(hwLocal.sid),team:'hw',hwName:hwLocal.name});
   saveSession({role:'student',room:r.room,teamId:r.team,token:r.token});
+  try{sessionStorage.setItem('mv_hw_tab_'+hwCode,hwLocal.sid);}catch(e){}
   activePlayMode=null;hwSubmitState='';hwLastSig='';
   await refresh(true);
  }catch(e){bkError=e.message||'Không vào được bài.';startScreen();}
